@@ -10,8 +10,8 @@ class Inflector
 
     public function __construct()
     {
-        $this->baseComponentPath = dirname(dirname(__DIR__)) . '/admin';
-        $this->baseModelPath     = dirname(dirname(__DIR__)). '/models';
+        $this->baseComponentPath = dirname(__DIR__) . '/admin';
+        $this->baseModelPath     = dirname(__DIR__). '/models';
     }
 
     public function getComponentClassPath($path)
