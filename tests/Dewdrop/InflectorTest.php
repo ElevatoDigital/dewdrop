@@ -13,7 +13,7 @@ class Dewdrop_InflectorTest extends PHPUnit_Framework_TestCase
 
     public function testComponentClassPath()
     {
-        $base = dirname(dirname(__DIR__)) . '/admin';
+        $base = dirname(dirname(dirname(__DIR__))) . '/admin';
         $name = 'test';
 
         $this->assertEquals(
@@ -44,7 +44,7 @@ class Dewdrop_InflectorTest extends PHPUnit_Framework_TestCase
 
     public function testModelClassPath()
     {
-        $base = dirname(dirname(__DIR__)) . '/models';
+        $base = dirname(dirname(dirname(__DIR__))) . '/models';
         $name = 'Fruits';
 
         $this->assertEquals(
