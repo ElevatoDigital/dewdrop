@@ -3,13 +3,70 @@
 
 // Ensure the installer's dependencies are present
 checkCli();
-checkGit();
 checkWordPress();
+
+$git = checkGit();
 
 $pluginInfo = getPluginInfo();
 
-var_dump($pluginInfo);
-exit;
+checkFolderAlreadyExists($pluginInfo['folder']);
+
+$pluginPath = getcwd() . '/wp-content/plugins/' . $pluginInfo['folder'];
+
+if (!mkdir($pluginPath)) {
+    abortInstall('Could not create plugin folder.  Please check permissions and try again.');
+}
+
+// Create default plugin subfolders
+$subfolders = array(
+    'admin',
+    'db',
+    'models',
+    'short-codes',
+    'tests'
+);
+
+foreach ($subfolders as $subfolder) {
+    mkdir("{$pluginPath}/{$subfolder}");
+}
+
+// Clone Dewdrop repo into lib subfolder
+$cmd = sprintf(
+    '%s clone https://github.com/DeltaSystems/dewdrop.git %s 2>&1',
+    $git,
+    escapeshellarg($pluginPath . '/lib')
+);
+
+exec($cmd, $output, $exitStatus);
+
+if ($exitStatus) {
+    abortInstall(
+        'Failed to clone git repo:' . PHP_EOL
+        . $cmd
+        . PHP_EOL . PHP_EOL
+        . implode(PHP_EOL . '    ', $output)
+    );
+}
+
+// Create main plugin file
+$template = <<<PLUGIN
+<?php
+
+/**
+ * Plugin Name: {$pluginInfo['name']}
+ * Description: A new WordPress plugin based on Dewdrop.
+ * Version: 0.1
+ */
+
+require_once __DIR__ . '/lib/Dewdrop/Wiring.php';
+
+\$wiring = new \Dewdrop\Wiring();
+PLUGIN;
+
+file_put_contents(
+    "{$pluginPath}/{$pluginInfo['folder']}.php",
+    $template
+);
 
 function getPluginInfo()
 {
@@ -21,17 +78,18 @@ function getPluginInfo()
 
     echo 'What do you want to name your plugin?:' . PHP_EOL;
     echo '(type your plugin\'s name and press enter)' . PHP_EOL;
-    $name = trim(fgets($stdin));
+    $name   = trim(fgets($stdin));
+    $folder = inflectPluginFolderFromName($name);
 
     fclose($stdin);
 
-    if (!$name) {
+    if (!$name || !$folder) {
         return getPluginInfo();
     }
 
     return array(
         'name'   => $name,
-        'folder' => inflectPluginFolderFromName($name)
+        'folder' => $folder
     );
 }
 
@@ -64,12 +122,24 @@ function checkGit()
     if (!$gitBin) {
         abortInstall('Please install git and ensure it is in your shell\'s $PATH');
     }
+
+    return trim($gitBin);
 }
 
 function checkWordPress()
 {
     if (!file_exists(getcwd() . '/wp-config.php')) {
         abortInstall('This installer must be run in the root directory of your WordPress install.');
+    }
+}
+
+function checkFolderAlreadyExists($folder)
+{
+    $cwd    = getcwd();
+    $plugin = "$cwd/wp-content/plugins/$folder";
+
+    if (file_exists($plugin)) {
+        abortInstall("\"{$plugin}\" folder already exists.  Cannot install.");
     }
 }
 
