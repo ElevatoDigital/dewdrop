@@ -101,7 +101,7 @@ echo 'Dewdrop installation complete!';
 echo PHP_EOL;
 echo PHP_EOL;
 echo 'Your plugin is available at:' . PHP_EOL;
-echo "    {$pluginPath}/{$pluginInfo['folder']}" . PHP_EOL;
+echo "    {$pluginPath}" . PHP_EOL;
 echo 'You can also run the dewdrop commandline tool:' . PHP_EOL;
 echo '    ./dewdrop help' . PHP_EOL;
 echo PHP_EOL;
@@ -109,7 +109,7 @@ echo '------';
 echo PHP_EOL;
 echo PHP_EOL;
 echo 'For more information on how to get started, checkout the wiki:' . PHP_EOL;
-echo '    <https://github.com/DeltaSystems/dewdrop/wiki>'. PHP_EOL;
+echo '<https://github.com/DeltaSystems/dewdrop/wiki>'. PHP_EOL;
 echo PHP_EOL;
 
 
