@@ -68,6 +68,33 @@ file_put_contents(
     $template
 );
 
+// Create dewdrop CLI tool
+$template = <<<CLI
+#!/usr/bin/env php
+<?php
+
+if ('cli' !== php_sapi_name()) {
+    exit;
+}
+
+require_once __DIR__ . '/wp-content/plugins/{$pluginInfo['folder']}/lib/Dewdrop/Cli/Run.php';
+\$cli = new \Dewdrop\Cli\Run();
+
+\$cli->run();
+CLI;
+
+file_put_contents(
+    getcwd() . '/dewdrop',
+    $template
+);
+
+$cmd = sprintf(
+    'chmod +x %s',
+    escapeshellarg(getcwd() . '/dewdrop')
+);
+
+shell_exec($cmd);
+
 function getPluginInfo()
 {
     $stdin = @fopen('php://stdin', 'r');
