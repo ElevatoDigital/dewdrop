@@ -103,17 +103,6 @@ class Statement implements StatementInterface
     }
 
     /**
-     * Internal method called by abstract statment constructor to setup
-     * the driver level statement
-     *
-     * @return void
-     */
-    protected function _prepare($sql)
-    {
-        return;
-    }
-
-    /**
      * @param string $sql
      * @return void
      */
@@ -122,8 +111,12 @@ class Statement implements StatementInterface
         $sql = $this->stripQuoted($sql);
 
         // split into text and params
-        $this->sqlSplit = preg_split('/(\?|\:[a-zA-Z0-9_]+)/',
-            $sql, -1, PREG_SPLIT_DELIM_CAPTURE|PREG_SPLIT_NO_EMPTY);
+        $this->sqlSplit = preg_split(
+            '/(\?|\:[a-zA-Z0-9_]+)/',
+            $sql,
+            -1,
+            PREG_SPLIT_DELIM_CAPTURE|PREG_SPLIT_NO_EMPTY
+        );
 
         // map params
         $this->sqlParam = array();
@@ -132,7 +125,7 @@ class Statement implements StatementInterface
                 if ($this->adapter->supportsParameters('positional') === false) {
                     throw new StatementException("Invalid bind-variable position '$val'");
                 }
-            } else if ($val[0] == ':') {
+            } elseif ($val[0] == ':') {
                 if ($this->adapter->supportsParameters('named') === false) {
                     throw new StatementException("Invalid bind-variable name '$val'");
                 }
@@ -223,7 +216,7 @@ class Statement implements StatementInterface
             if ($intval >= 1 || $intval <= count($this->sqlParam)) {
                 $position = $intval;
             }
-        } else if ($this->adapter->supportsParameters('named')) {
+        } elseif ($this->adapter->supportsParameters('named')) {
             if ($parameter[0] != ':') {
                 $parameter = ':' . $parameter;
             }
@@ -429,22 +422,6 @@ class Statement implements StatementInterface
     }
 
     /**
-     * Binds a parameter to the specified variable name.
-     *
-     * @param mixed $parameter Name the parameter, either integer or string.
-     * @param mixed $variable  Reference to PHP variable containing the value.
-     * @param mixed $type      OPTIONAL Datatype of SQL parameter.
-     * @param mixed $length    OPTIONAL Length of SQL parameter.
-     * @param mixed $options   OPTIONAL Other options.
-     * @return bool
-     * @throws Zend_Db_Statement_Mysqli_Exception
-     */
-    protected function _bindParam($parameter, &$variable, $type = null, $length = null, $options = null)
-    {
-        return true;
-    }
-
-    /**
      * Closes the cursor and the statement.
      *
      * @return bool
@@ -529,7 +506,7 @@ class Statement implements StatementInterface
         }
 
         // if no params were given as an argument to execute(),
-        // then default to the _bindParam array
+        // then default to the bindParam array
         if ($params === null) {
             $params = $this->bindParam;
         }
@@ -543,13 +520,16 @@ class Statement implements StatementInterface
             call_user_func_array(
                 array($this->stmt, 'bind_param'),
                 $stmtParams
-                );
+            );
         }
 
         // execute the statement
         $retval = $this->stmt->execute();
         if ($retval === false) {
-            throw new Zend_Db_Statement_Mysqli_Exception("Mysqli statement execute error : " . $this->_stmt->error, $this->_stmt->errno);
+            throw new Zend_Db_Statement_Mysqli_Exception(
+                "Mysqli statement execute error : " . $this->_stmt->error,
+                $this->_stmt->errno
+            );
         }
 
 
@@ -557,7 +537,10 @@ class Statement implements StatementInterface
         if ($this->meta === null) {
             $this->meta = $this->stmt->result_metadata();
             if ($this->stmt->errno) {
-                throw new Zend_Db_Statement_Mysqli_Exception("Mysqli statement metadata error: " . $this->_stmt->error, $this->_stmt->errno);
+                throw new Zend_Db_Statement_Mysqli_Exception(
+                    "Mysqli statement metadata error: " . $this->_stmt->error,
+                    $this->_stmt->errno
+                );
             }
         }
 
@@ -684,5 +667,4 @@ class Statement implements StatementInterface
         $mysqli = $this->_adapter->getConnection();
         return $mysqli->affected_rows;
     }
-
 }
