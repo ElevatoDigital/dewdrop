@@ -1,4 +1,94 @@
 #!/usr/bin/env php
 <?php
 
+// Ensure the installer's dependencies are present
+checkCli();
+checkGit();
+checkWordPress();
 
+$pluginInfo = getPluginInfo();
+
+var_dump($pluginInfo);
+exit;
+
+function getPluginInfo()
+{
+    $stdin = @fopen('php://stdin', 'r');
+
+    if (!$stdin) {
+        abortInstall('Could not read STDIN.');
+    }
+
+    echo 'What do you want to name your plugin?:' . PHP_EOL;
+    echo '(type your plugin\'s name and press enter)' . PHP_EOL;
+    $name = trim(fgets($stdin));
+
+    fclose($stdin);
+
+    if (!$name) {
+        return getPluginInfo();
+    }
+
+    return array(
+        'name'   => $name,
+        'folder' => inflectPluginFolderFromName($name)
+    );
+}
+
+function inflectPluginFolderFromName($name)
+{
+    $folder = strtolower($name);
+
+    $folder = str_replace(' ', '-', $folder);
+
+    $folder = preg_replace(
+        '/[^a-z0-9\-]/i',
+        '',
+        $folder
+    );
+
+    return $folder;
+}
+
+function checkCli()
+{
+    if ('cli' !== php_sapi_name()) {
+        abortInstall('The installer must be run on the command-line.');
+    }
+}
+
+function checkGit()
+{
+    $gitBin = shell_exec('which git');
+
+    if (!$gitBin) {
+        abortInstall('Please install git and ensure it is in your shell\'s $PATH');
+    }
+}
+
+function checkWordPress()
+{
+    if (!file_exists(getcwd() . '/wp-config.php')) {
+        abortInstall('This installer must be run in the root directory of your WordPress install.');
+    }
+}
+
+/**
+ * Print provided error message and exit.
+ */
+function abortInstall($message)
+{
+    echo PHP_EOL;
+    echo 'ABORTING INSTALLATION' . PHP_EOL;
+    echo '=====================' . PHP_EOL;
+    echo PHP_EOL;
+
+    echo 'ERROR: ' . $message . PHP_EOL;
+
+    echo PHP_EOL;
+
+    echo 'For help, go to <https://github.com/DeltaSystems/dewdrop> ';
+    echo 'and create a new issue.' . PHP_EOL;
+
+    exit;
+}

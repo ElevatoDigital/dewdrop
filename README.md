@@ -8,8 +8,15 @@ sensible project layout and developer tools.
 Quick Start
 -----------
 
-0. Download and install the latest release of WordPress <http://wordpress.org/latest.zip>
-0. Run a magical script to create a new plugin with the Dewdrop libraries and dependencies in place
+### Step 1
+
+Download and install the latest release of WordPress <http://wordpress.org/latest.zip>
+
+### Step 2
+
+Run the Dewdrop installer script from within the root folder of your WordPress installation:
+
+    php <(curl -sS https://raw.github.com/DeltaSystems/dewdrop/master/installer)
 
 
 Testing and style
