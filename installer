@@ -65,7 +65,7 @@ PLUGIN;
 
 file_put_contents(
     "{$pluginPath}/{$pluginInfo['folder']}.php",
-    $template
+    $template . PHP_EOL
 );
 
 // Create dewdrop CLI tool
