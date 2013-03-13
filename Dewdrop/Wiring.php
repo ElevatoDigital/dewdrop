@@ -14,6 +14,7 @@ class Wiring
     protected $autoloader;
 
     public function __construct(
+        $autoRegister = true,
         $db = null,
         $libraryPath = null,
         $inflector = null,
@@ -28,6 +29,22 @@ class Wiring
         $this->autoloader = ($autoloader ?: $this->buildAutoloader($libraryPath));
         $this->db         = ($db ?: new DbAdapter($wpdb));
         $this->inflector  = ($inflector ?: new Inflector());
+
+        if ($autoRegister) {
+            $this->autoRegisterAdminComponents();
+        }
+    }
+
+    public function autoRegisterAdminComponents()
+    {
+        $path = __DIR__ . '/../../admin';
+        $dir  = opendir($path);
+
+        while ($folder = readdir($dir)) {
+            if (0 !== strpos($folder, '.') && is_dir("{$path}/{$folder}")) {
+                $this->registerAdminComponent($folder);
+            }
+        }
     }
 
     public function registerAdminComponent($path)
@@ -50,17 +67,7 @@ class Wiring
 
     protected function buildAutoloader($libraryPath)
     {
-        require_once $libraryPath . '/Zend/Loader/AutoloaderFactory.php';
-
-        $config = array(
-            'Zend\Loader\StandardAutoloader' => array(
-                'namespaces' => array(
-                    'Dewdrop' => $libraryPath . '/Dewdrop',
-                    'Zend'    => $libraryPath . '/Zend',
-                )
-            )
-        );
-
-        return Zend\Loader\AutoloaderFactory::factory($config);
+        require_once __DIR__ . '/Autoloader.php';
+        return new \Dewdrop\Autoloader($libraryPath);
     }
 }

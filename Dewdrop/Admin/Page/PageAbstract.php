@@ -52,7 +52,7 @@ abstract class PageAbstract
 
     abstract public function render();
 
-    protected function renderView()
+    public function renderView()
     {
         echo $this->renderer->render($this->view);
     }

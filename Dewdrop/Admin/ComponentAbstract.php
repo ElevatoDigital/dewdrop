@@ -2,6 +2,8 @@
 
 namespace Dewdrop\Admin;
 
+use ReflectionClass;
+
 abstract class ComponentAbstract
 {
     private $title;
@@ -36,14 +38,21 @@ abstract class ComponentAbstract
 
     public function route()
     {
+        $reflectedClass = new ReflectionClass($this);
+
         $pageKey   = basename(isset($_GET['route']) ? $_GET['route'] : 'Index');
-        $pageFile  = dirname(dirname(dirname(__DIR__))) . '/admin/fruits/' . $pageKey . '.php';
-        $className = '\Admin\Fruits\\' . $pageKey;
+        $pageFile  = dirname($reflectedClass->getFileName()) . '/' . $pageKey . '.php';
+        $className = $reflectedClass->getNamespaceName() . '\\' . $pageKey;
 
         require_once $pageFile;
         $page = new $className($this, $pageFile);
 
-        echo $page->render();
+        $output = $page->render();
+
+        // Automatically render view if no output is generated
+        if (!$output) {
+            $page->renderView();
+        }
     }
 
     public function registerMenuPage()

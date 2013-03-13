@@ -6,28 +6,6 @@ class Run
 {
     protected $validCommands = array(
         array(
-            'description' => 'Display the list of available commands',
-            'callback'    => 'runHelp',
-            'command'     => 'help'
-        ),
-        array(
-            'description' => 'Pull the latest Dewdrop library code from Github',
-            'callback'    => 'runUpdate',
-            'command'     => 'update',
-            'aliases'     => array(
-                'pull'
-            )
-        ),
-        array(
-            'description' => 'Run PHP_CodeSniffer on your plugin to ensure follows PSR-2',
-            'callback'    => 'runSniff',
-            'command'     => 'sniff',
-            'aliases'     => array(
-                'code-sniff',
-                'cs'
-            )
-        ),
-        array(
             'description' => 'Run PHPUnit on the Dewdrop unit tests',
             'callback'    => 'runDewdropTests',
             'command'     => 'test-dewdrop',
@@ -47,49 +25,70 @@ class Run
         )
     );
 
+    private $commandClasses = array(
+        'Help',
+        'Update',
+        'Sniff',
+        'Dbdeploy',
+        'Lint',
+        'GenAdminComponent',
+        'GenDbTable'
+    );
+
+    private $commands = array();
+
+    private $autoloader;
+
+    private $args = array();
+
+    public function __construct(array $args = null)
+    {
+        $this->args = ($args ?: array_slice($_SERVER['argv'], 2));
+
+        require_once dirname(__DIR__) . '/Autoloader.php';
+        $this->autoloader = new \Dewdrop\Autoloader(dirname(dirname(__DIR__)));
+    }
+
     public function run()
     {
-        $subcommand = (isset($_SERVER['argv'][1]) ? strtolower($_SERVER['argv'][1]) : null);
+        $subcommand   = (isset($_SERVER['argv'][1]) ? strtolower($_SERVER['argv'][1]) : null);
+        $commandFound = false;
 
-        foreach ($this->validCommands as $validCommand) {
-            if ($validCommand['command'] === $subcommand
-                || (isset($validCommand['aliases']) && in_array($subcommand, $validCommand['aliases']))
-            ) {
-                $method = $validCommand['callback'];
-                $this->$method();
-                exit;
+        $this->instantiateCommands();
+
+        foreach ($this->commands as $command) {
+            if ($command->isSelected($subcommand)) {
+                $command
+                    ->parseArgs($this->args)
+                    ->execute();
+
+                $commandFound = true;
             }
         }
 
-        echo PHP_EOL;
-        echo 'ERROR: Please specify a valid command as the first argument.' . PHP_EOL;
-        echo PHP_EOL;
+        if (!$commandFound) {
+            echo PHP_EOL;
+            echo 'ERROR: Please specify a valid command as the first argument.' . PHP_EOL;
+            echo PHP_EOL;
 
-        $this->runHelp();
-        exit;
-    }
-
-    public function runHelp()
-    {
-        foreach ($this->validCommands as $validCommand) {
-            printf(
-                "%15s: %s" . PHP_EOL,
-                $validCommand['command'],
-                $validCommand['description']
-            );
+            $this->commands['Help']->execute();
+            exit;
         }
     }
 
-    public function runSniff()
+    public function getCommands()
     {
-        $cmd = sprintf(
-            'phpcs --standard=PSR2 --ignore=*/Zend/* --ignore=*/tests/* %s',
-            escapeshellarg(
-                dirname(dirname(dirname(__DIR__)))
-            )
-        );
+        return $this->commands;
+    }
 
-        passthru($cmd);
+    protected function instantiateCommands()
+    {
+        foreach ($this->commandClasses as $commandClass) {
+            require_once __DIR__ . '/Command/' . $commandClass . '.php';
+            $fullClassName = '\Dewdrop\Cli\Command\\' . $commandClass;
+
+            $this->commands[$commandClass] = new $fullClassName($this);
+        }
     }
 
     public function runTests()
@@ -114,17 +113,5 @@ class Run
         );
 
         passthru($cmd);
-    }
-
-    public function runUpdate()
-    {
-        $cwd = getcwd();
-
-        // Change to lib/ folder
-        chdir(dirname(dirname(__DIR__)));
-
-        passthru('git pull');
-
-        chdir($cwd);
     }
 }
