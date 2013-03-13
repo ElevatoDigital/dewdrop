@@ -16,7 +16,7 @@ Quick Start
 
 Download and install the latest release of WordPress:
     
-    <http://wordpress.org/latest.zip>
+<http://wordpress.org/latest.zip>
 
 ### Step 2
 
