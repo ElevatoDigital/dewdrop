@@ -20,7 +20,8 @@ Download and install the latest release of WordPress:
 
 ### Step 2
 
-Run the Dewdrop installer script from within the root folder of your WordPress installation:
+Run the Dewdrop installer script in your terminal from within the root folder 
+of your WordPress installation (the folder containing your wp-config.php file):
 
     php <(curl -sS https://raw.github.com/DeltaSystems/dewdrop/master/installer)
 

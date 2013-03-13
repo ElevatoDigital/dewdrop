@@ -174,7 +174,11 @@ function checkGit()
 function checkWordPress()
 {
     if (!file_exists(getcwd() . '/wp-config.php')) {
-        abortInstall('This installer must be run in the root directory of your WordPress install.');
+        abortInstall(
+            'This installer must be run in the root directory of your '
+            . 'WordPress install (the folder containing your wp-config.php '
+            . 'file).'
+        );
     }
 }
 
