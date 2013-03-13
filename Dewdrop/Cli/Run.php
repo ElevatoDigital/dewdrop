@@ -11,6 +11,14 @@ class Run
             'command'     => 'help'
         ),
         array(
+            'description' => 'Pull the latest Dewdrop library code from Github',
+            'callback'    => 'runUpdate',
+            'command'     => 'update',
+            'aliases'     => array(
+                'pull'
+            )
+        ),
+        array(
             'description' => 'Run PHP_CodeSniffer on your plugin to ensure follows PSR-2',
             'callback'    => 'runSniff',
             'command'     => 'sniff',
@@ -106,5 +114,17 @@ class Run
         );
 
         passthru($cmd);
+    }
+
+    public function runUpdate()
+    {
+        $cwd = getcwd();
+
+        // Change to lib/ folder
+        chdir(dirname(dirname(__DIR__)));
+
+        passthru('git pull');
+
+        chdir($cwd);
     }
 }
