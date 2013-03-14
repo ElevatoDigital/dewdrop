@@ -5,28 +5,123 @@ namespace Dewdrop\Cli\Command;
 use Dewdrop\Cli\Run;
 use Dewdrop\Cli\Renderer\RendererInterface;
 
+/**
+ * The abstract class used by all CLI commands.
+ *
+ * This abstract class supplies CLI commands with argument parsing, help
+ * content display, alias support, etc.
+ *
+ * @package Dewdrop
+ */
 abstract class CommandAbstract
 {
+    /**
+     * Command argument is required.
+     *
+     * @const
+     */
     const ARG_REQUIRED = true;
 
+    /**
+     * Command argument is optional.
+     *
+     * @const
+     */
     const ARG_OPTIONAL = false;
 
+    /**
+     * @var \Dewdrop\Cli\Run
+     */
     protected $runner;
 
+    /**
+     * The renderer that should be used for all command output.  No output
+     * should be rendered directly (i.e. with echo, print, printf, etc.),
+     * so that it is easier to capture and examine output during testing.
+     *
+     * @var \Dewdrop\Cli\Renderer\RendererInterface
+     */
     protected $renderer;
 
+    /**
+     * The command name that should be used on the CLI to select this
+     * command class for execution.  For example, when running the
+     * dewdrop CLI tool like this:
+     *
+     * ./dewdrop command-name
+     *
+     * \Dewdrop\Cli\Run will select the command class that has a command
+     * class that has a $command property value of "command-name"
+     *
+     * @var string
+     */
     private $command;
 
+    /**
+     * A brief, 8-12 word description of this command's purpose.  This will
+     * be displayed in the command's own help content and the global list
+     * of available commands.
+     *
+     * @var string
+     */
     private $description;
 
+    /**
+     * Any aliases that can be used to trigger this command in addition to
+     * the primary command name.
+     *
+     * @var array
+     */
     private $aliases = array();
 
+    /**
+     * The name of the command's primary argument.  The primary argument's
+     * value can be specified without naming the argument explicitly on the
+     * command line.  Using popular version control system Subversion as an
+     * example, you can do a code checkout without specifying the name of the
+     * path argument like this:
+     *
+     * svn checkout http://example.org/path
+     *
+     * In that case, the path argument is the primary argument of SVN's
+     * checkout command.
+     *
+     * In Dewdrop, if your command had a primary argument of "name" and the
+     * user supplied this input:
+     *
+     * ./dewdrop my-command --folder=example "Example Name Value"
+     *
+     * The argument parser would set the name argument's value to "Example Name
+     * Value" because that is the value expression not explicitly assigned to
+     * another argument name.
+     *
+     * Users can still explicitly set the argument name for the primary argument,
+     * too, if they prefer:
+     *
+     * ./dewdrop --name="Example Name Value"
+     *
+     * @var string
+     */
     private $primaryArg;
 
+    /**
+     * The arguments that are available for this command.
+     *
+     * @var array
+     */
     private $args = array();
 
+    /**
+     * Examples of valid usage for this command.
+     *
+     * @var array
+     */
     private $examples = array();
 
+    /**
+     * @param \Dewdrop\Cli\Run
+     * @param \Dewdrop\Cli\Renderer\RendererInterface
+     */
     public function __construct(Run $runner, RendererInterface $renderer)
     {
         $this->runner   = $runner;
@@ -41,8 +136,26 @@ abstract class CommandAbstract
         $this->init();
     }
 
+    /**
+     * Implement the init() method in your command sub-class to set required
+     * properties.  You'll likely call:
+     *
+     * - setCommand()
+     * - setDescription()
+     * - addAlias()
+     * - addArg()
+     * - setPrimaryArg()
+     * - addExample()
+     *
+     * @return void
+     */
     abstract public function init();
 
+    /**
+     * Run your command.  This will only be called if parseArgs() returns true,
+     * indicating that the command line arguments could be successfully parsed
+     * according the definitions you created in your init() method.
+     */
     abstract public function execute();
 
     public function parseArgs($input)

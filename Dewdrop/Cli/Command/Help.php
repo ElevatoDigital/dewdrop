@@ -2,10 +2,28 @@
 
 namespace Dewdrop\Cli\Command;
 
+/**
+ * A command to handle display of help information for other commands or
+ * list available commands if none was selected by the command line
+ * arguments.
+ *
+ * When the CLI runner can't find a valid command, this command is
+ * executed to help the user fix their input.
+ *
+ * @package Dewdrop
+ */
 class Help extends CommandAbstract
 {
+    /**
+     * The command help content should be displayed for.
+     *
+     * @var string
+     */
     private $subcommand;
 
+    /**
+     * @inheritdoc
+     */
     public function init()
     {
         $this
@@ -24,6 +42,10 @@ class Help extends CommandAbstract
         );
     }
 
+    /**
+     * @param string $subcommand
+     * @return \Dewdrop\Cli\Command\Help
+     */
     public function setSubcommand($subcommand)
     {
         $this->subcommand = $subcommand;
@@ -31,6 +53,12 @@ class Help extends CommandAbstract
         return $this;
     }
 
+    /**
+     * If a subcommand is specified, display help content for that specific
+     * command.  Otherwise, display the global list of available commands.
+     *
+     * @return void
+     */
     public function execute()
     {
         if (!$this->subcommand) {
@@ -40,6 +68,11 @@ class Help extends CommandAbstract
         }
     }
 
+    /**
+     * Display the global list of available commands.
+     *
+     * @return void
+     */
     public function displayGlobalHelp()
     {
         $longestCommand = 0;
@@ -63,6 +96,13 @@ class Help extends CommandAbstract
         $this->renderer->table($rows);
     }
 
+    /**
+     * Display help content for a specific command, if a matching command
+     * object is available in the runner.  Otherwise, display an error
+     * message and the global help content instead.
+     *
+     * @return void
+     */
     public function displayCommandHelp()
     {
         foreach ($this->runner->getCommands() as $command) {
