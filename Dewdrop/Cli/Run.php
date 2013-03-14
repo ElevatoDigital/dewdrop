@@ -21,7 +21,8 @@ class Run
         'Dbdeploy',
         'Lint',
         'GenAdminComponent',
-        'GenDbTable'
+        'GenDbTable',
+        'DewdropTest'
     );
 
     /**

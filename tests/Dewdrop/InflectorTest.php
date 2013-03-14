@@ -1,7 +1,5 @@
 <?php
 
-require_once dirname(__DIR__) . '/bootstrap.php';
-
 class Dewdrop_InflectorTest extends PHPUnit_Framework_TestCase
 {
     protected $inflector;

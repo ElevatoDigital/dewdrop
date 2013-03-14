@@ -495,6 +495,71 @@ abstract class CommandAbstract
     }
 
     /**
+     * Render the provided error message and display the command's help content.
+     *
+     * @param string $errorMessage
+     *
+     * @return \Dewdrop\Cli\Command\CommandAbstract
+     */
+    protected function abort($errorMessage)
+    {
+        $this->renderer->error($errorMessage);
+        $this->help();
+        return $this;
+    }
+
+    /**
+     * Use the built-in passthru() function to call an external command and
+     * return its exit status.  This is separated into its own method primarily
+     * to make it easier to mock during testing.
+     *
+     * @param string $command
+     * @return integer
+     */
+    protected function passthru($command)
+    {
+        passthru($command, $exitStatus);
+
+        return $exitStatus;
+    }
+
+    /**
+     * Change "~" prefix to the user's home folder.
+     *
+     * Bash doesn't do "~" evaluation automatically for command arguments, so
+     * we do it hear to avoid confusing developers by creating a "~" folder
+     * in their WP install instead.
+     *
+     * @param string $path
+     * @return string
+     */
+    protected function evalPathArgument($path)
+    {
+        if (0 === strpos($path, '~') && isset($_SERVER['HOME'])) {
+            $path = $_SERVER['HOME'] . substr($path, 1);
+        }
+
+        return $path;
+    }
+
+    /**
+     * Attempt to locate the named executable using "which", if it is
+     * available.  Otherwise, just return the name and hope it is in
+     * the user's $PATH.
+     *
+     * @param string $name
+     * @return string
+     */
+    protected function autoDetectExecutable($name)
+    {
+        if (!file_exists('/usr/bin/which')) {
+            return $name;
+        } else {
+            return trim(shell_exec("which {$name}")) ?: $name;
+        }
+    }
+
+    /**
      * Set the valid of the specified argument.
      *
      * The argument's name is inflected to form a setter name that will be
@@ -518,20 +583,6 @@ abstract class CommandAbstract
 
         $this->$setter($value);
 
-        return $this;
-    }
-
-    /**
-     * Render the provided error message and display the command's help content.
-     *
-     * @param string $errorMessage
-     *
-     * @return \Dewdrop\Cli\Command\CommandAbstract
-     */
-    protected function abort($errorMessage)
-    {
-        $this->renderer->error($errorMessage);
-        $this->help();
         return $this;
     }
 }

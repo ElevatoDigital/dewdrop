@@ -1,7 +1,5 @@
 <?php
 
-require_once __DIR__ . '/../../../bootstrap.php';
-
 use Dewdrop\Cli\Run;
 use Dewdrop\Cli\Renderer\Mock as MockRenderer;
 
