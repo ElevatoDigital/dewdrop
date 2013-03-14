@@ -19,6 +19,22 @@ class Dewdrop_Cli_Command_HelpTest extends PHPUnit_Framework_TestCase
         );
     }
 
+    public function testDisplayGlobalHelp()
+    {
+        $help = $this->getMock(
+            '\Dewdrop\Cli\Command\Help',
+            array('displayGlobalHelp'),
+            array($this->runner, $this->renderer)
+        );
+
+        $help
+            ->expects($this->once())
+            ->method('displayGlobalHelp');
+
+        $help->parseArgs(array());
+        $help->execute();
+    }
+
     public function testHelpArg()
     {
         $help = $this->getMock(
