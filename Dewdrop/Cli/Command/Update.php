@@ -13,6 +13,13 @@ namespace Dewdrop\Cli\Command;
 class Update extends CommandAbstract
 {
     /**
+     * The path to the git executable.
+     *
+     * @var string
+     */
+    protected $git;
+
+    /**
      * @inheritdoc
      */
     public function init()
@@ -21,6 +28,12 @@ class Update extends CommandAbstract
             ->setDescription('Pull the latest Dewdrop library code from Github')
             ->setCommand('update')
             ->addAlias('pull');
+
+        $this->addArg(
+            'git',
+            'The path to the git executable',
+            self::ARG_OPTIONAL
+        );
     }
 
     /**
@@ -33,6 +46,10 @@ class Update extends CommandAbstract
      */
     public function execute()
     {
+        if (null === $this->git) {
+            $this->git = $this->autoDetectExecutable('git');
+        }
+
         $cwd = getcwd();
 
         // Change to lib/ folder so git isn't confused
@@ -40,7 +57,7 @@ class Update extends CommandAbstract
 
         $cmd = sprintf(
             '%s pull',
-            $this->autoDetectExecutable('git')
+            $this->git
         );
 
         $this->passthru($cmd);
