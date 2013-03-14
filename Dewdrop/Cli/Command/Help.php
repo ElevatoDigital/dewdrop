@@ -75,16 +75,6 @@ class Help extends CommandAbstract
      */
     public function displayGlobalHelp()
     {
-        $longestCommand = 0;
-
-        foreach ($this->runner->getCommands() as $command) {
-            $commandName = $command->getCommand();
-
-            if (strlen($commandName) > $longestCommand) {
-                $longestCommand = strlen($commandName);
-            }
-        }
-
         $this->renderer->title('Available Commands');
 
         $rows = array();
