@@ -4,27 +4,6 @@ namespace Dewdrop\Cli;
 
 class Run
 {
-    protected $validCommands = array(
-        array(
-            'description' => 'Run PHPUnit on the Dewdrop unit tests',
-            'callback'    => 'runDewdropTests',
-            'command'     => 'test-dewdrop',
-            'aliases'     => array(
-                'dewdrop-test',
-                'dewdrop-tests'
-            )
-        ),
-        array(
-            'description' => "Run PHPUnit on your plugin's unit tests",
-            'command'     => 'test',
-            'callback'    => 'runTests',
-            'aliases'     => array(
-                'tests',
-                'phpunit'
-            )
-        )
-    );
-
     private $commandClasses = array(
         'Help',
         'Update',
@@ -41,39 +20,64 @@ class Run
 
     private $args = array();
 
-    public function __construct(array $args = null)
-    {
-        $this->args = ($args ?: array_slice($_SERVER['argv'], 2));
+    private $command;
 
+    private $renderer;
+
+    public function __construct(array $args = null, $command = null, $renderer = null)
+    {
         require_once dirname(__DIR__) . '/Autoloader.php';
         $this->autoloader = new \Dewdrop\Autoloader(dirname(dirname(__DIR__)));
+
+        $this->args     = ($args ?: array_slice($_SERVER['argv'], 2));
+        $this->renderer = ($renderer ?: new Renderer\Markdown());
+
+        if ($command) {
+            $this->command = $command;
+        } elseif (isset($_SERVER['argv'][1])) {
+            $this->command = $_SERVER['argv'][1];
+        }
+    }
+
+    public function setArgs(array $args)
+    {
+        $this->args = $args;
+
+        return $this;
     }
 
     public function run()
     {
-        $subcommand   = (isset($_SERVER['argv'][1]) ? strtolower($_SERVER['argv'][1]) : null);
-        $commandFound = false;
-
         $this->instantiateCommands();
 
-        foreach ($this->commands as $command) {
-            if ($command->isSelected($subcommand)) {
-                $command
-                    ->parseArgs($this->args)
-                    ->execute();
-
-                $commandFound = true;
+        foreach ($this->commands as $name => $command) {
+            if ($command->isSelected($this->command)) {
+                $this->executeCommand($name);
+                $this->halt();
+                return;
             }
         }
 
-        if (!$commandFound) {
-            echo PHP_EOL;
-            echo 'ERROR: Please specify a valid command as the first argument.' . PHP_EOL;
-            echo PHP_EOL;
+        $this->renderer->error('Please specify a valid command as the first argument.');
+        $this->executeCommand('Help');
+        $this->halt();
+    }
 
-            $this->commands['Help']->execute();
-            exit;
+    public function halt()
+    {
+        exit;
+    }
+
+    public function executeCommand($name)
+    {
+        $command       = $this->commands[$name];
+        $shouldExecute = $command->parseArgs($this->args);
+
+        if ($shouldExecute) {
+            $command->execute();
         }
+
+        return $this;
     }
 
     public function getCommands()
@@ -87,31 +91,7 @@ class Run
             require_once __DIR__ . '/Command/' . $commandClass . '.php';
             $fullClassName = '\Dewdrop\Cli\Command\\' . $commandClass;
 
-            $this->commands[$commandClass] = new $fullClassName($this);
+            $this->commands[$commandClass] = new $fullClassName($this, $this->renderer);
         }
-    }
-
-    public function runTests()
-    {
-        $cmd = sprintf(
-            'phpunit %s',
-            escapeshellarg(
-                dirname(dirname(dirname(__DIR__))) . '/tests'
-            )
-        );
-
-        passthru($cmd);
-    }
-
-    public function runDewdropTests()
-    {
-        $cmd = sprintf(
-            'phpunit %s',
-            escapeshellarg(
-                dirname(dirname(__DIR__)) . '/tests'
-            )
-        );
-
-        passthru($cmd);
     }
 }

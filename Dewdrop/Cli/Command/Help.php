@@ -52,19 +52,15 @@ class Help extends CommandAbstract
             }
         }
 
-        echo 'Available Commands' . PHP_EOL;
-        echo '==================' . PHP_EOL;
-        echo PHP_EOL;
+        $this->renderer->title('Available Commands');
+
+        $rows = array();
 
         foreach ($this->runner->getCommands() as $command) {
-            printf(
-                '%-' . ($longestCommand + 1) . 's %s' . PHP_EOL,
-                $command->getCommand() . ':',
-                $command->getDescription()
-            );
+            $rows[$command->getCommand()] = $command->getDescription();
         }
 
-        echo PHP_EOL;
+        $this->renderer->table($rows);
     }
 
     public function displayCommandHelp()
@@ -72,14 +68,14 @@ class Help extends CommandAbstract
         foreach ($this->runner->getCommands() as $command) {
             if ($command->isSelected($this->subcommand)) {
                 $command->help();
-                exit;
+                return;
             }
         }
 
-        echo 'ERROR: Could not find command "' . $this->subcommand . '" for help.';
-        echo PHP_EOL;
-        echo PHP_EOL;
+        $this->renderer
+            ->error('Could not find command "' . $this->subcommand . '" for help.')
+            ->newline();
+
         $this->displayGlobalHelp();
-        exit;
     }
 }

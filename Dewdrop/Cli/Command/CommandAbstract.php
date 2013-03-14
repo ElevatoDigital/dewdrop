@@ -3,6 +3,7 @@
 namespace Dewdrop\Cli\Command;
 
 use Dewdrop\Cli\Run;
+use Dewdrop\Cli\Renderer\RendererInterface;
 
 abstract class CommandAbstract
 {
@@ -11,6 +12,8 @@ abstract class CommandAbstract
     const ARG_OPTIONAL = false;
 
     protected $runner;
+
+    protected $renderer;
 
     private $command;
 
@@ -24,9 +27,10 @@ abstract class CommandAbstract
 
     private $examples = array();
 
-    public function __construct(Run $runner)
+    public function __construct(Run $runner, RendererInterface $renderer)
     {
-        $this->runner = $runner;
+        $this->runner   = $runner;
+        $this->renderer = $renderer;
 
         $this->addArg(
             'help',
@@ -52,7 +56,7 @@ abstract class CommandAbstract
 
             if (0 === stripos($segment, '--help')) {
                 $this->help();
-                exit;
+                return false;
             }
 
             $segment = preg_replace('/^-+/', '', $segment);
@@ -69,6 +73,7 @@ abstract class CommandAbstract
                     $value = $input[$next];
                 } else {
                     $this->abort('No value given for argument "' . $name . '"');
+                    return false;
                 }
 
                 unset($input[$index]);
@@ -99,6 +104,7 @@ abstract class CommandAbstract
 
             if (!$selected) {
                 $this->abort('Attempting to set unknown argument "' . $name . '"');
+                return false;
             }
         }
 
@@ -112,10 +118,11 @@ abstract class CommandAbstract
         foreach ($this->args as $arg) {
             if ($arg['required'] && !in_array($arg['name'], $argsSet)) {
                 $this->abort('Required argument "' . $arg['name'] . '" not set.');
+                return false;
             }
         }
 
-        return $this;
+        return true;
     }
 
     public function setDescription($description)
@@ -197,56 +204,46 @@ abstract class CommandAbstract
 
     public function help()
     {
-        echo PHP_EOL;
-        echo 'Help' . PHP_EOL;
-        echo '====' . PHP_EOL;
-        echo PHP_EOL;
-
-        echo 'Command: ' . $this->getCommand() . PHP_EOL;
-        echo 'Description: ' . $this->getDescription() . PHP_EOL;
+        $this->renderer
+            ->title($this->getCommand())
+            ->text($this->getDescription());
 
         if (count($this->aliases)) {
-            echo 'Aliases: ' . implode(', ', $this->aliases) . PHP_EOL;
+            $this->renderer->text('Aliases: ' . implode(', ', $this->aliases));
         }
 
-        echo PHP_EOL;
+        $this->renderer->newline();
 
         if (count($this->examples)) {
-            echo 'Examples' . PHP_EOL;
-            echo '--------' . PHP_EOL;
-            echo PHP_EOL;
+            $this->renderer->subhead('Examples');
 
             foreach ($this->examples as $example) {
-                echo rtrim($example['description'], ':') . ':' . PHP_EOL;
-                echo '    ' . $example['command'] . PHP_EOL;
-                echo PHP_EOL;
+                $this->renderer
+                    ->text(rtrim($example['description'], ':') . ':')
+                    ->text('    ' . $example['command'])
+                    ->newline();
             }
         }
 
         if (count($this->args)) {
-            $longestArg = 0;
+            $this->renderer->subhead('Arguments');
+
+            $rows = array();
 
             foreach ($this->args as $arg) {
-                if (strlen($arg['name']) > $longestArg) {
-                    $longestArg = strlen($arg['name']);
-                }
-            }
+                $title = '--' . $arg['name'];
 
-            echo 'Arguments' . PHP_EOL;
-            echo '---------' . PHP_EOL;
-            echo PHP_EOL;
-
-            foreach ($this->args as $arg) {
-                printf(
-                    '--%-' . ($longestArg + 1) . 's %s (%s)' . PHP_EOL,
-                    $arg['name'] . ':',
+                $rows[$title] = sprintf(
+                    '%s (%s)',
                     $arg['description'],
                     ($arg['required'] ? 'Required' : 'Optional')
                 );
             }
+
+            $this->renderer->table($rows);
         }
 
-        echo PHP_EOL;
+        return $this;
     }
 
     private function setArgValue($name, $value)
@@ -256,6 +253,7 @@ abstract class CommandAbstract
 
         if (!method_exists($this, $setter)) {
             $this->abort('Attempting to set unknown argument "' . $name . '"');
+            return;
         }
 
         $this->$setter($value);
@@ -263,9 +261,8 @@ abstract class CommandAbstract
 
     protected function abort($errorMessage)
     {
-        echo 'ERROR: ' . $errorMessage . PHP_EOL;
-
+        $this->renderer->error($errorMessage);
         $this->help();
-        exit;
+        return $this;
     }
 }

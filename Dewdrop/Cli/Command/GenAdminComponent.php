@@ -56,23 +56,23 @@ class GenAdminComponent extends CommandAbstract
             $this->folder = $this->inflectFolderFromTitle();
         }
 
-        $path   = realpath(__DIR__ . '/../../../../admin');
+        $path   = $this->getComponentPath();
         $newDir = "{$path}/{$this->folder}";
 
-        if (file_exists($newDir)) {
-            $this->abort(
+        if ($this->componentAlreadyExists($newDir)) {
+            return $this->abort(
                 'Cannot generate component because a folder with the name "' . $this->folder . '" already exists.'
             );
         }
 
-        mkdir($newDir);
+        $this->createFolder($newDir);
 
         $templateReplacements = array(
             '{{namespace}}' => ($this->namespace ?: $this->inflectNamespaceFromFolder()),
             '{{title}}'     => str_replace("'", "\'", $this->title)
         );
 
-        file_put_contents(
+        $this->writeFile(
             "{$newDir}/Component.php",
             str_replace(
                 array_keys($templateReplacements),
@@ -81,7 +81,7 @@ class GenAdminComponent extends CommandAbstract
             )
         );
 
-        file_put_contents(
+        $this->writeFile(
             "{$newDir}/Index.php",
             str_replace(
                 array_keys($templateReplacements),
@@ -90,9 +90,9 @@ class GenAdminComponent extends CommandAbstract
             )
         );
 
-        mkdir("{$newDir}/view-scripts");
+        $this->createFolder("{$newDir}/view-scripts");
 
-        file_put_contents(
+        $this->writeFile(
             "{$newDir}/view-scripts/index.phtml",
             file_get_contents(__DIR__ . '/gen-templates/admin-component/view-scripts/index.tpl')
         );
@@ -117,6 +117,30 @@ class GenAdminComponent extends CommandAbstract
         $this->namespace = $namespace;
 
         return $this;
+    }
+
+    public function getComponentPath()
+    {
+        return realpath(__DIR__ . '/../../../../admin');
+    }
+
+    protected function createFolder($path)
+    {
+        mkdir($path);
+
+        return $this;
+    }
+
+    protected function writeFile($path, $contents)
+    {
+        file_put_contents($path, $contents);
+
+        return $this;
+    }
+
+    protected function componentAlreadyExists($newDir)
+    {
+        return file_exists($newDir);
     }
 
     private function inflectFolderFromTitle()
