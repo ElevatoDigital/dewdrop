@@ -5,6 +5,13 @@ use Dewdrop\Cli\Renderer\Mock as MockRenderer;
 
 class Dewdrop_Cli_RunTest extends PHPUnit_Framework_TestCase
 {
+    public function testConnectDb()
+    {
+        $runner = new \Dewdrop\Cli\Run();
+
+        $this->assertTrue($runner->connectDb() instanceof \Dewdrop\Db\Adapter);
+    }
+
     public function testUnknownCommand()
     {
         $runner = $this->getMockRunner(array(), 'fafafafafafafafa');

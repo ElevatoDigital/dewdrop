@@ -2,6 +2,9 @@
 
 namespace Dewdrop\Cli;
 
+use Dewdrop\Paths;
+use Dewdrop\Db\Adapter;
+
 /**
  * This class is responsible for handling execution of CLI commands.
  *
@@ -63,6 +66,13 @@ class Run
      * @var \Dewdrop\Cli\Renderer\RendererInterface
      */
     private $renderer;
+
+    /**
+     * The DB adapter.  You can retrieve this by calling connectDb().
+     *
+     * @var \Dewdrop\Db\Adapter
+     */
+    private $dbAdapter;
 
     /**
      * @param array $args
@@ -158,6 +168,28 @@ class Run
     public function getCommands()
     {
         return $this->commands;
+    }
+
+    /**
+     * Pull in the wp-config.php file to allow us to connect to the database
+     * on the CLI.
+     *
+     * @return \Dewdrop\Db\Adapter
+     */
+    public function connectDb()
+    {
+        if (!$this->dbAdapter) {
+            $paths = new Paths();
+
+            require_once $paths->getWpRoot() . '/wp-config.php';
+            require_once $paths->getWpRoot() . '/wp-includes/wp-db.php';
+
+            global $wpdb;
+
+            $this->dbAdapter = new Adapter($wpdb);
+        }
+
+        return $this->dbAdapter;
     }
 
     /**

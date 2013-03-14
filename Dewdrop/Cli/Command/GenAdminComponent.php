@@ -121,7 +121,7 @@ class GenAdminComponent extends CommandAbstract
 
     public function getComponentPath()
     {
-        return realpath(__DIR__ . '/../../../../admin');
+        return $this->paths->getAdmin();
     }
 
     protected function createFolder($path)

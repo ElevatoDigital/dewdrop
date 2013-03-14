@@ -2,8 +2,8 @@
 
 namespace Dewdrop;
 
-use Zend;
 use Dewdrop\Db\Adapter as DbAdapter;
+use Dewdrop\Paths;
 
 class Wiring
 {
@@ -12,6 +12,8 @@ class Wiring
     protected $inflector;
 
     protected $autoloader;
+
+    protected $paths;
 
     public function __construct(
         $autoRegister = true,
@@ -29,6 +31,7 @@ class Wiring
         $this->autoloader = ($autoloader ?: $this->buildAutoloader($libraryPath));
         $this->db         = ($db ?: new DbAdapter($wpdb));
         $this->inflector  = ($inflector ?: new Inflector());
+        $this->paths      = new Paths();
 
         if ($autoRegister) {
             $this->autoRegisterAdminComponents();
@@ -37,7 +40,7 @@ class Wiring
 
     public function autoRegisterAdminComponents()
     {
-        $path = __DIR__ . '/../../admin';
+        $path = $this->paths->getAdmin();
         $dir  = opendir($path);
 
         while ($folder = readdir($dir)) {

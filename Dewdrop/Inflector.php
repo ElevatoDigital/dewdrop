@@ -2,22 +2,21 @@
 
 namespace Dewdrop;
 
+use Dewdrop\Paths;
+
 class Inflector
 {
-    protected $baseComponentPath;
-
-    protected $baseModelPath;
+    private $paths;
 
     public function __construct()
     {
-        $this->baseComponentPath = dirname(dirname(__DIR__)) . '/admin';
-        $this->baseModelPath     = dirname(dirname(__DIR__)). '/models';
+        $this->paths = new Paths();
     }
 
     public function getComponentClassPath($path)
     {
         $folder = basename($path);
-        $full   = $this->baseComponentPath . '/' . $folder;
+        $full   = $this->paths->getAdmin() . '/' . $folder;
 
         return $full . '/Component.php';
     }
@@ -32,7 +31,7 @@ class Inflector
 
     public function getModelClassPath($name)
     {
-        return $this->baseModelPath . '/' . $name . '.php';
+        return $this->paths->getModels() . '/' . $name . '.php';
     }
 
     public function getModelClass($name)

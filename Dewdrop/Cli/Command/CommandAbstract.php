@@ -5,6 +5,7 @@ namespace Dewdrop\Cli\Command;
 use Dewdrop\Cli\Run;
 use Dewdrop\Cli\Renderer\RendererInterface;
 use Dewdrop\Exception;
+use Dewdrop\Paths;
 
 /**
  * The abstract class used by all CLI commands.
@@ -43,6 +44,11 @@ abstract class CommandAbstract
      * @var \Dewdrop\Cli\Renderer\RendererInterface
      */
     protected $renderer;
+
+    /**
+     * @var \Dewdrop\Paths
+     */
+    protected $paths;
 
     /**
      * The command name that should be used on the CLI to select this
@@ -127,6 +133,7 @@ abstract class CommandAbstract
     {
         $this->runner   = $runner;
         $this->renderer = $renderer;
+        $this->paths    = new Paths();
 
         // All commands support the --help argument
         $this->addArg(

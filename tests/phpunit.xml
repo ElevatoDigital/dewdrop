@@ -6,4 +6,12 @@
             <directory suffix="Test.php">./</directory>
         </testsuite>
     </testsuites>
+    <filter>
+        <whitelist addUncoveredFilesFromWhitelist="true">
+            <directory suffix=".php">../Dewdrop</directory>
+            <exclude>
+                <file>Zend</file>
+            </exclude>
+        </whitelist>
+    </filter>
 </phpunit>
