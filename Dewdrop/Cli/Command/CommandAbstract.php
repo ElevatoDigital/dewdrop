@@ -4,6 +4,7 @@ namespace Dewdrop\Cli\Command;
 
 use Dewdrop\Cli\Run;
 use Dewdrop\Cli\Renderer\RendererInterface;
+use Dewdrop\Exception;
 
 /**
  * The abstract class used by all CLI commands.
@@ -127,6 +128,7 @@ abstract class CommandAbstract
         $this->runner   = $runner;
         $this->renderer = $renderer;
 
+        // All commands support the --help argument
         $this->addArg(
             'help',
             'Display the help message for this command',
@@ -134,6 +136,10 @@ abstract class CommandAbstract
         );
 
         $this->init();
+
+        if (!$this->command || !$this->description) {
+            throw new Exception('You must set the name and description in your init() method.');
+        }
     }
 
     /**
@@ -144,7 +150,7 @@ abstract class CommandAbstract
      * - setDescription()
      * - addAlias()
      * - addArg()
-     * - setPrimaryArg()
+     * - addPrimaryArg()
      * - addExample()
      *
      * @return void
@@ -158,30 +164,70 @@ abstract class CommandAbstract
      */
     abstract public function execute();
 
+    /**
+     * Parse the arguments passed to this command.
+     *
+     * If the "--help" argument is present anywhere in the argument input, all
+     * further parsing will be aborted and the command's help content will be
+     * displayed.
+     *
+     * For all argument names and their aliases, there are multiple acceptable
+     * formats of argument and value.  For example, all of these inputs are
+     * equivalent:
+     *
+     * ./dewdrop my-command --argument-name=value
+     * ./dewdrop my-command --argument-name value
+     * ./dewdrop my-command --argument-alias=value
+     * ./dewdrop my-command -argument-alias=value
+     * ./dewdrop my-command -argument-alias value
+     *
+     * In short, you can use one or two dashes at the beginning of the argument
+     * name and you can separate the value from the name with either a space
+     * or an equals sign.
+     *
+     * For every argument your command supports, you need to implement a setter
+     * method.  For example, if you have an argument with the name "my-argument"
+     * then your command class needs a method called "setMyArgument()".
+     *
+     * Also note that the command API supports the concept of a "primary
+     * argument".  See the documentation for the $primaryArgument property for
+     * more information about that feature.
+     *
+     * @param array $input
+     *
+     * @return boolean Whether args were fully parsed and command can be executed.
+     */
     public function parseArgs($input)
     {
+        // Which args have been set while parsing
         $argsSet = array();
 
         foreach ($input as $index => $segment) {
+            // In this loop, we're only interested in input indicated an argument name
             if (0 !== strpos($segment, '-')) {
                 continue;
             }
 
+            // If we encounter the --help argument, display command help and stop parsing
             if (0 === stripos($segment, '--help')) {
                 $this->help();
                 return false;
             }
 
+            // Replace any "-" character at beginning of input
             $segment = preg_replace('/^-+/', '', $segment);
 
             if (false !== strpos($segment, '=')) {
+                // If there's an equal sign present, our name and value are readily available
                 list($name, $value) = explode('=', $segment);
 
                 unset($input[$index]);
             } else {
+                // Otherwise, we need to look to the next input segment for the value
                 $name  = $segment;
                 $next  = $index + 1;
 
+                // The next input segment is only the value if it doesn't start with "-"
                 if (isset($input[$next]) && !preg_match('/^-/', $input[$next])) {
                     $value = $input[$next];
                 } else {
@@ -196,6 +242,7 @@ abstract class CommandAbstract
             $name     = strtolower($name);
             $selected = false;
 
+            // Now that name and value are available, find matching arg from command definition
             foreach ($this->args as $arg) {
                 if ($arg['name'] === $name) {
                     $selected = true;
@@ -221,6 +268,7 @@ abstract class CommandAbstract
             }
         }
 
+        // If after matching named args, there is one bit of input left, assign it to our primary arg
         if ($this->primaryArg && !in_array($this->primaryArg, $argsSet) && 1 === count($input)) {
             $this->setArgValue($this->primaryArg, current($input));
 
@@ -228,6 +276,7 @@ abstract class CommandAbstract
             $input     = array();
         }
 
+        // Ensure no required args were missed
         foreach ($this->args as $arg) {
             if ($arg['required'] && !in_array($arg['name'], $argsSet)) {
                 $this->abort('Required argument "' . $arg['name'] . '" not set.');
@@ -238,6 +287,10 @@ abstract class CommandAbstract
         return true;
     }
 
+    /**
+     * @var string $description
+     * @return \Dewdrop\Cli\Command\CommandAbstract
+     */
     public function setDescription($description)
     {
         $this->description = $description;
@@ -245,11 +298,21 @@ abstract class CommandAbstract
         return $this;
     }
 
+    /**
+     * This method is available so the Help command can display a list of
+     * available commands.
+     *
+     * @return string
+     */
     public function getDescription()
     {
         return $this->description;
     }
 
+    /**
+     * @param string $command
+     * @return \Dewdrop\Cli\Command\CommandAbstract
+     */
     public function setCommand($command)
     {
         $this->command = strtolower($command);
@@ -257,11 +320,27 @@ abstract class CommandAbstract
         return $this;
     }
 
+    /**
+     * This method is available so the Help command can display a list of
+     * available commands.
+     *
+     * @return string
+     */
     public function getCommand()
     {
         return $this->command;
     }
 
+    /**
+     * Register an alias for this command.  This can be useful to provide
+     * the user other ways to execute the command.  For example, you might
+     * provide a shortened version of the command name so that experienced
+     * users can avoid typing the full name once their comfortable with
+     * the command.
+     *
+     * @param string $alias
+     * @return \Dewdrop\Cli\Command\CommandAbstract
+     */
     public function addAlias($alias)
     {
         $this->aliases[] = strtolower($alias);
@@ -269,6 +348,18 @@ abstract class CommandAbstract
         return $this;
     }
 
+    /**
+     * Add an argument while also setting it as the primary arg for this
+     * command.  For more information about the primary arg feature, read
+     * the docs on the $primaryArg property.
+     *
+     * @param string $name
+     * @param string $description
+     * @param boolean $required
+     * @param array $aliases
+     *
+     * @return \Dewdrop\Cli\Command\CommandAbstract
+     */
     public function addPrimaryArg($name, $description, $required, $aliases = array())
     {
         $this->primaryArg = $name;
@@ -278,6 +369,14 @@ abstract class CommandAbstract
         return $this;
     }
 
+    /**
+     * @param string $name
+     * @param string $description
+     * @param boolean $required
+     * @param array $aliases
+     *
+     * @return \Dewdrop\Cli\Command\CommandAbstract
+     */
     public function addArg($name, $description, $required, $aliases = array())
     {
         $this->args[] = array(
@@ -290,14 +389,33 @@ abstract class CommandAbstract
         return $this;
     }
 
+    /**
+     * Add an example usage for this command.  These are displayed in the
+     * command's help content.
+     *
+     * @param string $description
+     * @param string $command
+     *
+     * @return \Dewdrop\Cli\Command\CommandAbstract
+     */
     public function addExample($description, $command)
     {
         $this->examples[] = array(
             'description' => $description,
             'command'     => $command
         );
+
+        return $this;
     }
 
+    /**
+     * Based on the supplied input command, determine whether this command
+     * should be selected for argument parsing and execution.
+     *
+     * @param string $inputCommand
+     *
+     * @return \Dewdrop\Cli\Command\CommandAbstract
+     */
     public function isSelected($inputCommand)
     {
         $inputCommand = strtolower($inputCommand);
@@ -315,6 +433,23 @@ abstract class CommandAbstract
         return false;
     }
 
+    /**
+     * Display help content for this command.
+     *
+     * The basic command name and description, any avaialble aliases, and
+     * any avaialble examples are all included in the help display.
+     *
+     * This content can be accessed by called "--help" on this command
+     * directly:
+     *
+     * ./dewdrop my-command --help
+     *
+     * Or, you can use the built-in help command to access it:
+     *
+     * ./dewdrop help my-command
+     *
+     * @return void
+     */
     public function help()
     {
         $this->renderer
@@ -359,19 +494,40 @@ abstract class CommandAbstract
         return $this;
     }
 
+    /**
+     * Set the valid of the specified argument.
+     *
+     * The argument's name is inflected to form a setter name that will be
+     * called to set the value.  If no setter is available, execution will
+     * be aborted.
+     *
+     * @param string $name
+     * @param string $value
+     *
+     * @return \Dewdrop\Cli\Command\CommandAbstract
+     */
     private function setArgValue($name, $value)
     {
         $words  = explode('-', $name);
         $setter = 'set' . implode('', array_map('ucfirst', $words));
 
         if (!method_exists($this, $setter)) {
-            $this->abort('Attempting to set unknown argument "' . $name . '"');
+            $this->abort('No setter method available for argument "' . $name . '"');
             return;
         }
 
         $this->$setter($value);
+
+        return $this;
     }
 
+    /**
+     * Render the provided error message and display the command's help content.
+     *
+     * @param string $errorMessage
+     *
+     * @return \Dewdrop\Cli\Command\CommandAbstract
+     */
     protected function abort($errorMessage)
     {
         $this->renderer->error($errorMessage);
