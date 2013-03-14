@@ -527,7 +527,7 @@ abstract class CommandAbstract
      * Change "~" prefix to the user's home folder.
      *
      * Bash doesn't do "~" evaluation automatically for command arguments, so
-     * we do it hear to avoid confusing developers by creating a "~" folder
+     * we do it here to avoid confusing developers by creating a "~" folder
      * in their WP install instead.
      *
      * @param string $path
