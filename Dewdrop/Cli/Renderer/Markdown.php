@@ -2,8 +2,18 @@
 
 namespace Dewdrop\Cli\Renderer;
 
+/**
+ * Render output as Markdown.  For more information, see:
+ *
+ * <http://daringfireball.net/projects/markdown/>
+ *
+ * @package Dewdrop
+ */
 class Markdown implements RendererInterface
 {
+    /**
+     * @inheritdoc
+     */
     public function title($title)
     {
         echo PHP_EOL;
@@ -15,6 +25,9 @@ class Markdown implements RendererInterface
         return $this;
     }
 
+    /**
+     * @inheritdoc
+     */
     public function subhead($subhead)
     {
         echo $subhead . PHP_EOL;
@@ -24,6 +37,9 @@ class Markdown implements RendererInterface
         return $this;
     }
 
+    /**
+     * @inheritdoc
+     */
     public function text($text)
     {
         echo wordwrap($text, 80) . PHP_EOL;
@@ -31,6 +47,9 @@ class Markdown implements RendererInterface
         return $this;
     }
 
+    /**
+     * @inheritdoc
+     */
     public function table(array $rows)
     {
         $longest = 0;
@@ -44,10 +63,17 @@ class Markdown implements RendererInterface
         }
 
         foreach ($rows as $title => $description) {
-            printf(
-                '%-' . ($longest + 1) . 's %s',
-                $title . ':',
-                $description
+            echo str_replace(
+                PHP_EOL,
+                PHP_EOL . str_repeat(' ', $longest + 2),
+                wordwrap(
+                    sprintf(
+                        '%-' . ($longest + 1) . 's %s',
+                        $title . ':',
+                        $description
+                    ),
+                    80
+                )
             );
 
             echo PHP_EOL;
@@ -58,6 +84,9 @@ class Markdown implements RendererInterface
         return $this;
     }
 
+    /**
+     * @inheritdoc
+     */
     public function error($error)
     {
         echo PHP_EOL;
@@ -66,6 +95,9 @@ class Markdown implements RendererInterface
         return $this;
     }
 
+    /**
+     * @inheritdoc
+     */
     public function newline()
     {
         echo PHP_EOL;
