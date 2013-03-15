@@ -14,3 +14,7 @@ $config = array(
 );
 
 Zend\Loader\AutoloaderFactory::factory($config);
+
+$paths = new \Dewdrop\Paths();
+require_once $paths->getWpRoot() . '/wp-config.php';
+require_once $paths->getWpRoot() . '/wp-includes/wp-db.php';

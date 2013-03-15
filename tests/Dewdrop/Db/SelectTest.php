@@ -27,7 +27,6 @@ class Dewdrop_Db_SelectTest extends PHPUnit_Framework_TestCase
      */
     public function tearDown()
     {
-        //$this->db->closeConnection();
         $this->db = null;
     }
 
@@ -1471,11 +1470,6 @@ class Dewdrop_Db_SelectTest extends PHPUnit_Framework_TestCase
      */
     public function testSelectLimitFetchCol()
     {
-        // Stop here and mark this test as incomplete.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
-
         $product_id = $this->db->quoteIdentifier('product_id');
 
         $select = $this->db->select()
@@ -1483,10 +1477,10 @@ class Dewdrop_Db_SelectTest extends PHPUnit_Framework_TestCase
             ->where($product_id . ' = ?', 3)
             ->limit(1);
 
-        $result = $this->db->fetchCol($select);
-        $this->assertEquals(1, count($result));
-        $this->assertEquals('OS X', $result[0]);
-        $this->_checkExtraField($result);
+        $this->assertEquals(
+            'SELECT `zfproducts`.`product_name` FROM `zfproducts` WHERE (`product_id` = 3) LIMIT 1',
+            (string) $select
+        );
     }
 
     protected function selectLimitNone()
