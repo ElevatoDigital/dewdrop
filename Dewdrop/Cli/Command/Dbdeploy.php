@@ -162,7 +162,7 @@ class Dbdeploy extends CommandAbstract
 
             $this->renderer
                 ->unorderedList($listItems)
-                ->renderer->newline();
+                ->newline();
         }
     }
 
