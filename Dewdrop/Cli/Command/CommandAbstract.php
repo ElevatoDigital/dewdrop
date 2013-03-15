@@ -506,13 +506,13 @@ abstract class CommandAbstract
      *
      * @param string $errorMessage
      *
-     * @return \Dewdrop\Cli\Command\CommandAbstract
+     * @return boolean
      */
     protected function abort($errorMessage)
     {
         $this->renderer->error($errorMessage);
         $this->help();
-        return $this;
+        return false;
     }
 
     /**

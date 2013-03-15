@@ -2,19 +2,47 @@
 
 namespace Dewdrop\Cli\Command;
 
+/**
+ * Apply update to your database schema in a controlled and repeatable manner.
+ *
+ * @package Dewdrop
+ */
 class Dbdeploy extends CommandAbstract
 {
+    /**
+     * The valid options for the action arg.
+     *
+     * @var array
+     */
     private $validActions = array(
         'update',
         'status'
     );
 
+    /**
+     * A reference to the CLI runner's DB connection.  Carried around so it's
+     * easier to use throughout this command.
+     *
+     * @var \Dewdrop\Db\Adapter
+     */
     private $db;
 
+    /**
+     * @var string
+     */
     private $action;
 
+    /**
+     * The path the mysql binary.  If not specified, we'll attempt to
+     * auto-detect it.
+     *
+     * @var string
+     */
     private $mysql;
 
+    /**
+     * @inheritdoc
+     */
     public function init()
     {
         $this
@@ -37,6 +65,10 @@ class Dbdeploy extends CommandAbstract
         );
     }
 
+    /**
+     * @param string $action
+     * @return \Dewdrop\Cli\Command\Dbdeploy
+     */
     public function setAction($action)
     {
         $this->action = $action;
@@ -44,6 +76,10 @@ class Dbdeploy extends CommandAbstract
         return $this;
     }
 
+    /**
+     * @param string $action
+     * @return \Dewdrop\Cli\Command\Dbdeploy
+     */
     public function setMysql($mysql)
     {
         $this->mysql = $mysql;
@@ -51,6 +87,13 @@ class Dbdeploy extends CommandAbstract
         return $this;
     }
 
+    /**
+     * Determine which action the user has selected (update or status), ensure
+     * the changelog table is present and then delegate the remainder of the
+     * work to the action's own method.
+     *
+     * @return void
+     */
     public function execute()
     {
         if (null === $this->action) {
@@ -74,11 +117,23 @@ class Dbdeploy extends CommandAbstract
         $this->$method();
     }
 
+    /**
+     * Run any available updates.  If no updates are available, we display
+     * status information instead.
+     *
+     * @return void
+     */
     public function executeUpdate()
     {
         $current = $this->getCurrentRevision();
         $files   = $this->getChangeFiles($current);
-        $count   = count($files);
+
+        // Abort was called because a file was named improperly
+        if (false === $files) {
+            return false;
+        }
+
+        $count = count($files);
 
         if (!$count) {
             return $this->executeStatus();
@@ -117,11 +172,24 @@ class Dbdeploy extends CommandAbstract
             ->newline();
     }
 
+    /**
+     * Display dbdeploy status information including the DB's current
+     * revision and any update scripts that need to be run to bring it
+     * up to date.
+     *
+     * @return void
+     */
     public function executeStatus()
     {
         $current = $this->getCurrentRevision();
         $files   = $this->getChangeFiles($current);
-        $count   = count($files);
+
+        // Abort was called because a file was named improperly
+        if (false === $files) {
+            return false;
+        }
+
+        $count = count($files);
 
         $this->renderer->title('dbdeploy Status');
 
@@ -166,16 +234,58 @@ class Dbdeploy extends CommandAbstract
         }
     }
 
+    /**
+     * Extend the CommandAbstract help display with information on dbdeploy
+     * naming conventions.
+     *
+     * @return void
+     */
+    public function help()
+    {
+        parent::help();
+
+        $this->renderer
+            ->subhead('Naming conventions for dbdeploy files')
+            ->text('Files should be named in this format:')
+            ->newline()
+            ->text('    00001-short-description-of-change.sql')
+            ->newline()
+            ->text(
+                'Where "00001" is the change number padded with zeros to 5 digits in order '
+                . 'to ensure future changes sort nicely in a file listing, and the change number '
+                . 'and any words included in the file name are separated by hyphens.'
+            )
+            ->newline();
+    }
+
+    /**
+     * Check to see if the dbdeploy_changelog table already exists.
+     *
+     * @return boolean
+     */
     private function changelogExists()
     {
         return in_array('dbdeploy_changelog', $this->db->listTables());
     }
 
+    /**
+     * Create the changelog table by running the SQL script included with
+     * Dewdrop.
+     *
+     * @return boolean Whether it was successfully created.
+     */
     private function createChangelog()
     {
         return $this->runSqlScript(__DIR__ . '/dbdeploy/dbdeploy-changelog.sql');
     }
 
+    /**
+     * Update the changelog with a record for a newly executed file.
+     *
+     * @param string $file
+     * @param string $startDt
+     * @param string $completeDt
+     */
     private function updateChangelog($file, $startDt, $completeDt)
     {
         $this->db->insert(
@@ -191,11 +301,22 @@ class Dbdeploy extends CommandAbstract
         );
     }
 
+    /**
+     * Determine the current DB revision by looking for the maximum
+     * change_number value in the dbdeploy_changelog table.
+     *
+     * @return integer
+     */
     private function getCurrentRevision()
     {
         return (int) $this->db->fetchOne('SELECT MAX(change_number) FROM dbdeploy_changelog');
     }
 
+    /**
+     * Run the specified SQL script through the mysql binary.
+     *
+     * @return boolean Whether the mysql command ran successfully.
+     */
     private function runSqlScript($path)
     {
         if (null === $this->mysql) {
@@ -215,6 +336,11 @@ class Dbdeploy extends CommandAbstract
         return 0 === $this->passthru($cmd);
     }
 
+    /**
+     * Get the files with a change number greater than the current revision.
+     *
+     * @return array The files that need to be run.
+     */
     private function getChangeFiles($currentRevision)
     {
         $out   = array();
@@ -223,6 +349,11 @@ class Dbdeploy extends CommandAbstract
 
         foreach ($files as $file) {
             $changeNumber = $this->getFileChangeNumber($file);
+            $filename     = basename($file);
+
+            if (!preg_match('/^[0-9]{5}-/', $filename)) {
+                return $this->abort("Change file \"$filename\" does not follow the dbdeploy naming conventions.");
+            }
 
             if ($changeNumber > $currentRevision) {
                 $out[$changeNumber] = realpath($file);
@@ -234,6 +365,19 @@ class Dbdeploy extends CommandAbstract
         return $out;
     }
 
+    /**
+     * Determine the change number for the provided file name.  Files should be
+     * named in this format:
+     *
+     * 00001-short-description-of-change.sql
+     *
+     * Where "00001" is the change number padded with zeros to 5 digits in order
+     * to ensure future changes sort nicely in a file listing and the change number
+     * and any words included in the file name are separated by hyphens.
+     *
+     * @param string $file
+     * @return integer
+     */
     private function getFileChangeNumber($file)
     {
         $file = basename($file);

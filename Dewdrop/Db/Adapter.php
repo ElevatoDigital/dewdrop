@@ -214,9 +214,7 @@ class Adapter
                         $val = ':col'.$i;
                         $i++;
                     } else {
-                        /** @see Zend_Db_Adapter_Exception */
-                        // require_once 'Zend/Db/Adapter/Exception.php';
-                        throw new Zend_Db_Adapter_Exception(get_class($this) ." doesn't support positional or named binding");
+                        throw new Exception(get_class($this) ." doesn't support positional or named binding");
                     }
                 }
             }
@@ -677,5 +675,10 @@ class Adapter
             default:
                 return false;
         }
+    }
+
+    public function lastInsertId()
+    {
+        return $this->wpdb->insert_id;
     }
 }

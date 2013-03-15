@@ -12,12 +12,9 @@ abstract class ComponentAbstract
 
     private $menuPosition;
 
-    private $wiring;
-
-    public function __construct(\Dewdrop\Db\Adapter $db, \Dewdrop\Wiring $wiring)
+    public function __construct(\Dewdrop\Db\Adapter $db)
     {
-        $this->db     = $db;
-        $this->wiring = $wiring;
+        $this->db = $db;
 
         $this->init();
 
@@ -31,11 +28,6 @@ abstract class ComponentAbstract
         add_action('admin_menu', array($this, 'registerMenuPage'));
     }
 
-    public function getModel($name)
-    {
-        return $this->wiring->getModel($name);
-    }
-
     public function route()
     {
         $reflectedClass = new ReflectionClass($this);
@@ -46,8 +38,6 @@ abstract class ComponentAbstract
 
         require_once $pageFile;
         $page = new $className($this, $pageFile);
-
-        $output = $page->render();
 
         // Automatically render view if no output is generated
         if (!$output) {
@@ -66,6 +56,11 @@ abstract class ComponentAbstract
             $this->icon,
             $this->menuPosition
         );
+    }
+
+    public function getDb()
+    {
+        return $this->db;
     }
 
     public function setTitle($title)
