@@ -78,7 +78,7 @@ class SniffTest extends \PHPUnit_Framework_TestCase
 
         $cmd  = $bin;
         $cmd .= ' --standard=' . $standard;
-        $cmd .= ' --ignore=*/Zend/* --ignore=*/tests/* ';
+        $cmd .= ' --ignore=*/Zend/* --ignore=*/tests/* --ignore=*/models/metadata/* ';
         $cmd .= escapeshellarg($path);
 
         return $cmd;

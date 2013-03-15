@@ -83,7 +83,7 @@ class Sniff extends CommandAbstract
         }
 
         $cmd = sprintf(
-            '%s --standard=%s --ignore=*/Zend/* --ignore=*/tests/* %s',
+            '%s --standard=%s --ignore=*/Zend/* --ignore=*/tests/* --ignore=*/models/metadata/* %s',
             $this->phpcs,
             escapeshellarg($this->standard),
             escapeshellarg($this->paths->getPluginRoot())
