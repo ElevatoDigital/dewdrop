@@ -49,6 +49,15 @@ class Mock implements RendererInterface
 
     }
 
+    public function unorderedList(array $items)
+    {
+        foreach ($items as $item) {
+            $this->output .= $item;
+        }
+
+        return $this;
+    }
+
     public function hasOutput($search)
     {
         return false !== stripos($this->output, $search);

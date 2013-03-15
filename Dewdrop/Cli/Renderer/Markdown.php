@@ -98,6 +98,18 @@ class Markdown implements RendererInterface
     /**
      * @inheritdoc
      */
+    public function unorderedList(array $items)
+    {
+        foreach ($items as $item) {
+            $this->text("* {$item}");
+        }
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function newline()
     {
         echo PHP_EOL;

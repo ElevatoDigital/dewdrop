@@ -58,4 +58,12 @@ interface RendererInterface
      * @returns RendererInterface
      */
     public function newline();
+
+    /**
+     * Display an unordered (bulleted) list.
+     *
+     * @param array $items
+     * @return RendererInterface
+     */
+    public function unorderedList(array $items);
 }

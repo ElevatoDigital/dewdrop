@@ -2,8 +2,16 @@
 
 namespace Dewdrop\Cli\Command;
 
+/**
+ * Refresh all DB metadata definition files.
+ *
+ * @package Dewdrop
+ */
 class DbMetadata extends CommandAbstract
 {
+    /**
+     * @inheritdoc
+     */
     public function init()
     {
         $this
@@ -20,6 +28,12 @@ class DbMetadata extends CommandAbstract
         );
     }
 
+    /**
+     * Iterate over the list of DB tables and populate a metadata file for
+     * each one.
+     *
+     * @return void
+     */
     public function execute()
     {
         $db   = $this->runner->connectDb();

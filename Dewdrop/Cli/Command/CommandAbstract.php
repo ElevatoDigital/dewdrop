@@ -527,7 +527,7 @@ abstract class CommandAbstract
     {
         passthru($command, $exitStatus);
 
-        return $exitStatus;
+        return (int) $exitStatus;
     }
 
     /**

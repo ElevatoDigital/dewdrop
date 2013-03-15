@@ -136,6 +136,124 @@ class Adapter
         return $this->wpdb->get_var($sql);
     }
 
+    /**
+     * Inserts a table row with specified data.
+     *
+     * @param mixed $table The table to insert data into.
+     * @param array $bind Column-value pairs.
+     * @return int The number of affected rows.
+     */
+    public function insert($table, array $bind)
+    {
+        // extract and quote col names from the array keys
+        $cols = array();
+        $vals = array();
+        $i = 0;
+        foreach ($bind as $col => $val) {
+            $cols[] = $this->quoteIdentifier($col, true);
+            if ($val instanceof Expr) {
+                $vals[] = $val->__toString();
+                unset($bind[$col]);
+            } else {
+                if ($this->supportsParameters('positional')) {
+                    $vals[] = '?';
+                } else {
+                    if ($this->supportsParameters('named')) {
+                        unset($bind[$col]);
+                        $bind[':col'.$i] = $val;
+                        $vals[] = ':col'.$i;
+                        $i++;
+                    } else {
+                        throw new Exception(get_class($this) ." doesn't support positional or named binding");
+                    }
+                }
+            }
+        }
+
+        // build the statement
+        $sql = "INSERT INTO "
+             . $this->quoteIdentifier($table, true)
+             . ' (' . implode(', ', $cols) . ') '
+             . 'VALUES (' . implode(', ', $vals) . ')';
+
+        // execute the statement and return the number of affected rows
+        if ($this->supportsParameters('positional')) {
+            $bind = array_values($bind);
+        }
+
+        return $this->query($sql, $bind);
+    }
+
+    /**
+     * Updates table rows with specified data based on a WHERE clause.
+     *
+     * @param  mixed        $table The table to update.
+     * @param  array        $bind  Column-value pairs.
+     * @param  mixed        $where UPDATE WHERE clause(s).
+     * @return int          The number of affected rows.
+     */
+    public function update($table, array $bind, $where = '')
+    {
+        /**
+         * Build "col = ?" pairs for the statement,
+         * except for Zend_Db_Expr which is treated literally.
+         */
+        $set = array();
+        $i = 0;
+        foreach ($bind as $col => $val) {
+            if ($val instanceof Expr) {
+                $val = $val->__toString();
+                unset($bind[$col]);
+            } else {
+                if ($this->supportsParameters('positional')) {
+                    $val = '?';
+                } else {
+                    if ($this->supportsParameters('named')) {
+                        unset($bind[$col]);
+                        $bind[':col'.$i] = $val;
+                        $val = ':col'.$i;
+                        $i++;
+                    } else {
+                        /** @see Zend_Db_Adapter_Exception */
+                        // require_once 'Zend/Db/Adapter/Exception.php';
+                        throw new Zend_Db_Adapter_Exception(get_class($this) ." doesn't support positional or named binding");
+                    }
+                }
+            }
+            $set[] = $this->quoteIdentifier($col, true) . ' = ' . $val;
+        }
+
+        $where = $this->whereExpr($where);
+
+        /**
+         * Build the UPDATE statement
+         */
+        $sql = "UPDATE "
+             . $this->quoteIdentifier($table, true)
+             . ' SET ' . implode(', ', $set)
+             . (($where) ? " WHERE $where" : '');
+
+        /**
+         * Execute the statement and return the number of affected rows
+         */
+        if ($this->supportsParameters('positional')) {
+            $result = $this->query($sql, array_values($bind));
+        } else {
+            $result = $this->query($sql, $bind);
+        }
+
+        return $result;
+    }
+
+    public function query($sql, $bind = array())
+    {
+        foreach ($bind as $position => $param) {
+            $sql = $this->quoteInto($sql, $param, null, 1);
+        }
+
+        return $this->wpdb->query($sql);
+    }
+
     public function quoteIdentifier($identifier, $auto = false)
     {
         return $this->quoteIdentifierAs($identifier, null, $auto);
@@ -508,5 +626,56 @@ class Adapter
                 $value = (string) $key;
         }
         return $value;
+    }
+
+    /**
+     * Convert an array, string, or Zend_Db_Expr object
+     * into a string to put in a WHERE clause.
+     *
+     * @param mixed $where
+     * @return string
+     */
+    protected function whereExpr($where)
+    {
+        if (empty($where)) {
+            return $where;
+        }
+        if (!is_array($where)) {
+            $where = array($where);
+        }
+        foreach ($where as $cond => &$term) {
+            // is $cond an int? (i.e. Not a condition)
+            if (is_int($cond)) {
+                // $term is the full condition
+                if ($term instanceof Expr) {
+                    $term = $term->__toString();
+                }
+            } else {
+                // $cond is the condition with placeholder,
+                // and $term is quoted into the condition
+                $term = $this->quoteInto($cond, $term);
+            }
+            $term = '(' . $term . ')';
+        }
+
+        $where = implode(' AND ', $where);
+        return $where;
+    }
+
+    /**
+     * Check if the adapter supports real SQL parameters.
+     *
+     * @param string $type 'positional' or 'named'
+     * @return bool
+     */
+    public function supportsParameters($type)
+    {
+        switch ($type) {
+            case 'positional':
+                return true;
+            case 'named':
+            default:
+                return false;
+        }
     }
 }
