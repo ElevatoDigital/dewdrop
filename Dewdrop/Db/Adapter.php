@@ -14,6 +14,13 @@ class Adapter
     const FLOAT_TYPE  = 2;
 
     /**
+     * PDO constant values used by some helper methods on the adapter class.
+     */
+    const CASE_LOWER = 2;
+    const CASE_NATURAL = 0;
+    const CASE_UPPER = 1;
+
+    /**
      * Keys are UPPERCASE SQL datatypes or the constants
      * Zend_Db::INT_TYPE, Zend_Db::BIGINT_TYPE, or Zend_Db::FLOAT_TYPE.
      *
@@ -88,6 +95,11 @@ class Adapter
         $rs = $this->wpdb->get_results((string) $sql, $fetchMode);
 
         return $rs;
+    }
+
+    public function fetchCol($sql)
+    {
+        return $this->wpdb->get_col($sql);
     }
 
     public function fetchRow($sql, $fetchMode = null)
@@ -354,5 +366,147 @@ class Adapter
         }
 
         return $sql;
+    }
+
+    /**
+     * Returns a list of the tables in the database.
+     *
+     * @return array
+     */
+    public function listTables()
+    {
+        return $this->fetchCol('SHOW TABLES');
+    }
+
+    /**
+     * Returns the column descriptions for a table.
+     *
+     * The return value is an associative array keyed by the column name,
+     * as returned by the RDBMS.
+     *
+     * The value of each array element is an associative array
+     * with the following keys:
+     *
+     * SCHEMA_NAME      => string; name of database or schema
+     * TABLE_NAME       => string;
+     * COLUMN_NAME      => string; column name
+     * COLUMN_POSITION  => number; ordinal position of column in table
+     * DATA_TYPE        => string; SQL datatype name of column
+     * DEFAULT          => string; default expression of column, null if none
+     * NULLABLE         => boolean; true if column can have nulls
+     * LENGTH           => number; length of CHAR/VARCHAR
+     * SCALE            => number; scale of NUMERIC/DECIMAL
+     * PRECISION        => number; precision of NUMERIC/DECIMAL
+     * UNSIGNED         => boolean; unsigned property of an integer type
+     * PRIMARY          => boolean; true if column is part of the primary key
+     * PRIMARY_POSITION => integer; position of column in primary key
+     * IDENTITY         => integer; true if column is auto-generated with unique values
+     *
+     * @param string $tableName
+     * @param string $schemaName OPTIONAL
+     * @return array
+     */
+    public function describeTable($tableName, $schemaName = null)
+    {
+        if ($schemaName) {
+            $sql = 'DESCRIBE ' . $this->quoteIdentifier("$schemaName.$tableName", true);
+        } else {
+            $sql = 'DESCRIBE ' . $this->quoteIdentifier($tableName, true);
+        }
+
+        $result = $this->fetchAll($sql, ARRAY_A);
+        $desc   = array();
+
+        $row_defaults = array(
+            'Length'          => null,
+            'Scale'           => null,
+            'Precision'       => null,
+            'Unsigned'        => null,
+            'Primary'         => false,
+            'PrimaryPosition' => null,
+            'Identity'        => false
+        );
+        $i = 1;
+        $p = 1;
+        foreach ($result as $key => $row) {
+            $row = array_merge($row_defaults, $row);
+            if (preg_match('/unsigned/', $row['Type'])) {
+                $row['Unsigned'] = true;
+            }
+            if (preg_match('/^((?:var)?char)\((\d+)\)/', $row['Type'], $matches)) {
+                $row['Type'] = $matches[1];
+                $row['Length'] = $matches[2];
+            } else if (preg_match('/^decimal\((\d+),(\d+)\)/', $row['Type'], $matches)) {
+                $row['Type'] = 'decimal';
+                $row['Precision'] = $matches[1];
+                $row['Scale'] = $matches[2];
+            } else if (preg_match('/^float\((\d+),(\d+)\)/', $row['Type'], $matches)) {
+                $row['Type'] = 'float';
+                $row['Precision'] = $matches[1];
+                $row['Scale'] = $matches[2];
+            } else if (preg_match('/^((?:big|medium|small|tiny)?int)\((\d+)\)/', $row['Type'], $matches)) {
+                $row['Type'] = $matches[1];
+                /**
+                 * The optional argument of a MySQL int type is not precision
+                 * or length; it is only a hint for display width.
+                 */
+            }
+            if (strtoupper($row['Key']) == 'PRI') {
+                $row['Primary'] = true;
+                $row['PrimaryPosition'] = $p;
+                if ($row['Extra'] == 'auto_increment') {
+                    $row['Identity'] = true;
+                } else {
+                    $row['Identity'] = false;
+                }
+                ++$p;
+            }
+            $desc[$this->foldCase($row['Field'])] = array(
+                'SCHEMA_NAME'      => null, // @todo
+                'TABLE_NAME'       => $this->foldCase($tableName),
+                'COLUMN_NAME'      => $this->foldCase($row['Field']),
+                'COLUMN_POSITION'  => $i,
+                'DATA_TYPE'        => $row['Type'],
+                'DEFAULT'          => $row['Default'],
+                'NULLABLE'         => (bool) ($row['Null'] == 'YES'),
+                'LENGTH'           => $row['Length'],
+                'SCALE'            => $row['Scale'],
+                'PRECISION'        => $row['Precision'],
+                'UNSIGNED'         => $row['Unsigned'],
+                'PRIMARY'          => $row['Primary'],
+                'PRIMARY_POSITION' => $row['PrimaryPosition'],
+                'IDENTITY'         => $row['Identity']
+            );
+            ++$i;
+        }
+        return $desc;
+    }
+
+    /**
+     * Helper method to change the case of the strings used
+     * when returning result sets in FETCH_ASSOC and FETCH_BOTH
+     * modes.
+     *
+     * This is not intended to be used by application code,
+     * but the method must be public so the Statement class
+     * can invoke it.
+     *
+     * @param string $key
+     * @return string
+     */
+    public function foldCase($key)
+    {
+        switch ($this->_caseFolding) {
+            case self::CASE_LOWER:
+                $value = strtolower((string) $key);
+                break;
+            case self::CASE_UPPER:
+                $value = strtoupper((string) $key);
+                break;
+            case self::CASE_NATURAL:
+            default:
+                $value = (string) $key;
+        }
+        return $value;
     }
 }

@@ -8,7 +8,10 @@ class Dbdeploy extends CommandAbstract
     {
         $this
             ->setDescription('Update database schema using dbdeploy')
-            ->setCommand('dbdeploy');
+            ->setCommand('dbdeploy')
+            ->addAlias('db-deploy')
+            ->addAlias('db-migrate')
+            ->addAlias('db-migrations');
     }
 
     public function execute()

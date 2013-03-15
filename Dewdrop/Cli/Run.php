@@ -22,6 +22,7 @@ class Run
         'Update',
         'Sniff',
         'Dbdeploy',
+        'DbMetadata',
         'Lint',
         'GenAdminComponent',
         'GenDbTable',
