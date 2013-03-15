@@ -45,14 +45,19 @@ class Adapter
 
     protected $autoQuoteIdentifiers = true;
 
+    /**
+     * @var
+     */
     protected $fetchMode = ARRAY_A;
 
-    protected $defaultStmtClass = '\Dewdrop\Db\Statement';
-
-    protected $stmt;
-
+    /**
+     * @var \wpdb
+     */
     private $wpdb;
 
+    /**
+     * @param \wpdb $wpdb
+     */
     public function __construct(\wpdb $wpdb)
     {
         $this->wpdb = $wpdb;
@@ -73,7 +78,6 @@ class Adapter
     {
         return new Select($this);
     }
-
 
     public function fetchAll($sql, $fetchMode = null)
     {

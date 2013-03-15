@@ -81,7 +81,7 @@ class DewdropTest extends CommandAbstract
             $this->phpunit = $this->autoDetectExecutable('phpunit');
         }
 
-        $testPath = realpath(__DIR__ . '/../../../tests');
+        $testPath = $this->paths->getLib() . '/tests';
 
         $cmd = sprintf(
             '%s -c %s',

@@ -434,16 +434,12 @@ class Dewdrop_Db_SelectTest extends PHPUnit_Framework_TestCase
 
     public function testSelectJoinWithNocolumns()
     {
-        // Stop here and mark this test as incomplete.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
-
         $select = $this->selectJoinWithNocolumns();
-        $stmt = $this->db->query($select);
-        $result = $stmt->fetchAll();
-        $this->assertEquals(3, count($result));
-        $this->assertEquals(2, count($result[0]));
+
+        $this->assertEquals(
+            'SELECT `zfproducts`.* FROM `zfproducts` INNER JOIN `zfbugs` ON `zfbugs`.`bug_id` = 1 INNER JOIN `zfbugs_products` ON `zfproducts`.`product_id` = `zfbugs_products`.`product_id` AND `zfbugs_products`.`bug_id` = `zfbugs`.`bug_id`',
+            str_replace(PHP_EOL, '', (string) $select)
+        );
     }
 
     /**
@@ -463,18 +459,12 @@ class Dewdrop_Db_SelectTest extends PHPUnit_Framework_TestCase
 
     public function testSelectJoinLeft()
     {
-        // Stop here and mark this test as incomplete.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
-
         $select = $this->selectJoinLeft();
-        $stmt = $this->db->query($select);
-        $result = $stmt->fetchAll();
-        $this->assertEquals(7, count($result));
-        $this->assertEquals(9, count($result[0]));
-        $this->assertEquals(3, $result[3]['product_id']);
-        $this->assertNull($result[6]['product_id']);
+
+        $this->assertEquals(
+            'SELECT `zfbugs`.*, `zfbugs_products`.* FROM `zfbugs` LEFT JOIN `zfbugs_products` ON `zfbugs`.`bug_id` = `zfbugs_products`.`bug_id`',
+            str_replace(PHP_EOL, '', (string) $select)
+        );
     }
 
     /**
@@ -524,18 +514,12 @@ class Dewdrop_Db_SelectTest extends PHPUnit_Framework_TestCase
 
     public function testSelectJoinRight()
     {
-        // Stop here and mark this test as incomplete.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
-
         $select = $this->selectJoinRight();
-        $stmt = $this->db->query($select);
-        $result = $stmt->fetchAll();
-        $this->assertEquals(7, count($result));
-        $this->assertEquals(9, count($result[0]));
-        $this->assertEquals(3, $result[3]['product_id']);
-        $this->assertNull($result[6]['product_id']);
+
+        $this->assertEquals(
+            'SELECT `zfbugs_products`.*, `zfbugs`.* FROM `zfbugs_products` RIGHT JOIN `zfbugs` ON `zfbugs_products`.`bug_id` = `zfbugs`.`bug_id`',
+            str_replace(PHP_EOL, '', (string) $select)
+        );
     }
 
     /**
@@ -551,16 +535,12 @@ class Dewdrop_Db_SelectTest extends PHPUnit_Framework_TestCase
 
     public function testSelectJoinCross()
     {
-        // Stop here and mark this test as incomplete.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
-
         $select = $this->selectJoinCross();
-        $stmt = $this->db->query($select);
-        $result = $stmt->fetchAll();
-        $this->assertEquals(18, count($result));
-        $this->assertEquals(3, count($result[0]));
+
+        $this->assertEquals(
+            'SELECT `zfproducts`.*, `zfbugs_products`.* FROM `zfproducts` CROSS JOIN `zfbugs_products`',
+            str_replace(PHP_EOL, '', (string) $select)
+        );
     }
 
     /**
@@ -573,7 +553,8 @@ class Dewdrop_Db_SelectTest extends PHPUnit_Framework_TestCase
         $bugs_products = $this->db->quoteIdentifier('zfbugs_products');
         $product_id = $this->db->quoteIdentifier('product_id');
 
-        $schema = $this->_util->getSchema();
+        $schema = 'zfexample';
+
         $select = $this->db->select()
             ->from('zfproducts')
             ->join("$schema.zfbugs_products", "$products.$product_id = $bugs_products.$product_id");
@@ -582,16 +563,12 @@ class Dewdrop_Db_SelectTest extends PHPUnit_Framework_TestCase
 
     public function testSelectJoinQualified()
     {
-        // Stop here and mark this test as incomplete.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
-
         $select = $this->selectJoinQualified();
-        $stmt = $this->db->query($select);
-        $result = $stmt->fetchAll();
-        $this->assertEquals(6, count($result));
-        $this->assertEquals(3, count($result[0]));
+
+        $this->assertEquals(
+            'SELECT `zfproducts`.*, `zfbugs_products`.* FROM `zfproducts` INNER JOIN `zfexample`.`zfbugs_products` ON `zfproducts`.`product_id` = `zfbugs_products`.`product_id`',
+            str_replace(PHP_EOL, '', $select)
+        );
     }
 
     protected function selectJoinUsing()
@@ -620,17 +597,12 @@ class Dewdrop_Db_SelectTest extends PHPUnit_Framework_TestCase
 
     public function testSelectJoinUsing()
     {
-        // Stop here and mark this test as incomplete.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
-
         $select = $this->selectJoinUsing();
-        $sql = preg_replace('/\\s+/', ' ', $select->assemble());
-        $stmt = $this->db->query($select);
-        $result = $stmt->fetchAll();
-        $this->assertEquals(3, count($result));
-        $this->assertEquals(1, $result[0]['product_id']);
+
+        $this->assertEquals(
+            'SELECT `zfproducts`.*, ```zfbugs_products``.``product_id`` = ``zfproducts```.```product_id``` FROM `zfproducts` INNER JOIN `*`.`inner join` ON zfbugs_products WHERE (`zfbugs_products`.`product_id` < 3)',
+            str_replace(PHP_EOL, '', $select)
+        );
     }
 
     protected function selectJoinInnerUsing()
@@ -648,17 +620,12 @@ class Dewdrop_Db_SelectTest extends PHPUnit_Framework_TestCase
 
     public function testSelectJoinInnerUsing()
     {
-        // Stop here and mark this test as incomplete.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
-
         $select = $this->selectJoinInnerUsing();
-        $sql = preg_replace('/\\s+/', ' ', $select->assemble());
-        $stmt = $this->db->query($select);
-        $result = $stmt->fetchAll();
-        $this->assertEquals(3, count($result));
-        $this->assertEquals(1, $result[0]['product_id']);
+
+        $this->assertEquals(
+            'SELECT `zfproducts`.*, ```zfbugs_products``.``product_id`` = ``zfproducts```.```product_id``` FROM `zfproducts` INNER JOIN `*`.`inner join` ON zfbugs_products WHERE (`zfbugs_products`.`product_id` < 3)',
+            str_replace(PHP_EOL, '', $select)
+        );
     }
 
     public function testSelectJoinInnerUsingException()
@@ -711,16 +678,12 @@ class Dewdrop_Db_SelectTest extends PHPUnit_Framework_TestCase
 
     public function testSelectWhere()
     {
-        // Stop here and mark this test as incomplete.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
-
         $select = $this->selectWhere();
-        $stmt = $this->db->query($select);
-        $result = $stmt->fetchAll();
-        $this->assertEquals(1, count($result));
-        $this->assertEquals(2, $result[0]['product_id']);
+
+        $this->assertEquals(
+            'SELECT `zfproducts`.* FROM `zfproducts` WHERE (`product_id` = 2)',
+            (string) $select
+        );
     }
 
     /**
@@ -760,15 +723,12 @@ class Dewdrop_Db_SelectTest extends PHPUnit_Framework_TestCase
 
     public function testSelectWhereArray()
     {
-        // Stop here and mark this test as incomplete.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
-
         $select = $this->selectWhereArray();
-        $stmt = $this->db->query($select);
-        $result = $stmt->fetchAll();
-        $this->assertEquals(3, count($result));
+
+        $this->assertEquals(
+            'SELECT `zfproducts`.* FROM `zfproducts` WHERE (`product_id` IN (1, 2, 3))',
+            (string) $select
+        );
     }
 
     /**
@@ -788,15 +748,12 @@ class Dewdrop_Db_SelectTest extends PHPUnit_Framework_TestCase
 
     public function testSelectWhereAnd()
     {
-        // Stop here and mark this test as incomplete.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
-
         $select = $this->selectWhereAnd();
-        $stmt = $this->db->query($select);
-        $result = $stmt->fetchAll();
-        $this->assertEquals(0, count($result));
+
+        $this->assertEquals(
+            'SELECT `zfproducts`.* FROM `zfproducts` WHERE (`product_id` = 2) AND (`product_id` = 1)',
+            $select->__toString()
+        );
     }
 
     /**
@@ -1229,19 +1186,12 @@ class Dewdrop_Db_SelectTest extends PHPUnit_Framework_TestCase
 
     public function testSelectOrderByPositionAsc()
     {
-        // Stop here and mark this test as incomplete.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
-
         $select = $this->selectOrderByPositionAsc();
 
-        $stmt = $this->db->query($select);
-        $result = $stmt->fetchAll();
-
-        $this->assertEquals(2, $result[0]['product_id']);
-        $this->assertEquals(3, $result[1]['product_id']);
-        $this->assertEquals(1, $result[2]['product_id']);
+        $this->assertEquals(
+            'SELECT `zfproducts`.* FROM `zfproducts` ORDER BY 2 ASC',
+            $select->__toString()
+        );
     }
 
     protected function selectOrderByPositionDesc()
@@ -1254,19 +1204,12 @@ class Dewdrop_Db_SelectTest extends PHPUnit_Framework_TestCase
 
     public function testSelectOrderByPositionDesc()
     {
-        // Stop here and mark this test as incomplete.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
-
         $select = $this->selectOrderByPositionDesc();
 
-        $stmt = $this->db->query($select);
-        $result = $stmt->fetchAll();
-
-        $this->assertEquals(1, $result[0]['product_id']);
-        $this->assertEquals(3, $result[1]['product_id']);
-        $this->assertEquals(2, $result[2]['product_id']);
+        $this->assertEquals(
+            'SELECT `zfproducts`.* FROM `zfproducts` ORDER BY 2 DESC',
+            $select->__toString()
+        );
     }
 
     protected function selectOrderByMultiplePositions()
@@ -1279,19 +1222,12 @@ class Dewdrop_Db_SelectTest extends PHPUnit_Framework_TestCase
 
     public function testSelectOrderByMultiplePositions()
     {
-        // Stop here and mark this test as incomplete.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
-
         $select = $this->selectOrderByMultiplePositions();
 
-        $stmt = $this->db->query($select);
-        $result = $stmt->fetchAll();
-
-        $this->assertEquals(1, $result[0]['product_id']);
-        $this->assertEquals(3, $result[1]['product_id']);
-        $this->assertEquals(2, $result[2]['product_id']);
+        $this->assertEquals(
+            'SELECT `zfproducts`.* FROM `zfproducts` ORDER BY 2 DESC, 1 DESC',
+            $select->__toString()
+        );
     }
 
     protected function selectOrderByDesc()
@@ -1304,17 +1240,12 @@ class Dewdrop_Db_SelectTest extends PHPUnit_Framework_TestCase
 
     public function testSelectOrderByDesc()
     {
-        // Stop here and mark this test as incomplete.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
-
         $select = $this->selectOrderByDesc();
-        $stmt = $this->db->query($select);
-        $result = $stmt->fetchAll();
-        $this->assertEquals(3, count($result),
-            'Expected count of result set to be 2');
-        $this->assertEquals(3, $result[0]['product_id']);
+
+        $this->assertEquals(
+            'SELECT `zfproducts`.* FROM `zfproducts` ORDER BY `product_id` DESC',
+            $select->__toString()
+        );
     }
 
     /**
@@ -1331,15 +1262,12 @@ class Dewdrop_Db_SelectTest extends PHPUnit_Framework_TestCase
 
     public function testSelectOrderByQualified()
     {
-        // Stop here and mark this test as incomplete.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
-
         $select = $this->selectOrderByQualified();
-        $stmt = $this->db->query($select);
-        $result = $stmt->fetchAll();
-        $this->assertEquals(1, $result[0]['product_id']);
+
+        $this->assertEquals(
+            'SELECT `zfproducts`.* FROM `zfproducts` ORDER BY `zfproducts`.`product_id` ASC',
+            $select->__toString()
+        );
     }
 
     /**
@@ -1356,15 +1284,12 @@ class Dewdrop_Db_SelectTest extends PHPUnit_Framework_TestCase
 
     public function testSelectOrderByExpr()
     {
-        // Stop here and mark this test as incomplete.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
-
         $select = $this->selectOrderByExpr();
-        $stmt = $this->db->query($select);
-        $result = $stmt->fetchAll();
-        $this->assertEquals(1, $result[0]['product_id']);
+
+        $this->assertEquals(
+            'SELECT `zfproducts`.* FROM `zfproducts` ORDER BY 1',
+            $select->__toString()
+        );
     }
 
     /**
@@ -1386,15 +1311,12 @@ class Dewdrop_Db_SelectTest extends PHPUnit_Framework_TestCase
 
     public function testSelectOrderByAutoExpr()
     {
-        // Stop here and mark this test as incomplete.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
-
         $select = $this->selectOrderByAutoExpr();
-        $stmt = $this->db->query($select);
-        $result = $stmt->fetchAll();
-        $this->assertEquals(1, $result[0]['product_id']);
+
+        $this->assertEquals(
+            'SELECT `zfproducts`.* FROM `zfproducts` ORDER BY ABS(`zfproducts`.`product_id`) ASC',
+            $select->__toString()
+        );
     }
 
     /**
@@ -1412,15 +1334,12 @@ class Dewdrop_Db_SelectTest extends PHPUnit_Framework_TestCase
 
     public function testSelectOrderByMultiLine()
     {
-        // Stop here and mark this test as incomplete.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
-
         $select = $this->selectOrderByMultiLine();
-        $stmt = $this->db->query($select);
-        $result = $stmt->fetchAll();
-        $this->assertEquals(3, $result[0]['product_id']);
+
+        $this->assertEquals(
+            "SELECT `zfproducts`.* FROM `zfproducts` ORDER BY `product_id` DESC",
+            $select->__toString()
+        );
     }
 
     /**
@@ -1451,17 +1370,12 @@ class Dewdrop_Db_SelectTest extends PHPUnit_Framework_TestCase
      */
     public function testSelectLimit()
     {
-        // Stop here and mark this test as incomplete.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
-
         $select = $this->selectLimit();
-        $stmt = $this->db->query($select);
-        $result = $stmt->fetchAll();
-        $this->assertEquals(1, count($result));
-        $this->assertEquals(1, $result[0]['product_id']);
-        $this->_checkExtraField($result[0]);
+
+        $this->assertEquals(
+            'SELECT `zfproducts`.* FROM `zfproducts` ORDER BY `product_id` ASC LIMIT 1',
+            $select->__toString()
+        );
     }
 
     /**
@@ -1497,16 +1411,12 @@ class Dewdrop_Db_SelectTest extends PHPUnit_Framework_TestCase
      */
     public function testSelectLimitNone()
     {
-        // Stop here and mark this test as incomplete.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
-
         $select = $this->selectLimitNone();
-        $stmt = $this->db->query($select);
-        $result = $stmt->fetchAll();
-        $this->assertEquals(3, count($result));
-        $this->_checkExtraField($result[0]);
+
+        $this->assertEquals(
+            'SELECT `zfproducts`.* FROM `zfproducts` ORDER BY `product_id` ASC',
+            $select->__toString()
+        );
     }
 
     protected function selectLimitOffset()
@@ -1523,17 +1433,12 @@ class Dewdrop_Db_SelectTest extends PHPUnit_Framework_TestCase
      */
     public function testSelectLimitOffset()
     {
-        // Stop here and mark this test as incomplete.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
-
         $select = $this->selectLimitOffset();
-        $stmt = $this->db->query($select);
-        $result = $stmt->fetchAll();
-        $this->assertEquals(1, count($result));
-        $this->assertEquals(2, $result[0]['product_id']);
-        $this->_checkExtraField($result[0]);
+
+        $this->assertEquals(
+            'SELECT `zfproducts`.* FROM `zfproducts` ORDER BY `product_id` ASC LIMIT 1 OFFSET 1',
+            $select->__toString()
+        );
     }
 
     /**
@@ -1553,17 +1458,12 @@ class Dewdrop_Db_SelectTest extends PHPUnit_Framework_TestCase
      */
     public function testSelectLimitPageOne()
     {
-        // Stop here and mark this test as incomplete.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
-
         $select = $this->selectLimitPageOne();
-        $stmt = $this->db->query($select);
-        $result = $stmt->fetchAll();
-        $this->assertEquals(1, count($result));
-        $this->assertEquals(1, $result[0]['product_id']);
-        $this->_checkExtraField($result[0]);
+
+        $this->assertEquals(
+            'SELECT `zfproducts`.* FROM `zfproducts` ORDER BY `product_id` ASC LIMIT 1',
+            $select->__toString()
+        );
     }
 
     protected function selectLimitPageTwo()
@@ -1580,17 +1480,12 @@ class Dewdrop_Db_SelectTest extends PHPUnit_Framework_TestCase
      */
     public function testSelectLimitPageTwo()
     {
-        // Stop here and mark this test as incomplete.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
-
         $select = $this->selectLimitPageTwo();
-        $stmt = $this->db->query($select);
-        $result = $stmt->fetchAll();
-        $this->assertEquals(1, count($result));
-        $this->assertEquals(2, $result[0]['product_id']);
-        $this->_checkExtraField($result[0]);
+
+        $this->assertEquals(
+            'SELECT `zfproducts`.* FROM `zfproducts` ORDER BY `product_id` ASC LIMIT 1 OFFSET 1',
+            $select->__toString()
+        );
     }
 
     /**
@@ -1637,16 +1532,12 @@ class Dewdrop_Db_SelectTest extends PHPUnit_Framework_TestCase
 
     public function testSelectUnionString()
     {
-        // Stop here and mark this test as incomplete.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
-
         $select = $this->selectUnionString();
-        $stmt = $this->db->query($select);
-        $result = $stmt->fetchAll();
-        $this->assertEquals(7, count($result));
-        $this->assertEquals(1, $result[0]['id']);
+
+        $this->assertEquals(
+            'SELECT `bug_id` AS `id`, `bug_status` AS `name` FROM `zfbugs` UNION SELECT `product_id` AS `id`, `product_name` AS `name` FROM `zfproducts` ORDER BY `id` ASC',
+            $select->__toString()
+        );
     }
 
     /**

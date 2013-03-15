@@ -14,7 +14,7 @@ abstract class ComponentAbstract
 
     private $wiring;
 
-    public function __construct($db, $wiring)
+    public function __construct(\Dewdrop\Db\Adapter $db, \Dewdrop\Wiring $wiring)
     {
         $this->db     = $db;
         $this->wiring = $wiring;
