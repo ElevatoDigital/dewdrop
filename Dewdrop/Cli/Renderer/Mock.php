@@ -37,6 +37,20 @@ class Mock implements RendererInterface
         return $this;
     }
 
+    public function success($message)
+    {
+        $this->output .= $message;
+
+        return $this;
+    }
+
+    public function warn($warning)
+    {
+        $this->output .= $warning;
+
+        return $this;
+    }
+
     public function error($error)
     {
         $this->output .= $error;

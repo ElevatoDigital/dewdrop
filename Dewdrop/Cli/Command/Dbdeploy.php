@@ -2,6 +2,8 @@
 
 namespace Dewdrop\Cli\Command;
 
+use Dewdrop\Cli\Command\DbMetadata;
+
 /**
  * Apply update to your database schema in a controlled and repeatable manner.
  *
@@ -82,11 +84,6 @@ class Dbdeploy extends CommandAbstract
         $this->addExample(
             'Apply all new dbdeploy scripts to your database',
             './dewdrop dbdeploy'
-        );
-
-        $this->addExample(
-            'Use an alternative mysql binary',
-            './dewdrop dbdeploy --mysql=/opt/mysql5/bin/mysql'
         );
 
         $this->addExample(
@@ -209,9 +206,11 @@ class Dbdeploy extends CommandAbstract
             $changes[] = basename($file);
         }
 
+        $this->refreshDbMetadata();
+
         $this->renderer
             ->title('dbdeploy Complete')
-            ->text("Successfully applied $count change file{$suffix}.")
+            ->success("Successfully applied $count change file{$suffix}.")
             ->newline()
             ->subhead('Change files applied')
             ->unorderedList($changes)
@@ -240,11 +239,11 @@ class Dbdeploy extends CommandAbstract
         $this->renderer->title('dbdeploy Status');
 
         if (!$count) {
-            $this->renderer->text('Your database schema is up to date.');
+            $this->renderer->success('Your database schema is up to date.');
         } elseif (1 === $count) {
-            $this->renderer->text("You need to run {$count} dbdeploy script.");
+            $this->renderer->warn("You need to run {$count} dbdeploy script.");
         } else {
-            $this->renderer->text("You need to run {$count} dbdeploy scripts.");
+            $this->renderer->warn("You need to run {$count} dbdeploy scripts.");
         }
 
         $this->renderer->newline();
@@ -492,5 +491,16 @@ class Dbdeploy extends CommandAbstract
         );
 
         return $changeNumber;
+    }
+
+    /**
+     * Run command to refresh DB metadata following successful schema updates.
+     *
+     * @return void
+     */
+    private function refreshDbMetadata()
+    {
+        $command = new DbMetadata($this->runner, $this->renderer);
+        $command->execute();
     }
 }

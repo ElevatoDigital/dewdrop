@@ -2,6 +2,9 @@
 
 namespace Dewdrop\Cli\Renderer;
 
+use Zend\Console\Console;
+use Zend\Console\Color\Xterm256 as Color;
+
 /**
  * Render output as Markdown.  For more information, see:
  *
@@ -11,6 +14,13 @@ namespace Dewdrop\Cli\Renderer;
  */
 class Markdown implements RendererInterface
 {
+    private $console;
+
+    public function __construct()
+    {
+        $this->console = Console::getInstance();
+    }
+
     /**
      * @inheritdoc
      */
@@ -87,10 +97,40 @@ class Markdown implements RendererInterface
     /**
      * @inheritdoc
      */
+    public function success($message)
+    {
+        $this->console->writeLine(
+            $message . PHP_EOL,
+            Color::calculate('00ff00')
+        );
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function warn($warning)
+    {
+        $this->console->writeLine(
+            $warning . PHP_EOL,
+            Color::calculate('ffff00')
+        );
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function error($error)
     {
         echo PHP_EOL;
-        echo 'ERROR: ' . $error . PHP_EOL;
+
+        $this->console->writeLine(
+            'ERROR: ' . $error . PHP_EOL,
+            Color::calculate('ff0000')
+        );
 
         return $this;
     }

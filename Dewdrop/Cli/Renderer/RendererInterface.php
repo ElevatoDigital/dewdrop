@@ -45,6 +45,22 @@ interface RendererInterface
     public function table(array $rows);
 
     /**
+     * Display a success message.
+     *
+     * @param string
+     * @returns RendererInterface
+     */
+    public function success($message);
+
+    /**
+     * Display a warning message.
+     *
+     * @param string
+     * @returns RendererInterface
+     */
+    public function warn($warning);
+
+    /**
      * Display an error message.
      *
      * @param string
