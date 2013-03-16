@@ -16,7 +16,8 @@ class Dbdeploy extends CommandAbstract
      */
     private $validActions = array(
         'update',
-        'status'
+        'status',
+        'backfill'
     );
 
     /**
@@ -41,6 +42,14 @@ class Dbdeploy extends CommandAbstract
     private $mysql;
 
     /**
+     * When running the backfill action, the revision up to which you'd like
+     * to backfill your database's changelog.
+     *
+     * @var integer
+     */
+    private $revision;
+
+    /**
      * @inheritdoc
      */
     public function init()
@@ -54,7 +63,7 @@ class Dbdeploy extends CommandAbstract
 
         $this->addPrimaryArg(
             'action',
-            'Which action to execution: status or update (default)',
+            'Which action to execution: status, backfill or update [default]',
             self::ARG_OPTIONAL
         );
 
@@ -62,6 +71,32 @@ class Dbdeploy extends CommandAbstract
             'mysql',
             'The path to the mysql binary',
             self::ARG_OPTIONAL
+        );
+
+        $this->addArg(
+            'revision',
+            "The revision number you'd like to backfill the changelog to",
+            self::ARG_OPTIONAL
+        );
+
+        $this->addExample(
+            'Apply all new dbdeploy scripts to your database',
+            './dewdrop dbdeploy'
+        );
+
+        $this->addExample(
+            'Use an alternative mysql binary',
+            './dewdrop dbdeploy --mysql=/opt/mysql5/bin/mysql'
+        );
+
+        $this->addExample(
+            'Check your database to see if any scripts need to be applied',
+            './dewdrop dbdeploy status'
+        );
+
+        $this->addExample(
+            'Backfill your changelog up to a certain revision number',
+            './dewdrop dbdeploy backfill --revision=5'
         );
     }
 
@@ -83,6 +118,17 @@ class Dbdeploy extends CommandAbstract
     public function setMysql($mysql)
     {
         $this->mysql = $mysql;
+
+        return $this;
+    }
+
+    /**
+     * @param integer $revision
+     * @return \Dewdrop\Cli\Command\Dbdeploy
+     */
+    public function setRevision($revision)
+    {
+        $this->revision = (int) $revision;
 
         return $this;
     }
@@ -235,6 +281,62 @@ class Dbdeploy extends CommandAbstract
     }
 
     /**
+     * Fill in changelog entries up to the specified revision number.
+     *
+     * The backfill action can sometimes be useful if you schema was updated
+     * outside dbdeploy or the changelog is inaccurate for any other reason.
+     * It will add entries to the changelog, effectively telling future runs
+     * of dbdeploy to skip those scripts and move on to those you know still
+     * need to be applied to your database.
+     *
+     * @return void
+     */
+    public function executeBackfill()
+    {
+        if (null === $this->revision) {
+            return $this->abort('The revision arg is required for the backfill action.');
+        }
+
+        $current = $this->getCurrentRevision();
+        $files   = $this->getChangeFiles($current);
+
+        // Abort was called because a file was named improperly
+        if (false === $files) {
+            return false;
+        }
+
+        $count = count($files);
+
+        if (!$count) {
+            return $this->executeStatus();
+        }
+
+        foreach ($files as $file) {
+            $timestamp = date('Y-m-d G:i:s');
+            $revision  = $this->getFileChangeNumber($file);
+
+            if ($revision <= $this->revision) {
+                $this->updateChangelog($file, $timestamp, $timestamp);
+            }
+        }
+
+        $suffix  = (1 === $count ? '' : 's');
+        $changes = array();
+
+        foreach ($files as $file) {
+            $changes[] = basename($file);
+        }
+
+        $this->renderer
+            ->title('dbdeploy Backfill Complete')
+            ->text("Successfully backfilled changelog entries for $count change file{$suffix}.")
+            ->newline()
+            ->subhead('Changelog entries inserted')
+            ->unorderedList($changes)
+            ->newline();
+    }
+
+    /**
      * Extend the CommandAbstract help display with information on dbdeploy
      * naming conventions.
      *
@@ -244,6 +346,7 @@ class Dbdeploy extends CommandAbstract
     {
         parent::help();
 
+        // Naming conventions
         $this->renderer
             ->subhead('Naming conventions for dbdeploy files')
             ->text('Files should be named in this format:')
