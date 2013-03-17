@@ -45,6 +45,12 @@ class Row
             throw new Exception("Setting value on invalid  column \"{$column}\"");
         }
 
+        if (is_array($column)) {
+            foreach ($columns as $key => $value) {
+                $this->set($key, $value);
+            }
+        }
+
         if (is_bool($value)) {
             $value = (int) $value;
         }

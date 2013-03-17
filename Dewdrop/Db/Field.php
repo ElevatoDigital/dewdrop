@@ -37,11 +37,18 @@ class Field
      */
     private $metadata;
 
+    private $controlName;
+
     public function __construct(Table $table, $name, array $metadata)
     {
         $this->table    = $table;
         $this->name     = $name;
         $this->metadata = $metadata;
+    }
+
+    public function isType($type)
+    {
+        return $this->metadata['DATA_TYPE'] === $type;
     }
 
     public function setRow(Row $row)
@@ -111,9 +118,20 @@ class Field
         return $this->note;
     }
 
+    public function setControlName($controlName)
+    {
+        $this->controlName = $controlName;
+
+        return $this;
+    }
+
     public function getControlName()
     {
-        return $this->table->getTableName() . ':' . $this->name;
+        if (null === $this->controlName) {
+            $this->controlName = $this->table->getTableName() . ':' . $this->name;
+        }
+
+        return $this->controlName;
     }
 
     /**
