@@ -3,46 +3,33 @@
 namespace Dewdrop\Admin\Page;
 
 use Dewdrop\Admin\ComponentAbstract;
-use Zend\View\Renderer\PhpRenderer;
-use Zend\View\Resolver;
-use Zend\View\Model\ViewModel;
+use Dewdrop\Request;
+use Dewdrop\View\View;
 
 abstract class PageAbstract
 {
     protected $component;
 
-    protected $pagePath;
-
-    protected $renderer;
-
     protected $view;
+
+    protected $request;
 
     public function __construct(ComponentAbstract $component, $pageFile)
     {
         $this->component = $component;
-        $this->renderer  = new PhpRenderer();
-        $this->view      = new ViewModel();
+        $this->view      = new View();
+        $this->request   = new Request();
 
-        $resolver = new Resolver\AggregateResolver();
-        $this->renderer->setResolver($resolver);
-
-        $stack = new Resolver\TemplatePathStack(
-            array(
-                'script_paths' => array(
-                    dirname($pageFile) . '/view-scripts'
-                )
-            )
-        );
-
-        $resolver->attach($stack);
-
-        $this->view->setTemplate('index');
-
-        $this->init();
+        $this->view->setScriptPath(dirname($pageFile) . '/view-scripts');
     }
 
     public function init()
     {
+    }
+
+    public function shouldProcess()
+    {
+        return true;
     }
 
     public function process()
@@ -54,6 +41,15 @@ abstract class PageAbstract
 
     public function renderView()
     {
-        echo $this->renderer->render($this->view);
+        echo $this->view->render($this->inflectViewScriptName());
+    }
+
+    private function inflectViewScriptName()
+    {
+        $className = get_class($this);
+        $pageName  = substr($className, strrpos($className, '\\') + 1);
+        $words     = implode('-', preg_split('/(?=[A-Z])/', $pageName));
+
+        return strtolower($pageName . '.phtml');
     }
 }

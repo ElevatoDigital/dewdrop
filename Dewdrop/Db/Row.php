@@ -34,6 +34,11 @@ class Row
         return $this->table;
     }
 
+    public function field($name)
+    {
+        return $this->table->field($name, $this);
+    }
+
     public function set($column, $value)
     {
         if (!array_key_exists($column, $this->columns)) {

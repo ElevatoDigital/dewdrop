@@ -4,12 +4,24 @@ namespace Dewdrop\Db;
 
 use Dewdrop\Paths;
 use Dewdrop\Exception;
+use Dewdrop\Db\Row;
+use Dewdrop\Db\Field;
 
 /**
  * @package Dewdrop
  */
 abstract class Table
 {
+    /**
+     * @var array
+     */
+    private $fields = array();
+
+    /**
+     * @var array
+     */
+    private $fieldCustomizationCallbacks = array();
+
     /**
      * @var string
      */
@@ -53,6 +65,65 @@ abstract class Table
     abstract public function init();
 
     /**
+     * Retrieve the field object associated with the specified name.
+     *
+     * @param string $name
+     * @return \Dewdrop\Db\Field
+     */
+    public function field($name, Row $row = null)
+    {
+        if (isset($this->fields[$name])) {
+            $field = $this->fields[$name];
+
+            if ($row) {
+                $field->setRow($row);
+            }
+
+            return $field;
+        }
+
+        $meta = $this->getMetadata();
+
+        if (!isset($meta[$name])) {
+            throw new Exception("Attempting to retrieve unknown column \"{$name}\"");
+        }
+
+        $field = new Field($this, $name, $meta[$name]);
+
+        if ($row) {
+            $field->setRow($row);
+        }
+
+        if (isset($this->fieldCustomizationCallbacks[$name])) {
+            call_user_func($this->fieldCustomizationCallbacks[$name], $field);
+        }
+
+        return $field;
+    }
+
+    /**
+     * Assign a callback that will allow you to further customize a field
+     * object whenever that object is requested using the table's field()
+     * method.
+     *
+     * @param string $name
+     * @param mixed $callback
+     * @return \Dewdrop\Db\Table
+     */
+    public function customizeField($name, $callback)
+    {
+        $meta = $this->getMetadata();
+
+        if (!isset($meta[$name])) {
+            throw new Exception("Setting customization callback for unknown column \"{$name}\"");
+        }
+
+        $this->fieldCustomizationCallbacks[$name] = $callback;
+
+        return $this;
+    }
+
+    /**
      * @param string $tableName
      * @returns \Dewdrop\Db\Table
      */
@@ -61,6 +132,14 @@ abstract class Table
         $this->tableName = $tableName;
 
         return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTableName()
+    {
+        return $this->tableName;
     }
 
     /**

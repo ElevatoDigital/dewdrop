@@ -39,10 +39,7 @@ abstract class ComponentAbstract
         require_once $pageFile;
         $page = new $className($this, $pageFile);
 
-        // Automatically render view if no output is generated
-        if (!$output) {
-            $page->renderView();
-        }
+        $this->dispatchPage($page);
     }
 
     public function registerMenuPage()
@@ -88,6 +85,22 @@ abstract class ComponentAbstract
     {
         if (!$this->title) {
             throw new \Dewdrop\Exception('Component title is required');
+        }
+    }
+
+    protected function dispatchPage($page)
+    {
+        $page->init();
+
+        if ($page->shouldProcess()) {
+            $page->process();
+        }
+
+        $page->render();
+
+        // Automatically render view if no output is generated
+        if (!$output) {
+            $page->renderView();
         }
     }
 }
