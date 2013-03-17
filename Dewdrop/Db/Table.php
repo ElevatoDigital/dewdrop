@@ -48,6 +48,16 @@ abstract class Table
     private $metadata;
 
     /**
+     * @var string
+     */
+    private $pluralTitle;
+
+    /**
+     * @var string
+     */
+    private $singularTitle;
+
+    /**
      * @param \Dewdrop\Db\Adapter $db
      */
     public function __construct(Adapter $db, Paths $paths = null)
@@ -82,7 +92,7 @@ abstract class Table
             return $field;
         }
 
-        $meta = $this->getMetadata();
+        $meta = $this->getMetadata('columns');
 
         if (!isset($meta[$name])) {
             throw new Exception("Attempting to retrieve unknown column \"{$name}\"");
@@ -112,7 +122,7 @@ abstract class Table
      */
     public function customizeField($name, $callback)
     {
-        $meta = $this->getMetadata();
+        $meta = $this->getMetadata('columns');
 
         if (!isset($meta[$name])) {
             throw new Exception("Setting customization callback for unknown column \"{$name}\"");
@@ -142,10 +152,42 @@ abstract class Table
         return $this->tableName;
     }
 
+    public function setSingularTitle($singularTitle)
+    {
+        $this->singularTitle = $singularTitle;
+
+        return $this;
+    }
+
+    public function getSingularTitle()
+    {
+        if (!$this->singurlarTitle) {
+            $this->singularTitle = $this->getMetadata('titles', 'singular');
+        }
+
+        return $this->singularTitle;
+    }
+
+    public function setPluralTitle($pluralTitle)
+    {
+        $this->pluralTitle = $pluralTitle;
+
+        return $this;
+    }
+
+    public function getPluralTitle()
+    {
+        if (!$this->pluralTitle) {
+            $this->pluralTitle = $this->getMetadata('titles', 'plural');
+        }
+
+        return $this->pluralTitle;
+    }
+
     /**
      * @return array
      */
-    public function getMetadata()
+    public function getMetadata($section = null, $index = null)
     {
         if (!$this->metadata) {
             $metadataPath = "{$this->paths->getModels()}/metadata/{$this->tableName}.php";
@@ -167,14 +209,20 @@ abstract class Table
             }
         }
 
-        return $this->metadata;
+        if ($section && $index) {
+            return $this->metadata[$section][$index];
+        } elseif ($section) {
+            return $this->metadata[$section];
+        } else {
+            return $this->metadata;
+        }
     }
 
     public function getPrimaryKey()
     {
         $columns = array();
 
-        foreach ($this->getMetadata() as $column => $metadata) {
+        foreach ($this->getMetadata('columns') as $column => $metadata) {
             if ($metadata['PRIMARY']) {
                 $position  = $metadata['PRIMARY_POSITION'];
 

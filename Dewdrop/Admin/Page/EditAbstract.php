@@ -21,6 +21,10 @@ abstract class EditAbstract extends PageAbstract
 
     public function findRowById($modelClass)
     {
+        if (false === strpos($modelClass, '\\')) {
+            $modelClass = '\Model\\' . $modelClass;
+        }
+
         $model = new $modelClass($this->component->getDb());
         $pkey  = $model->getPrimaryKey();
         $query = $this->request->getQuery();
@@ -33,8 +37,12 @@ abstract class EditAbstract extends PageAbstract
         }
 
         if (!count($id)) {
+            $this->view->title = "Add New {$model->getSingularTitle()}";
+
             return $model->createRow();
         } else {
+            $this->view->title = "Edit {$model->getSingularTitle()}";
+
             return call_user_func_array(
                 array($model, 'find'),
                 $id

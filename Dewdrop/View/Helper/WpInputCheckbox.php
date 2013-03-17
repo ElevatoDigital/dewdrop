@@ -65,4 +65,3 @@ class WpInputCheckbox extends AbstractHelper
         return $options;
     }
 }
-

@@ -14,7 +14,7 @@ class Row
     {
         $this->table   = $table;
         $this->data    = $data;
-        $this->columns = $this->table->getMetadata();
+        $this->columns = $this->table->getMetadata('columns');
 
         foreach ($this->data as $column => $value) {
             if (!array_key_exists($column, $this->columns)) {
@@ -71,7 +71,7 @@ class Row
             $this->table->insert($this->data);
 
             // Set value of auto-incrementing primary key, if available
-            foreach ($this->table->getMetadata() as $column => $metadata) {
+            foreach ($this->table->getMetadata('columns') as $column => $metadata) {
                 if ($metadata['IDENTITY'] && $metadata['PRIMARY']) {
                     $this->set($column, $this->getTable()->getAdapter()->lastInsertId());
                 }

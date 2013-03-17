@@ -2,6 +2,8 @@
 
 namespace Dewdrop\Cli\Command;
 
+use Dewdrop\Inflector;
+
 /**
  * Refresh all DB metadata definition files.
  *
@@ -43,14 +45,26 @@ class DbMetadata extends CommandAbstract
             mkdir($path);
         }
 
-        $tables = $db->listTables();
+        $tables    = $db->listTables();
+        $inflector = new Inflector();
 
         foreach ($tables as $table) {
-            $metadata = $db->describeTable($table);
+            $columns = $db->describeTable($table);
+            $title   = $inflector->titleize($table);
+
+            $replacements = array(
+                '{{singular}}' => $inflector->singularize($title),
+                '{{plural}}'   => $inflector->pluralize($title),
+                '{{columns}}'  => var_export($columns, true)
+            );
 
             file_put_contents(
                 "$path/$table.php",
-                "<?php\nreturn " . var_export($metadata, true) . ";\n"
+                str_replace(
+                    array_keys($replacements),
+                    $replacements,
+                    file_get_contents(__DIR__ . '/db-metadata/template.php')
+                )
             );
         }
     }
