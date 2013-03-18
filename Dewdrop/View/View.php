@@ -94,26 +94,46 @@ class View
 
     public function escapeHtml($string)
     {
+        if (null === $string) {
+            $string = '';
+        }
+
         return $this->escaper->escapeHtml($string);
     }
 
     public function escapeHtmlAttr($string)
     {
+        if (null === $string) {
+            $string = '';
+        }
+
         return $this->escaper->escapeHtmlAttr($string);
     }
 
     public function escapeJs($string)
     {
+        if (null === $string) {
+            $string = '';
+        }
+
         return $this->escaper->escapeJs($string);
     }
 
     public function escapeUrl($string)
     {
+        if (null === $string) {
+            $string = '';
+        }
+
         return $this->escaper->escapeUrl($string);
     }
 
     public function escapeCss($string)
     {
+        if (null === $string) {
+            $string = '';
+        }
+
         return $this->escaper->escapeCss($string);
     }
 

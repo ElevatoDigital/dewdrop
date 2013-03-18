@@ -18,7 +18,7 @@ class WpInputText extends AbstractHelper
             array(
                 'name'  => $field->getControlName(),
                 'id'    => $field->getControlName(),
-                'value' => ($field->getValue() ?: '')
+                'value' => $field->getValue()
             )
         );
     }
