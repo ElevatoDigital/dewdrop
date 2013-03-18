@@ -4,6 +4,14 @@ namespace Dewdrop\Db;
 
 use Dewdrop\Exception;
 
+/**
+ * This database adapter largely mirrors the Zend_Db API from Zend Framework 1.
+ * However, it is altered to accommodate the limitations of wpdb and use the
+ * normal wpdb instance created on every WordPress request as its driver.  This
+ * allows us to take advantage of the more expressive and powerful DB API
+ * from Zend_Db without needing to create a secondary MySQL connection on every
+ * request.
+ */
 class Adapter
 {
     /**
@@ -50,14 +58,31 @@ class Adapter
         'FLOAT'              => self::FLOAT_TYPE
     );
 
+    /**
+     * Whether to quote (i.e. add surrounding backticks to) identifiers like
+     * table and column names.
+     *
+     * @var boolean
+     */
     protected $autoQuoteIdentifiers = true;
 
     /**
-     * @var
+     * How to fetch results.  The should be one of the constants defined by
+     * wpdb:
+     *
+     * - ARRAY_A: An associative array
+     * - ARRAY_N: An array with numeric indexes
+     * - OBJECT: Use stdClass objects
+     * - OBJECT_K: Also uses stdClass objects, but the array containing all
+     *      the row objects uses the primar key as its index
+     *
+     * @var string
      */
     protected $fetchMode = ARRAY_A;
 
     /**
+     * The wpdb adapter used as a driver for this adapter.
+     *
      * @var \wpdb
      */
     private $wpdb;
@@ -81,11 +106,23 @@ class Adapter
         return $this->wpdb;
     }
 
+    /**
+     * Create a \Dewdrop\Db\Select object.
+     *
+     * @return \Dewdrop\Db\Select
+     */
     public function select()
     {
         return new Select($this);
     }
 
+    /**
+     * Fetch all results for the supplied SQL statement.
+     *
+     * @param string|\Dewdrop\Db\Select $sql
+     * @param string $fetchMode
+     * @return array
+     */
     public function fetchAll($sql, $fetchMode = null)
     {
         if (null === $fetchMode) {
@@ -97,11 +134,28 @@ class Adapter
         return $rs;
     }
 
+    /**
+     * Fetch a single column of the results from the supplied SQL statement.
+     *
+     * @param string|\Dewdrop\Db\Select $sql
+     * @return array
+     */
     public function fetchCol($sql)
     {
         return $this->wpdb->get_col($sql);
     }
 
+    /**
+     * Fetch a single row from the results from the supplied SQL statement.
+     *
+     * This method still uses a fetchAll internally, so you should either by
+     * selecting on a primary key or other unique key or LIMITing your results
+     * explicitly.
+     *
+     * @param string|\Dewdrop\Db\Select $sql
+     * @param string $fetchMode
+     * @return array
+     */
     public function fetchRow($sql, $fetchMode = null)
     {
         $rs = $this->fetchAll($sql, $fetchMode);
@@ -114,9 +168,10 @@ class Adapter
     }
 
     /**
-     * Fetches the first column of all SQL result rows as an array.
+     * Returns the first two columns from the SQL results as key-value
+     * pairs useful, for examples, for lists of options in a drop-down.
      *
-     * @param string|Select $sql An SQL SELECT statement.
+     * @param string|\Dewdrop\Db\Select $sql An SQL SELECT statement.
      * @return array
      */
     public function fetchPairs($sql)
@@ -131,6 +186,13 @@ class Adapter
         return $out;
     }
 
+    /**
+     * Fetch a single scalar value from the results of the supplied SQL
+     * statement.
+     *
+     * @param string|\Dewdrop\Db\Adapter
+     * @return mixed
+     */
     public function fetchOne($sql)
     {
         return $this->wpdb->get_var($sql);
@@ -243,6 +305,14 @@ class Adapter
         return $result;
     }
 
+    /**
+     * Run the supplied query, binding the supplied data to the statement
+     * prior to execution.
+     *
+     * @param string|\Dewdrop\Db\Adapter
+     * @param array $bind
+     * @return mixed
+     */
     public function query($sql, $bind = array())
     {
         foreach ($bind as $position => $param) {
@@ -252,6 +322,14 @@ class Adapter
         return $this->wpdb->query($sql);
     }
 
+    /**
+     * Quote a database identifier such as a column name or table name
+     * to make it safe to include in a SQL statement.
+     *
+     * @param string $identifier
+     * @param boolean $auto
+     * @return string
+     */
     public function quoteIdentifier($identifier, $auto = false)
     {
         return $this->quoteIdentifierAs($identifier, null, $auto);
@@ -320,6 +398,17 @@ class Adapter
         return $this->quoteInternal($value);
     }
 
+    /**
+     * An internal method used by other quote methods.  This was origianlly
+     * _quote() in Zend_Db, but in PSR-2 code style, it had to be renamed to
+     * avoid conflicting with the public method of the same name.  Because
+     * this adapter only needs to work with MySQL (because that is the only
+     * RDBMS supported by WP), this could likely be integrated directly with
+     * the quote methods.
+     *
+     * @param mixed $value
+     * @return mixed
+     */
     protected function quoteInternal($value)
     {
         if (is_int($value) || is_float($value)) {
@@ -677,6 +766,12 @@ class Adapter
         }
     }
 
+    /**
+     * Get the last insert ID from \wpdb after performing an insert on a table
+     * with an auto-incrementing primary key.
+     *
+     * @return integer
+     */
     public function lastInsertId()
     {
         return $this->wpdb->insert_id;

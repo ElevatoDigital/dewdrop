@@ -2,6 +2,11 @@
 
 namespace Dewdrop\Db;
 
+/**
+ * Expr allows you to inject raw SQL segments into a \Dewdrop\Db\Select or
+ * other context in which Dewdrop might otherwise quote and therefore
+ * misinterpret the code.
+ */
 class Expr
 {
     /**
