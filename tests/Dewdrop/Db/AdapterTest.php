@@ -39,6 +39,10 @@ class AdapterTest extends \PHPUnit_Framework_TestCase
 
     public function testFetchPairs()
     {
+        $this->markTestSkipped(
+            'Need to create test dataset'
+        );
+
         $sql   = 'SELECT fruit_id, name FROM fruits';
         $pairs = $this->db->fetchPairs($sql);
 
@@ -71,6 +75,10 @@ class AdapterTest extends \PHPUnit_Framework_TestCase
 
     public function testFetchOne()
     {
+        $this->markTestSkipped(
+            'Need to create test dataset'
+        );
+
         $sql = 'SELECT name FROM fruits ORDER BY name LIMIT 1';
 
         $this->assertEquals('Apple', $this->db->fetchOne($sql));
