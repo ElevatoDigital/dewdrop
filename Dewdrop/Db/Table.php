@@ -112,19 +112,19 @@ abstract class Table
      * @param string $name
      * @return \Dewdrop\Db\Field
      */
-    public function field($name) {
+    public function field($name)
     {
         if (isset($this->fields[$name])) {
             return $this->fields[$name];
         }
 
-        $meta = $this->getMetadata('columns');
+        $metadata = $this->getMetadata('columns', $name);
 
-        if (!isset($meta[$name])) {
+        if (!$metadata) {
             throw new Exception("Attempting to retrieve unknown column \"{$name}\"");
         }
 
-        $field = new Field($this, $name, $meta[$name]);
+        $field = new Field($this, $name, $metadata);
 
         if (isset($this->fieldCustomizationCallbacks[$name])) {
             call_user_func($this->fieldCustomizationCallbacks[$name], $field);
@@ -281,9 +281,9 @@ abstract class Table
             }
         }
 
-        if ($section && $index) {
+        if ($section && $index && isset($this->metadata[$section]) && isset($this->metadata[$index])) {
             return $this->metadata[$section][$index];
-        } elseif ($section) {
+        } elseif ($section && isset($this->metadata[$section])) {
             return $this->metadata[$section];
         } else {
             return $this->metadata;
