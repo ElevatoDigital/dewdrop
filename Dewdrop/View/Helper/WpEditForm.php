@@ -16,6 +16,10 @@ namespace Dewdrop\View\Helper;
  *
  * echo $this->wpEditForm()->close();
  * </code>
+ *
+ * @category   Dewdrop
+ * @package    View
+ * @subpackage Helper
  */
 class WpEditForm extends AbstractHelper
 {

@@ -11,6 +11,9 @@ use Dewdrop\Db\Field;
  * The table class provides a gateway to the a single DB table by providing
  * utility methods for querying the table and finding specific rows within
  * it.
+ *
+ * @category   Dewdrop
+ * @package    Db
  */
 abstract class Table
 {

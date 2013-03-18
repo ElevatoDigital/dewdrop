@@ -40,6 +40,9 @@ namespace Dewdrop\Db;
  * The field object allows you to easily integrate with other Dewdrop
  * APIs, leveraging the database metadata to add validators, retrieve lists
  * of options, etc.
+ *
+ * @category   Dewdrop
+ * @package    Db
  */
 class Row
 {

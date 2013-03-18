@@ -1,5 +1,16 @@
 <?php
 
+/**
+ * Dewdrop
+ *
+ * @link      https://github.com/DeltaSystems/dewdrop
+ * @copyright Copyright Delta Systems (http://deltasys.com)
+ * @license   https://github.com/DeltaSystems/dewdrop/LICENSE
+ *
+ * @category  Dewdrop
+ * @package   Request
+ */
+
 namespace Dewdrop;
 
 /**
@@ -10,8 +21,6 @@ namespace Dewdrop;
  * 1. It makes it easier to retrieve values from $_POST and $_GET without
  *    generating E_NOTICEs due to undefined variables.
  * 2. It makes it easier to inject other values during unit testing.
- *
- * @package Dewdrop
  */
 class Request
 {

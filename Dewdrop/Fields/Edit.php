@@ -6,7 +6,8 @@ use Dewdrop\Db\Field;
 use Dewdrop\Exception;
 
 /**
- * @package Dewdrop
+ * @category   Dewdrop
+ * @package    Fields
  */
 class Edit
 {

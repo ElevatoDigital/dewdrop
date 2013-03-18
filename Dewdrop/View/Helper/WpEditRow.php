@@ -17,6 +17,10 @@ use Dewdrop\Db\Field;
  * echo $this->wpInputText($this->fields->get('model:field_name'));
  * echo $this->wpEditRow()->close();
  * </code>
+ *
+ * @category   Dewdrop
+ * @package    View
+ * @subpackage Helper
  */
 class WpEditRow extends AbstractHelper
 {

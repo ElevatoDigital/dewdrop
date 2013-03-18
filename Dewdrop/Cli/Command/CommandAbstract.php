@@ -13,7 +13,9 @@ use Dewdrop\Paths;
  * This abstract class supplies CLI commands with argument parsing, help
  * content display, alias support, etc.
  *
- * @package Dewdrop
+ * @category   Dewdrop
+ * @package    Cli
+ * @subpackage Command
  */
 abstract class CommandAbstract
 {

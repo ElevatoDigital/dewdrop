@@ -1,5 +1,16 @@
 <?php
 
+/**
+ * Dewdrop
+ *
+ * @link      https://github.com/DeltaSystems/dewdrop
+ * @copyright Copyright Delta Systems (http://deltasys.com)
+ * @license   https://github.com/DeltaSystems/dewdrop/LICENSE
+ *
+ * @category  Dewdrop
+ * @package   Wiring
+ */
+
 namespace Dewdrop;
 
 use Dewdrop\Autoloader;
@@ -16,21 +27,30 @@ use Dewdrop\Paths;
 class Wiring
 {
     /**
+     * The database adapter wrapping wpdb
+     *
      * @var \Dewdrop\Db\Adapter
      */
     protected $db;
 
     /**
+     * An instance of \Dewdrop\Inflector used to locate admin components by
+     * inflecting their namespaces into folder names
+     *
      * @var \Dewdrop\Inflector
      */
     protected $inflector;
 
     /**
+     * The autoloader used for Dewdrop, Zend, and model class loading
+     *
      * @var \Dewdrop\Autoloader
      */
     protected $autoloader;
 
     /**
+     * Paths utility for finding our way around the plugin
+     *
      * @var \Dewdrop\Paths
      */
     protected $paths;

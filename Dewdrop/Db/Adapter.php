@@ -11,6 +11,9 @@ use Dewdrop\Exception;
  * allows us to take advantage of the more expressive and powerful DB API
  * from Zend_Db without needing to create a secondary MySQL connection on every
  * request.
+ *
+ * @category   Dewdrop
+ * @package    Db
  */
 class Adapter
 {

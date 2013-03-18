@@ -5,7 +5,9 @@ namespace Dewdrop\Cli\Command;
 /**
  * Run PHPUnit tests available for the Dewdrop library.
  *
- * @package Dewdrop
+ * @category   Dewdrop
+ * @package    Cli
+ * @subpackage Command
  */
 class DewdropTest extends CommandAbstract
 {

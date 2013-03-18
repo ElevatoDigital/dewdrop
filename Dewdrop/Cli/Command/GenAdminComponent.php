@@ -14,7 +14,9 @@ namespace Dewdrop\Cli\Command;
  * |   |-Component.php
  * |   `-Index.php
  *
- * @package Dewdrop
+ * @category   Dewdrop
+ * @package    Cli
+ * @subpackage Command
  */
 class GenAdminComponent extends CommandAbstract
 {

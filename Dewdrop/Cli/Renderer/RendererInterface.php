@@ -7,7 +7,9 @@ namespace Dewdrop\Cli\Renderer;
  * default, but alternate renders could be used to render directly to
  * HTML, etc.
  *
- * @package Dewdrop
+ * @category   Dewdrop
+ * @package    Cli
+ * @subpackage Renderer
  */
 interface RendererInterface
 {

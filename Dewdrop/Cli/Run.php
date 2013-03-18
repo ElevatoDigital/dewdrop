@@ -8,7 +8,8 @@ use Dewdrop\Db\Adapter;
 /**
  * This class is responsible for handling execution of CLI commands.
  *
- * @package Dewdrop
+ * @category   Dewdrop
+ * @package    Cli
  */
 class Run
 {
@@ -26,7 +27,8 @@ class Run
         'Lint',
         'GenAdminComponent',
         'GenDbTable',
-        'DewdropTest'
+        'DewdropTest',
+        'DewdropDoc'
     );
 
     /**

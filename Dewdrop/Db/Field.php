@@ -7,6 +7,9 @@ namespace Dewdrop\Db;
  * your application and establish a centralized source of information about
  * how the field should be labeled, any notes that should be displayed with
  * it, any validators that should be included, etc.
+ *
+ * @category   Dewdrop
+ * @package    Db
  */
 class Field
 {

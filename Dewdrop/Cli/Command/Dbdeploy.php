@@ -7,7 +7,9 @@ use Dewdrop\Cli\Command\DbMetadata;
 /**
  * Apply update to your database schema in a controlled and repeatable manner.
  *
- * @package Dewdrop
+ * @category   Dewdrop
+ * @package    Cli
+ * @subpackage Command
  */
 class Dbdeploy extends CommandAbstract
 {

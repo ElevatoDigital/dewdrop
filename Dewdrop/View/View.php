@@ -9,6 +9,9 @@ use Zend\Escaper\Escaper;
  * A simple view implementation that allows for simple assignment of data,
  * escaping for common contexts (e.g. HTML, HTML attribute, JS, etc.),
  * and calling of helper objects for reusable view logic.
+ *
+ * @category   Dewdrop
+ * @package    View
  */
 class View
 {

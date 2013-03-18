@@ -10,7 +10,9 @@ namespace Dewdrop\Cli\Command;
  * When the CLI runner can't find a valid command, this command is
  * executed to help the user fix their input.
  *
- * @package Dewdrop
+ * @category   Dewdrop
+ * @package    Cli
+ * @subpackage Command
  */
 class Help extends CommandAbstract
 {

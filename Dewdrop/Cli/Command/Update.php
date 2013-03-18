@@ -8,7 +8,9 @@ namespace Dewdrop\Cli\Command;
  * It would be great to have this integrate with a changelog facility so we
  * could let the user know what changes had occurred since their last update.
  *
- * @package Dewdrop
+ * @category   Dewdrop
+ * @package    Cli
+ * @subpackage Command
  */
 class Update extends CommandAbstract
 {

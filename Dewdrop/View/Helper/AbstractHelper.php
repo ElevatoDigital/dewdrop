@@ -14,6 +14,10 @@ use Dewdrop\Db\Field;
  * - The ability to easily render partial view scripts.
  * - The ability to manage methods implementing the 3 Dewdrop view helper
  *   argument styles (i.e. Field, explicit and array).
+ *
+ * @category   Dewdrop
+ * @package    View
+ * @subpackage Helper
  */
 abstract class AbstractHelper
 {

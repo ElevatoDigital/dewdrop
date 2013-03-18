@@ -14,6 +14,10 @@ use \Dewdrop\Exception;
  * <code>
  * echo $this->wpInputText($this->fields->get('animals:latin_name'));
  * </code>
+ *
+ * @category   Dewdrop
+ * @package    View
+ * @subpackage Helper
  */
 class WpInputText extends AbstractHelper
 {

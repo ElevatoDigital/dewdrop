@@ -6,7 +6,9 @@ namespace Dewdrop\Cli\Command;
  * Use PHP_CodeSniffer to check that your plugin code conforms to your coding
  * style of choice.  By default, we use the PSR-2 coding style.
  *
- * @package Dewdrop
+ * @category   Dewdrop
+ * @package    Cli
+ * @subpackage Command
  */
 class Sniff extends CommandAbstract
 {

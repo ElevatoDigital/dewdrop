@@ -7,7 +7,9 @@ use Dewdrop\Inflector;
 /**
  * Refresh all DB metadata definition files.
  *
- * @package Dewdrop
+ * @category   Dewdrop
+ * @package    Cli
+ * @subpackage Command
  */
 class DbMetadata extends CommandAbstract
 {

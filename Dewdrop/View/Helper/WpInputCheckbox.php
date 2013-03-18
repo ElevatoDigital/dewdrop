@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * Dewdrop
+ *
+ * @link      https://github.com/DeltaSystems/dewdrop
+ * @copyright Copyright Delta Systems (http://deltasys.com)
+ * @license   https://github.com/DeltaSystems/dewdrop/LICENSE
+ */
+
 namespace Dewdrop\View\Helper;
 
 use \Dewdrop\Db\Field;
@@ -14,6 +22,10 @@ use \Dewdrop\Exception;
  * <code>
  * echo $this->wpInputCheckbox($this->fields->get('animals:is_mammals'));
  * </code>
+ *
+ * @category   Dewdrop
+ * @package    View
+ * @subpackage Helper
  */
 class WpInputCheckbox extends AbstractHelper
 {

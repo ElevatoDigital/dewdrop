@@ -10,7 +10,9 @@ use Zend\Console\Color\Xterm256 as Color;
  *
  * <http://daringfireball.net/projects/markdown/>
  *
- * @package Dewdrop
+ * @category   Dewdrop
+ * @package    Cli
+ * @subpackage Renderer
  */
 class Markdown implements RendererInterface
 {
