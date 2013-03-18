@@ -18,10 +18,14 @@ use Dewdrop\Db\Field;
  *
  * This class provides:
  *
- * - A reference to the view that originally instantiated the helper.
- * - The ability to easily render partial view scripts.
- * - The ability to manage methods implementing the 3 Dewdrop view helper
- *   argument styles (i.e. Field, explicit and array).
+ * <ul>
+ *     <li>A reference to the view that originally instantiated the helper.</li>
+ *     <li>The ability to easily render partial view scripts.</li>
+ *     <li>
+ *         The ability to manage methods implementing the 3 Dewdrop view helper
+ *         argument styles (i.e. Field, explicit and array).
+ *     </li>
+ * </ul>
  */
 abstract class AbstractHelper
 {
