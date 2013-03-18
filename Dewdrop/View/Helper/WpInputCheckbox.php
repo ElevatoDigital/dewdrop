@@ -5,13 +5,38 @@ namespace Dewdrop\View\Helper;
 use \Dewdrop\Db\Field;
 use \Dewdrop\Exception;
 
+/**
+ * Render a checkbox node.  This helper can optionally leverage a
+ * \Dewdrop\Db\Field object to set it's options.
+ *
+ * Example usage:
+ *
+ * <code>
+ * echo $this->wpInputCheckbox($this->fields->get('animals:is_mammals'));
+ * </code>
+ */
 class WpInputCheckbox extends AbstractHelper
 {
+    /**
+     * Render the checkbox.
+     *
+     * This method will delegate to directField(), directExplicit(), or
+     * directArray() depending upon the arguments that are passed to it.
+     *
+     * @return string
+     */
     public function direct()
     {
         return $this->delegateByArgs(func_get_args(), 'direct');
     }
 
+    /**
+     * Use the supplied \Dewdrop\Db\Field object to set the helper's options
+     * and then render the checkbox.
+     *
+     * @param \Dewdrop\Db\Field
+     * @return string
+     */
     protected function directField(Field $field)
     {
         return $this->directArray(
@@ -24,6 +49,15 @@ class WpInputCheckbox extends AbstractHelper
         );
     }
 
+    /**
+     * Explicitly set the basic arguments for this helper and then render the
+     * checkbox.
+     *
+     * @param string $name
+     * @param boolean $value
+     * @param string $label
+     * @return string
+     */
     protected function directExplicit($name, $value, $label)
     {
         return $this->directArray(
@@ -35,6 +69,13 @@ class WpInputCheckbox extends AbstractHelper
         );
     }
 
+    /**
+     * Set the helper's options using an array of key-value pairs and then
+     * render the checkbox.
+     *
+     * @param array $options
+     * @return string
+     */
     protected function directArray(array $options)
     {
         extract($this->prepareOptionsArray($options));
@@ -55,6 +96,14 @@ class WpInputCheckbox extends AbstractHelper
         );
     }
 
+    /**
+     * Prepare the options array for the directArray() method, checking that
+     * required options are set, ensuring "classes" is an array and adding
+     * "classes" and "id" to the options array, if they are not present
+     * already.
+     *
+     * @return array
+     */
     private function prepareOptionsArray($options)
     {
         $this
