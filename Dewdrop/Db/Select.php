@@ -4,6 +4,14 @@ namespace Dewdrop\Db;
 
 use Dewdrop\Db\Select\SelectException;
 
+/**
+ * \Dewdrop\Db\Select provides a simple programmatic API for assembilng
+ * SQL SELECT statements.  It's essentially a direct port of
+ * Zend_Db_Select from Zend Framework 1.
+ *
+ * The Zend Framework test cases were used to ensure that \Dewdrop\Db\Select
+ * generates accurate and functional SQL statements.
+ */
 class Select
 {
     const DISTINCT       = 'distinct';
