@@ -2,33 +2,61 @@
 
 namespace Dewdrop;
 
+use Dewdrop\Autoloader;
 use Dewdrop\Db\Adapter as DbAdapter;
 use Dewdrop\Paths;
 
+/**
+ * This class ties WP to your plugin by registering the necessary hooks to
+ * let WP know where to find your components, short codes, etc.  In kicking
+ * things off for other parts of your Dewdrop-based plugin, this class also
+ * servers as a form of "root" class, passing core resources like the
+ * \Dewdrop\Db\Adapter to other areas.
+ */
 class Wiring
 {
+    /**
+     * @var \Dewdrop\Db\Adapter
+     */
     protected $db;
 
+    /**
+     * @var \Dewdrop\Inflector
+     */
     protected $inflector;
 
+    /**
+     * @var \Dewdrop\Autoloader
+     */
     protected $autoloader;
 
+    /**
+     * @var \Dewdrop\Paths
+     */
     protected $paths;
 
+    /**
+     * If auto-register is active, then the wiring class will attempt to find
+     * all the components to register by traversing the default Dewdrop plugin
+     * paths for them, rather than requiring your to manually register admin
+     * components, shortcodes, etc.
+     *
+     * @param boolean $autoRegister
+     * @param \Dewdrop\Db\Adapter $db
+     * @param \Dewdrop\Inflector $inflector
+     * @param \Dewdrop\Autoloader $autoloader
+     */
     public function __construct(
         $autoRegister = true,
         $db = null,
-        $libraryPath = null,
         $inflector = null,
         $autoloader = null
     ) {
         global $wpdb;
 
-        if (null === $libraryPath) {
-            $libraryPath = dirname(__DIR__);
-        }
+        require_once __DIR__ . '/Autoloader.php';
 
-        $this->autoloader = ($autoloader ?: $this->buildAutoloader($libraryPath));
+        $this->autoloader = ($autoloader ?: new Autoloader());
         $this->db         = ($db ?: new DbAdapter($wpdb));
         $this->inflector  = ($inflector ?: new Inflector());
         $this->paths      = new Paths();
@@ -38,6 +66,12 @@ class Wiring
         }
     }
 
+    /**
+     * Look in the default admin path for any admin components and register
+     * them.
+     *
+     * @return void
+     */
     public function autoRegisterAdminComponents()
     {
         $path = $this->paths->getAdmin();
@@ -50,27 +84,19 @@ class Wiring
         }
     }
 
+    /**
+     * Register the admin component located at $path.
+     *
+     * @param string $path
+     */
     public function registerAdminComponent($path)
     {
-        $componentPath  = $this->inflector->getComponentClassPath($path);
-        $className      = $this->inflector->getComponentClass($path);
+        $componentPath  = $this->paths->getAdmin() . '/' . $path . '/Component.php';
+        $className      = '\Admin\\' . $this->inflector->camelize($path) . '\Component';
 
         require_once $componentPath;
         $component = new $className($this->db, $this);
 
         $component->register();
-    }
-
-    public function getModel($name)
-    {
-        require_once $this->inflector->getModelClassPath($name);
-        $className = $this->inflector->getModelClass($name);
-        return new $className($this->db);
-    }
-
-    protected function buildAutoloader($libraryPath)
-    {
-        require_once __DIR__ . '/Autoloader.php';
-        return new \Dewdrop\Autoloader($libraryPath);
     }
 }

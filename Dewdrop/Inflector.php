@@ -4,47 +4,24 @@ namespace Dewdrop;
 
 use Dewdrop\Paths;
 
+/**
+ * Some utility functions that make it easy to convert from one text format
+ * to another (e.g. from CamelCase to under_scores).
+ *
+ * This tool is used in various places to created default human-friendly
+ * titles from database table or column names, to convert class names to
+ * paths, etc.
+ *
+ * This is more or less a direct port of the PEAR Text_Inflector package.
+ */
 class Inflector
 {
-    private $paths;
-
-    public function __construct()
-    {
-        $this->paths = new Paths();
-    }
-
-    public function getComponentClassPath($path)
-    {
-        $folder = basename($path);
-        $full   = $this->paths->getAdmin() . '/' . $folder;
-
-        return $full . '/Component.php';
-    }
-
-    public function getComponentClass($path)
-    {
-        $words = explode('-', $path);
-        $words = array_map('ucfirst', $words);
-
-        return '\Admin\\' . implode('', $words) . '\\Component';
-    }
-
-    public function getModelClassPath($name)
-    {
-        return $this->paths->getModels() . '/' . $name . '.php';
-    }
-
-    public function getModelClass($name)
-    {
-        return '\Model\\' . $name;
-    }
-
     /**
      * Pluralizes English nouns.
      *
      * @access public
      * @static
-     * @param    string    $word    English noun to pluralize
+     * @param string $word English noun to pluralize
      * @return string Plural noun
      */
     public function pluralize($word)
@@ -202,10 +179,10 @@ class Inflector
      * capitalize the first character of the title.
      *
      * @access public
-     * @param    string    $word    Word to format as tile
-     * @param    string    $uppercase    If set to 'first' it will only uppercase the
-     * first character. Otherwise it will uppercase all
-     * the words in the title.
+     * @param string $word Word to format as tile
+     * @param string $uppercase If set to 'first' it will only uppercase the
+     *                          first character. Otherwise it will uppercase all
+     *                          the words in the title.
      * @return string Text formatted as title
      */
     public function titleize($word, $uppercase = '')
@@ -375,22 +352,14 @@ class Inflector
         }
     }
 
-    public function demodulize($moduleName)
-    {
-        $moduleName = preg_replace('/^.*::/', '', $moduleName);
-        return $this->humanize($this->underscore($moduleName));
-    }
-
-    public function modulize($moduleDescription)
-    {
-        return $this->camelize($this->singularize($moduleDescription));
-    }
-
     /**
      * Transforms a string to its unaccented version.
-     * This might be useful for generating "friendly" URLs
+     * This might be useful for generating "friendly" URLs.
+     *
+     * @param string $text
+     * @return string
      */
-    public static function unaccent($text)
+    public function unaccent($text)
     {
         return strtr(
             $text,
@@ -401,37 +370,14 @@ class Inflector
         );
     }
 
+    /**
+     * Convert the supplied text to a format friendly for URL segments.
+     *
+     * @param string $text
+     * @return string
+     */
     public function urlize($text)
     {
         return trim($this->underscore($this->unaccent($text)), '_');
-    }
-
-    /**
-     * Returns $className in underscored form, with "_id" tacked on at the end.
-     * This is for use in dealing with the database.
-     *
-     * @param string $className
-     * @return string
-     */
-    public function foreignKey($className, $separateClassAndIdWithUnderscore = true)
-    {
-        return $this->underscore($this->demodulize($class_name)) . ($separateClassAndIdWithUnderscore ? '_id' : 'id');
-    }
-
-    public function toFullName($name, $correct)
-    {
-        if (strstr($name, '_') && strtolower($name) == $name) {
-            return $this->camelize($name);
-        }
-
-        if (preg_match("/^(.    * )({$correct})$/i", $name, $reg)) {
-            if ($reg[2] === $correct) {
-                return $name;
-            } else {
-                return ucfirst($reg[1] . $correct);
-            }
-        } else {
-            return ucfirst($name . $correct);
-        }
     }
 }
