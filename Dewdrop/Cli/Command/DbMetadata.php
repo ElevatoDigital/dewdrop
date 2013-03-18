@@ -1,19 +1,25 @@
 <?php
 
+/**
+ * Dewdrop
+ *
+ * @link      https://github.com/DeltaSystems/dewdrop
+ * @copyright Delta Systems (http://deltasys.com)
+ * @license   https://github.com/DeltaSystems/dewdrop/LICENSE
+ */
+
 namespace Dewdrop\Cli\Command;
 
 use Dewdrop\Inflector;
 
 /**
  * Refresh all DB metadata definition files.
- *
- * @category   Dewdrop
- * @package    Cli
- * @subpackage Command
  */
 class DbMetadata extends CommandAbstract
 {
     /**
+     * Set basic command information, arguments and examples
+     *
      * @inheritdoc
      */
     public function init()
@@ -65,7 +71,7 @@ class DbMetadata extends CommandAbstract
                 str_replace(
                     array_keys($replacements),
                     $replacements,
-                    file_get_contents(__DIR__ . '/db-metadata/template.php')
+                    file_get_contents(__DIR__ . '/db-metadata/template.tpl')
                 )
             );
         }

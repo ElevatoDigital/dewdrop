@@ -1,5 +1,16 @@
 <?php
 
+/**
+ * Dewdrop
+ *
+ * @link      https://github.com/DeltaSystems/dewdrop
+ * @copyright Delta Systems (http://deltasys.com)
+ * @license   https://github.com/DeltaSystems/dewdrop/LICENSE
+ *
+ * @category   Dewdrop
+ * @package    Cli
+ */
+
 namespace Dewdrop\Cli;
 
 use Dewdrop\Paths;
@@ -7,9 +18,6 @@ use Dewdrop\Db\Adapter;
 
 /**
  * This class is responsible for handling execution of CLI commands.
- *
- * @category   Dewdrop
- * @package    Cli
  */
 class Run
 {
@@ -78,6 +86,9 @@ class Run
     private $dbAdapter;
 
     /**
+     * Create the CLI runner, giving users the ability to inject non-default
+     * args, command name, and renderer (primarily for testing purposes).
+     *
      * @param array $args
      * @param string $command
      * @param RendererInterface $renderer
@@ -98,6 +109,8 @@ class Run
     }
 
     /**
+     * Override the args applied to this runner
+     *
      * @param array $args
      * @return \Dewdrop\Cli\Run
      */

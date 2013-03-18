@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * Dewdrop
+ *
+ * @link      https://github.com/DeltaSystems/dewdrop
+ * @copyright Delta Systems (http://deltasys.com)
+ * @license   https://github.com/DeltaSystems/dewdrop/LICENSE
+ */
+
 namespace Dewdrop\View\Helper;
 
 use Dewdrop\View\View;
@@ -14,10 +22,6 @@ use Dewdrop\Db\Field;
  * - The ability to easily render partial view scripts.
  * - The ability to manage methods implementing the 3 Dewdrop view helper
  *   argument styles (i.e. Field, explicit and array).
- *
- * @category   Dewdrop
- * @package    View
- * @subpackage Helper
  */
 abstract class AbstractHelper
 {
@@ -29,7 +33,9 @@ abstract class AbstractHelper
     protected $view;
 
     /**
-     * @param \Dewdrop\View\View
+     * Create helper, accepting a reference to the related view object
+     *
+     * @param View $view
      */
     public function __construct(View $view)
     {
@@ -171,7 +177,7 @@ abstract class AbstractHelper
      * methods.
      *
      * @param array $options
-     * @param array $present
+     * @param array $isArray
      * @return \Dewdrop\View\Helper\AbstractHelper
      */
     protected function ensureArray(array &$options, array $isArray)

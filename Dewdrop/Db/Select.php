@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * Dewdrop
+ *
+ * @link      https://github.com/DeltaSystems/dewdrop
+ * @copyright Delta Systems (http://deltasys.com)
+ * @license   https://github.com/DeltaSystems/dewdrop/LICENSE
+ */
+
 namespace Dewdrop\Db;
 
 use Dewdrop\Db\Select\SelectException;
@@ -59,6 +67,8 @@ class Select
     protected $bind = array();
 
     /**
+     * The DB adapter that generated this object
+     *
      * @var \Dewdrop\Db\Adapter
      */
     protected $adapter;
@@ -126,7 +136,7 @@ class Select
     /**
      * Class constructor
      *
-     * @param \Dewdrop\Db\Adapter $adapter
+     * @param Adapter $adapter
      */
     public function __construct(Adapter $adapter)
     {
@@ -239,6 +249,7 @@ class Select
      * </code>
      *
      * @param  array $select Array of select clauses for the union.
+     * @param  string $type
      * @return \Dewdrop\Db\Select This \Dewdrop\Db\Select object.
      */
     public function union($select = array(), $type = self::SQL_UNION)
@@ -820,6 +831,11 @@ class Select
      * * joinRightUsing
      * * joinLeftUsing
      *
+     * @param string $type
+     * @param string $name
+     * @param string $cond
+     * @param string|array $cols
+     * @param string schema
      * @return \Dewdrop\Db\Select This \Dewdrop\Db\Select object.
      */
     public function joinUsingInternal($type, $name, $cond, $cols = '*', $schema = null)
@@ -862,10 +878,11 @@ class Select
     /**
      * Adds to the internal table-to-column mapping array.
      *
-     * @param  string $tbl The table/join the columns come from.
+     * @param  string $correlationName The table/join the columns come from.
      * @param  array|string $cols The list of columns; preferably as
-     * an array, but possibly as a string containing one column.
-     * @param  bool|string True if it should be prepended, a correlation name if it should be inserted
+     *     an array, but possibly as a string containing one column.
+     * @param  bool|string $afterCorrelationName True if it should be prepended,
+     *     a correlation name if it should be inserted
      * @return void
      */
     protected function tableCols($correlationName, $cols, $afterCorrelationName = null)
@@ -963,6 +980,8 @@ class Select
     }
 
     /**
+     * Return an array to serve as a dummy table when needed
+     *
      * @return array
      */
     protected function getDummyTable()

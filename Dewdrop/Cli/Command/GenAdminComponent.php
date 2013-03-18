@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * Dewdrop
+ *
+ * @link      https://github.com/DeltaSystems/dewdrop
+ * @copyright Delta Systems (http://deltasys.com)
+ * @license   https://github.com/DeltaSystems/dewdrop/LICENSE
+ */
+
 namespace Dewdrop\Cli\Command;
 
 /**
@@ -7,16 +15,14 @@ namespace Dewdrop\Cli\Command;
  *
  * Once generated, you should end up with something like this:
  *
+ * <code>
  * |~admin/
  * | `~my-component/
  * |   |~view-scripts/
  * |   | `-index.phtml
  * |   |-Component.php
  * |   `-Index.php
- *
- * @category   Dewdrop
- * @package    Cli
- * @subpackage Command
+ * </code>
  */
 class GenAdminComponent extends CommandAbstract
 {
@@ -46,6 +52,8 @@ class GenAdminComponent extends CommandAbstract
     private $namespace;
 
     /**
+     * Set basic command information, arguments and examples
+     *
      * @inheritdoc
      */
     public function init()
@@ -142,6 +150,8 @@ class GenAdminComponent extends CommandAbstract
     }
 
     /**
+     * Set the title of the component to be displayed in the WP navigation menu
+     *
      * @param string $title
      * @return \Dewdrop\Cli\Command\GenAdminComponent
      */
@@ -153,7 +163,14 @@ class GenAdminComponent extends CommandAbstract
     }
 
     /**
-     * @param string $title
+     * Set the name of the subfolder you'd like to create in the admin folder of
+     * your plugin.
+     *
+     * You should usually allow the inflector to determine this value based upon
+     * the folder name.  It's really only advisable to use this method in cases
+     * where the inflector fails for some reason.
+     *
+     * @param string $folder
      * @return \Dewdrop\Cli\Command\GenAdminComponent
      */
     public function setFolder($folder)
@@ -164,7 +181,11 @@ class GenAdminComponent extends CommandAbstract
     }
 
     /**
-     * @param string $title
+     * Manually set the namespace for this component.
+     *
+     * If not set, we'll try to inflect a namespace from the title property.
+     *
+     * @param string $namespace
      * @return \Dewdrop\Cli\Command\GenAdminComponent
      */
     public function setNamespace($namespace)
@@ -175,6 +196,8 @@ class GenAdminComponent extends CommandAbstract
     }
 
     /**
+     * Get the path to the admin folder of the plugin
+     *
      * @return string
      */
     public function getComponentPath()
@@ -187,6 +210,7 @@ class GenAdminComponent extends CommandAbstract
      *
      * This is a separate method so that it's easy to mock during testing.
      *
+     * @param string $path
      * @return \Dewdrop\Cli\Command\GenAdminComponent
      */
     protected function createFolder($path)
@@ -201,6 +225,8 @@ class GenAdminComponent extends CommandAbstract
      *
      * This is a separate method so that it's easy to mock during testing.
      *
+     * @param string $path
+     * @param string $contents
      * @return \Dewdrop\Cli\Command\GenAdminComponent
      */
     protected function writeFile($path, $contents)
@@ -215,6 +241,7 @@ class GenAdminComponent extends CommandAbstract
      *
      * This is a separate method so that it's easy to mock during testing.
      *
+     * @param string $newDir
      * @return boolean
      */
     protected function componentAlreadyExists($newDir)

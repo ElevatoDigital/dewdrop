@@ -4,11 +4,8 @@
  * Dewdrop
  *
  * @link      https://github.com/DeltaSystems/dewdrop
- * @copyright Copyright Delta Systems (http://deltasys.com)
+ * @copyright Delta Systems (http://deltasys.com)
  * @license   https://github.com/DeltaSystems/dewdrop/LICENSE
- *
- * @category  Dewdrop
- * @package   Request
  */
 
 namespace Dewdrop;
@@ -50,6 +47,9 @@ class Request
     private $method;
 
     /**
+     * Create request, optionally injecting alterative values for post, query,
+     * and method properties, primarily to aid in testing.
+     *
      * @param array $post
      * @param array $query
      * @param string $method

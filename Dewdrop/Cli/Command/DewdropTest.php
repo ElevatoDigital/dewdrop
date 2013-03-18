@@ -1,13 +1,17 @@
 <?php
 
+/**
+ * Dewdrop
+ *
+ * @link      https://github.com/DeltaSystems/dewdrop
+ * @copyright Delta Systems (http://deltasys.com)
+ * @license   https://github.com/DeltaSystems/dewdrop/LICENSE
+ */
+
 namespace Dewdrop\Cli\Command;
 
 /**
  * Run PHPUnit tests available for the Dewdrop library.
- *
- * @category   Dewdrop
- * @package    Cli
- * @subpackage Command
  */
 class DewdropTest extends CommandAbstract
 {
@@ -27,6 +31,8 @@ class DewdropTest extends CommandAbstract
     protected $coverageHtml;
 
     /**
+     * Set basic command information, arguments and examples
+     *
      * @inheritdoc
      */
     public function init()
@@ -51,6 +57,8 @@ class DewdropTest extends CommandAbstract
     }
 
     /**
+     * Manually set the path to the phpunit binary
+     *
      * @param string $phpunit
      * @return \Dewdrop\Cli\Command\DewdropTest
      */
@@ -62,7 +70,10 @@ class DewdropTest extends CommandAbstract
     }
 
     /**
-     * @param string $phpunit
+     * Set the path where you would like HTML code coverage reports to be
+     * saved
+     *
+     * @param string $coverageHtml
      * @return \Dewdrop\Cli\Command\DewdropTest
      */
     public function setCoverageHtml($coverageHtml)

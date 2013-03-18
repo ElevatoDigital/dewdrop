@@ -4,11 +4,8 @@
  * Dewdrop
  *
  * @link      https://github.com/DeltaSystems/dewdrop
- * @copyright Copyright Delta Systems (http://deltasys.com)
+ * @copyright Delta Systems (http://deltasys.com)
  * @license   https://github.com/DeltaSystems/dewdrop/LICENSE
- *
- * @category  Dewdrop
- * @package   Paths
  */
 
 namespace Dewdrop;
@@ -59,7 +56,9 @@ class Paths
     }
 
     /**
-     * @return string The root of the WP install (i.e. where wp-config.php lives)
+     * The root of the WP install (i.e. where wp-config.php lives)
+     *
+     * @return string
      */
     public function getWpRoot()
     {
@@ -67,7 +66,9 @@ class Paths
     }
 
     /**
-     * @return string The Dewdrop folder inside "lib"
+     * The Dewdrop folder inside "lib"
+     *
+     * @return string
      */
     public function getDewdropLib()
     {
@@ -75,7 +76,9 @@ class Paths
     }
 
     /**
-     * @return string The root of your Dewdrop-based plugin
+     * The root of your Dewdrop-based plugin
+     *
+     * @return string
      */
     public function getPluginRoot()
     {
@@ -83,7 +86,9 @@ class Paths
     }
 
     /**
-     * @return string The folder housing your admin components
+     * The folder housing your admin components
+     *
+     * @return string
      */
     public function getAdmin()
     {
@@ -91,7 +96,9 @@ class Paths
     }
 
     /**
-     * @return string The folder housing your dbdeploy deltas
+     * The folder housing your dbdeploy deltas
+     *
+     * @return string
      */
     public function getDb()
     {
@@ -99,7 +106,9 @@ class Paths
     }
 
     /**
-     * @return string The "lib" folder inside your plugin
+     * The "lib" folder inside your plugin
+     *
+     * @return string
      */
     public function getLib()
     {
@@ -107,7 +116,9 @@ class Paths
     }
 
     /**
-     * @return string The folder housing your models
+     * The folder housing your models
+     *
+     * @return string
      */
     public function getModels()
     {
@@ -115,7 +126,9 @@ class Paths
     }
 
     /**
-     * @return string The folder housing your shortcodes
+     * The folder housing your shortcodes
+     *
+     * @return string
      */
     public function getShortCodes()
     {
@@ -123,7 +136,9 @@ class Paths
     }
 
     /**
-     * @return string The folder housing your plugin's tests
+     * The folder housing your plugin's tests
+     *
+     * @return string
      */
     public function getTests()
     {

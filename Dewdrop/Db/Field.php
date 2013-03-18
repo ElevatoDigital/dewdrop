@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * Dewdrop
+ *
+ * @link      https://github.com/DeltaSystems/dewdrop
+ * @copyright Delta Systems (http://deltasys.com)
+ * @license   https://github.com/DeltaSystems/dewdrop/LICENSE
+ */
+
 namespace Dewdrop\Db;
 
 /**
@@ -7,9 +15,6 @@ namespace Dewdrop\Db;
  * your application and establish a centralized source of information about
  * how the field should be labeled, any notes that should be displayed with
  * it, any validators that should be included, etc.
- *
- * @category   Dewdrop
- * @package    Db
  */
 class Field
 {
@@ -92,7 +97,11 @@ class Field
     private $controlName;
 
     /**
-     * @param \Dewdrop\Db\Table $table
+     * Create new field with a reference to the table that instantiated it,
+     * the name of the DB column it represents and metadata from the DB about
+     * its type, constraints, etc.
+     *
+     * @param Table $table
      * @param string $name
      * @param array $metadata
      */
@@ -118,7 +127,7 @@ class Field
      * Associate a row with this field object so that it can be used to retrieve
      * and/or set the value of the associated column in the row.
      *
-     * @param \Dewdrop\Db\Row $row
+     * @param Row $row
      * @return \Dewdrop\Db\Field
      */
     public function setRow(Row $row)

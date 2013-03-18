@@ -1,15 +1,19 @@
 <?php
 
+/**
+ * Dewdrop
+ *
+ * @link      https://github.com/DeltaSystems/dewdrop
+ * @copyright Delta Systems (http://deltasys.com)
+ * @license   https://github.com/DeltaSystems/dewdrop/LICENSE
+ */
+
 namespace Dewdrop\Cli\Command;
 
 use Dewdrop\Cli\Command\DbMetadata;
 
 /**
  * Apply update to your database schema in a controlled and repeatable manner.
- *
- * @category   Dewdrop
- * @package    Cli
- * @subpackage Command
  */
 class Dbdeploy extends CommandAbstract
 {
@@ -33,6 +37,8 @@ class Dbdeploy extends CommandAbstract
     private $db;
 
     /**
+     * The action that should be run.
+     *
      * @var string
      */
     private $action;
@@ -54,6 +60,8 @@ class Dbdeploy extends CommandAbstract
     private $revision;
 
     /**
+     * Set basic command information, arguments and examples
+     *
      * @inheritdoc
      */
     public function init()
@@ -100,6 +108,8 @@ class Dbdeploy extends CommandAbstract
     }
 
     /**
+     * Set the action to run (see the $validActions property for a list)
+     *
      * @param string $action
      * @return \Dewdrop\Cli\Command\Dbdeploy
      */
@@ -111,7 +121,9 @@ class Dbdeploy extends CommandAbstract
     }
 
     /**
-     * @param string $action
+     * Manually set the path to the mysql binary
+     *
+     * @param string $mysql
      * @return \Dewdrop\Cli\Command\Dbdeploy
      */
     public function setMysql($mysql)
@@ -122,6 +134,8 @@ class Dbdeploy extends CommandAbstract
     }
 
     /**
+     * When running the backfill action, set the revision number to backfill to.
+     *
      * @param integer $revision
      * @return \Dewdrop\Cli\Command\Dbdeploy
      */
@@ -419,6 +433,7 @@ class Dbdeploy extends CommandAbstract
     /**
      * Run the specified SQL script through the mysql binary.
      *
+     * @param string $path
      * @return boolean Whether the mysql command ran successfully.
      */
     private function runSqlScript($path)
@@ -443,6 +458,7 @@ class Dbdeploy extends CommandAbstract
     /**
      * Get the files with a change number greater than the current revision.
      *
+     * @param integer $currentRevision
      * @return array The files that need to be run.
      */
     private function getChangeFiles($currentRevision)

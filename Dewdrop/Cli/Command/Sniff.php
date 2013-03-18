@@ -1,14 +1,18 @@
 <?php
 
+/**
+ * Dewdrop
+ *
+ * @link      https://github.com/DeltaSystems/dewdrop
+ * @copyright Delta Systems (http://deltasys.com)
+ * @license   https://github.com/DeltaSystems/dewdrop/LICENSE
+ */
+
 namespace Dewdrop\Cli\Command;
 
 /**
  * Use PHP_CodeSniffer to check that your plugin code conforms to your coding
  * style of choice.  By default, we use the PSR-2 coding style.
- *
- * @category   Dewdrop
- * @package    Cli
- * @subpackage Command
  */
 class Sniff extends CommandAbstract
 {
@@ -28,6 +32,8 @@ class Sniff extends CommandAbstract
     protected $standard = 'PSR2';
 
     /**
+     * Set basic command information, arguments and examples
+     *
      * @inheritdoc
      */
     public function init()
@@ -52,6 +58,8 @@ class Sniff extends CommandAbstract
     }
 
     /**
+     * Manually set the path to the phpcs binary
+     *
      * @param string $phpcs
      * @return \Dewdrop\Cli\Command\Sniff
      */
@@ -63,7 +71,9 @@ class Sniff extends CommandAbstract
     }
 
     /**
-     * @param string $phpcs
+     * Set the standard you'd like to check you code style against
+     *
+     * @param string $standard
      * @return \Dewdrop\Cli\Command\Sniff
      */
     public function setStandard($standard)

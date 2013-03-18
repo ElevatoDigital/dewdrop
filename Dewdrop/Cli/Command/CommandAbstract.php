@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * Dewdrop
+ *
+ * @link      https://github.com/DeltaSystems/dewdrop
+ * @copyright Delta Systems (http://deltasys.com)
+ * @license   https://github.com/DeltaSystems/dewdrop/LICENSE
+ */
+
 namespace Dewdrop\Cli\Command;
 
 use Dewdrop\Cli\Run;
@@ -12,10 +20,6 @@ use Dewdrop\Paths;
  *
  * This abstract class supplies CLI commands with argument parsing, help
  * content display, alias support, etc.
- *
- * @category   Dewdrop
- * @package    Cli
- * @subpackage Command
  */
 abstract class CommandAbstract
 {
@@ -34,6 +38,9 @@ abstract class CommandAbstract
     const ARG_OPTIONAL = false;
 
     /**
+     * The \Dewdrop\Cli\Run instance that is managing this and other CLI
+     * commands.
+
      * @var \Dewdrop\Cli\Run
      */
     protected $runner;
@@ -48,6 +55,9 @@ abstract class CommandAbstract
     protected $renderer;
 
     /**
+     * Paths utility to assist CLI commands in getting around the WP
+     * environment.
+     *
      * @var \Dewdrop\Paths
      */
     protected $paths;
@@ -128,8 +138,12 @@ abstract class CommandAbstract
     private $examples = array();
 
     /**
-     * @param \Dewdrop\Cli\Run
-     * @param \Dewdrop\Cli\Renderer\RendererInterface
+     * Instantiate command with a runner and renderer.  After the command
+     * sub-class runs its init() method, check to ensure the required basic
+     * properties were set.
+     *
+     * @param Run $runner
+     * @param RendererInterface $renderer
      */
     public function __construct(Run $runner, RendererInterface $renderer)
     {
@@ -297,7 +311,9 @@ abstract class CommandAbstract
     }
 
     /**
-     * @var string $description
+     * Set a human-friendly description of this command's role
+     *
+     * @param string $description
      * @return \Dewdrop\Cli\Command\CommandAbstract
      */
     public function setDescription($description)
@@ -319,6 +335,10 @@ abstract class CommandAbstract
     }
 
     /**
+     * Set the primary command that will be used to run this command.  This
+     * value differs from aliases because it is displayed in the default help
+     * listings.
+     *
      * @param string $command
      * @return \Dewdrop\Cli\Command\CommandAbstract
      */
@@ -379,6 +399,8 @@ abstract class CommandAbstract
     }
 
     /**
+     * Register a new argument allowed to be used with this command.
+     *
      * @param string $name
      * @param string $description
      * @param boolean $required

@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * Dewdrop
+ *
+ * @link      https://github.com/DeltaSystems/dewdrop
+ * @copyright Delta Systems (http://deltasys.com)
+ * @license   https://github.com/DeltaSystems/dewdrop/LICENSE
+ */
+
 namespace Dewdrop\Cli\Command;
 
 /**
@@ -7,10 +15,6 @@ namespace Dewdrop\Cli\Command;
  *
  * It would be great to have this integrate with a changelog facility so we
  * could let the user know what changes had occurred since their last update.
- *
- * @category   Dewdrop
- * @package    Cli
- * @subpackage Command
  */
 class Update extends CommandAbstract
 {
@@ -22,6 +26,8 @@ class Update extends CommandAbstract
     protected $git;
 
     /**
+     * Set basic command information, arguments and examples
+     *
      * @inheritdoc
      */
     public function init()

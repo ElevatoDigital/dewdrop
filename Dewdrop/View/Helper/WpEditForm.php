@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * Dewdrop
+ *
+ * @link      https://github.com/DeltaSystems/dewdrop
+ * @copyright Delta Systems (http://deltasys.com)
+ * @license   https://github.com/DeltaSystems/dewdrop/LICENSE
+ */
+
 namespace Dewdrop\View\Helper;
 
 /**
@@ -16,10 +24,6 @@ namespace Dewdrop\View\Helper;
  *
  * echo $this->wpEditForm()->close();
  * </code>
- *
- * @category   Dewdrop
- * @package    View
- * @subpackage Helper
  */
 class WpEditForm extends AbstractHelper
 {

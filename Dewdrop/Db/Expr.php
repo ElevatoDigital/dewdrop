@@ -1,14 +1,19 @@
 <?php
 
+/**
+ * Dewdrop
+ *
+ * @link      https://github.com/DeltaSystems/dewdrop
+ * @copyright Delta Systems (http://deltasys.com)
+ * @license   https://github.com/DeltaSystems/dewdrop/LICENSE
+ */
+
 namespace Dewdrop\Db;
 
 /**
  * Expr allows you to inject raw SQL segments into a \Dewdrop\Db\Select or
  * other context in which Dewdrop might otherwise quote and therefore
  * misinterpret the code.
- *
- * @category   Dewdrop
- * @package    Db
  */
 class Expr
 {
@@ -31,6 +36,9 @@ class Expr
     }
 
     /**
+     * Return expression property when this object is used as a string (e.g.
+     * concatenated with another string value).
+     *
      * @return string The string of the SQL expression stored in this object.
      */
     public function __toString()

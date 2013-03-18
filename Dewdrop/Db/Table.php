@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * Dewdrop
+ *
+ * @link      https://github.com/DeltaSystems/dewdrop
+ * @copyright Delta Systems (http://deltasys.com)
+ * @license   https://github.com/DeltaSystems/dewdrop/LICENSE
+ */
+
 namespace Dewdrop\Db;
 
 use Dewdrop\Paths;
@@ -11,9 +19,6 @@ use Dewdrop\Db\Field;
  * The table class provides a gateway to the a single DB table by providing
  * utility methods for querying the table and finding specific rows within
  * it.
- *
- * @category   Dewdrop
- * @package    Db
  */
 abstract class Table
 {
@@ -43,11 +48,15 @@ abstract class Table
     private $rowClass = '\Dewdrop\Db\Row';
 
     /**
+     * The database adapter used by this table
+     *
      * @var \Dewdrop\Db\Adapter
      */
     private $db;
 
     /**
+     * Paths utility to help in finding DB metadata files
+     *
      * @var \Dewdrop\Paths
      */
     private $paths;
@@ -86,8 +95,10 @@ abstract class Table
     private $singularTitle;
 
     /**
-     * @param \Dewdrop\Db\Adapter $db
-     * @param \Dewdrop\Paths $paths
+     * Create new table object with supplied DB adapter
+     *
+     * @param Adapter $db
+     * @param Paths $paths
      */
     public function __construct(Adapter $db, Paths $paths = null)
     {
@@ -260,6 +271,8 @@ abstract class Table
      * $this->getMetadata('columns', 'name');
      * </code>
      *
+     * @param string $section
+     * @param string $index
      * @return array
      */
     public function getMetadata($section = null, $index = null)

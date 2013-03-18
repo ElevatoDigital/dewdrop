@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * Dewdrop
+ *
+ * @link      https://github.com/DeltaSystems/dewdrop
+ * @copyright Copyright Delta Systems (http://deltasys.com)
+ * @license   https://github.com/DeltaSystems/dewdrop/LICENSE
+ */
+
 namespace Dewdrop\View\Helper;
 
 use \Dewdrop\Db\Field;
@@ -14,10 +22,6 @@ use \Dewdrop\Exception;
  * <code>
  * echo $this->wpInputText($this->fields->get('animals:latin_name'));
  * </code>
- *
- * @category   Dewdrop
- * @package    View
- * @subpackage Helper
  */
 class WpInputText extends AbstractHelper
 {
@@ -38,7 +42,7 @@ class WpInputText extends AbstractHelper
      * Use the supplied \Dewdrop\Db\Field object to set the helper's options
      * and then render the input.
      *
-     * @param \Dewdrop\Db\Field
+     * @param Field $field
      * @return string
      */
     protected function directField(Field $field)
@@ -58,7 +62,7 @@ class WpInputText extends AbstractHelper
      *
      * @param string $name
      * @param boolean $value
-     * @param string $label
+     * @param string $class
      * @return string
      */
     protected function directExplicit($name, $value, $class = null)
@@ -108,9 +112,10 @@ class WpInputText extends AbstractHelper
      * "classes" and "id" to the options array, if they are not present
      * already.
      *
+     * @param array $options
      * @return array
      */
-    private function prepareOptionsArray($options)
+    private function prepareOptionsArray(array $options)
     {
         $this
             ->checkRequired($options, array('name', 'value'))

@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * Dewdrop
+ *
+ * @link      https://github.com/DeltaSystems/dewdrop
+ * @copyright Delta Systems (http://deltasys.com)
+ * @license   https://github.com/DeltaSystems/dewdrop/LICENSE
+ */
+
 namespace Dewdrop\Db;
 
 use Dewdrop\Exception;
@@ -11,9 +19,6 @@ use Dewdrop\Exception;
  * allows us to take advantage of the more expressive and powerful DB API
  * from Zend_Db without needing to create a secondary MySQL connection on every
  * request.
- *
- * @category   Dewdrop
- * @package    Db
  */
 class Adapter
 {
@@ -91,6 +96,8 @@ class Adapter
     private $wpdb;
 
     /**
+     * Create new adapter using the wpdb object as the driver
+     *
      * @param \wpdb $wpdb
      */
     public function __construct(\wpdb $wpdb)
@@ -193,7 +200,7 @@ class Adapter
      * Fetch a single scalar value from the results of the supplied SQL
      * statement.
      *
-     * @param string|\Dewdrop\Db\Adapter
+     * @param string|\Dewdrop\Db\Select
      * @return mixed
      */
     public function fetchOne($sql)

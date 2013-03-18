@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * Dewdrop
+ *
+ * @link      https://github.com/DeltaSystems/dewdrop
+ * @copyright Delta Systems (http://deltasys.com)
+ * @license   https://github.com/DeltaSystems/dewdrop/LICENSE
+ */
+
 namespace Dewdrop\View\Helper;
 
 use Dewdrop\Db\Field;
@@ -17,10 +25,6 @@ use Dewdrop\Db\Field;
  * echo $this->wpInputText($this->fields->get('model:field_name'));
  * echo $this->wpEditRow()->close();
  * </code>
- *
- * @category   Dewdrop
- * @package    View
- * @subpackage Helper
  */
 class WpEditRow extends AbstractHelper
 {
@@ -41,7 +45,7 @@ class WpEditRow extends AbstractHelper
      * Open the edit row using a \Dewdrop\Db\Field object to determine the
      * label text and the value of the "for" attribute on the label tag.
      *
-     * @param \Dewdrop\Db\Field
+     * @param Field $field
      * @return string
      */
     protected function openField(Field $field)
@@ -114,7 +118,13 @@ class WpEditRow extends AbstractHelper
         );
     }
 
-    protected function prepareOptionsArray($options)
+    /**
+     * Check and prepare options for use in openArray()
+     *
+     * @param array $options
+     * @return array
+     */
+    protected function prepareOptionsArray(array $options)
     {
         $this
             ->checkRequired($options, array('label'))

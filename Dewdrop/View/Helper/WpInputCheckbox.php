@@ -4,7 +4,7 @@
  * Dewdrop
  *
  * @link      https://github.com/DeltaSystems/dewdrop
- * @copyright Copyright Delta Systems (http://deltasys.com)
+ * @copyright Delta Systems (http://deltasys.com)
  * @license   https://github.com/DeltaSystems/dewdrop/LICENSE
  */
 
@@ -22,10 +22,6 @@ use \Dewdrop\Exception;
  * <code>
  * echo $this->wpInputCheckbox($this->fields->get('animals:is_mammals'));
  * </code>
- *
- * @category   Dewdrop
- * @package    View
- * @subpackage Helper
  */
 class WpInputCheckbox extends AbstractHelper
 {
@@ -46,7 +42,7 @@ class WpInputCheckbox extends AbstractHelper
      * Use the supplied \Dewdrop\Db\Field object to set the helper's options
      * and then render the checkbox.
      *
-     * @param \Dewdrop\Db\Field
+     * @param Field $field
      * @return string
      */
     protected function directField(Field $field)
@@ -114,9 +110,10 @@ class WpInputCheckbox extends AbstractHelper
      * "classes" and "id" to the options array, if they are not present
      * already.
      *
+     * @param array $options
      * @return array
      */
-    private function prepareOptionsArray($options)
+    private function prepareOptionsArray(array $options)
     {
         $this
             ->checkRequired($options, array('name', 'value', 'label'))

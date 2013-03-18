@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * Dewdrop
+ *
+ * @link      https://github.com/DeltaSystems/dewdrop
+ * @copyright Delta Systems (http://deltasys.com)
+ * @license   https://github.com/DeltaSystems/dewdrop/LICENSE
+ */
+
 namespace Dewdrop\Cli\Command;
 
 /**
@@ -9,10 +17,6 @@ namespace Dewdrop\Cli\Command;
  *
  * When the CLI runner can't find a valid command, this command is
  * executed to help the user fix their input.
- *
- * @category   Dewdrop
- * @package    Cli
- * @subpackage Command
  */
 class Help extends CommandAbstract
 {
@@ -24,6 +28,8 @@ class Help extends CommandAbstract
     private $subcommand;
 
     /**
+     * Set basic command information, arguments and examples
+     *
      * @inheritdoc
      */
     public function init()
@@ -45,6 +51,9 @@ class Help extends CommandAbstract
     }
 
     /**
+     * Set the sub-command (the command for which you want to display help
+     * content)
+     *
      * @param string $subcommand
      * @return \Dewdrop\Cli\Command\Help
      */

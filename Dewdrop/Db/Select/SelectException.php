@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * Dewdrop
+ *
+ * @link      https://github.com/DeltaSystems/dewdrop
+ * @copyright Delta Systems (http://deltasys.com)
+ * @license   https://github.com/DeltaSystems/dewdrop/LICENSE
+ */
+
 namespace Dewdrop\Db\Select;
 
 use Dewdrop\Exception as DewdropException;
@@ -7,10 +15,6 @@ use Dewdrop\Exception as DewdropException;
 /**
  * An exception generated during the assembly of a \Dewdrop\Db\Select
  * object.
- *
- * @category   Dewdrop
- * @package    Db
- * @subpackage Select
  */
 class SelectException extends DewdropException
 {

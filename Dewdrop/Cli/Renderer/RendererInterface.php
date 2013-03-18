@@ -1,15 +1,19 @@
 <?php
 
+/**
+ * Dewdrop
+ *
+ * @link      https://github.com/DeltaSystems/dewdrop
+ * @copyright Delta Systems (http://deltasys.com)
+ * @license   https://github.com/DeltaSystems/dewdrop/LICENSE
+ */
+
 namespace Dewdrop\Cli\Renderer;
 
 /**
  * The interface CLI renderers must implement.  Markdown is used by
  * default, but alternate renders could be used to render directly to
  * HTML, etc.
- *
- * @category   Dewdrop
- * @package    Cli
- * @subpackage Renderer
  */
 interface RendererInterface
 {
@@ -41,7 +45,7 @@ interface RendererInterface
      * Display a table.  The supplied array should have the row title as
      * the keys and the descriptions as the array values.
      *
-     * @param array
+     * @param array $rows
      * @returns RendererInterface
      */
     public function table(array $rows);

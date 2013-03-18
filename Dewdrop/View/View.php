@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * Dewdrop
+ *
+ * @link      https://github.com/DeltaSystems/dewdrop
+ * @copyright Delta Systems (http://deltasys.com)
+ * @license   https://github.com/DeltaSystems/dewdrop/LICENSE
+ */
+
 namespace Dewdrop\View;
 
 use Dewdrop\Exception;
@@ -9,9 +17,6 @@ use Zend\Escaper\Escaper;
  * A simple view implementation that allows for simple assignment of data,
  * escaping for common contexts (e.g. HTML, HTML attribute, JS, etc.),
  * and calling of helper objects for reusable view logic.
- *
- * @category   Dewdrop
- * @package    View
  */
 class View
 {
@@ -52,7 +57,10 @@ class View
     );
 
     /**
-     * @param \Zend\Escaper\Escaper $escaper
+     * Create a new view, optionally supplying an escaper object for use
+     * in sanitizing output in various contexts.
+     *
+     * @param Escaper $escaper
      */
     public function __construct(Escaper $escaper = null)
     {
@@ -209,6 +217,8 @@ class View
     }
 
     /**
+     * Escape string included in normal HTML context (i.e. not in an attribute value).
+     *
      * @see \Zend\Escaper\Escaper::escapeHtml
      * @param string $string
      * @return string
@@ -223,6 +233,8 @@ class View
     }
 
     /**
+     * Escape a string included in an HTML attribute value.
+     *
      * @see \Zend\Escaper\Escaper::escapeHtmlAttr
      * @param string $string
      * @return string
@@ -237,6 +249,8 @@ class View
     }
 
     /**
+     * Escape a JavaScript string.
+     *
      * @see \Zend\Escaper\Escaper::escapeJs
      * @param string $string
      * @return string
@@ -251,6 +265,8 @@ class View
     }
 
     /**
+     * Escape a URL.
+     *
      * @see \Zend\Escaper\Escaper::escapeUrl
      * @param string $string
      * @return string
@@ -265,6 +281,8 @@ class View
     }
 
     /**
+     * Escape a CSS property value.
+     *
      * @see \Zend\Escaper\Escaper::escapeCss
      * @param string $string
      * @return string

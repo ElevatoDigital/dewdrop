@@ -4,11 +4,8 @@
  * Dewdrop
  *
  * @link      https://github.com/DeltaSystems/dewdrop
- * @copyright Copyright Delta Systems (http://deltasys.com)
+ * @copyright Delta Systems (http://deltasys.com)
  * @license   https://github.com/DeltaSystems/dewdrop/LICENSE
- *
- * @category  Dewdrop
- * @package   Autoloader
  */
 
 namespace Dewdrop;
@@ -21,6 +18,8 @@ namespace Dewdrop;
 class Autoloader
 {
     /**
+     * Zend autoloader instance created by this class
+     *
      * @var \Zend\Loader\Autoloader\StandardAutoloader
      */
     private $autoloader;

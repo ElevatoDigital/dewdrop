@@ -1,4 +1,5 @@
 <?php
+
 return array(
     'titles' => array(
         'singular' => '{{singular}}',

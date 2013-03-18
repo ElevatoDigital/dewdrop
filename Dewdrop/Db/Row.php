@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * Dewdrop
+ *
+ * @link      https://github.com/DeltaSystems/dewdrop
+ * @copyright Delta Systems (http://deltasys.com)
+ * @license   https://github.com/DeltaSystems/dewdrop/LICENSE
+ */
+
 namespace Dewdrop\Db;
 
 /**
@@ -40,9 +48,6 @@ namespace Dewdrop\Db;
  * The field object allows you to easily integrate with other Dewdrop
  * APIs, leveraging the database metadata to add validators, retrieve lists
  * of options, etc.
- *
- * @category   Dewdrop
- * @package    Db
  */
 class Row
 {
@@ -72,7 +77,7 @@ class Row
      * Instantiate the row, checking to ensure the data array contains only
      * those columns present in the table's metadata.
      *
-     * @param \Dewdrop\Db\Table $table
+     * @param Table $table
      * @param array $data
      */
     public function __construct(Table $table, array $data = array())

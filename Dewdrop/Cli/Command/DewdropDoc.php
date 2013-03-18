@@ -1,13 +1,40 @@
 <?php
 
+/**
+ * Dewdrop
+ *
+ * @link      https://github.com/DeltaSystems/dewdrop
+ * @copyright Delta Systems (http://deltasys.com)
+ * @license   https://github.com/DeltaSystems/dewdrop/LICENSE
+ */
+
 namespace Dewdrop\Cli\Command;
 
+/**
+ * Generate API documentation for all Drewdrop libraries with
+ * phpdoc (a.k.a. phpDocumentor2).
+ */
 class DewdropDoc extends CommandAbstract
 {
+    /**
+     * Where you'd like the phpdoc output to be put
+     *
+     * @var string
+     */
     private $outputDir;
 
+    /**
+     * The path to the phpdoc binary
+     *
+     * @var string
+     */
     private $phpdoc;
 
+    /**
+     * Set basic command information, arguments and examples
+     *
+     * @inheritdoc
+     */
     public function init()
     {
         $this
@@ -31,6 +58,12 @@ class DewdropDoc extends CommandAbstract
         );
     }
 
+    /**
+     * Set the location of the folder you'd like to store phpdoc output in
+     *
+     * @param string $outputDir
+     * @return \Dewdrop\Cli\Command\DewdropDoc
+     */
     public function setOutputDir($outputDir)
     {
         $this->outputDir = $outputDir;
@@ -38,6 +71,12 @@ class DewdropDoc extends CommandAbstract
         return $this;
     }
 
+    /**
+     * Manually set the location of the phpdoc executable
+     *
+     * @param string $phpdoc
+     * @return \Dewdrop\Cli\Command\DewdropDoc
+     */
     public function setPhpdoc($phpdoc)
     {
         $this->phpdoc = $phpdoc;
@@ -45,6 +84,11 @@ class DewdropDoc extends CommandAbstract
         return $this;
     }
 
+    /**
+     * Run phpdoc to generate HTML API docs for the Dewdrop libraries
+     *
+     * @return void
+     */
     public function execute()
     {
         if (!$this->phpdoc) {
@@ -52,7 +96,7 @@ class DewdropDoc extends CommandAbstract
         }
 
         $cmd = sprintf(
-            "%s -d %s -t %s",
+            "%s --sourcecode=1 --defaultpackagename=Dewdrop --title=Dewdrop --ignore=*.phtml -d %s -t %s",
             $this->phpdoc,
             escapeshellarg($this->paths->getDewdropLib()),
             escapeshellarg($this->evalPathArgument($this->outputDir))

@@ -4,11 +4,8 @@
  * Dewdrop
  *
  * @link      https://github.com/DeltaSystems/dewdrop
- * @copyright Copyright Delta Systems (http://deltasys.com)
+ * @copyright Delta Systems (http://deltasys.com)
  * @license   https://github.com/DeltaSystems/dewdrop/LICENSE
- *
- * @category  Dewdrop
- * @package   Inflector
  */
 
 namespace Dewdrop;
