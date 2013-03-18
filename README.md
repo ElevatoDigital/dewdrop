@@ -8,7 +8,6 @@ Our next steps include adding code generation tools to the command line
 interface and fleshing out the model API.  If you're interested in
 contributing, contact Brad at <bgriffith@deltasys.com>.
 
-
 Quick Start
 -----------
 
@@ -34,6 +33,14 @@ wired in and accessible via the command line tool.
 See what's available to you by running:
 
     ./dewdrop help
+
+
+API docs and test reports
+-------------------------
+
+You can view our latest build results at:
+
+<http://ci.deltasys.com/dewdrop/>
 
 
 Testing and style
