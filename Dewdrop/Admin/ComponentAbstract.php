@@ -13,6 +13,8 @@ namespace Dewdrop\Admin;
 use ReflectionClass;
 use Dewdrop\Admin\Page\PageAbstract;
 use Dewdrop\Db\Adapter;
+use Dewdrop\Paths;
+use Dewdrop\Request;
 
 /**
  * This class enables you to define how your component should appear and wire
@@ -51,14 +53,34 @@ abstract class ComponentAbstract
     private $menuPosition;
 
     /**
+     * An array of submenu pages that have been added by calling addToSubmenu().
+     * These are actually tied in by registerMenuPage() after the admin_menu
+     * hook is triggered.
+     *
+     * @var array
+     */
+    private $submenuPages = array();
+
+    /**
+     * A request object that makes it easier to work with GET and POST
+     *
+     * @var \Dewdrop\Request
+     */
+    private $request;
+
+    /**
      * Create a component instance using the DB adapter creating by the Wiring
      * class.
      *
      * @param Adapter $db
+     * @param Paths $paths
+     * @param Request $request
      */
-    public function __construct(Adapter $db)
+    public function __construct(Adapter $db, Paths $paths, Request $request = null)
     {
-        $this->db = $db;
+        $this->db      = $db;
+        $this->paths   = $paths;
+        $this->request = ($request ?: new Request());
 
         $this->init();
 
@@ -106,15 +128,63 @@ abstract class ComponentAbstract
      */
     public function registerMenuPage()
     {
-        add_menu_page(
+        $slug = str_replace('\\', '/', get_class($this));
+
+        add_object_page(
             $this->title,
             $this->title,
             'add_users',
-            get_class($this),
+            $slug,
             array($this, 'route'),
             $this->icon,
             $this->menuPosition
         );
+
+        if (count($this->submenuPages)) {
+            global $submenu_file;
+
+            foreach ($this->submenuPages as $page) {
+                $url = $slug;
+
+                // Use primary component URL for index page so item is selected correctly by WP
+                if ('index' !== $page['route']) {
+                    $url .= '&route=' . $page['route'];
+                }
+
+                // If the current route matches the page linked then mark it as selected
+                if ($page['route'] === $this->request->getQuery('route', 'index')) {
+                    $submenu_file = $url;
+                }
+
+                add_submenu_page(
+                    $slug,
+                    $page['title'],
+                    $page['title'],
+                    'add_users',
+                    $url,
+                    array($this, 'route')
+                );
+            }
+
+            unset($this->submenuPages);
+        }
+    }
+
+    /**
+     * Add a link to the submenu for this component.
+     *
+     * @param string $title
+     * @param string $page
+     * @return \Dewdrop\Admin\ComponentAbstract
+     */
+    public function addToSubmenu($title, $page)
+    {
+        $this->submenuPages[] = array(
+            'title' => $title,
+            'route' => strtolower($page)
+        );
+
+        return $this;
     }
 
     /**

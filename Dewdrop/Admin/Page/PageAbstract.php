@@ -74,12 +74,13 @@ abstract class PageAbstract
      *
      * @param ComponentAbstract $component
      * @param string $pageFile
+     * @param Request $request
      */
-    public function __construct(ComponentAbstract $component, $pageFile)
+    public function __construct(ComponentAbstract $component, $pageFile, Request $request = null)
     {
         $this->component = $component;
         $this->view      = new View();
-        $this->request   = new Request();
+        $this->request   = ($request ?: new Request());
 
         $this->view->setScriptPath(dirname($pageFile) . '/view-scripts');
     }

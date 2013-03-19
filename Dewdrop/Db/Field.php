@@ -304,6 +304,17 @@ class Field
     }
 
     /**
+     * Get a version of the control name using underscores as word separators to
+     * be more friendly in CSS selectors, etc.
+     *
+     * @return string
+     */
+    public function getHtmlId()
+    {
+        return str_replace(':', '_', $this->getControlName());
+    }
+
+    /**
      * Get the \Zend\InputFilter\Filter object associated with this field.  This
      * object allows us to easily filter and validate values assigned to the
      * field.

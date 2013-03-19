@@ -117,7 +117,7 @@ class Wiring
         $className      = '\Admin\\' . $this->inflector->camelize($path) . '\Component';
 
         require_once $componentPath;
-        $component = new $className($this->db, $this);
+        $component = new $className($this->db, $this->paths);
 
         $component->register();
     }

@@ -50,7 +50,7 @@ class WpInputText extends AbstractHelper
         return $this->directArray(
             array(
                 'name'  => $field->getControlName(),
-                'id'    => $field->getControlName(),
+                'id'    => $field->getHtmlId(),
                 'value' => $field->getValue()
             )
         );

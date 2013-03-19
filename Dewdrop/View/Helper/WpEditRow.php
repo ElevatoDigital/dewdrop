@@ -53,7 +53,7 @@ class WpEditRow extends AbstractHelper
         return $this->openArray(
             array(
                 'label'    => $field->getLabel(),
-                'labelFor' => $field->getControlName()
+                'labelFor' => $field->getHtmlId()
             )
         );
     }
