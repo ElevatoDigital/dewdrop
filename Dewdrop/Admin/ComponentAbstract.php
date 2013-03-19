@@ -112,7 +112,7 @@ abstract class ComponentAbstract
     {
         $reflectedClass = new ReflectionClass($this);
 
-        $pageKey   = basename(isset($_GET['route']) ? $_GET['route'] : 'Index');
+        $pageKey   = $this->determineCurrentPage();
         $pageFile  = dirname($reflectedClass->getFileName()) . '/' . $pageKey . '.php';
         $className = $reflectedClass->getNamespaceName() . '\\' . $pageKey;
 
@@ -129,7 +129,7 @@ abstract class ComponentAbstract
      */
     public function registerMenuPage()
     {
-        $slug = str_replace('\\', '/', get_class($this));
+        $slug = $this->getSlug();
 
         add_object_page(
             $this->title,
@@ -148,12 +148,12 @@ abstract class ComponentAbstract
                 $url = $slug;
 
                 // Use primary component URL for index page so item is selected correctly by WP
-                if ('index' !== $page['route']) {
-                    $url .= '&route=' . $page['route'];
+                if ($page['route'] !== 'Index') {
+                    $url .= '/' . ucfirst($page['route']);
                 }
 
                 // If the current route matches the page linked then mark it as selected
-                if ($page['route'] === $this->request->getQuery('route', 'index')) {
+                if ($url === $this->request->getQuery('page')) {
                     $submenu_file = $url;
                 }
 
@@ -171,6 +171,11 @@ abstract class ComponentAbstract
         }
     }
 
+    public function dummy()
+    {
+
+    }
+
     /**
      * Add a link to the submenu for this component.
      *
@@ -182,7 +187,7 @@ abstract class ComponentAbstract
     {
         $this->submenuPages[] = array(
             'title' => $title,
-            'route' => strtolower($page)
+            'route' => $page
         );
 
         return $this;
@@ -282,5 +287,19 @@ abstract class ComponentAbstract
         if (!$output) {
             $page->renderView();
         }
+    }
+
+    private function determineCurrentPage()
+    {
+        $slug   = $this->getSlug();
+        $page   = $this->request->getQuery('page', $slug);
+        $suffix = ltrim(str_replace($slug, '', $page), '/');
+
+        return ($suffix ?: 'Index');
+    }
+
+    private function getSlug()
+    {
+        return str_replace('\\', '/', get_class($this));
     }
 }
