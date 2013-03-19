@@ -394,6 +394,8 @@ class Field
 
             $filters->attach(new Filter\StringTrim());
             $filters->attach(new Filter\Null(Filter\Null::TYPE_STRING));
+        } elseif ($this->isType('date')) {
+            $validators->addValidator(new Validator\Date());
         } elseif ($this->isType('tinyint')) {
             $filters->attach(new Filter\Int());
         } elseif ($this->isType('int', 'integer', 'mediumint', 'smallint', 'bigint')) {
