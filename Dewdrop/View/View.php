@@ -226,11 +226,9 @@ class View
      */
     public function escapeHtml($string)
     {
-        if (null === $string) {
-            $string = '';
-        }
-
-        return $this->escaper->escapeHtml($string);
+        return $this->escaper->escapeHtml(
+            $this->castEscaperStringValue($string)
+        );
     }
 
     /**
@@ -242,11 +240,9 @@ class View
      */
     public function escapeHtmlAttr($string)
     {
-        if (null === $string) {
-            $string = '';
-        }
-
-        return $this->escaper->escapeHtmlAttr($string);
+        return $this->escaper->escapeHtmlAttr(
+            $this->castEscaperStringValue($string)
+        );
     }
 
     /**
@@ -258,11 +254,9 @@ class View
      */
     public function escapeJs($string)
     {
-        if (null === $string) {
-            $string = '';
-        }
-
-        return $this->escaper->escapeJs($string);
+        return $this->escaper->escapeJs(
+            $this->castEscaperStringValue($string)
+        );
     }
 
     /**
@@ -274,11 +268,9 @@ class View
      */
     public function escapeUrl($string)
     {
-        if (null === $string) {
-            $string = '';
-        }
-
-        return $this->escaper->escapeUrl($string);
+        return $this->escaper->escapeUrl(
+            $this->castEscaperStringValue($string)
+        );
     }
 
     /**
@@ -290,11 +282,9 @@ class View
      */
     public function escapeCss($string)
     {
-        if (null === $string) {
-            $string = '';
-        }
-
-        return $this->escaper->escapeCss($string);
+        return $this->escaper->escapeCss(
+            $this->castEscaperStringValue($string)
+        );
     }
 
     /**
@@ -313,5 +303,24 @@ class View
         $this->helpers[$name] = $helper;
 
         return $helper;
+    }
+
+    /**
+     * \Zend\Escaper\Escaper does not play well with falsey non-string values
+     * like null or false.  It throws exceptions claiming it cannot convert
+     * them to utf-8.  This method will convert false and null to an empty
+     * string and then cast the return value to a string (which should catch
+     * ints and floats as well).
+     *
+     * @param mixed $input
+     * @return string
+     */
+    private function castEscaperStringValue($input)
+    {
+        if (false === $input || null === $input) {
+            $input = '';
+        }
+
+        return (string) $input;
     }
 }
