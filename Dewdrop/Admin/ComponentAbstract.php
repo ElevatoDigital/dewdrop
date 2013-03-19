@@ -171,11 +171,6 @@ abstract class ComponentAbstract
         }
     }
 
-    public function dummy()
-    {
-
-    }
-
     /**
      * Add a link to the submenu for this component.
      *
@@ -289,6 +284,13 @@ abstract class ComponentAbstract
         }
     }
 
+    /**
+     * Determine which page (e.g. Index, Edit, etc.) is currently being
+     * displayed.  We take the route query parameter, subtract the slug
+     * and see what's left, defaulting to "Index".
+     *
+     * @return string
+     */
     private function determineCurrentPage()
     {
         $slug   = $this->getSlug();
@@ -298,6 +300,14 @@ abstract class ComponentAbstract
         return ($suffix ?: 'Index');
     }
 
+    /**
+     * Get WP slug for this component.
+     *
+     * We use the classname, with namespace back slashes replaced with
+     * URL-friendly front slashes, as the slug.
+     *
+     * @return string
+     */
     private function getSlug()
     {
         return str_replace('\\', '/', get_class($this));
