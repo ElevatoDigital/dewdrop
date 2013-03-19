@@ -1,6 +1,19 @@
 <div class="wrap">
     <h2><?php echo $this->escapeHtml($this->title);?></h2>
 
+    <?php foreach ($this->errors as $error) :?>
+    <div class="error settings-error">
+        <p>
+            <?php if (false === strpos($error, ':')) :?>
+            <?php echo $this->escapeHtml($error);?>
+            <?php else:?>
+            <strong><?php echo $this->escapeHtml(substr($error, 0, strpos($error, ':') + 1));?></strong>
+            <?php echo $this->escapeHtml(substr($error, strpos($error, ':') + 1));?>
+            <?php endif;?>
+        </p>
+    </div>
+    <?php endforeach;?>
+
     <form method="<?php echo $this->escapeHtmlAttr($this->method);?>" action="<?php echo $this->escapeHtmlAttr($this->action);?>">
         <table class="form-table">
             <tbody>

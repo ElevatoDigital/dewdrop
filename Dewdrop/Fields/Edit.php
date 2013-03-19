@@ -12,6 +12,7 @@ namespace Dewdrop\Fields;
 
 use Dewdrop\Db\Field;
 use Dewdrop\Exception;
+use Zend\InputFilter\InputFilter;
 
 /**
  * Use the \Dewdrop\Db\Field API to manage the editing of values.
@@ -24,6 +25,23 @@ class Edit
      * @var array
      */
     private $fields = array();
+
+    /**
+     * Object used to filter and validate user input
+     *
+     * @var \Zend\InputFilter\InputFilter
+     */
+    private $inputFilter;
+
+    /**
+     * Create InputFilter instance for validation and filtering of input
+     *
+     * @param InputFilter $inputFilter
+     */
+    public function __construct(InputFilter $inputFilter = null)
+    {
+        $this->inputFilter = ($inputFilter ?: new InputFilter());
+    }
 
     /**
      * Add a field, optionally changing its control name to disambiguate it
@@ -112,5 +130,52 @@ class Edit
         }
 
         return $this;
+    }
+
+    /**
+     * Check to see if the supplied values are valid.  If you've already called
+     * setValues(), those values will be used for validation as well.
+     *
+     * @param array $values
+     * @return boolean
+     */
+    public function isValid(array $values = null)
+    {
+        foreach ($this->fields as $field) {
+            $this->inputFilter->add($field->getInputFilter());
+        }
+
+        if (null !== $values) {
+            $this->setValues($values);
+        } else {
+            $values = array();
+
+            foreach ($this->fields as $field) {
+                $values[$field->getControlName()] = $field->getValue();
+            }
+        }
+
+        $this->inputFilter->setData($values);
+
+        return $this->inputFilter->isValid();
+    }
+
+    /**
+     * Get any validation messages that were generated when isValid() was
+     * called.
+     *
+     * @return array
+     */
+    public function getMessages()
+    {
+        $messages = array();
+
+        foreach ($this->inputFilter->getInvalidInput() as $id => $error) {
+            foreach ($error->getMessages() as $message) {
+                $messages[] = $this->get($id)->getLabel() . ': ' . $message;
+            }
+        }
+
+        return $messages;
     }
 }

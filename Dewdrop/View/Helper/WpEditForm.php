@@ -33,17 +33,19 @@ class WpEditForm extends AbstractHelper
      * If no action is provided, the form will submit to the current page.
      *
      * @param string $title
+     * @param array $errors
      * @param string $method
      * @param string $action
      * @return string
      */
-    public function open($title, $method = 'POST', $action = null)
+    public function open($title, $errors = array(), $method = 'POST', $action = null)
     {
         return $this->partial(
             'wp-edit-form-open.phtml',
             array(
                 'title'  => $title,
                 'method' => $method,
+                'errors' => $errors,
                 'action' => ($action ?: $_SERVER['REQUEST_URI'])
             )
         );

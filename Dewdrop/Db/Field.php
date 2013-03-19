@@ -10,6 +10,10 @@
 
 namespace Dewdrop\Db;
 
+use Zend\InputFilter\Input;
+use Zend\Filter;
+use Zend\Validator;
+
 /**
  * Field objects provide a way to leverage database metadata throughout
  * your application and establish a centralized source of information about
@@ -97,6 +101,21 @@ class Field
     private $controlName;
 
     /**
+     * The \Zend\InputFilter\Filter instance used to validate and filter this
+     * field.
+     *
+     * @var \Zend\InputFilter\Filter
+     */
+    private $inputFilter;
+
+    /**
+     * Whether this field is required or not
+     *
+     * @var boolean
+     */
+    private $required;
+
+    /**
      * Create new field with a reference to the table that instantiated it,
      * the name of the DB column it represents and metadata from the DB about
      * its type, constraints, etc.
@@ -113,14 +132,47 @@ class Field
     }
 
     /**
-     * Check whether the field is of the specified type.
+     * Manually override the default setting regarding whether this field
+     * is required
      *
-     * @param string $type
+     * @param boolean $required
+     * @return \Dewdrop\Db\Field
+     */
+    public function setRequired($required)
+    {
+        $this->required = (boolean) $required;
+
+        return $this;
+    }
+
+    /**
+     * Check whether this field is required.  If setRequired() has not been
+     * called, then we look to the DB metadata to determine whether the
+     * field is required.  When the metadata says the column is not NULLABLE,
+     * then it is marked as being required.
+     *
+     * @return boolaen
+     */
+    public function isRequired()
+    {
+        if (null === $this->required) {
+            $this->required = (false === $this->metadata['NULLABLE']);
+        }
+
+        return $this->required;
+    }
+
+    /**
+     * Check whether the field is of the specified type.  One or more
+     * types can be provided as individual arguments to this method.
+     * If the field matches any of the supplied types, this method
+     * will return true.
+     *
      * @return boolean
      */
-    public function isType($type)
+    public function isType()
     {
-        return $this->metadata['DATA_TYPE'] === $type;
+        return in_array($this->metadata['DATA_TYPE'], func_get_args());
     }
 
     /**
@@ -252,6 +304,46 @@ class Field
     }
 
     /**
+     * Get the \Zend\InputFilter\Filter object associated with this field.  This
+     * object allows us to easily filter and validate values assigned to the
+     * field.
+     *
+     * @return \Zend\InputFilter\Filter
+     */
+    public function getInputFilter()
+    {
+        if (null === $this->inputFilter) {
+            $this->inputFilter = new Input($this->getControlName());
+
+            $this->addFiltersAndValidatorsUsingMetadata($this->inputFilter);
+        }
+
+        return $this->inputFilter;
+    }
+
+    /**
+     * Convenience method that lets you access the validator chain directly
+     * instead of first having to retrieve the input filter.
+     *
+     * @return \Zend\Validator\ValidatorChain
+     */
+    public function getValidatorChain()
+    {
+        return $this->getInputFilter()->getValidatorChain();
+    }
+
+    /**
+     * Convenience method that lets you access the filter chain directly
+     * instead of first having to retrieve the input filter.
+     *
+     * @return \Zend\Filter\FilterChain
+     */
+    public function getFilterChain()
+    {
+        return $this->getInputFilter()->getFilterChain();
+    }
+
+    /**
      * Generate a label for this field based up the underlying database
      * column's name.
      *
@@ -266,5 +358,50 @@ class Field
                 preg_replace('/_id$/', '', $this->name)
             )
         );
+    }
+
+    /**
+     * Create some basic filters and validators using the DB metadata.
+     *
+     * The following filters and validators are added:
+     *
+     * <ul>
+     *     <li>For required fields, a NotEmpty validator is added.</li>
+     *     <li>For text-based fields, a length validator and trim filter are added.</li>
+     *     <li>For integers, an integer validator is added.</li>
+     *     <li>For all floating point types, a float validator is added.</li>
+     * </ul>
+     *
+     * @param Input $inputFilter
+     * @return void
+     */
+    private function addFiltersAndValidatorsUsingMetadata(Input $inputFilter)
+    {
+        $validators = $inputFilter->getValidatorChain();
+        $filters    = $inputFilter->getFilterChain();
+        $metadata   = $this->metadata;
+
+        if ($this->isRequired() && !$this->isType('tinyint')) {
+            $inputFilter->setAllowEmpty(false);
+        } else {
+            $inputFilter->setAllowEmpty(true);
+        }
+
+        if ($this->isType('varchar', 'char', 'text')) {
+            if ($metadata['LENGTH']) {
+                $validators->addValidator(new Validator\StringLength(0, $metadata['LENGTH']));
+            }
+
+            $filters->attach(new Filter\StringTrim());
+            $filters->attach(new Filter\Null(Filter\Null::TYPE_STRING));
+        } elseif ($this->isType('tinyint')) {
+            $filters->attach(new Filter\Int());
+        } elseif ($this->isType('int', 'integer', 'mediumint', 'smallint', 'bigint')) {
+            $filters->attach(new Filter\Digits());
+            $validators->addValidator(new \Zend\I18n\Validator\Int());
+        } elseif ($this->isType('float', 'dec', 'decimal', 'double', 'double precision', 'fixed', 'float')) {
+            $filters->attach(new Filter\Digits());
+            $validators->addValidator(new \Zend\I18n\Validator\Flaot());
+        }
     }
 }
