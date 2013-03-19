@@ -32,6 +32,13 @@ class Sniff extends CommandAbstract
     protected $standard = 'PSR2';
 
     /**
+     * The type of report you would like to generate.
+     *
+     * @var string
+     */
+    private $report;
+
+    /**
      * Set basic command information, arguments and examples
      *
      * @inheritdoc
@@ -53,6 +60,12 @@ class Sniff extends CommandAbstract
         $this->addArg(
             'standard',
             'The standard you want to check your code against',
+            self::ARG_OPTIONAL
+        );
+
+        $this->addArg(
+            'report',
+            'The type of report you want to generate',
             self::ARG_OPTIONAL
         );
     }
@@ -84,6 +97,19 @@ class Sniff extends CommandAbstract
     }
 
     /**
+     * Set the type of report you'd like to generate from phpcs
+     *
+     * @param string $report
+     * @return \Dewdrop\Cli\Command\DewdropDoc
+     */
+    public function setReport($report)
+    {
+        $this->report = $report;
+
+        return $this;
+    }
+
+    /**
      * Run PHP_CodeSniffer on the plugin code.
      *
      * @return void
@@ -94,9 +120,16 @@ class Sniff extends CommandAbstract
             $this->phpcs = $this->autoDetectExecutable('phpcs');
         }
 
+        $report = ' ';
+
+        if (null !== $this->report) {
+            $report = ' --report=' . escapeshellarg($this->report) . ' ';
+        }
+
         $cmd = sprintf(
-            '%s --standard=%s --ignore=*/Zend/* --ignore=*/tests/* --ignore=*/models/metadata/* %s',
+            '%s%s--standard=%s --ignore=*/Zend/* --ignore=*/tests/* --ignore=*/models/metadata/* %s',
             $this->phpcs,
+            $report,
             escapeshellarg($this->standard),
             escapeshellarg($this->paths->getPluginRoot())
         );
