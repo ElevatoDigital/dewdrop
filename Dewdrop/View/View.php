@@ -50,10 +50,11 @@ class View
      */
     private $helperClasses = array(
         'wpeditform'      => '\Dewdrop\View\Helper\WpEditForm',
-        'wptitle'         => '\Dewdrop\View\Helper\WpTitle',
+        'wpeditor'        => '\Dewdrop\View\Helper\WpEditor',
         'wpeditrow'       => '\Dewdrop\View\Helper\WpEditRow',
         'wpinputtext'     => '\Dewdrop\View\Helper\WpInputText',
-        'wpinputcheckbox' => '\Dewdrop\View\Helper\WpInputCheckbox'
+        'wpinputcheckbox' => '\Dewdrop\View\Helper\WpInputCheckbox',
+        'wptitle'         => '\Dewdrop\View\Helper\WpTitle'
     );
 
     /**

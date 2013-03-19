@@ -297,7 +297,7 @@ abstract class Table
             }
         }
 
-        if ($section && $index && isset($this->metadata[$section]) && isset($this->metadata[$index])) {
+        if ($section && $index && isset($this->metadata[$section]) && isset($this->metadata[$section][$index])) {
             return $this->metadata[$section][$index];
         } elseif ($section && isset($this->metadata[$section])) {
             return $this->metadata[$section];

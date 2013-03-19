@@ -261,8 +261,8 @@ class Field
     {
         return ucwords(
             str_replace(
-                array(' Of ', ' The ', ' A '),
-                array(' of ', ' the ', ' a '),
+                array(' Of ', ' The ', ' A ', ' From ', '_'),
+                array(' of ', ' the ', ' a ', ' from ', ' '),
                 preg_replace('/_id$/', '', $this->name)
             )
         );

@@ -149,6 +149,7 @@ class Run
      * Stop execution.  In a separate method to make it easy to mock during
      * testing.
      *
+     * @param integer $exitStatus
      * @return void
      */
     public function halt($exitStatus = 0)

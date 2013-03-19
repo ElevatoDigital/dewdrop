@@ -91,7 +91,15 @@ class Edit
     {
         foreach ($values as $key => $value) {
             if ($this->has($key)) {
-                $this->get($key)->setValue($value);
+                $field = $this->get($key);
+
+                // For some odd reason wp_editor() adds slashes by quotes.  Breaks
+                // many things.  This works around that problem.
+                if ($field->isType('text')) {
+                    $value = stripslashes($value);
+                }
+
+                $field->setValue($value);
             }
         }
 
