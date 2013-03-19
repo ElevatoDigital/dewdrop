@@ -18,8 +18,9 @@ use Dewdrop\Request;
 
 /**
  * This class enables you to define how your component should appear and wire
- * into the WP admin shell.  For example, this classes $title property
- * determines what your plugin will be labeled in the admin navigation.
+ * into the WP admin shell.  For example, the $title property determines what
+ * your plugin will be labeled in the admin navigation and the addToSubmenu()
+ * method will allow you to add submenu items for your component.
  */
 abstract class ComponentAbstract
 {
