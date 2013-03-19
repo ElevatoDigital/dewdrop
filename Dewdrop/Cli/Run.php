@@ -151,9 +151,9 @@ class Run
      *
      * @return void
      */
-    public function halt()
+    public function halt($exitStatus = 0)
     {
-        exit;
+        exit($exitStatus);
     }
 
     /**

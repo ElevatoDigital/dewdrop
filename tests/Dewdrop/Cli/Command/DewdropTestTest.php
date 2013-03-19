@@ -14,10 +14,10 @@ class DewdropTestTest extends \PHPUnit_Framework_TestCase
     {
         $this->renderer = new \Dewdrop\Cli\Renderer\Mock();
 
-        $this->runner = new \Dewdrop\Cli\Run(
-            array(),
-            'dewdrop-test',
-            $this->renderer
+        $this->runner = $this->getMock(
+            '\Dewdrop\Cli\Run',
+            array('halt'),
+            array(array(), 'dewdrop-test', $this->renderer)
         );
 
         $this->command = $this->getMock(

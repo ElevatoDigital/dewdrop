@@ -111,6 +111,6 @@ class DewdropTest extends CommandAbstract
 
         $cmd .= ' ' . escapeshellarg($testPath);
 
-        $this->passthru($cmd);
+        $this->runner->halt($this->passthru($cmd));
     }
 }
