@@ -130,16 +130,18 @@ class Adapter
      * Fetch all results for the supplied SQL statement.
      *
      * @param string|\Dewdrop\Db\Select $sql
+     * @param array $bind
      * @param string $fetchMode
      * @return array
      */
-    public function fetchAll($sql, $fetchMode = null)
+    public function fetchAll($sql, $bind = array(), $fetchMode = null)
     {
         if (null === $fetchMode) {
             $fetchMode = $this->fetchMode;
         }
 
-        $rs = $this->wpdb->get_results((string) $sql, $fetchMode);
+        $sql = $this->prepare($sql, $bind);
+        $rs  = $this->wpdb->get_results($sql, $fetchMode);
 
         return $rs;
     }
@@ -148,11 +150,12 @@ class Adapter
      * Fetch a single column of the results from the supplied SQL statement.
      *
      * @param string|\Dewdrop\Db\Select $sql
+     * @param array $bind
      * @return array
      */
-    public function fetchCol($sql)
+    public function fetchCol($sql, $bind = array())
     {
-        return $this->wpdb->get_col($sql);
+        return $this->wpdb->get_col($this->prepare($sql, $bind));
     }
 
     /**
@@ -163,12 +166,13 @@ class Adapter
      * explicitly.
      *
      * @param string|\Dewdrop\Db\Select $sql
+     * @param array $bind
      * @param string $fetchMode
      * @return array
      */
-    public function fetchRow($sql, $fetchMode = null)
+    public function fetchRow($sql, $bind = array(), $fetchMode = null)
     {
-        $rs = $this->fetchAll($sql, $fetchMode);
+        $rs = $this->fetchAll($sql, $bind, $fetchMode);
 
         if ($rs) {
             return current($rs);
@@ -182,11 +186,12 @@ class Adapter
      * pairs useful, for examples, for lists of options in a drop-down.
      *
      * @param string|\Dewdrop\Db\Select $sql An SQL SELECT statement.
+     * @param array $bind
      * @return array
      */
-    public function fetchPairs($sql)
+    public function fetchPairs($sql, $bind = array())
     {
-        $rs  = $this->fetchAll($sql, ARRAY_N);
+        $rs  = $this->fetchAll($sql, $bind, ARRAY_N);
         $out = array();
 
         foreach ($rs as $row) {
@@ -201,11 +206,12 @@ class Adapter
      * statement.
      *
      * @param string|\Dewdrop\Db\Select
+     * @param array $bind
      * @return mixed
      */
-    public function fetchOne($sql)
+    public function fetchOne($sql, $bind = array())
     {
-        return $this->wpdb->get_var($sql);
+        return $this->wpdb->get_var($this->prepare($sql, $bind));
     }
 
     /**
@@ -325,11 +331,25 @@ class Adapter
      */
     public function query($sql, $bind = array())
     {
+        return $this->wpdb->query($this->prepare($sql, $bind));
+    }
+
+    /**
+     * Quote the bound values into the provided SQL query.
+     *
+     * @param string|\Dewdrop\Db\Select $sql
+     * @param array $bind
+     * @return string
+     */
+    public function prepare($sql, $bind = array())
+    {
+        $sql = (string) $sql;
+
         foreach ($bind as $position => $param) {
             $sql = $this->quoteInto($sql, $param, null, 1);
         }
 
-        return $this->wpdb->query($sql);
+        return $sql;
     }
 
     /**
@@ -629,7 +649,7 @@ class Adapter
             $sql = 'DESCRIBE ' . $this->quoteIdentifier($tableName, true);
         }
 
-        $result = $this->fetchAll($sql, ARRAY_A);
+        $result = $this->fetchAll($sql, array(), ARRAY_A);
         $desc   = array();
 
         $row_defaults = array(

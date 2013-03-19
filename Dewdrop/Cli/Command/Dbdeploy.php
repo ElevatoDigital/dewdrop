@@ -60,6 +60,21 @@ class Dbdeploy extends CommandAbstract
     private $revision;
 
     /**
+     * The path where the dbdeploy delta scripts can be found.
+     *
+     * @var string
+     */
+    private $scriptPath;
+
+    /**
+     * The name of the changeset in the dbdeploy_changelog table.  You can
+     * track multiple streams of changes by using differing changeset names.
+     *
+     * @var string
+     */
+    private $changeset = 'plugin';
+
+    /**
      * Set basic command information, arguments and examples
      *
      * @inheritdoc
@@ -89,6 +104,20 @@ class Dbdeploy extends CommandAbstract
             'revision',
             "The revision number you'd like to backfill the changelog to",
             self::ARG_OPTIONAL
+        );
+
+        $this->addArg(
+            'changeset',
+            'The name of the changeset the scripts should be applied to',
+            self::ARG_OPTIONAL,
+            array('changeset-name')
+        );
+
+        $this->addArg(
+            'script-path',
+            'The folder in which the dbdeploy delta scripts can be found',
+            self::ARG_OPTIONAL,
+            array('path')
         );
 
         $this->addExample(
@@ -142,6 +171,37 @@ class Dbdeploy extends CommandAbstract
     public function setRevision($revision)
     {
         $this->revision = (int) $revision;
+
+        return $this;
+    }
+
+    /**
+     * Set the path where the dbdeploy script files can be found.  By default,
+     * the "db" folder in your plugin's root folder will be used.
+     *
+     * @param string $scriptPath
+     * @return \Dewdrop\Cli\Command\Dbdeploy
+     */
+    public function setScriptPath($scriptPath)
+    {
+        $this->scriptPath = $scriptPath;
+
+        return $this;
+    }
+
+    /**
+     * Set the name of the changeset you'd like to you when checking the
+     * current revision number and adding new entries to the dbdeploy_changelog
+     * table.  This defaults to "plugin", which is the changeset name that
+     * should be used for changes originating from scripts in your plugin's
+     * DB folder.
+     *
+     * @param string $changeset
+     * @return \Dewdrop\Cli\Command\Dbdeploy
+     */
+    public function setChangeset($changeset)
+    {
+        $this->changeset = $changeset;
 
         return $this;
     }
@@ -263,6 +323,8 @@ class Dbdeploy extends CommandAbstract
         }
 
         $this->renderer->newline();
+
+        $this->renderer->text("Change Set: {$this->changeset}");
 
         $this->renderer->text(
             sprintf(
@@ -410,7 +472,7 @@ class Dbdeploy extends CommandAbstract
             'dbdeploy_changelog',
             array(
                 'change_number' => $this->getFileChangeNumber($file),
-                'delta_set'     => 'Main',
+                'delta_set'     => $this->changeset,
                 'start_dt'      => $startDt,
                 'complete_dt'   => $completeDt,
                 'applied_by'    => (isset($_SERVER['USER']) ? $_SERVER['USER'] : 'unknown'),
@@ -427,7 +489,12 @@ class Dbdeploy extends CommandAbstract
      */
     private function getCurrentRevision()
     {
-        return (int) $this->db->fetchOne('SELECT MAX(change_number) FROM dbdeploy_changelog');
+        return (int) $this->db->fetchOne(
+            'SELECT MAX(change_number) FROM dbdeploy_changelog WHERE delta_set = ?',
+            array(
+                'delta_set' => $this->changeset
+            )
+        );
     }
 
     /**
@@ -464,7 +531,7 @@ class Dbdeploy extends CommandAbstract
     private function getChangeFiles($currentRevision)
     {
         $out   = array();
-        $path  = $this->paths->getDb();
+        $path  = $this->evalPathArgument($this->scriptPath ?: $this->paths->getDb());
         $files = glob("{$path}/*.sql");
 
         foreach ($files as $file) {

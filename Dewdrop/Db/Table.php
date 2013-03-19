@@ -400,6 +400,7 @@ abstract class Table
     {
         return $this->db->fetchRow(
             $this->assembleFindSql($args),
+            array(),
             ARRAY_A
         );
     }
@@ -426,7 +427,7 @@ abstract class Table
     public function fetchRow($sql)
     {
         $className = $this->rowClass;
-        $data      = $this->db->fetchRow($sql, ARRAY_A);
+        $data      = $this->db->fetchRow($sql, array(), ARRAY_A);
 
         return new $className($this, $data);
     }
