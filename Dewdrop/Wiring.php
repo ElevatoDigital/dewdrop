@@ -73,6 +73,11 @@ class Wiring
 
         require_once __DIR__ . '/Autoloader.php';
 
+        // We use output buffering because otherwise WP will output before we can redirect, etc.
+        if ('cli' !== php_sapi_name()) {
+            ob_start();
+        }
+
         $this->autoloader = ($autoloader ?: new Autoloader());
         $this->db         = ($db ?: new DbAdapter($wpdb));
         $this->inflector  = ($inflector ?: new Inflector());
