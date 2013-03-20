@@ -233,18 +233,7 @@ class Adapter
                 $vals[] = $val->__toString();
                 unset($bind[$col]);
             } else {
-                if ($this->supportsParameters('positional')) {
-                    $vals[] = '?';
-                } else {
-                    if ($this->supportsParameters('named')) {
-                        unset($bind[$col]);
-                        $bind[':col'.$i] = $val;
-                        $vals[] = ':col'.$i;
-                        $i++;
-                    } else {
-                        throw new Exception(get_class($this) ." doesn't support positional or named binding");
-                    }
-                }
+                $vals[] = '?';
             }
         }
 
@@ -254,10 +243,7 @@ class Adapter
              . ' (' . implode(', ', $cols) . ') '
              . 'VALUES (' . implode(', ', $vals) . ')';
 
-        // execute the statement and return the number of affected rows
-        if ($this->supportsParameters('positional')) {
-            $bind = array_values($bind);
-        }
+        $bind = array_values($bind);
 
         return $this->query($sql, $bind);
     }
@@ -283,18 +269,7 @@ class Adapter
                 $val = $val->__toString();
                 unset($bind[$col]);
             } else {
-                if ($this->supportsParameters('positional')) {
-                    $val = '?';
-                } else {
-                    if ($this->supportsParameters('named')) {
-                        unset($bind[$col]);
-                        $bind[':col'.$i] = $val;
-                        $val = ':col'.$i;
-                        $i++;
-                    } else {
-                        throw new Exception(get_class($this) ." doesn't support positional or named binding");
-                    }
-                }
+                $val = '?';
             }
             $set[] = $this->quoteIdentifier($col, true) . ' = ' . $val;
         }
@@ -312,11 +287,7 @@ class Adapter
         /**
          * Execute the statement and return the number of affected rows
          */
-        if ($this->supportsParameters('positional')) {
-            $result = $this->query($sql, array_values($bind));
-        } else {
-            $result = $this->query($sql, $bind);
-        }
+        $result = $this->query($sql, array_values($bind));
 
         return $result;
     }
@@ -777,23 +748,6 @@ class Adapter
 
         $where = implode(' AND ', $where);
         return $where;
-    }
-
-    /**
-     * Check if the adapter supports real SQL parameters.
-     *
-     * @param string $type 'positional' or 'named'
-     * @return bool
-     */
-    public function supportsParameters($type)
-    {
-        switch ($type) {
-            case 'positional':
-                return true;
-            case 'named':
-            default:
-                return false;
-        }
     }
 
     /**
