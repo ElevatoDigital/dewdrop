@@ -147,9 +147,8 @@ abstract class ComponentAbstract
             foreach ($this->submenuPages as $page) {
                 $url = $slug;
 
-                // Use primary component URL for index page so item is selected correctly by WP
-                if ($page['route'] !== 'Index') {
-                    $url .= '/' . ucfirst($page['route']);
+                if ('Index' !== $page['route']) {
+                    $url .= '/' . $page['route'];
                 }
 
                 // If the current route matches the page linked then mark it as selected
@@ -166,9 +165,42 @@ abstract class ComponentAbstract
                     array($this, 'route')
                 );
             }
-
-            unset($this->submenuPages);
         }
+    }
+
+    /**
+     * Get a URL for a page in this component.  This method will automatically
+     * return submenu-friendly URLs when a submenu item matches the supplied
+     * page and params arguments.
+     *
+     * @param string $page
+     * @param array $params
+     * @return string
+     */
+    public function url($page, array $params = array())
+    {
+        $base  = get_bloginfo('wpurl') . '/wp-admin/admin.php?page=' . $this->getSlug();
+        $query = $this->assembleQueryString($params);
+
+        foreach ($this->submenuPages as $submenu) {
+            if ($submenu['route'] === $page) {
+                $submenuParams  = $subment['params'];
+                $matchesSubmenu = true;
+
+                foreach ($params as $name => $value) {
+                    if (!isset($submenuParams[$name]) || $submenuParams['value'] !== $value) {
+                        $matchesSubmenu = false;
+                        break;
+                    }
+                }
+
+                if ($matchesSubmenu) {
+                    return "{$base}/{$submenu['route']}{$query}";
+                }
+            }
+        }
+
+        return "{$base}&route={$page}{$query}";
     }
 
     /**
@@ -176,13 +208,15 @@ abstract class ComponentAbstract
      *
      * @param string $title
      * @param string $page
+     * @param array $params
      * @return \Dewdrop\Admin\ComponentAbstract
      */
-    public function addToSubmenu($title, $page)
+    public function addToSubmenu($title, $page, $params = array())
     {
         $this->submenuPages[] = array(
-            'title' => $title,
-            'route' => $page
+            'title'  => $title,
+            'route'  => ucfirst($page),
+            'params' => $params
         );
 
         return $this;
@@ -293,11 +327,15 @@ abstract class ComponentAbstract
      */
     private function determineCurrentPage()
     {
-        $slug   = $this->getSlug();
-        $page   = $this->request->getQuery('page', $slug);
-        $suffix = ltrim(str_replace($slug, '', $page), '/');
+        $slug  = $this->getSlug();
+        $page  = str_replace($slug, '', $this->request->getQuery('page'));
+        $route = $this->request->getQuery('route', 'Index');
 
-        return ($suffix ?: 'Index');
+        if ($page) {
+            return ltrim($page, '/');
+        }
+
+        return $route;
     }
 
     /**
@@ -311,5 +349,29 @@ abstract class ComponentAbstract
     private function getSlug()
     {
         return str_replace('\\', '/', get_class($this));
+    }
+
+    /**
+     * Assemble the remainder of a URL query string.  We can assume that a
+     * query string already exists because the "page" variable must be set
+     * to get to this component in the first place, so this method's return
+     * value is always prefixed with "&" to join it to the existing value.
+     *
+     * @param array $params
+     * @return string
+     */
+    private function assembleQueryString(array $params)
+    {
+        $segments = array();
+
+        foreach ($params as $name => $value) {
+            $segments[] = sprintf(
+                "%s=%s",
+                rawurlencode($name),
+                rawurlencode($value)
+            );
+        }
+
+        return (count($segments) ? '&' . implode('&', $segments) : '');
     }
 }

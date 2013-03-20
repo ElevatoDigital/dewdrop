@@ -54,7 +54,8 @@ class View
         'wpeditrow'       => '\Dewdrop\View\Helper\WpEditRow',
         'wpinputtext'     => '\Dewdrop\View\Helper\WpInputText',
         'wpinputcheckbox' => '\Dewdrop\View\Helper\WpInputCheckbox',
-        'wptitle'         => '\Dewdrop\View\Helper\WpTitle'
+        'wptitle'         => '\Dewdrop\View\Helper\WpTitle',
+        'adminurl'        => '\Dewdrop\View\Helper\AdminUrl'
     );
 
     /**

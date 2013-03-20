@@ -82,7 +82,10 @@ abstract class PageAbstract
         $this->view      = new View();
         $this->request   = ($request ?: new Request());
 
-        $this->view->setScriptPath(dirname($pageFile) . '/view-scripts');
+        $this->view
+            ->setScriptPath(dirname($pageFile) . '/view-scripts')
+            ->helper('AdminUrl')
+                ->setPage($this);
     }
 
     /**
@@ -126,6 +129,21 @@ abstract class PageAbstract
     public function renderView()
     {
         echo $this->view->render($this->inflectViewScriptName());
+    }
+
+    /**
+     * As the component this page belongs to for a URL matching the provided
+     * page and query string parameters.  This method should always be used for
+     * generating URLs in your components so that it will play nicely with
+     * various WP integration points like submenus.
+     *
+     * @param string $page
+     * @param array $params
+     * @return string
+     */
+    public function url($page, array $params = array())
+    {
+        return $this->component->url($page, $params);
     }
 
     /**
