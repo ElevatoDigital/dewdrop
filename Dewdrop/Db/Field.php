@@ -362,11 +362,15 @@ class Field
      */
     private function inflectLabel()
     {
-        return ucwords(
-            str_replace(
-                array(' Of ', ' The ', ' A ', ' From ', '_'),
-                array(' of ', ' the ', ' a ', ' from ', ' '),
-                preg_replace('/_id$/', '', $this->name)
+        return str_replace(
+            array(' Of ', ' The ', ' A ', ' From '),
+            array(' of ', ' the ', ' a ', ' from '),
+            ucwords(
+                str_replace(
+                    '_',
+                    ' ',
+                    preg_replace('/_id$/', '', $this->name)
+                )
             )
         );
     }
