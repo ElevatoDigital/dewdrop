@@ -1,0 +1,219 @@
+<?php
+
+namespace Dewdrop\Db;
+
+class TableTest extends Test\DbTestCase
+{
+    private $table;
+
+    private $db;
+
+    public function setUp()
+    {
+        parent::setUp();
+
+        require_once __DIR__ . '/table/DewdropTestFruits.php';
+
+        $wpdb     = new \wpdb(DB_USER, DB_PASSWORD, DB_NAME, DB_HOST);
+        $this->db = new Adapter($wpdb);
+
+        $this->table = new \DewdropTest\DewdropTestFruits($this->db);
+    }
+
+    public function getDataSet()
+    {
+        return $this->createXmlDataSet(__DIR__ . '/datasets/basic-adapter.xml');
+    }
+
+    public function testCustomizeFieldCallbackIsRunUponRetrieval()
+    {
+        $this->table->customizeField(
+            'name',
+            function ($field) {
+                $field->setLabel('fafafafa');
+            }
+        );
+
+        $this->assertEquals(
+            'fafafafa',
+            $this->table->field('name')->getLabel()
+        );
+    }
+
+    /**
+     * @expectedException \Dewdrop\Exception
+     */
+    public function testCustomizingUnkownFieldThrowsException()
+    {
+        $this->table->customizeField(
+            'fafafafa',
+            function ($field) {
+
+            }
+        );
+    }
+
+    /**
+     * @expectedException \Dewdrop\Exception
+     */
+    public function testRetrievingUnknownFieldThrowsAnException()
+    {
+        $this->table->field('fafafafa');
+    }
+
+    public function testRetrievingFieldMultipleTimesReturnsSameObject()
+    {
+        $field = $this->table->field('name');
+
+        $this->assertEquals($field, $this->table->field('name'));
+
+        $this->assertEquals(
+            spl_object_hash($field),
+            spl_object_hash($this->table->field('name'))
+        );
+    }
+
+    /**
+     * @expectedException \Dewdrop\Exception
+     */
+    public function testFailingToSetTableNameInInitMethodThrowsException()
+    {
+        require_once __DIR__ . '/table/NoTableName.php';
+        $table = new \DewdropTest\NoTableName($this->db);
+    }
+
+    public function testSelectReturnsDewdropDbSelectObject()
+    {
+        $this->assertInstanceOf('\Dewdrop\Db\Select', $this->table->select());
+    }
+
+    public function testSelectAlwaysReturnsNewObject()
+    {
+        $select = $this->table->select();
+
+        $this->assertNotEquals(spl_object_hash($select), spl_object_hash($this->table->select()));
+    }
+
+    public function testGetTableNameMatchesNameAsSetInInit()
+    {
+        $this->assertEquals('dewdrop_test_fruits', $this->table->getTableName());
+    }
+
+    public function testSingularTitleIsPulledFromMetadataIfNotSet()
+    {
+        $this->assertEquals('Dewdrop Test Fruit', $this->table->getSingularTitle());
+        $this->assertEquals('Dewdrop Test Fruit', $this->table->getMetadata('titles', 'singular'));
+    }
+
+    public function testPluralTitleIsPulledFromMetadataIfNotSet()
+    {
+        $this->assertEquals('Dewdrop Test Fruits', $this->table->getPluralTitle());
+        $this->assertEquals('Dewdrop Test Fruits', $this->table->getMetadata('titles', 'plural'));
+    }
+
+    public function testCanManuallyOverrideSingularTitleValue()
+    {
+        $this->table->setSingularTitle('fafafafa');
+
+        $this->assertEquals('fafafafa', $this->table->getSingularTitle());
+    }
+
+    public function testCanManuallyOverridePluralTitleValue()
+    {
+        $this->table->setPluralTitle('fafafafas');
+
+        $this->assertEquals('fafafafas', $this->table->getPluralTitle());
+    }
+
+    public function testRetrieveAnUnknownMetadataSectionReturnsFalse()
+    {
+        $this->assertFalse($this->table->getMetadata('fafafafa'));
+    }
+
+    public function testRetrieveEntiretyOfMetadataArray()
+    {
+        $keys = array_keys($this->table->getMetadata());
+
+        $this->assertTrue(in_array('titles', $keys));
+        $this->assertTrue(in_array('columns', $keys));
+    }
+
+    public function testGetPrimaryKeyReturnsArrayWithCorrectColumn()
+    {
+        $pkey = $this->table->getPrimaryKey();
+
+        $this->assertTrue(is_array($pkey));
+        $this->assertEquals(1, count($pkey));
+        $this->assertEquals('dewdrop_test_fruit_id', current($pkey));
+    }
+
+    public function testGetAdapterReturnsExpectedObject()
+    {
+        $this->assertInstanceOf('\Dewdrop\Db\Adapter', $this->table->getAdapter());
+    }
+
+    public function testInsertAddsToTableSuccessfullyAndReturnsCountOfRowsAffected()
+    {
+        $affected = $this->table->insert(
+            array(
+                'name'                   => 'Peach',
+                'is_delicious'           => 1,
+                'level_of_deliciousness' => 6
+            )
+        );
+
+        $this->assertEquals(1, $affected);
+        $this->assertEquals(6, $this->db->lastInsertId());
+        $this->assertEquals(6, $this->db->fetchOne('SELECT COUNT(*) FROM dewdrop_test_fruits'));
+    }
+
+    public function testUpdateSuccessfullySavesExistingRowAndReturnsRowsAffected()
+    {
+        $affected = $this->table->update(
+            array(
+                'name'                   => 'Star Fruit',
+                'is_delicious'           => 1,
+                'level_of_deliciousness' => 4
+            ),
+            'dewdrop_test_fruit_id = 1'
+        );
+
+        $this->assertEquals(1, $affected);
+        $this->assertEquals(5, $this->db->fetchOne('SELECT COUNT(*) FROM dewdrop_test_fruits'));
+
+        $this->assertEquals(
+            'Star Fruit',
+            $this->db->fetchOne('SELECT name FROM dewdrop_test_fruits WHERE dewdrop_test_fruit_id = 1')
+        );
+    }
+
+    public function testFindReturnsExpectedRow()
+    {
+        $row = $this->table->find(1);
+
+        $this->assertEquals('Apple', $row->get('name'));
+    }
+
+    public function testCreateRowWithNoDataReturnsBlankRowObject()
+    {
+        $row = $this->table->createRow();
+
+        $this->assertNull($row->get('dewdrop_test_fruit_id'));
+        $this->assertNull($row->get('name'));
+        $this->assertNull($row->get('is_delicious'));
+        $this->assertNull($row->get('level_of_deliciousness'));
+    }
+
+    public function testCreateRowWithInitialDataSetsFieldsCorrectly()
+    {
+        $row = $this->table->createRow(
+            array(
+                'name'         => 'Blood Orange',
+                'is_delicious' => 1
+            )
+        );
+
+        $this->assertEquals('Blood Orange', $row->get('name'));
+        $this->assertEquals(1, $row->get('is_delicious'));
+    }
+}

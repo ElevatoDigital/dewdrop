@@ -140,6 +140,9 @@ abstract class Table
 
         $field = new Field($this, $name, $metadata);
 
+        // Store reference to field so we can return the same instance on subsequent calls
+        $this->fields[$name] = $field;
+
         if (isset($this->fieldCustomizationCallbacks[$name])) {
             call_user_func($this->fieldCustomizationCallbacks[$name], $field);
         }
@@ -215,7 +218,7 @@ abstract class Table
      */
     public function getSingularTitle()
     {
-        if (!$this->singurlarTitle) {
+        if (!$this->singularTitle) {
             $this->singularTitle = $this->getMetadata('titles', 'singular');
         }
 
@@ -297,10 +300,18 @@ abstract class Table
             }
         }
 
-        if ($section && $index && isset($this->metadata[$section]) && isset($this->metadata[$section][$index])) {
-            return $this->metadata[$section][$index];
-        } elseif ($section && isset($this->metadata[$section])) {
-            return $this->metadata[$section];
+        if ($section && $index) {
+            if (isset($this->metadata[$section][$index])) {
+                return $this->metadata[$section][$index];
+            } else {
+                return false;
+            }
+        } elseif ($section) {
+            if (isset($this->metadata[$section])) {
+                return $this->metadata[$section];
+            } else {
+                return false;
+            }
         } else {
             return $this->metadata;
         }
