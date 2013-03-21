@@ -136,7 +136,7 @@ abstract class PageAbstract
      */
     public function renderView()
     {
-        echo $this->view->render($this->inflectViewScriptName());
+        return $this->view->render($this->inflectViewScriptName());
     }
 
     /**

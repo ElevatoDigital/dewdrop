@@ -77,10 +77,10 @@ abstract class ComponentAbstract
      * @param Paths $paths
      * @param Request $request
      */
-    public function __construct(Adapter $db, Paths $paths, Request $request = null)
+    public function __construct(Adapter $db, Paths $paths = null, Request $request = null)
     {
         $this->db      = $db;
-        $this->paths   = $paths;
+        $this->paths   = ($paths ?: new Paths());
         $this->request = ($request ?: new Request());
 
         $this->init();
@@ -322,7 +322,7 @@ abstract class ComponentAbstract
 
         // Automatically render view if no output is generated
         if (!$output) {
-            $page->renderView();
+            echo $page->renderView();
         }
     }
 
