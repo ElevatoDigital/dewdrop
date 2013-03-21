@@ -22,7 +22,7 @@ class PathsTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($this->wpRoot, $this->paths->getWpRoot());
     }
 
-    public function getDewdropLib()
+    public function testDewdropLib()
     {
         $this->assertEquals($this->pluginRoot . '/lib/Dewdrop', $this->paths->getDewdropLib());
     }
@@ -32,32 +32,32 @@ class PathsTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($this->pluginRoot, $this->paths->getPluginRoot());
     }
 
-    public function getAdmin()
+    public function testAdmin()
     {
         $this->assertEquals($this->pluginRoot . '/admin', $this->paths->getAdmin());
     }
 
-    public function getDb()
+    public function testDb()
     {
         $this->assertEquals($this->pluginRoot . '/db', $this->paths->getDb());
     }
 
-    public function getLib()
+    public function testLib()
     {
         $this->assertEquals($this->pluginRoot . '/lib', $this->paths->getLib());
     }
 
-    public function getModels()
+    public function testModels()
     {
         $this->assertEquals($this->pluginRoot . '/models', $this->paths->getModels());
     }
 
-    public function getShortCodes()
+    public function testShortCodes()
     {
         $this->assertEquals($this->pluginRoot . '/short-codes', $this->paths->getShortCodes());
     }
 
-    public function getTests()
+    public function testTests()
     {
         $this->assertEquals($this->pluginRoot . '/tests', $this->paths->getTests());
     }
