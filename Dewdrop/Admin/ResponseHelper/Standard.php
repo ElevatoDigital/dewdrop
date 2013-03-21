@@ -163,6 +163,17 @@ class Standard
     }
 
     /**
+     * Check to see if the executing the queued actions will short circuit the
+     * response.
+     *
+     * @return boolean
+     */
+    public function willShortCircuitResponse()
+    {
+        return $this->hasRedirectUrl();
+    }
+
+    /**
      * Schedule a callback to run while executing the response.
      *
      * If the $callback parameter is null, then the $label parameter

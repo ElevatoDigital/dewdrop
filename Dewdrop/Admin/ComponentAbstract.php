@@ -12,8 +12,7 @@ namespace Dewdrop\Admin;
 
 use ReflectionClass;
 use Dewdrop\Admin\Page\PageAbstract;
-use Dewdrop\Admin\Response\Response;
-use Dewdrop\Admin\Response\ResponseInterface;
+use Dewdrop\Admin\Response;
 use Dewdrop\Db\Adapter;
 use Dewdrop\Paths;
 use Dewdrop\Request;
@@ -111,26 +110,19 @@ abstract class ComponentAbstract
      * pages in a component without having to hook into WP again for every page.
      *
      * @param string $page The name of the page to route to (e.g. "Index" or "Edit").
-     * @param ResponseInterface $response Inject a response object, usually for tests.
-     * @return ResponseInterface
+     * @param Response $response Inject a response object, usually for tests.
      */
-    public function route($page = null, ResponseInterface $response = null)
+    public function route($page = null, Response $response = null)
     {
+        $page = $this->createPageObject($page);
+
         if (null === $response) {
             $response = new Response();
         }
 
-        $page = $this->createPageObject($page);
-
         $response->setPage($page);
-
         $this->dispatchPage($page, $response);
-
-        if ($response->shouldRenderOutput()) {
-            echo $response->getOutput();
-        }
-
-        return $response;
+        $response->render();
     }
 
     /**
@@ -316,10 +308,10 @@ abstract class ComponentAbstract
      * to render the page's default view script automatically.
      *
      * @param PageAbstract $page
-     * @param ResponseInterface $response
+     * @param Response $response
      * @return void
      */
-    protected function dispatchPage(PageAbstract $page, ResponseInterface $response)
+    protected function dispatchPage(PageAbstract $page, Response $response)
     {
         $page->init();
 
@@ -332,7 +324,7 @@ abstract class ComponentAbstract
                 ->setWasProcessed(true)
                 ->setHelper($responseHelper);
 
-            if ($response->shouldShortCircuit()) {
+            if ($response->executeQueuedActions()) {
                 return true;
             }
         }

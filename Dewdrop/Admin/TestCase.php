@@ -10,7 +10,7 @@
 
 namespace Dewdrop\Admin;
 
-use Dewdrop\Admin\Response\MockResponse;
+use Dewdrop\Admin\Response;
 use Dewdrop\Db\Adapter;
 use Dewdrop\Paths;
 use Dewdrop\Request;
@@ -100,7 +100,12 @@ abstract class TestCase extends PHPUnit_Framework_TestCase
         $method    = (count($post) ? 'POST' : 'GET');
         $request   = new Request($post, $query, $method);
         $component = $this->getComponent($request);
-        $response  = new MockResponse();
+
+        $response = $this->getMock(
+            '\Dewdrop\Admin\Response',
+            array('render', 'executeHelper'),
+            array()
+        );
 
         $component->route($name, $response);
 
