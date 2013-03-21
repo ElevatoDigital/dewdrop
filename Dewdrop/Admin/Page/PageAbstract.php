@@ -77,7 +77,7 @@ abstract class PageAbstract
      * @param Request $request
      * @param string $pageFile
      */
-    public function __construct(ComponentAbstract $component, Request $request = null, $pageFile)
+    public function __construct(ComponentAbstract $component, Request $request, $pageFile)
     {
         $this->component = $component;
         $this->view      = new View();
