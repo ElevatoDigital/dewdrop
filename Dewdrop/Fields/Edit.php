@@ -23,11 +23,9 @@ use Zend\InputFilter\InputFilter;
  * <ol>
  *     <li>
  *         It automatically attaches the added fields to the input filter
- *         for filtering and validation.  This object can use its own
- *         InputFilter instance independently of any other object, but
- *         more commonly, the InputFilter will be injected into the
- *         constructor so that it can be integrated into some other context
- *         like an EditAbstract sub-class.
+ *         for filtering and validation.  The InputFilter will be injected
+ *         into the constructor so that it can be integrated into some other
+ *         context like an EditAbstract sub-class.
  *     </li>
  *     <li>
  *         When calling setValues(), this fields collection will automatically
@@ -39,6 +37,14 @@ use Zend\InputFilter\InputFilter;
  *         Think of adding a field to this object as passing a signed
  *         permission slip to the user saying they are allowed to edit that
  *         field on that particular row.
+ *     </li>
+ *     <li>
+ *         When calling setValues(), this object will take care of odd quirks in
+ *         input processing.  For example, when a checkbox is unchecked, it is
+ *         excluded completely from the POST data.  This object will find boolean
+ *         fields and if they are not in POST at all, set their values to false
+ *         instead of just skipping over them while setting values for other
+ *         fields whose control names _do_ appear in the supplied values hash.
  *     </li>
  * </ol>
  */
@@ -59,13 +65,14 @@ class Edit
     private $inputFilter;
 
     /**
-     * Create InputFilter instance for validation and filtering of input
+     * Store reference to supplied InputFilter so that fields can be added
+     * to it at the same time they're added to this object.
      *
      * @param InputFilter $inputFilter
      */
-    public function __construct(InputFilter $inputFilter = null)
+    public function __construct(InputFilter $inputFilter)
     {
-        $this->inputFilter = ($inputFilter ?: new InputFilter());
+        $this->inputFilter = $inputFilter;
     }
 
     /**
