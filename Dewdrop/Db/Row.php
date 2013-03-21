@@ -10,6 +10,8 @@
 
 namespace Dewdrop\Db;
 
+use Dewdrop\Exception;
+
 /**
  * The Row class provides a simple way to manipulate the values associated
  * with a single database row.
@@ -135,16 +137,18 @@ class Row
      * @param mixed $value
      * @return \Dewdrop\Db\Row
      */
-    public function set($column, $value)
+    public function set($column, $value = null)
     {
-        if (!array_key_exists($column, $this->columns)) {
-            throw new Exception("Setting value on invalid  column \"{$column}\"");
-        }
-
         if (is_array($column)) {
-            foreach ($columns as $key => $value) {
+            foreach ($column as $key => $value) {
                 $this->set($key, $value);
             }
+
+            return $this;
+        }
+
+        if (!array_key_exists($column, $this->columns)) {
+            throw new Exception("Setting value on invalid  column \"{$column}\"");
         }
 
         if (is_bool($value)) {
