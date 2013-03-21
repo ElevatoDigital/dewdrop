@@ -54,6 +54,13 @@ class Standard
     private $redirectUrl;
 
     /**
+     * Callbacks to run as part of executing the response
+     *
+     * @param array
+     */
+    private $callbacks = array();
+
+    /**
      * Create a new ResponseHelper, generally kicked off by a page class in
      * its createResponseHelper() method.
      *
@@ -103,6 +110,10 @@ class Standard
      */
     public function execute()
     {
+        foreach ($this->callbacks as $callback) {
+            call_user_func($callback);
+        }
+
         if ($this->successMessage) {
             // No sessions in WP, so we're using a cookie for this for now
             setcookie(
@@ -137,5 +148,43 @@ class Standard
     public function hasSuccessMessage()
     {
         return null !== $this->successMessage;
+    }
+
+    /**
+     * Check to see if the given callback label will run if the response is
+     * executed.
+     *
+     * @param string $callbackLabel
+     * @return boolean
+     */
+    public function willRun($callbackLabel)
+    {
+        return array_key_exists($callbackLabel, $this->callbacks);
+    }
+
+    /**
+     * Schedule a callback to run while executing the response.
+     *
+     * If the $callback parameter is null, then the $label parameter
+     * will be used for both the label and the callback and the callback
+     * will be assumed to be a method on the current page.
+     *
+     * @param string $label
+     * @param mixed $callback
+     * @return \Dewdrop\Admin\ResponseHelper\Standard
+     */
+    public function run($label, $callback = null)
+    {
+        if (null === $callback) {
+            $callback = $label;
+        }
+
+        if (is_string($callback)) {
+            $callback = array($this->page, $callback);
+        }
+
+        $this->callbacks[$label] = $callback;
+
+        return $this;
     }
 }

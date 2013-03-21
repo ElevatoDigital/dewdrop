@@ -112,6 +112,16 @@ class Response implements ResponseInterface
     }
 
     /**
+     * Check to see if the page's process() method was called
+     *
+     * @return boolean
+     */
+    public function wasProcessed()
+    {
+        return $this->wasProcessed;
+    }
+
+    /**
      * Set the response helper associated with this response.
      *
      * @param ResponseHelper $helper
@@ -122,6 +132,18 @@ class Response implements ResponseInterface
         $this->helper = $helper;
 
         return $this;
+    }
+
+    /**
+     * Get the response helper.  If one hasn't been set (process wasn't
+     * run, we return a new instance of the page's process helper to
+     * make testing easier.
+     *
+     * @return \Dewdrop\Admin\ResponseHelper\Standard
+     */
+    public function getHelper()
+    {
+        return ($this->helper ?: $this->page->createResposneHelper());
     }
 
     /**
