@@ -11,6 +11,7 @@
 namespace Dewdrop\Admin\Page;
 
 use Dewdrop\Admin\ComponentAbstract;
+use Dewdrop\Admin\ResponseHelper\Standard as ResponseHelper;
 use Dewdrop\Request;
 use Dewdrop\View\View;
 
@@ -105,13 +106,20 @@ abstract class PageAbstract
      */
     public function shouldProcess()
     {
-        return true;
+        return  true;
     }
 
     /**
-     * Perform any processing or data manipulation needed prior to rendering.
+     * Perform any processing or data manipulation needed before render.
+     *
+     * A response helper object will be passed to this method to allow you to
+     * easily add success messages or redirects.  This helper should be used
+     * to handle these kinds of actions so that you can easily test your
+     * page's code.
+     *
+     * @param ResponseHelper $response
      */
-    public function process()
+    public function process($response)
     {
 
     }
@@ -144,6 +152,21 @@ abstract class PageAbstract
     public function url($page, array $params = array())
     {
         return $this->component->url($page, $params);
+    }
+
+    /**
+     * Create a response helper object for this page.
+     *
+     * If your page would benefit from an alternative response helper with
+     * additional methods relevant to your use case, you can override this
+     * method and the helper will be injected into the page's process()
+     * method rather than the standard helper created in PageAbstract.
+     *
+     * @return \Dewdrop\Admin\ResponseHelper\Standard
+     */
+    public function createResponseHelper()
+    {
+        return new ResponseHelper($this);
     }
 
     /**

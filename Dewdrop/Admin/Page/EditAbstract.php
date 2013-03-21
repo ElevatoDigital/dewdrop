@@ -12,6 +12,7 @@ namespace Dewdrop\Admin\Page;
 
 use Dewdrop\Admin\ComponentAbstract;
 use Dewdrop\Fields\Edit as EditFields;
+use Zend\InputFilter\InputFilter;
 
 /**
  * An abstract page controller to make the standard edit page workflow easier
@@ -21,8 +22,54 @@ use Dewdrop\Fields\Edit as EditFields;
  * <ul>
  *     <li>Your process method will only be called if the request is a POST</li>
  *     <li>You'll have a \Dewdrop\Fields\Edit object available automatically</li>
+ *     <li>You'll have a \Zend\InputFilter\InputFilter object available</li>
  *     <li>The findRowById() method makes it easy to get a row based on the query string</li>
  * </ul>
+ *
+ * Prior to calling your page's process() method, EditAbstract will do a couple
+ * things that are very consistently needed for add/edit pages.  First, it will
+ * skip your process() method completely if the request is not a POST, as
+ * mentioned above.  Second, if the request _is_ a POST, EditAbstract will
+ * automatically pass the data from POST to your fields and input filter
+ * objects.
+ *
+ * That means by the time your process() method is running, you only need to
+ * concern yourself with a couple steps:
+ *
+ * <ol>
+ *     <li>Use the input filter to determine if the input from POST was valid.</li>
+ *     <li>Apply any post-validation filtering you need (e.g. password hashing)</li>
+ *     <li>Save DB rows objects as needed</li>
+ *     <li>Set a redirect and/or success message on the supplied response object</li>
+ * </ol>
+ *
+ * The following is a simple example of applying the described tasks:
+ *
+ * <code>
+ *
+ * namespace Admin\MyComponent;
+ *
+ * use Dewdrop\Admin\Page\EditAbstract;
+ *
+ * class MyPage extends EditAbstract
+ * {
+ *     // ... your init method ...
+ *
+ *     public function process($response)
+ *     {
+ *         if ($this->inputFilter->isValid()) {
+ *             $this->row->save();
+ *
+ *             $this->response
+ *                 ->setSuccessMessage('You saved it!  Wooohoooo!')
+ *                 ->setRedirectToAdminPage('Index');
+ *         }
+ *     }
+ *
+ *     // ... your render method
+ * }
+ *
+ * </code>
  */
 abstract class EditAbstract extends PageAbstract
 {
@@ -34,27 +81,53 @@ abstract class EditAbstract extends PageAbstract
     protected $fields;
 
     /**
+     * A \Zend\InputFilter\InputFilter object that can be used for filtering
+     * and validating any input accepted by this page.  This input filter
+     * will be passed directly to the \Dewdrop\Fields\Edit object but you
+     * can also add your own input objects for non-Field-related input
+     * (e.g. credit card security codes, plaintext passwords, etc.) and handle
+     * their post-validation processing and filtering independently.
+     *
+     * @var \Zend\InputFilter\InputFilter
+     */
+    protected $inputFilter;
+
+    /**
      * Override the PageAbstract contructor so we can add a \Dewdrop\Fields\Edit
      * object before proceeding to init().
      *
      * @param ComponentAbstract $component
      * @param string $pageFile The file in which the page class is defined.
+     * @param InputFilter $inputFilter
      */
-    public function __construct(ComponentAbstract $component, $pageFile)
+    public function __construct(ComponentAbstract $component, $pageFile, InputFilter $inputFilter = null)
     {
         parent::__construct($component, $pageFile);
 
-        $this->fields = new EditFields();
+        $this->inputFilter = ($inputFilter ?: new InputFilter());
+        $this->fields      = new EditFields($this->inputFilter);
     }
 
     /**
      * Only proceed to process() method if the request is a POST.
      *
+     * If the request _is_ a POST, pass the POST data along to the fields
+     * object and the input filter.
+     *
      * @return boolean
      */
     public function shouldProcess()
     {
-        return $this->request->isPost();
+        if ($this->request->isPost()) {
+            $post = $this->request->getPost();
+
+            $this->fields->setValues($post);
+            $this->inputFilter->setData($post);
+
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -103,5 +176,31 @@ abstract class EditAbstract extends PageAbstract
                 $id
             );
         }
+    }
+
+    /**
+     * Retrieve error messages from input filter.
+     *
+     * If the specific input object generating the message is tied to a Field,
+     * we will prefix the field's label to the error message to make it easier
+     * to understand.
+     *
+     * @return array
+     */
+    public function getErrorsFromInputFilter()
+    {
+        $errors = array();
+
+        foreach ($this->inputFilter->getInvalidInput() as $id => $error) {
+            foreach ($error->getMessages() as $message) {
+                if ($this->fields->has($id)) {
+                    $errors[] = $this->fields->get($id)->getLabel() . ': ' . $message;
+                } else {
+                    $errors[] = $message;
+                }
+            }
+        }
+
+        return $errors;
     }
 }

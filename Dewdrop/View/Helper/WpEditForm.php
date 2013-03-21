@@ -43,6 +43,7 @@ class WpEditForm extends AbstractHelper
         return $this->partial(
             'wp-edit-form-open.phtml',
             array(
+                'wrap'   => $this->view->wpWrap()->open(),
                 'title'  => $title,
                 'method' => $method,
                 'errors' => $errors,
@@ -64,7 +65,8 @@ class WpEditForm extends AbstractHelper
         return $this->partial(
             'wp-edit-form-close.phtml',
             array(
-                'buttonTitle' => $buttonTitle
+                'buttonTitle' => $buttonTitle,
+                'wrap'        => $this->view->wpWrap()->close()
             )
         );
     }

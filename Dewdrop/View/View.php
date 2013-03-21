@@ -49,13 +49,15 @@ class View
      * @var array
      */
     private $helperClasses = array(
+        'adminurl'        => '\Dewdrop\View\Helper\AdminUrl',
+        'wpadminnotice'   => '\Dewdrop\View\Helper\WpAdminNotice',
         'wpeditform'      => '\Dewdrop\View\Helper\WpEditForm',
         'wpeditor'        => '\Dewdrop\View\Helper\WpEditor',
         'wpeditrow'       => '\Dewdrop\View\Helper\WpEditRow',
         'wpinputtext'     => '\Dewdrop\View\Helper\WpInputText',
         'wpinputcheckbox' => '\Dewdrop\View\Helper\WpInputCheckbox',
         'wptitle'         => '\Dewdrop\View\Helper\WpTitle',
-        'adminurl'        => '\Dewdrop\View\Helper\AdminUrl'
+        'wpwrap'          => '\Dewdrop\View\Helper\WpWrap'
     );
 
     /**

@@ -16,6 +16,31 @@ use Zend\InputFilter\InputFilter;
 
 /**
  * Use the \Dewdrop\Db\Field API to manage the editing of values.
+ *
+ * Adding fields to this object simplifies a couple aspects of the common
+ * add/edit workflow in a web application:
+ *
+ * <ol>
+ *     <li>
+ *         It automatically attaches the added fields to the input filter
+ *         for filtering and validation.  This object can use its own
+ *         InputFilter instance independently of any other object, but
+ *         more commonly, the InputFilter will be injected into the
+ *         constructor so that it can be integrated into some other context
+ *         like an EditAbstract sub-class.
+ *     </li>
+ *     <li>
+ *         When calling setValues(), this fields collection will automatically
+ *         only set values on fields that you've explicitly added to the
+ *         collection.  For example, a malicious user adding a field you did
+ *         not intend to allow them to edit to their POST data would be
+ *         thwarted by this API.  In other words, this API is intended as a
+ *         way to prevent mass assignment (http://en.wikipedia.org/wiki/Mass_assignment_vulnerability).
+ *         Think of adding a field to this object as passing a signed
+ *         permission slip to the user saying they are allowed to edit that
+ *         field on that particular row.
+ *     </li>
+ * </ol>
  */
 class Edit
 {
@@ -53,6 +78,8 @@ class Edit
      */
     public function add(Field $field, $groupName = null)
     {
+        $this->inputFilter->add($field->getInputFilter());
+
         if (null === $groupName) {
             $this->fields[$field->getControlName()] = $field;
         } else {
@@ -130,52 +157,5 @@ class Edit
         }
 
         return $this;
-    }
-
-    /**
-     * Check to see if the supplied values are valid.  If you've already called
-     * setValues(), those values will be used for validation as well.
-     *
-     * @param array $values
-     * @return boolean
-     */
-    public function isValid(array $values = null)
-    {
-        foreach ($this->fields as $field) {
-            $this->inputFilter->add($field->getInputFilter());
-        }
-
-        if (null !== $values) {
-            $this->setValues($values);
-        } else {
-            $values = array();
-
-            foreach ($this->fields as $field) {
-                $values[$field->getControlName()] = $field->getValue();
-            }
-        }
-
-        $this->inputFilter->setData($values);
-
-        return $this->inputFilter->isValid();
-    }
-
-    /**
-     * Get any validation messages that were generated when isValid() was
-     * called.
-     *
-     * @return array
-     */
-    public function getMessages()
-    {
-        $messages = array();
-
-        foreach ($this->inputFilter->getInvalidInput() as $id => $error) {
-            foreach ($error->getMessages() as $message) {
-                $messages[] = $this->get($id)->getLabel() . ': ' . $message;
-            }
-        }
-
-        return $messages;
     }
 }

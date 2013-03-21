@@ -195,7 +195,13 @@ abstract class ComponentAbstract
                 }
 
                 if ($matchesSubmenu) {
-                    return "{$base}/{$submenu['route']}{$query}";
+                    if ('Index' === $submenu['route']) {
+                        $route = '';
+                    } else {
+                        $route = '/' . $submenu['route'];
+                    }
+
+                    return "{$base}{$route}{$query}";
                 }
             }
         }
@@ -305,7 +311,9 @@ abstract class ComponentAbstract
         $page->init();
 
         if ($page->shouldProcess()) {
-            $page->process();
+            $responseHelper = $page->createResponseHelper();
+            $page->process($responseHelper);
+            $responseHelper->execute();
         }
 
         ob_start();
