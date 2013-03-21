@@ -10,7 +10,7 @@
 
 namespace Dewdrop\Db\Test;
 
-use \PHPUnit_Extensions_Database_TestCase;
+use PHPUnit_Extensions_Database_TestCase;
 use PDO;
 
 /**
@@ -18,7 +18,7 @@ use PDO;
  * PDO-basd connection to the WP MySQL database for loading testing fixtures
  * and comparing them with your expected test results.
  */
-abstract class DbTestCase extends \PHPUnit_Extensions_Database_TestCase
+abstract class DbTestCase extends PHPUnit_Extensions_Database_TestCase
 {
     /**
      * Create the PDO connection for PHPUnit using constants defined in

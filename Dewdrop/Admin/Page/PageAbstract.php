@@ -74,10 +74,10 @@ abstract class PageAbstract
      * in the view-scripts sub-folder of its component.
      *
      * @param ComponentAbstract $component
-     * @param string $pageFile
      * @param Request $request
+     * @param string $pageFile
      */
-    public function __construct(ComponentAbstract $component, $pageFile, Request $request = null)
+    public function __construct(ComponentAbstract $component, Request $request = null, $pageFile)
     {
         $this->component = $component;
         $this->view      = new View();

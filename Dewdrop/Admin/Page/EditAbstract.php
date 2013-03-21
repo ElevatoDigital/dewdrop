@@ -10,6 +10,8 @@
 
 namespace Dewdrop\Admin\Page;
 
+use Dewdrop\Exception;
+use Dewdrop\Request;
 use Dewdrop\Admin\ComponentAbstract;
 use Dewdrop\Fields\Edit as EditFields;
 use Zend\InputFilter\InputFilter;
@@ -93,18 +95,26 @@ abstract class EditAbstract extends PageAbstract
     protected $inputFilter;
 
     /**
+     * We keep a list of fields with errors so that we can check our validation
+     * logic while testing.
+     *
+     * @var array
+     */
+    private $fieldsWithErrors = array();
+
+    /**
      * Override the PageAbstract contructor so we can add a \Dewdrop\Fields\Edit
      * object before proceeding to init().
      *
      * @param ComponentAbstract $component
+     * @param Request $request
      * @param string $pageFile The file in which the page class is defined.
-     * @param InputFilter $inputFilter
      */
-    public function __construct(ComponentAbstract $component, $pageFile, InputFilter $inputFilter = null)
+    public function __construct(ComponentAbstract $component, Request $request, $pageFile)
     {
-        parent::__construct($component, $pageFile);
+        parent::__construct($component, $request, $pageFile);
 
-        $this->inputFilter = ($inputFilter ?: new InputFilter());
+        $this->inputFilter = new InputFilter();
         $this->fields      = new EditFields($this->inputFilter);
     }
 
@@ -193,14 +203,31 @@ abstract class EditAbstract extends PageAbstract
 
         foreach ($this->inputFilter->getInvalidInput() as $id => $error) {
             foreach ($error->getMessages() as $message) {
-                if ($this->fields->has($id)) {
-                    $errors[] = $this->fields->get($id)->getLabel() . ': ' . $message;
-                } else {
+                if (!$this->fields->has($id)) {
                     $errors[] = $message;
+                } else {
+                    $field = $this->fields->get($id);
+                    $this->fieldsWithErrors[] = $field->getControlName();
+                    $errors[] = $field->getLabel() . ': ' . $message;
                 }
             }
         }
 
         return $errors;
+    }
+
+    /**
+     * Check to see whether the supplied field control name is associated
+     * with any validation errors.
+     *
+     * @param string $name
+     */
+    public function fieldHasError($name)
+    {
+        if (!$this->fields->has($name)) {
+            throw new Exception("Checking for errors on unknown field \"{$field}\"");
+        }
+
+        return in_array($name, $this->fieldsWithErrors);
     }
 }

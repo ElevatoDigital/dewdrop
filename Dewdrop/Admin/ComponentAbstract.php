@@ -12,6 +12,8 @@ namespace Dewdrop\Admin;
 
 use ReflectionClass;
 use Dewdrop\Admin\Page\PageAbstract;
+use Dewdrop\Admin\Response\Response;
+use Dewdrop\Admin\Response\ResponseInterface;
 use Dewdrop\Db\Adapter;
 use Dewdrop\Paths;
 use Dewdrop\Request;
@@ -107,19 +109,28 @@ abstract class ComponentAbstract
      * Route requests to this component to the specified in the "route"
      * parameter of the query string, if set.  This allows us to manage multiple
      * pages in a component without having to hook into WP again for every page.
+     *
+     * @param string $page The name of the page to route to (e.g. "Index" or "Edit").
+     * @param ResponseInterface $response Inject a response object, usually for tests.
+     * @return ResponseInterface
      */
-    public function route()
+    public function route($page = null, ResponseInterface $response = null)
     {
-        $reflectedClass = new ReflectionClass($this);
+        if (null === $response) {
+            $response = new Response();
+        }
 
-        $pageKey   = $this->determineCurrentPage();
-        $pageFile  = dirname($reflectedClass->getFileName()) . '/' . $pageKey . '.php';
-        $className = $reflectedClass->getNamespaceName() . '\\' . $pageKey;
+        $page = $this->createPageObject($page);
 
-        require_once $pageFile;
-        $page = new $className($this, $pageFile);
+        $response->setPage($page);
 
-        $this->dispatchPage($page);
+        $this->dispatchPage($page, $response);
+
+        if ($response->shouldRenderOutput()) {
+            echo $response->getOutput();
+        }
+
+        return $response;
     }
 
     /**
@@ -305,15 +316,25 @@ abstract class ComponentAbstract
      * to render the page's default view script automatically.
      *
      * @param PageAbstract $page
+     * @param ResponseInterface $response
+     * @return void
      */
-    protected function dispatchPage(PageAbstract $page)
+    protected function dispatchPage(PageAbstract $page, ResponseInterface $response)
     {
         $page->init();
 
         if ($page->shouldProcess()) {
             $responseHelper = $page->createResponseHelper();
+
             $page->process($responseHelper);
-            $responseHelper->execute();
+
+            $response
+                ->setWasProcessed(true)
+                ->setHelper($responseHelper);
+
+            if ($response->shouldShortCircuit()) {
+                return true;
+            }
         }
 
         ob_start();
@@ -322,8 +343,10 @@ abstract class ComponentAbstract
 
         // Automatically render view if no output is generated
         if (!$output) {
-            echo $page->renderView();
+            $output = $page->renderView();
         }
+
+        $response->setOutput($output);
     }
 
     /**
@@ -381,5 +404,27 @@ abstract class ComponentAbstract
         }
 
         return (count($segments) ? '&' . implode('&', $segments) : '');
+    }
+
+    /**
+     * Create a page object matching the current selected page name, either
+     * supplied to this method explicitly or as returned by the
+     * determineCurrentPage() method.
+     *
+     * @param $page string
+     * @return PageAbstract
+     */
+    private function createPageObject($page = null)
+    {
+        $reflectedClass = new ReflectionClass($this);
+
+        $pageKey   = ($page ?: $this->determineCurrentPage());
+        $pageFile  = dirname($reflectedClass->getFileName()) . '/' . $pageKey . '.php';
+        $className = $reflectedClass->getNamespaceName() . '\\' . $pageKey;
+
+        require_once $pageFile;
+        $page = new $className($this, $this->request, $pageFile);
+
+        return $page;
     }
 }
