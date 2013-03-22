@@ -191,4 +191,65 @@ class AdapterTest extends DbTestCase
 
         $this->assertEquals('Apple', $this->db->fetchOne($sql));
     }
+
+    public function testFetchRowWithNoResultsReturnsNull()
+    {
+        $this->assertNull(
+            $this->db->fetchRow('SELECT * FROM dewdrop_test_fruits WHERE dewdrop_test_fruit_id = 10')
+        );
+    }
+
+    /**
+     * @expectedException \Dewdrop\Exception
+     */
+    public function testInvalidLimitCountThrowsException()
+    {
+        $this->db->limit('SELECT * FROM dewdrop_test_fruits', -1);
+    }
+
+    /**
+     * @expectedException \Dewdrop\Exception
+     */
+    public function testInvalidLimitOffsetThrowsException()
+    {
+        $this->db->limit('SELECT * FROM dewdrop_test_fruits', 1, -10);
+    }
+
+    public function testListTablesReturnsSingleColumnArrayWithTableNames()
+    {
+        $tables = $this->db->listTables();
+
+        $stringValues = true;
+        $numKeys      = true;
+
+        foreach ($tables as $key => $table) {
+            if (!is_int($key)) {
+                $numKeys = false;
+            }
+
+            if (!is_string($table)) {
+                $stringValues = false;
+            }
+        }
+
+        $this->assertTrue($numKeys);
+        $this->assertTrue($stringValues);
+        $this->assertTrue(in_array('dewdrop_test_fruits', $tables));
+    }
+
+    public function testDescribeTableReturnsAccurateListingOfFruitsColumns()
+    {
+        $columns = $this->db->describeTable('dewdrop_test_fruits');
+
+        $this->assertTrue(array_key_exists('dewdrop_test_fruit_id', $columns));
+
+        $this->assertTrue($columns['dewdrop_test_fruit_id']['IDENTITY']);
+        $this->assertEquals(1, $columns['dewdrop_test_fruit_id']['PRIMARY_POSITION']);
+        $this->assertEquals(4, count($columns));
+    }
+
+    public function testGetConnectionReturnsWpdbInstance()
+    {
+        $this->assertInstanceOf('\wpdb', $this->db->getConnection());
+    }
 }
