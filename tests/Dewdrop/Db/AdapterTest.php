@@ -6,6 +6,9 @@ use Dewdrop\Db\Test\DbTestCase;
 
 class AdapterTest extends DbTestCase
 {
+    /**
+     * @var Adapter
+     */
     private $db;
 
     public function setUp()
@@ -251,5 +254,34 @@ class AdapterTest extends DbTestCase
     public function testGetConnectionReturnsWpdbInstance()
     {
         $this->assertInstanceOf('\wpdb', $this->db->getConnection());
+    }
+
+    public function testDelete()
+    {
+        $table       = 'dewdrop_test_fruits';
+        $idField     = 'dewdrop_test_fruit_id';
+        $fetchAllSql = "SELECT * FROM {$table} ORDER BY {$idField}";
+
+        $fruits = $this->db->fetchAll($fetchAllSql);
+        $this->assertSame(5, count($fruits));
+        $this->assertEquals(1, $fruits[0][$idField]);
+
+        $this->assertSame(1, $this->db->delete($table, "{$idField} = 1"));
+
+        $fruits = $this->db->fetchAll($fetchAllSql);
+        $this->assertSame(4, count($fruits));
+        $this->assertEquals(2, $fruits[0][$idField]);
+
+        $this->assertSame(0, $this->db->delete($table, "{$idField} = 7"));
+
+        $fruits = $this->db->fetchAll($fetchAllSql);
+        $this->assertSame(4, count($fruits));
+        $this->assertEquals(2, $fruits[0][$idField]);
+
+        $this->assertSame(1, $this->db->delete($table, array("{$idField} = 2", 'is_delicious')));
+
+        $fruits = $this->db->fetchAll($fetchAllSql);
+        $this->assertSame(3, count($fruits));
+        $this->assertEquals(3, $fruits[0][$idField]);
     }
 }
