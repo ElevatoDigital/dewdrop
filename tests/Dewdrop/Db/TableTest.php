@@ -4,8 +4,14 @@ namespace Dewdrop\Db;
 
 class TableTest extends Test\DbTestCase
 {
+    /**
+     * @var \DewdropTest\DewdropTestFruits
+     */
     private $table;
 
+    /**
+     * @var Adapter
+     */
     private $db;
 
     public function setUp()
@@ -215,5 +221,34 @@ class TableTest extends Test\DbTestCase
 
         $this->assertEquals('Blood Orange', $row->get('name'));
         $this->assertEquals(1, $row->get('is_delicious'));
+    }
+
+    public function testDelete()
+    {
+        $table       = 'dewdrop_test_fruits';
+        $idField     = 'dewdrop_test_fruit_id';
+        $fetchAllSql = "SELECT * FROM {$table} ORDER BY {$idField}";
+
+        $fruits = $this->db->fetchAll($fetchAllSql);
+        $this->assertSame(5, count($fruits));
+        $this->assertEquals(1, $fruits[0][$idField]);
+
+        $this->assertSame(1, $this->table->delete("{$idField} = 1"));
+
+        $fruits = $this->db->fetchAll($fetchAllSql);
+        $this->assertSame(4, count($fruits));
+        $this->assertEquals(2, $fruits[0][$idField]);
+
+        $this->assertSame(0, $this->table->delete("{$idField} = 7"));
+
+        $fruits = $this->db->fetchAll($fetchAllSql);
+        $this->assertSame(4, count($fruits));
+        $this->assertEquals(2, $fruits[0][$idField]);
+
+        $this->assertSame(1, $this->table->delete(array("{$idField} = 2", 'is_delicious')));
+
+        $fruits = $this->db->fetchAll($fetchAllSql);
+        $this->assertSame(3, count($fruits));
+        $this->assertEquals(3, $fruits[0][$idField]);
     }
 }

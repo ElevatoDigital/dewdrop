@@ -220,6 +220,31 @@ class Row
     }
 
     /**
+     * Deletes existing rows.
+     *
+     * @return int The number of rows deleted.
+     */
+    public function delete()
+    {
+        $where = $this->assembleUpdateWhereClause();
+
+        /**
+         * Execute the DELETE (this may throw an exception)
+         */
+        $result = $this->getTable()->delete($where);
+
+        /**
+         * Reset all fields to null to indicate that the row is not there
+         */
+        $this->data = array_combine(
+            array_keys($this->data),
+            array_fill(0, count($this->data), null)
+        );
+
+        return $result;
+    }
+
+    /**
      * Refresh the row, pulling in the latest data from the DB.
      *
      * @return \Dewdrop\Db\Row

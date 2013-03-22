@@ -4,10 +4,14 @@ namespace Dewdrop\Db;
 
 class RowTest extends Test\DbTestCase
 {
-    private $row;
-
+    /**
+     * @var \DewdropTest\DewdropTestFruits
+     */
     private $table;
 
+    /**
+     * @var Adapter
+     */
     private $db;
 
     public function setUp()
@@ -168,5 +172,29 @@ class RowTest extends Test\DbTestCase
 
         $this->assertEquals(5, $this->db->fetchOne('SELECT COUNT(*) FROM dewdrop_test_fruits'));
         $this->assertEquals(1, $row->get('dewdrop_test_fruit_id'));
+    }
+
+    public function testDelete()
+    {
+        $table       = 'dewdrop_test_fruits';
+        $idField     = 'dewdrop_test_fruit_id';
+        $fetchAllSql = "SELECT * FROM {$table} ORDER BY {$idField}";
+
+        $fruits = $this->db->fetchAll($fetchAllSql);
+        $this->assertSame(5, count($fruits));
+        $this->assertEquals(1, $fruits[0][$idField]);
+
+        $fruit = $this->table->find(1);
+
+        $this->assertSame(1, $fruit->delete());
+
+        $this->assertNull($fruit->get('dewdrop_test_fruit_id'));
+        $this->assertNull($fruit->get('name'));
+        $this->assertNull($fruit->get('is_delicious'));
+        $this->assertNull($fruit->get('level_of_deliciousness'));
+
+        $fruits = $this->db->fetchAll($fetchAllSql);
+        $this->assertSame(4, count($fruits));
+        $this->assertEquals(2, $fruits[0][$idField]);
     }
 }

@@ -293,6 +293,30 @@ class Adapter
     }
 
     /**
+     * Deletes table rows based on a WHERE clause.
+     *
+     * @param  mixed        $table The table to update.
+     * @param  mixed        $where DELETE WHERE clause(s).
+     * @return int          The number of affected rows.
+     */
+    public function delete($table, $where = '')
+    {
+        $where = $this->whereExpr($where);
+
+        /**
+         * Build the DELETE statement
+         */
+        $sql = "DELETE FROM "
+             . $this->quoteIdentifier($table, true)
+             . (($where) ? " WHERE $where" : '');
+
+        /**
+         * Execute the statement and return the number of affected rows
+         */
+        return $this->query($sql);
+    }
+
+    /**
      * Run the supplied query, binding the supplied data to the statement
      * prior to execution.
      *
