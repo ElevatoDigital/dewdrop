@@ -4,9 +4,20 @@ Dewdrop
 Dewdrop makes writing complex WordPress plugins simpler by providing a 
 sensible project layout and developer tools.
 
-Our next steps include adding code generation tools to the command line
-interface and fleshing out the model API.  If you're interested in
-contributing, contact Brad at <bgriffith@deltasys.com>.
+
+Contributing
+------------
+
+If you'd like to contribute to Dewdrop, read this wiki page for information on
+how to get your development environment running smoothly:
+
+<https://github.com/DeltaSystems/dewdrop/wiki/Contributing>
+
+### Current contributors
+
+* Brad Griffith, Delta Systems
+* Darby Felton, Delta Systems
+
 
 Quick Start
 -----------
