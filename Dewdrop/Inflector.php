@@ -369,13 +369,7 @@ class Inflector
      */
     public function unaccent($text)
     {
-        return strtr(
-            $text,
-            'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóô'
-            . 'õöøùúûüýþÿ',
-            'AAAAAAACEEEEIIIIDNOOOOOOUUUUYTsaaaaaaaceeeeiiiienooo'
-            . 'ooouuuuyty'
-        );
+        return iconv('UTF-8', 'ASCII//TRANSLIT', $text);
     }
 
     /**
