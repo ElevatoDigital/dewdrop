@@ -391,6 +391,17 @@ abstract class Table
     }
 
     /**
+     * Deletes existing rows.
+     *
+     * @param  array|string $where SQL WHERE clause(s).
+     * @return int          The number of rows deleted.
+     */
+    public function delete($where)
+    {
+        return $this->db->delete($this->tableName, $where);
+    }
+
+    /**
      * Find a single row based upon primary key value.
      *
      * @return \Dewdrop\Db\Row
