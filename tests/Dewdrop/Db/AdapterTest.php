@@ -279,7 +279,7 @@ class AdapterTest extends DbTestCase
         $this->assertEquals(2, $fruits[0][$idField]);
 
         $this->assertSame(1, $this->db->delete($table, array("{$idField} = 2", 'is_delicious')));
-        
+
         $fruits = $this->db->fetchAll($fetchAllSql);
         $this->assertSame(3, count($fruits));
         $this->assertEquals(3, $fruits[0][$idField]);
