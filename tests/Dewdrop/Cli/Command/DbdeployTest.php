@@ -96,6 +96,7 @@ class DbdeployTest extends \PHPUnit_Framework_TestCase
         $db = $this->runner->connectDb();
 
         // Forcing reconnect because of quirky wpdb during testing with logs of queries
+        // @see http://core.trac.wordpress.org/ticket/23085
         $db->getConnection()->db_connect();
 
         $db->query('DROP TABLE IF EXISTS dewdrop_test_dbdeploy_changelog');
