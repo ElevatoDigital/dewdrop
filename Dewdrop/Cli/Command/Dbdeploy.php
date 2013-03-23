@@ -646,7 +646,7 @@ class Dbdeploy extends CommandAbstract
 
         if ('subhead' === $rendererMethod) {
             $this->renderer->subhead($header);
-        } else if ('text' === $rendererMethod) {
+        } elseif ('text' === $rendererMethod) {
             $this->renderer
                 ->text("### {$header}")
                 ->newline();
