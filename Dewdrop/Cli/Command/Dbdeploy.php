@@ -60,19 +60,24 @@ class Dbdeploy extends CommandAbstract
     private $revision;
 
     /**
-     * The path where the dbdeploy delta scripts can be found.
-     *
-     * @var string
-     */
-    private $scriptPath;
-
-    /**
      * The name of the changeset in the dbdeploy_changelog table.  You can
      * track multiple streams of changes by using differing changeset names.
      *
      * @var string
      */
-    private $changeset = 'plugin';
+    private $changeset;
+
+    /**
+     * The changesets that need to be updated when the default dbdeploy command
+     * is run.  If you only want to run a single changeset, you can manually
+     * set the changeset argument as well.
+     *
+     * @param array
+     */
+    private $changesets = array(
+        'plugin'       => 'db',
+        'dewdrop-test' => 'lib/tests/db'
+    );
 
     /**
      * Set basic command information, arguments and examples
@@ -108,16 +113,9 @@ class Dbdeploy extends CommandAbstract
 
         $this->addArg(
             'changeset',
-            'The name of the changeset the scripts should be applied to',
+            'Only run scripts for the specified changeset instead of all',
             self::ARG_OPTIONAL,
             array('changeset-name')
-        );
-
-        $this->addArg(
-            'script-path',
-            'The folder in which the dbdeploy delta scripts can be found',
-            self::ARG_OPTIONAL,
-            array('path')
         );
 
         $this->addExample(
@@ -132,7 +130,7 @@ class Dbdeploy extends CommandAbstract
 
         $this->addExample(
             'Backfill your changelog up to a certain revision number',
-            './dewdrop dbdeploy backfill --revision=5'
+            './dewdrop dbdeploy backfill --revision=5 --changeset=plugin'
         );
     }
 
@@ -171,20 +169,6 @@ class Dbdeploy extends CommandAbstract
     public function setRevision($revision)
     {
         $this->revision = (int) $revision;
-
-        return $this;
-    }
-
-    /**
-     * Set the path where the dbdeploy script files can be found.  By default,
-     * the "db" folder in your plugin's root folder will be used.
-     *
-     * @param string $scriptPath
-     * @return \Dewdrop\Cli\Command\Dbdeploy
-     */
-    public function setScriptPath($scriptPath)
-    {
-        $this->scriptPath = $scriptPath;
 
         return $this;
     }
@@ -244,53 +228,52 @@ class Dbdeploy extends CommandAbstract
      */
     public function executeUpdate()
     {
-        $current = $this->getCurrentRevision();
-        $files   = $this->getChangeFiles($current);
+        $filesByChangeset = $this->getFilesByChangeset($count);
 
-        // Abort was called because a file was named improperly
-        if (false === $files) {
+        // Could not retrieve files collection
+        if (false === $filesByChangeset) {
             return false;
         }
-
-        $count = count($files);
 
         if (!$count) {
             return $this->executeStatus();
         }
 
-        foreach ($files as $file) {
-            $start   = date('Y-m-d G:i:s');
-            $success = $this->runSqlScript($file);
+        foreach ($filesByChangeset as $changeset => $changes) {
+            foreach ($changes['files'] as $file) {
+                $start   = date('Y-m-d G:i:s');
+                $success = $this->runSqlScript($file);
 
-            if (!$success) {
-                $filename = basename($file);
+                if (!$success) {
+                    $filename = basename($file);
 
-                return $this->abort(
-                    "Stopping dbdeploy run because of error in script: {$filename}"
-                );
+                    return $this->abort(
+                        "Stopping dbdeploy run because of error in script: {$filename}"
+                    );
+                }
+
+                $end = date('Y-m-d G:i:s');
+
+                $this->updateChangelog($changeset, $file, $start, $end);
             }
-
-            $end = date('Y-m-d G:i:s');
-
-            $this->updateChangelog($file, $start, $end);
         }
 
         $suffix  = (1 === $count ? '' : 's');
-        $changes = array();
-
-        foreach ($files as $file) {
-            $changes[] = basename($file);
-        }
 
         $this->refreshDbMetadata();
 
         $this->renderer
             ->title('dbdeploy Complete')
             ->success("Successfully applied $count change file{$suffix}.")
-            ->newline()
-            ->subhead('Change files applied')
-            ->unorderedList($changes)
             ->newline();
+
+        foreach ($filesByChangeset as $changeset => $changes) {
+            $this->renderFileList(
+                "Change files applied to \"{$changeset}\" changeset",
+                $changes['files'],
+                'subhead'
+            );
+        }
     }
 
     /**
@@ -302,15 +285,12 @@ class Dbdeploy extends CommandAbstract
      */
     public function executeStatus()
     {
-        $current = $this->getCurrentRevision();
-        $files   = $this->getChangeFiles($current);
+        $filesByChangeset = $this->getFilesByChangeset($count);
 
-        // Abort was called because a file was named improperly
-        if (false === $files) {
+        // Couldn't get files collection
+        if (false === $filesByChangeset) {
             return false;
         }
-
-        $count = count($files);
 
         $this->renderer->title('dbdeploy Status');
 
@@ -322,9 +302,28 @@ class Dbdeploy extends CommandAbstract
             $this->renderer->warn("You need to run {$count} dbdeploy scripts.");
         }
 
-        $this->renderer->newline();
+        foreach ($filesByChangeset as $changeset => $changes) {
+            $this->renderStatusForChangeset($changeset, $changes['current'], $changes['files']);
+        }
+    }
 
-        $this->renderer->text("Change Set: {$this->changeset}");
+    /**
+     * Render the status for a single changeset, displaying the current and
+     * the available revision numbers and a list of any files that need to
+     * be run.
+     *
+     * @param string $changeset
+     * @param integer $current
+     * @param array $files
+     * @return void
+     */
+    private function renderStatusForChangeset($changeset, $current, array $files)
+    {
+        $count = count($files);
+
+        $this->renderer
+            ->newline()
+            ->subhead("{$changeset} Changeset");
 
         $this->renderer->text(
             sprintf(
@@ -342,19 +341,11 @@ class Dbdeploy extends CommandAbstract
 
         $this->renderer->newline();
 
-        if ($count) {
-            $this->renderer->subhead('Scripts that need to be run');
-
-            $listItems = array();
-
-            foreach ($files as $file) {
-                $listItems[] = basename($file);
-            }
-
-            $this->renderer
-                ->unorderedList($listItems)
-                ->newline();
-        }
+        $this->renderFileList(
+            "Scripts that need to be run in \"{$changeset}\" changeset",
+            $files,
+            'text'
+        );
     }
 
     /**
@@ -374,8 +365,12 @@ class Dbdeploy extends CommandAbstract
             return $this->abort('The revision arg is required for the backfill action.');
         }
 
-        $current = $this->getCurrentRevision();
-        $files   = $this->getChangeFiles($current);
+        if (null === $this->changeset) {
+            return $this->abort('You must specify a changeset when backfilling your changelog.');
+        }
+
+        $current = $this->getCurrentRevision($this->changeset);
+        $files   = $this->getChangeFiles($current, $this->changesets[$this->changeset]);
 
         // Abort was called because a file was named improperly
         if (false === $files) {
@@ -398,19 +393,13 @@ class Dbdeploy extends CommandAbstract
         }
 
         $suffix  = (1 === $count ? '' : 's');
-        $changes = array();
-
-        foreach ($files as $file) {
-            $changes[] = basename($file);
-        }
 
         $this->renderer
             ->title('dbdeploy Backfill Complete')
             ->text("Successfully backfilled changelog entries for $count change file{$suffix}.")
-            ->newline()
-            ->subhead('Changelog entries inserted')
-            ->unorderedList($changes)
             ->newline();
+
+        $this->renderFileList('Changelog entries inserted', $files, 'subhead');
     }
 
     /**
@@ -439,6 +428,54 @@ class Dbdeploy extends CommandAbstract
     }
 
     /**
+     * Get all change files that need to be run grouped by changeset.  The
+     * return value will be an array following this structure:
+     *
+     * <code>
+     * array(
+     *     'changeset-name' => array(
+     *         'current' => 0,
+     *         'files'   => array(
+     *
+     *         )
+     *     )
+     * )
+     * </code>
+     *
+     * @param integer $count
+     * @return array
+     */
+    private function getFilesByChangeset(&$count = 0)
+    {
+        $filesByChangeset = array();
+
+        $count = 0;
+
+        foreach ($this->changesets as $changeset => $path) {
+            if ($this->changeset && $changeset !== $this->changeset) {
+                continue;
+            }
+
+            $current = $this->getCurrentRevision($changeset);
+            $files   = $this->getChangeFiles($current, $path);
+
+            // Abort was called because a file was named improperly
+            if (false === $files) {
+                return false;
+            }
+
+            $filesByChangeset[$changeset] = array(
+                'current' => $current,
+                'files'   => $files
+            );
+
+            $count += count($files);
+        }
+
+        return $filesByChangeset;
+    }
+
+    /**
      * Check to see if the dbdeploy_changelog table already exists.
      *
      * @return boolean
@@ -462,17 +499,18 @@ class Dbdeploy extends CommandAbstract
     /**
      * Update the changelog with a record for a newly executed file.
      *
+     * @param string $changeset
      * @param string $file
      * @param string $startDt
      * @param string $completeDt
      */
-    private function updateChangelog($file, $startDt, $completeDt)
+    private function updateChangelog($changeset, $file, $startDt, $completeDt)
     {
         $this->db->insert(
             'dbdeploy_changelog',
             array(
                 'change_number' => $this->getFileChangeNumber($file),
-                'delta_set'     => $this->changeset,
+                'delta_set'     => $changeset,
                 'start_dt'      => $startDt,
                 'complete_dt'   => $completeDt,
                 'applied_by'    => (isset($_SERVER['USER']) ? $_SERVER['USER'] : 'unknown'),
@@ -485,14 +523,15 @@ class Dbdeploy extends CommandAbstract
      * Determine the current DB revision by looking for the maximum
      * change_number value in the dbdeploy_changelog table.
      *
+     * @param string $changeset
      * @return integer
      */
-    private function getCurrentRevision()
+    private function getCurrentRevision($changeset)
     {
         return (int) $this->db->fetchOne(
             'SELECT MAX(change_number) FROM dbdeploy_changelog WHERE delta_set = ?',
             array(
-                'delta_set' => $this->changeset
+                'delta_set' => $changeset
             )
         );
     }
@@ -526,12 +565,13 @@ class Dbdeploy extends CommandAbstract
      * Get the files with a change number greater than the current revision.
      *
      * @param integer $currentRevision
+     * @param string $path The path relative to the plugin root folder.
      * @return array The files that need to be run.
      */
-    private function getChangeFiles($currentRevision)
+    private function getChangeFiles($currentRevision, $path)
     {
         $out   = array();
-        $path  = $this->evalPathArgument($this->scriptPath ?: $this->paths->getDb());
+        $path  = $this->paths->getPluginRoot() . '/' . $path;
         $files = glob("{$path}/*.sql");
 
         foreach ($files as $file) {
@@ -587,5 +627,41 @@ class Dbdeploy extends CommandAbstract
     {
         $command = new DbMetadata($this->runner, $this->renderer);
         $command->execute();
+    }
+
+    /**
+     * Render a file list with the supplied subhead, assuming there is at least
+     * one file to include in the list.
+     *
+     * @param string $header
+     * @param array $files
+     * @param string $rendererMethod
+     * @return void
+     */
+    private function renderFileList($header, array $files, $rendererMethod)
+    {
+        if (!count($files)) {
+            return false;
+        }
+
+        if ('subhead' === $rendererMethod) {
+            $this->renderer->subhead($header);
+        } else if ('text' === $rendererMethod) {
+            $this->renderer
+                ->text("### {$header}")
+                ->newline();
+        } else {
+            throw new Exception('Only "subhead" and "text" can be used for rendererMethod');
+        }
+
+        $listItems = array();
+
+        foreach ($files as $file) {
+            $listItems[] = basename($file);
+        }
+
+        $this->renderer
+            ->unorderedList($listItems)
+            ->newline();
     }
 }
