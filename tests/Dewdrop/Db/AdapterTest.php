@@ -284,4 +284,36 @@ class AdapterTest extends DbTestCase
         $this->assertSame(3, count($fruits));
         $this->assertEquals(3, $fruits[0][$idField]);
     }
+
+    /**
+     * @expectedException \Dewdrop\Exception
+     */
+    public function testBadFetchAllThrowsException()
+    {
+        $this->db->fetchAll('not even close to valid sql');
+    }
+
+    /**
+     * @expectedException \Dewdrop\Exception
+     */
+    public function testBadFetchColThrowsException()
+    {
+        $this->db->fetchCol('not even close to valid sql');
+    }
+
+    /**
+     * @expectedException \Dewdrop\Exception
+     */
+    public function testBadFetchOneThrowsException()
+    {
+        $this->db->fetchCol('not even close to valid sql');
+    }
+
+    /**
+     * @expectedException \Dewdrop\Exception
+     */
+    public function testBadFetchQueryThrowsException()
+    {
+        $this->db->query('not even close to valid sql');
+    }
 }

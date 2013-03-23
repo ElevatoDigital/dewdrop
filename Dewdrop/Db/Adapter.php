@@ -103,6 +103,8 @@ class Adapter
     public function __construct(\wpdb $wpdb)
     {
         $this->wpdb = $wpdb;
+
+        $this->wpdb->suppress_errors = true;
     }
 
     /**
