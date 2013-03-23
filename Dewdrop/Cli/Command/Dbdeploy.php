@@ -11,6 +11,7 @@
 namespace Dewdrop\Cli\Command;
 
 use Dewdrop\Cli\Command\DbMetadata;
+use Dewdrop\Exception;
 
 /**
  * Apply update to your database schema in a controlled and repeatable manner.
@@ -60,8 +61,8 @@ class Dbdeploy extends CommandAbstract
     private $revision;
 
     /**
-     * The name of the changeset in the dbdeploy_changelog table.  You can
-     * track multiple streams of changes by using differing changeset names.
+     * The name of the changeset in the changelog table.  You can track multiple
+     * streams of changes by using differing changeset names.
      *
      * @var string
      */
@@ -78,6 +79,15 @@ class Dbdeploy extends CommandAbstract
         'plugin'       => 'db',
         'dewdrop-test' => 'lib/tests/db'
     );
+
+    /**
+     * The name of the changelog table.  This is not intended to be modified
+     * outside the unit testing environment.  Not available as a command
+     * argument.
+     *
+     * @param string
+     */
+    private $changelogTableName = 'dbdeploy_changelog';
 
     /**
      * Set basic command information, arguments and examples
@@ -175,7 +185,7 @@ class Dbdeploy extends CommandAbstract
 
     /**
      * Set the name of the changeset you'd like to you when checking the
-     * current revision number and adding new entries to the dbdeploy_changelog
+     * current revision number and adding new entries to the changelog
      * table.  This defaults to "plugin", which is the changeset name that
      * should be used for changes originating from scripts in your plugin's
      * DB folder.
@@ -476,24 +486,48 @@ class Dbdeploy extends CommandAbstract
     }
 
     /**
-     * Check to see if the dbdeploy_changelog table already exists.
+     * Check to see if the changelog table already exists.
      *
      * @return boolean
      */
-    private function changelogExists()
+    protected function changelogExists()
     {
-        return in_array('dbdeploy_changelog', $this->db->listTables());
+        return in_array($this->changelogTableName, $this->db->listTables());
     }
 
     /**
      * Create the changelog table by running the SQL script included with
      * Dewdrop.
      *
+     * @throws \Dewdrop\Exception
      * @return boolean Whether it was successfully created.
      */
-    private function createChangelog()
+    protected function createChangelog()
     {
-        return $this->runSqlScript(__DIR__ . '/dbdeploy/dbdeploy-changelog.sql');
+        $tempFile = tempnam(sys_get_temp_dir(), 'dewdrop.cli.');
+        $template = __DIR__ . '/dbdeploy/dbdeploy-changelog.sql';
+
+        $content = str_replace(
+            '{{table_name}}',
+            $this->changelogTableName,
+            file_get_contents($template)
+        );
+
+        if (!file_exists($tempFile) || !is_writable($tempFile)) {
+            throw Exception('Could not write to temporary file for dbdeploy changelog.');
+        }
+
+        file_put_contents($tempFile, $content, LOCK_EX);
+
+        $result = $this->runSqlScript($tempFile);
+
+        // WARNING: Notice the error suppression "@" operator!  Used because
+        //          failure is also reported by unlink() return value.
+        if (!@unlink($tempFile)) {
+            throw Exception('Could not delete temporary dbdeploy changelog file.');
+        }
+
+        return $result;
     }
 
     /**
@@ -507,7 +541,7 @@ class Dbdeploy extends CommandAbstract
     private function updateChangelog($changeset, $file, $startDt, $completeDt)
     {
         $this->db->insert(
-            'dbdeploy_changelog',
+            $this->changelogTableName,
             array(
                 'change_number' => $this->getFileChangeNumber($file),
                 'delta_set'     => $changeset,
@@ -521,7 +555,7 @@ class Dbdeploy extends CommandAbstract
 
     /**
      * Determine the current DB revision by looking for the maximum
-     * change_number value in the dbdeploy_changelog table.
+     * change_number value in the changelog table.
      *
      * @param string $changeset
      * @return integer
@@ -529,7 +563,10 @@ class Dbdeploy extends CommandAbstract
     private function getCurrentRevision($changeset)
     {
         return (int) $this->db->fetchOne(
-            'SELECT MAX(change_number) FROM dbdeploy_changelog WHERE delta_set = ?',
+            sprintf(
+                'SELECT MAX(change_number) FROM %s WHERE delta_set = ?',
+                $this->db->quoteIdentifier($this->changelogTableName)
+            ),
             array(
                 'delta_set' => $changeset
             )
@@ -663,5 +700,24 @@ class Dbdeploy extends CommandAbstract
         $this->renderer
             ->unorderedList($listItems)
             ->newline();
+    }
+
+    /**
+     * Override the default changelog table name.
+     *
+     * This is really only intended for testing purposes.  You'll notice that
+     * it's not availble as an argument on this command and that it's using
+     * abnormal syntax (i.e. "override" instead of "set").  We don't anticipate
+     * or encourage people using alternative changelog table names for their
+     * production code.
+     *
+     * @param string $tableName
+     * @return \Dewdrop\Cli\Command\Dbdeploy
+     */
+    public function overrideChangelogTableName($tableName)
+    {
+        $this->changelogTableName = $tableName;
+
+        return $this;
     }
 }

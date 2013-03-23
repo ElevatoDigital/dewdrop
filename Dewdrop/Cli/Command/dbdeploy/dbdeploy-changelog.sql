@@ -1,4 +1,4 @@
-CREATE TABLE dbdeploy_changelog (
+CREATE TABLE {{table_name}} (
     change_number INTEGER,
     delta_set VARCHAR(32) NOT NULL,
     start_dt TIMESTAMP NOT NULL,
