@@ -555,6 +555,21 @@ abstract class CommandAbstract
     }
 
     /**
+     * Run a shell command using PHP's exec fucntion, which may be preferable to
+     * passthru() when you need to capture output.  This is primarily present
+     * to make it easy to mock exec() during testing.
+     *
+     * @param string $command
+     * @param array $output
+     * @param integer $exitStatus
+     * @return void
+     */
+    protected function exec($command, &$output, &$exitStatus)
+    {
+        exec($command, $output, $exitStatus);
+    }
+
+    /**
      * Change "~" prefix to the user's home folder.
      *
      * Bash doesn't do "~" evaluation automatically for command arguments, so

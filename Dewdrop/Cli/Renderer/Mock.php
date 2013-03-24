@@ -125,7 +125,7 @@ class Mock implements RendererInterface
      */
     public function newline()
     {
-
+        return $this;
     }
 
     /**
