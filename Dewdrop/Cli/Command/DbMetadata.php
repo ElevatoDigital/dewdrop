@@ -10,6 +10,8 @@
 
 namespace Dewdrop\Cli\Command;
 
+use Dewdrop\Db\Adapter as DbAdapter;
+use Dewdrop\Exception;
 use Dewdrop\Inflector;
 
 /**
@@ -53,7 +55,22 @@ class DbMetadata extends CommandAbstract
             mkdir($path);
         }
 
-        $tables    = $db->listTables();
+        $tables = $db->listTables();
+
+        $this->writeMetadataFiles($path, $db, $tables);
+        $this->deleteMetadataForDroppedTables($path, $tables);
+    }
+
+    /**
+     * Write metadata files for all the listed tables.
+     *
+     * @param string $path
+     * @param DbAdapter $db
+     * @param array $tables
+     * @return void
+     */
+    protected function writeMetadataFiles($path, DbAdapter $db, array $tables)
+    {
         $inflector = new Inflector();
 
         foreach ($tables as $table) {
@@ -74,6 +91,32 @@ class DbMetadata extends CommandAbstract
                     file_get_contents(__DIR__ . '/db-metadata/template.tpl')
                 )
             );
+        }
+    }
+
+    /**
+     * Delete metadata files for any tables that have been dropped and no longer
+     * exist in the table list.
+     *
+     * @param string $path
+     * @param array $tables
+     * @throws \Dewdrop\Exception
+     * @return void
+     */
+    protected function deleteMetadataForDroppedTables($path, array $tables)
+    {
+        $files = glob($path . '/*.php');
+
+        foreach ($files as $file) {
+            $tableName = basename($file, '.php');
+
+            if (!in_array($tableName, $tables)) {
+                // WARNING: Notice the error suppression "@" operator!  Used because
+                //          failure is also reported by unlink() return value.
+                if (!@unlink($file)) {
+                    throw Exception("Could not delete DB metadata file for \"{$tableName}\"");
+                }
+            }
         }
     }
 }
