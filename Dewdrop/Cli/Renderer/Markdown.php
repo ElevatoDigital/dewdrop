@@ -188,6 +188,8 @@ class Markdown implements RendererInterface
             Color::calculate('ff0000')
         );
 
+        echo PHP_EOL;
+
         return $this;
     }
 

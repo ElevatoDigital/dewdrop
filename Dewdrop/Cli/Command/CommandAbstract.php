@@ -529,13 +529,20 @@ abstract class CommandAbstract
      * Render the provided error message and display the command's help content.
      *
      * @param string $errorMessage
+     * @param boolean $displayHelp
      *
      * @return boolean
      */
-    protected function abort($errorMessage)
+    protected function abort($errorMessage, $displayHelp = true)
     {
         $this->renderer->error($errorMessage);
-        $this->help();
+
+        if ($displayHelp) {
+            $this->help();
+        } else {
+            $this->renderer->newline();
+        }
+
         return false;
     }
 

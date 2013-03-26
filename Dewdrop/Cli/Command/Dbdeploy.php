@@ -265,10 +265,14 @@ class Dbdeploy extends CommandAbstract
                 if (!$success) {
                     $filename = basename($file);
 
-                    return $this->abort(
-                        "Stopping dbdeploy run because of error in script: {$filename}.  "
-                        . $this->mysqlOutput
+                    $this->abort(
+                        "Stopping dbdeploy run because of error in script: {$filename}.",
+                        false // Don't display help content
                     );
+
+                    $this->renderer->text($this->mysqlOutput);
+
+                    return false;
                 }
 
                 $end = date('Y-m-d G:i:s');
