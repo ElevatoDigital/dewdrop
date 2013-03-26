@@ -1,0 +1,3 @@
+CREATE TABLE {{tableName}} (
+    {{primaryKey}} INTEGER PRIMARY KEY AUTO_INCREMENT
+) ENGINE=InnoDb CHARSET=utf8;

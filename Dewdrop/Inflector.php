@@ -330,7 +330,7 @@ class Inflector
      */
     public function classify($tableName)
     {
-        return $this->camelize($this->singularize($tableName));
+        return $this->camelize($this->pluralize($tableName));
     }
 
     /**

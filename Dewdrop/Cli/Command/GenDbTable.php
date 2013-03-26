@@ -10,10 +10,10 @@
 
 namespace Dewdrop\Cli\Command;
 
+use Dewdrop\Inflector;
+
 /**
  * Generate a model class and a dbdeploy delta for a new database table.
- *
- * @todo Just a stub.  Not yet implemented.
  */
 class GenDbTable extends CommandAbstract
 {
@@ -64,6 +64,33 @@ class GenDbTable extends CommandAbstract
     }
 
     /**
+     * Set the name of the DB table you'd like to create.
+     *
+     * @param string $name
+     * @return \Dewdrop\Cli\Command\GenDbTable
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * Manually set the name of the model class that will be generated, if you'd
+     * prefer not to use the name automatically inflected by from the table name.
+     *
+     * @param string $modelClass
+     * @return \Dewdrop\Cli\Command\GenDbTable
+     */
+    public function setModelClass($modelClass)
+    {
+        $this->modelClass = $modelClass;
+
+        return $this;
+    }
+
+    /**
      * Generate the model class and dbdeploy delta and then output the path
      * to each so that they can easily be found for editing.
      *
@@ -71,6 +98,85 @@ class GenDbTable extends CommandAbstract
      */
     public function execute()
     {
+        $inflector = new Inflector();
 
+        if (null === $this->modelClass) {
+            $this->modelClass = $inflector->classify($this->name);
+        }
+
+        $modelFile    = $this->paths->getModels() . '/' . $this->modelClass . '.php';
+        $dbdeployFile = $this->paths->getDb() . '/' . $this->getDbRevision() . '-add-' . $this->name . '.sql';
+
+        if (file_exists($modelFile)) {
+            return $this->abort("There is a already a model file named \"{$this->modelClass}.php\"");
+        }
+
+        if (file_exists($dbdeployFile)) {
+            return $this->abort("There is already a dbdeploy file at \"{$dbdeployFile}\"");
+        }
+
+        $templateReplacements = array(
+            '{{modelClass}}' => $this->modelClass,
+            '{{tableName}}'  => $this->name
+        );
+
+        $this->writeFile(
+            $modelFile,
+            str_replace(
+                array_keys($templateReplacements),
+                $templateReplacements,
+                file_get_contents(__DIR__ . '/gen-templates/db-table/ModelClass.tpl')
+            )
+        );
+
+        $templateReplacements = array(
+            '{{tableName}}'  => $this->name,
+            '{{primaryKey}}' => $inflector->singularize($this->name) . '_id'
+        );
+
+        $this->writeFile(
+            $dbdeployFile,
+            str_replace(
+                array_keys($templateReplacements),
+                $templateReplacements,
+                file_get_contents(__DIR__ . '/gen-templates/db-table/dbdeploy-delta.sql')
+            )
+        );
+    }
+
+    /**
+     * Write a file at the specified path with the supplied contents.
+     *
+     * This is a separate method so that it's easy to mock during testing.
+     *
+     * @param string $path
+     * @param string $contents
+     * @return \Dewdrop\Cli\Command\GenAdminComponent
+     */
+    protected function writeFile($path, $contents)
+    {
+        file_put_contents($path, $contents);
+
+        return $this;
+    }
+
+    /**
+     * Get the revision number that should be used for the dbdeploy file.
+     *
+     * Returns the number as a zero-padded string, as suggested in the naming
+     * conventions (e.g. "00002").
+     *
+     * @return string
+     */
+    protected function getDbRevision()
+    {
+        $current = (int) $this->runner->connectDb()->fetchOne(
+            "SELECT MAX(change_number) FROM dbdeploy_changelog WHERE delta_set = 'plugin'"
+        );
+
+        return sprintf(
+            '%05s',
+            $current + 1
+        );
     }
 }
