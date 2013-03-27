@@ -107,11 +107,11 @@ class GenDbTable extends CommandAbstract
         $modelFile    = $this->paths->getModels() . '/' . $this->modelClass . '.php';
         $dbdeployFile = $this->paths->getDb() . '/' . $this->getDbRevision() . '-add-' . $this->name . '.sql';
 
-        if (file_exists($modelFile)) {
+        if ($this->modelAlreadyExists($modelFile)) {
             return $this->abort("There is a already a model file named \"{$this->modelClass}.php\"");
         }
 
-        if (file_exists($dbdeployFile)) {
+        if ($this->dbdeployFileAlreadyExists($dbdeployFile)) {
             return $this->abort("There is already a dbdeploy file at \"{$dbdeployFile}\"");
         }
 
@@ -178,5 +178,31 @@ class GenDbTable extends CommandAbstract
             '%05s',
             $current + 1
         );
+    }
+
+    /**
+     * Determine if the specified model file already exists.
+     *
+     * Really only around for mocking during tests.
+     *
+     * @param string $file
+     * @return param boolean
+     */
+    protected function modelAlreadyExists($file)
+    {
+        return file_exists($file);
+    }
+
+    /**
+     * Determine if the specified dbdeploy file already exists.
+     *
+     * Really only around for mocking during tests.
+     *
+     * @param string $file
+     * @return param boolean
+     */
+    protected function dbdeployFileAlreadyExists($file)
+    {
+        return file_exists($file);
     }
 }
