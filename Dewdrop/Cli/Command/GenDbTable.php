@@ -142,6 +142,40 @@ class GenDbTable extends CommandAbstract
                 file_get_contents(__DIR__ . '/gen-templates/db-table/dbdeploy-delta.sql')
             )
         );
+
+        $this->renderSuccessMessage($dbdeployFile, $modelFile);
+    }
+
+    /**
+     * Render a success message that lets the user know where their newly
+     * generated files are located and explains that they'll need to edit
+     * the dbdeploy file.
+     *
+     * @param string $dbdeployFile
+     * @param string $modelFile
+     * @return void
+     */
+    protected function renderSuccessMessage($dbdeployFile, $modelFile)
+    {
+        $base = $this->paths->getWpRoot();
+
+        $files = array(
+            'dbdeploy' => str_replace($base, '', $dbdeployFile),
+            'model'    => str_replace($base, '', $modelFile)
+        );
+
+        $this->renderer
+            ->title('gen-db-table')
+            ->success('Your new table and model class have been successfully created')
+            ->newline()
+            ->subhead('File Locations')
+            ->table($files)
+            ->subhead('Next Steps')
+            ->text(
+                'You will need to edit your dbdeploy file to add columns and indexes '
+                . 'prior to running the dbdeploy command.'
+            )
+            ->newline();
     }
 
     /**
