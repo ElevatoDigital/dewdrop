@@ -110,4 +110,44 @@ class Request
             return (isset($this->query[$name]) ? $this->query[$name] : $default);
         }
     }
+
+    /**
+     * Modify or add the POST value specified by key.  This is primarily useful
+     * for manipulating requests during testing.  If you pass an array as the
+     * $key, you'll overwrite the entirety of the POST data.
+     *
+     * @param mixed $key
+     * @param mixed $value
+     * @return \Dewdrop\Request
+     */
+    public function setPost($key, $value = null)
+    {
+        if (is_array($key)) {
+            $this->post = $key;
+        } else {
+            $this->post[$key] = $value;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Modify or add the GET value specified by key.  This is primarily useful
+     * for manipulating requests during testing.  If you pass an array as the
+     * $key, you'll overwrite the entirety of the GET data.
+     *
+     * @param mixed $key
+     * @param mixed $value
+     * @return \Dewdrop\Request
+     */
+    public function setQuery($key, $value = null)
+    {
+        if (is_array($key)) {
+            $this->query = $key;
+        } else {
+            $this->query[$key] = $value;
+        }
+
+        return $this;
+    }
 }

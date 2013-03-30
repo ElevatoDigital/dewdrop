@@ -134,7 +134,7 @@ abstract class ComponentAbstract
     {
         $slug = $this->getSlug();
 
-        add_object_page(
+        $this->addObjectPage(
             $this->title,
             $this->title,
             'add_users',
@@ -159,7 +159,7 @@ abstract class ComponentAbstract
                     $submenu_file = $url;
                 }
 
-                add_submenu_page(
+                $this->addSubmenuPage(
                     $slug,
                     $page['title'],
                     $page['title'],
@@ -342,6 +342,49 @@ abstract class ComponentAbstract
     }
 
     /**
+     * A mock wrapper for WP's add_object_page() function.  Allows calls
+     * during testing without error.
+     *
+     * @return void
+     */
+    protected function addObjectPage()
+    {
+        if (function_exists('add_object_page')) {
+            call_user_func_array('add_object_page', func_get_args());
+        }
+    }
+
+    /**
+     * A mock wrapper for WP's add_submenu_page() function.  Allows calls
+     * during testing without error.
+     *
+     * @return void
+     */
+    protected function addSubmenuPage()
+    {
+        if (function_exists('add_submenu_page')) {
+            call_user_func_array('add_submenu_page', func_get_args());
+        }
+    }
+
+    /**
+     * Get WP slug for this component.
+     *
+     * We use the component name, with namespace back slashes replaced with
+     * URL-friendly front slashes, as the slug.
+     *
+     * @return string
+     */
+    protected function getSlug()
+    {
+        $fullClass = str_replace('\\', '/', get_class($this));
+        $segments  = explode('/', $fullClass);
+        $nameIndex = count($segments) - 2;
+
+        return $segments[$nameIndex];
+    }
+
+    /**
      * Determine which page (e.g. Index, Edit, etc.) is currently being
      * displayed.  We take the route query parameter, subtract the slug
      * and see what's left, defaulting to "Index".
@@ -359,19 +402,6 @@ abstract class ComponentAbstract
         }
 
         return $route;
-    }
-
-    /**
-     * Get WP slug for this component.
-     *
-     * We use the classname, with namespace back slashes replaced with
-     * URL-friendly front slashes, as the slug.
-     *
-     * @return string
-     */
-    private function getSlug()
-    {
-        return str_replace('\\', '/', get_class($this));
     }
 
     /**

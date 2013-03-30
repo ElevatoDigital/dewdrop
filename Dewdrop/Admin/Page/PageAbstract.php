@@ -186,8 +186,9 @@ abstract class PageAbstract
     {
         $className = get_class($this);
         $pageName  = substr($className, strrpos($className, '\\') + 1);
-        $words     = implode('-', preg_split('/(?=[A-Z])/', $pageName));
+        $words     = preg_split('/(?=[A-Z])/', $pageName);
+        $fileName  = implode('-', array_slice($words, 1));
 
-        return strtolower($pageName . '.phtml');
+        return strtolower($fileName . '.phtml');
     }
 }
