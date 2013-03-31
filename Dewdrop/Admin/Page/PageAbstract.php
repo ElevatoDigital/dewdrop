@@ -106,7 +106,7 @@ abstract class PageAbstract
      */
     public function shouldProcess()
     {
-        return  true;
+        return true;
     }
 
     /**
@@ -167,6 +167,16 @@ abstract class PageAbstract
     public function createResponseHelper()
     {
         return new ResponseHelper($this);
+    }
+
+    /**
+     * Get a reference to this page's view object.
+     *
+     * @return \Dewdrop\View\View
+     */
+    public function getView()
+    {
+        return $this->view;
     }
 
     /**

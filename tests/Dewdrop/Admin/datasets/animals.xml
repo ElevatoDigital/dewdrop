@@ -1,0 +1,21 @@
+<?xml version="1.0" ?>
+<dataset>
+    <table name="dewdrop_test_animals">
+        <column>dewdrop_test_animal_id</column>
+        <column>name</column>
+        <column>is_fierce</column>
+        <column>is_cute</column>
+        <row>
+            <value>1</value>
+            <value>Cat</value>
+            <value>0</value>
+            <value>1</value>
+        </row>
+        <row>
+            <value>2</value>
+            <value>Raptor</value>
+            <value>1</value>
+            <value>0</value>
+        </row>
+    </table>
+</dataset>
