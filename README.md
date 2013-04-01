@@ -53,14 +53,4 @@ You can view our latest build results at:
 
 <http://ci.deltasys.com/dewdrop/>
 
-
-Testing and style
------------------
-
-Unit tests are greatly appreciated.  We aim to have over 90% code coverage and 
-high-quality, relevant tests.  We also value integration tests to help us ensure
-that Dewdrop-based plugins continue working reliably with new WordPress releases.
-Code should be written to conform with PSR-2 style.
-
-
 _Dewdrop is written by Delta Systems and distributed under the GPL license._
