@@ -86,4 +86,87 @@ class EditAbstractTest extends DbTestCase
             $this->page->getView()->title
         );
     }
+
+    public function testWillProcessIfRequestMethodIsPost()
+    {
+        $this->request->setMethod('POST');
+
+        $this->assertTrue($this->page->shouldProcess());
+    }
+
+    public function testWontProcessIfRequestIsNotPost()
+    {
+        $this->request->setMethod('GET');
+
+        $this->assertFalse($this->page->shouldProcess());
+    }
+
+    public function testInputFilterGeneratesErrorsAccurately()
+    {
+        $filter = $this->page->getInputFilter();
+        $name   = new \Zend\InputFilter\Input('name');
+        $email  = new \Zend\InputFilter\Input('email');
+        $valid  = new \Zend\InputFilter\Input('valid_input');
+
+        $name->getValidatorChain()
+            ->addValidator(new \Zend\Validator\NotEmpty());
+
+        $filter->add($name);
+
+        $email->getValidatorChain()
+            ->addValidator(new \Zend\Validator\EmailAddress());
+
+        $filter->add($email);
+
+        $valid->getValidatorChain()
+            ->addValidator(new \Zend\Validator\NotEmpty());
+
+        $filter->add($valid);
+
+        $filter->setData(
+            array(
+                'name'         => null,
+                'email'        => 'test',
+                'not_an_input' => null,
+                'valid_input'  => 'test'
+            )
+        );
+
+        $filter->isValid();
+
+        $this->assertEquals(2, count($this->page->getErrorsFromInputFilter()));
+    }
+
+    public function testErrorMessagesRelatedToFieldsHaveTitlePrefix()
+    {
+        $model = new \DewdropTest\Model\Animals($this->db);
+        $row   = $model->createRow();
+
+        $this->request
+            ->setMethod('POST')
+            ->setPost(
+                array(
+                    'name'      => null,
+                    'is_fierce' => 1
+                )
+            );
+
+        $this->page->getFields()
+            ->add($row->field('name'), 'animals')
+            ->add($row->field('is_fierce'));
+
+        $this->page->shouldProcess();
+        $this->page->getInputFilter()->isValid();
+
+        $this->assertEquals(1, count($this->page->getErrorsFromInputFilter()));
+        $this->assertTrue($this->page->fieldHasError('animals:name'));
+    }
+
+    /**
+     * @expectedException \Dewdrop\Exception
+     */
+    public function testCheckUnknownFieldForErrorThrowsException()
+    {
+        $this->page->fieldHasError('test');
+    }
 }

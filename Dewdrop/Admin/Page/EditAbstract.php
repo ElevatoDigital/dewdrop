@@ -230,4 +230,24 @@ abstract class EditAbstract extends PageAbstract
 
         return in_array($name, $this->fieldsWithErrors);
     }
+
+    /**
+     * Get a reference to the page's input filter.  Primarily used for testing.
+     *
+     * @return \Zend\InputFilter\InputFilter
+     */
+    public function getInputFilter()
+    {
+        return $this->inputFilter;
+    }
+
+    /**
+     * Get a reference to the page's fields.  Primarily used for testing.
+     *
+     * @return \Dewdrop\Fields\Edit
+     */
+    public function getFields()
+    {
+        return $this->fields;
+    }
 }

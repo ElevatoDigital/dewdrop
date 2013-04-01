@@ -112,6 +112,20 @@ class Request
     }
 
     /**
+     * Manually override the request method after instantiation.  This is
+     * primarily helpful in testing.
+     *
+     * @param string $method
+     * @return \Dewdrop\Request
+     */
+    public function setMethod($method)
+    {
+        $this->method = $method;
+
+        return $this;
+    }
+
+    /**
      * Modify or add the POST value specified by key.  This is primarily useful
      * for manipulating requests during testing.  If you pass an array as the
      * $key, you'll overwrite the entirety of the POST data.

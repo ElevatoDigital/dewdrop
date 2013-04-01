@@ -85,8 +85,6 @@ class Edit
      */
     public function add(Field $field, $groupName = null)
     {
-        $this->inputFilter->add($field->getInputFilter());
-
         if (null === $groupName) {
             $this->fields[$field->getControlName()] = $field;
         } else {
@@ -94,6 +92,8 @@ class Edit
             $field->setControlName($fieldIndex);
             $this->fields[$fieldIndex] = $field;
         }
+
+        $this->inputFilter->add($field->getInputFilter());
 
         return $this;
     }
