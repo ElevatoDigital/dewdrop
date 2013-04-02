@@ -11,6 +11,7 @@
 namespace Dewdrop\View\Helper;
 
 use Dewdrop\Db\Field;
+use Dewdrop\Filter\Stripslashes;
 
 /**
  * Use the WordPress editor in a form.
@@ -41,6 +42,8 @@ class WpEditor extends AbstractHelper
      */
     public function directField(Field $field)
     {
+        $field->getFilterChain()->attach(new StripSlashes());
+
         return $this->directArray(
             array(
                 'id'      => $field->getControlName(),
