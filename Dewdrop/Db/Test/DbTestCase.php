@@ -36,4 +36,23 @@ abstract class DbTestCase extends PHPUnit_Extensions_Database_TestCase
 
         return $this->createDefaultDBConnection($connection, DB_NAME);
     }
+
+    /**
+     * Use our own truncate operation so that we can work with InnoDB foreign
+     * keys constraints.
+     *
+     * @see http://stackoverflow.com/questions/10331445/phpunit-and-mysql-truncation-error
+     * @return \PHPUnit_Extensions_Database_Operation_Composite
+     */
+    public function getSetUpOperation()
+    {
+        $cascadeTruncates = true;
+
+        return new \PHPUnit_Extensions_Database_Operation_Composite(
+            array(
+                new TruncateOperation($cascadeTruncates),
+                \PHPUnit_Extensions_Database_Operation_Factory::INSERT()
+            )
+        );
+    }
 }

@@ -74,13 +74,15 @@ class DbMetadata extends CommandAbstract
         $inflector = new Inflector();
 
         foreach ($tables as $table) {
-            $columns = $db->describeTable($table);
-            $title   = $inflector->titleize($table);
+            $columns    = $db->describeTable($table);
+            $references = $db->listForeignKeyReferences($table);
+            $title      = $inflector->titleize($table);
 
             $replacements = array(
-                '{{singular}}' => $inflector->singularize($title),
-                '{{plural}}'   => $inflector->pluralize($title),
-                '{{columns}}'  => var_export($columns, true)
+                '{{singular}}'   => $inflector->singularize($title),
+                '{{plural}}'     => $inflector->pluralize($title),
+                '{{columns}}'    => var_export($columns, true),
+                '{{references}}' => var_export($references, true)
             );
 
             file_put_contents(

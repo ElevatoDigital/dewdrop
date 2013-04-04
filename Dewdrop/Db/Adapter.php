@@ -622,6 +622,51 @@ class Adapter
     }
 
     /**
+     * Returns an associative array containing all the foreign key relationships
+     * associated with the supplied table.
+     *
+     * The array has the following format:
+     *
+     * <code>
+     * array(
+     *     'column_name' => array(
+     *         'table'  => 'foreign_table',
+     *         'column' => 'foreign_column'
+     *     )
+     * )
+     * </code>
+     *
+     * @param string $tableName
+     * @return array
+     */
+    public function listForeignKeyReferences($tableName)
+    {
+        $sql = 'SELECT
+                    column_name,
+                    referenced_table_name,
+                    referenced_column_name
+                FROM information_schema.key_column_usage
+                WHERE
+                    table_name = ?
+                    AND referenced_table_name IS NOT NULL
+                    AND referenced_column_name IS NOT NULL';
+
+        $dbInfo     = $this->fetchAll($sql, array($tableName), ARRAY_A);
+        $references = array();
+
+        foreach ($dbInfo as $reference) {
+            $column = $reference['column_name'];
+
+            $references[$column] = array(
+                'table'  => $reference['referenced_table_name'],
+                'column' => $reference['referenced_column_name']
+            );
+        }
+
+        return $references;
+    }
+
+    /**
      * Returns the column descriptions for a table.
      *
      * The return value is an associative array keyed by the column name,
@@ -646,17 +691,11 @@ class Adapter
      * IDENTITY         => integer; true if column is auto-generated with unique values
      *
      * @param string $tableName
-     * @param string $schemaName OPTIONAL
      * @return array
      */
-    public function describeTable($tableName, $schemaName = null)
+    public function describeTable($tableName)
     {
-        if ($schemaName) {
-            $sql = 'DESCRIBE ' . $this->quoteIdentifier("$schemaName.$tableName", true);
-        } else {
-            $sql = 'DESCRIBE ' . $this->quoteIdentifier($tableName, true);
-        }
-
+        $sql    = 'DESCRIBE ' . $this->quoteIdentifier($tableName, true);
         $result = $this->fetchAll($sql, array(), ARRAY_A);
         $desc   = array();
 

@@ -5,5 +5,6 @@ return array(
         'singular' => '{{singular}}',
         'plural'   => '{{plural}}'
     ),
-    'columns' => {{columns}}
+    'columns' => {{columns}},
+    'references' => {{references}}
 );
