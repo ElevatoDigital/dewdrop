@@ -24,20 +24,6 @@ class DewdropTest extends CommandAbstract
     protected $phpunit = null;
 
     /**
-     * Where you'd like to generate an HTML code coverage report for the tests.
-     *
-     * @var string
-     */
-    protected $coverageHtml;
-
-    /**
-     * If/where you'd like to generate a JSON log of the tests
-     *
-     * @var string
-     */
-    protected $logJson;
-
-    /**
      * Set basic command information, arguments and examples
      *
      * @inheritdoc
@@ -48,23 +34,12 @@ class DewdropTest extends CommandAbstract
             ->setDescription("Run the Dewdrop library's unit tests")
             ->setCommand('dewdrop-test')
             ->addAlias('test-dewdrop')
-            ->addAlias('phpunit-dewdrop');
+            ->addAlias('phpunit-dewdrop')
+            ->setSupportFallbackArgs(true);
 
         $this->addArg(
             'phpunit',
             'The location of the PHPUnit executable',
-            self::ARG_OPTIONAL
-        );
-
-        $this->addArg(
-            'coverage-html',
-            "The location where you'd like to generate an HTML code coverage report",
-            self::ARG_OPTIONAL
-        );
-
-        $this->addArg(
-            'log-json',
-            "The location where you'd like to geneartion a JSON test log",
             self::ARG_OPTIONAL
         );
     }
@@ -83,33 +58,6 @@ class DewdropTest extends CommandAbstract
     }
 
     /**
-     * Set the path where you would like HTML code coverage reports to be
-     * saved
-     *
-     * @param string $coverageHtml
-     * @return \Dewdrop\Cli\Command\DewdropTest
-     */
-    public function setCoverageHtml($coverageHtml)
-    {
-        $this->coverageHtml = $coverageHtml;
-
-        return $this;
-    }
-
-    /**
-     * Set the path where you would like JSON test logs to be saved
-     *
-     * @param string $logJson
-     * @return \Dewdrop\Cli\Command\DewdropTest
-     */
-    public function setLogJson($logJson)
-    {
-        $this->logJson = $logJson;
-
-        return $this;
-    }
-
-    /**
      * Run PHPUnit on the Dewdrop library tests folder.
      *
      * @return void
@@ -120,27 +68,14 @@ class DewdropTest extends CommandAbstract
             $this->phpunit = $this->autoDetectExecutable('phpunit');
         }
 
-        $logJson = ' ';
-
-        if (null !== $this->logJson) {
-            $logJson = ' --log-json=' . escapeshellarg($this->evalPathArgument($this->logJson)) . ' ';
-        }
-
         $testPath = $this->paths->getLib() . '/tests';
 
         $cmd = sprintf(
-            '%s%s -c %s',
+            '%s -c %s %s',
             $this->phpunit,
-            $logJson,
-            escapeshellarg($testPath . '/phpunit.xml')
+            escapeshellarg($testPath . '/phpunit.xml'),
+            $this->getFallbackArgString()
         );
-
-        if ($this->coverageHtml) {
-            $cmd .= sprintf(
-                ' --coverage-html=%s',
-                escapeshellarg($this->evalPathArgument($this->coverageHtml))
-            );
-        }
 
         $cmd .= ' ' . escapeshellarg($testPath);
 

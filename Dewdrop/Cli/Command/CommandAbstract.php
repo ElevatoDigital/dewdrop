@@ -131,6 +131,25 @@ abstract class CommandAbstract
     private $args = array();
 
     /**
+     * Whether this command supports passing along any unrecognized arguments to
+     * another command.  For example, if your CLI command is a thin wrapper
+     * around phpunit, you could pass all unrecognized arguments to phpunit so
+     * that the Dewdrop user has the full capabilities of phpunit available to
+     * them.
+     *
+     * @var boolean
+     */
+    private $supportFallbackArgs = false;
+
+    /**
+     * Any unrecognized arguments that should be passed along to the an
+     * underlying/wrapped command.
+     *
+     * @var array
+     */
+    private $fallbackArgs = array();
+
+    /**
      * Examples of valid usage for this command.
      *
      * @var array
@@ -216,50 +235,54 @@ abstract class CommandAbstract
      * argument".  See the documentation for the $primaryArgument property for
      * more information about that feature.
      *
-     * @param array $input
+     * @param array $args
      *
      * @return boolean Whether args were fully parsed and command can be executed.
      */
-    public function parseArgs($input)
+    public function parseArgs($args)
     {
         // Which args have been set while parsing
         $argsSet = array();
 
-        foreach ($input as $index => $segment) {
+        foreach ($args as $index => $input) {
             // In this loop, we're only interested in input indicated an argument name
-            if (0 !== strpos($segment, '-')) {
+            if (0 !== strpos($input, '-')) {
                 continue;
             }
 
             // If we encounter the --help argument, display command help and stop parsing
-            if (0 === stripos($segment, '--help')) {
+            if (0 === stripos($input, '--help')) {
                 $this->help();
                 return false;
             }
 
             // Replace any "-" character at beginning of input
-            $segment = preg_replace('/^-+/', '', $segment);
+            $segment = preg_replace('/^-+/', '', $input);
 
             if (false !== strpos($segment, '=')) {
                 // If there's an equal sign present, our name and value are readily available
                 list($name, $value) = explode('=', $segment);
 
-                unset($input[$index]);
+                unset($args[$index]);
             } else {
                 // Otherwise, we need to look to the next input segment for the value
                 $name  = $segment;
                 $next  = $index + 1;
 
                 // The next input segment is only the value if it doesn't start with "-"
-                if (isset($input[$next]) && !preg_match('/^-/', $input[$next])) {
-                    $value = $input[$next];
+                if (isset($args[$next]) && !preg_match('/^-/', $args[$next])) {
+                    $value = $args[$next];
                 } else {
                     $this->abort('No value given for argument "' . $name . '"');
                     return false;
                 }
 
-                unset($input[$index]);
-                unset($input[$next]);
+                unset($args[$index]);
+                unset($args[$next]);
+            }
+
+            if (0 === strpos($value, '~')) {
+                $value = $this->evalPathArgument($value);
             }
 
             $name     = strtolower($name);
@@ -286,14 +309,23 @@ abstract class CommandAbstract
             }
 
             if (!$selected) {
-                $this->abort('Attempting to set unknown argument "' . $name . '"');
-                return false;
+                if (!$this->supportFallbackArgs) {
+                    $this->abort('Attempting to set unknown argument "' . $name . '"');
+                    return false;
+                } else {
+                    if (false !== strpos($input, '=')) {
+                        $this->fallbackArgs[] = $input;
+                    } else {
+                        $this->fallbackArgs[] = $name;
+                        $this->fallbackArgs[] = $value;
+                    }
+                }
             }
         }
 
         // If after matching named args, there is one bit of input left, assign it to our primary arg
-        if ($this->primaryArg && !in_array($this->primaryArg, $argsSet) && 1 === count($input)) {
-            $this->setArgValue($this->primaryArg, current($input));
+        if ($this->primaryArg && !in_array($this->primaryArg, $argsSet) && 1 === count($args)) {
+            $this->setArgValue($this->primaryArg, current($args));
 
             $argsSet[] = $this->primaryArg;
             $input     = array();
@@ -421,6 +453,20 @@ abstract class CommandAbstract
     }
 
     /**
+     * Set whether this command supports fallback args.
+     *
+     * @see $supportFallbackArgs
+     * @param boolean $supportFallbackArgs
+     * @return \Dewdrop\Cli\Command\CommandAbstract
+     */
+    public function setSupportFallbackArgs($supportFallbackArgs)
+    {
+        $this->supportFallbackArgs = $supportFallbackArgs;
+
+        return $this;
+    }
+
+    /**
      * Add an example usage for this command.  These are displayed in the
      * command's help content.
      *
@@ -523,6 +569,18 @@ abstract class CommandAbstract
         }
 
         return $this;
+    }
+
+    /**
+     * Get a string representing all the args that were not recognized directly
+     * by this command and should be passed along to the underlying/wrapped
+     * command.
+     *
+     * @return string
+     */
+    protected function getFallbackArgString()
+    {
+        return implode(' ', $this->fallbackArgs);
     }
 
     /**
