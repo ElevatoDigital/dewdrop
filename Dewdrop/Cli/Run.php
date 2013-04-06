@@ -33,6 +33,7 @@ class Run
         'Dbdeploy',
         'DbMetadata',
         'Lint',
+        'Package',
         'GenAdminComponent',
         'GenDbTable',
         'DewdropTest',
