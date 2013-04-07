@@ -316,7 +316,13 @@ abstract class CommandAbstract
                     if (false !== strpos($input, '=')) {
                         $this->fallbackArgs[] = $input;
                     } else {
-                        $this->fallbackArgs[] = $name;
+                        $prefix = '-';
+
+                        if (preg_match('/^--/', $input)) {
+                            $prefix = '--';
+                        }
+
+                        $this->fallbackArgs[] = $prefix . $name;
                         $this->fallbackArgs[] = $value;
                     }
                 }

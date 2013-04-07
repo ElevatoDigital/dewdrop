@@ -39,36 +39,17 @@ class DewdropDoc extends CommandAbstract
     {
         $this
             ->setDescription('Generate API docs for the Dewdrop libraries')
+            ->setSupportFallbackArgs(true)
             ->setCommand('dewdrop-doc')
             ->addAlias('doc-dewdrop')
             ->addAlias('phpdoc-dewdrop')
             ->addAlias('dewdrop-phpdoc');
 
         $this->addArg(
-            'output-dir',
-            'The folder to generate the docs in',
-            self::ARG_REQUIRED,
-            array('output', 'o')
-        );
-
-        $this->addArg(
             'phpdoc',
             'The path to the phpdoc binary',
             self::ARG_OPTIONAL
         );
-    }
-
-    /**
-     * Set the location of the folder you'd like to store phpdoc output in
-     *
-     * @param string $outputDir
-     * @return \Dewdrop\Cli\Command\DewdropDoc
-     */
-    public function setOutputDir($outputDir)
-    {
-        $this->outputDir = $outputDir;
-
-        return $this;
     }
 
     /**
@@ -96,10 +77,10 @@ class DewdropDoc extends CommandAbstract
         }
 
         $cmd = sprintf(
-            "%s --sourcecode=1 --defaultpackagename=Dewdrop --title=Dewdrop --ignore=*.phtml -d %s -t %s",
+            "%s --sourcecode=1 --defaultpackagename=Dewdrop --title=Dewdrop --ignore=*.phtml -d %s %s",
             $this->phpdoc,
             escapeshellarg($this->paths->getDewdropLib()),
-            escapeshellarg($this->evalPathArgument($this->outputDir))
+            $this->getFallbackArgString()
         );
 
         $this->passthru($cmd);
