@@ -345,19 +345,37 @@ class Adapter
     /**
      * Quote the bound values into the provided SQL query.
      *
+     * Because the mysql extension used by wpdb does not support prepared
+     * statements, we emulate that support here by interpolating the bound
+     * values into "?" placeholders in the SQL string.  We have to break
+     * the overall SQL command into segments containing a single "?"
+     * placeholder each so that we don't mistake "?" characters in previously
+     * bound values as new placeholders.
+     *
      * @param string|\Dewdrop\Db\Select $sql
      * @param array $bind
      * @return string
      */
     public function prepare($sql, $bind = array())
     {
-        $sql = (string) $sql;
+        $sql   = (string) $sql;
+        $start = 0;
+        $end   = 0;
+        $out   = '';
 
         foreach ($bind as $position => $param) {
-            $sql = $this->quoteInto($sql, $param, null, 1);
+            $end     = strpos(substr($sql, $start), '?') + 1 + $end;
+            $segment = substr($sql, $start, $end - $start);
+
+            $out .= $this->quoteInto($segment, $param, null, 1);
+
+            $start = $end;
         }
 
-        return $sql;
+        // Append any unprocessed portions of the initial SQL string
+        $out .= substr($sql, $start);
+
+        return $out;
     }
 
     /**
