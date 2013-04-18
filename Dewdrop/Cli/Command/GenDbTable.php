@@ -204,14 +204,19 @@ class GenDbTable extends CommandAbstract
      */
     protected function getDbRevision()
     {
-        $current = (int) $this->runner->connectDb()->fetchOne(
-            "SELECT MAX(change_number) FROM dbdeploy_changelog WHERE delta_set = 'plugin'"
-        );
+        $path   = $this->paths->getDb();
+        $files  = glob("{$path}/*.sql");
+        $latest = 0;
 
-        return sprintf(
-            '%05s',
-            $current + 1
-        );
+        foreach ($files as $file) {
+            $changeNumber = (int) substr(basename($file), 0, strpos($file, '-'));
+
+            if ($changeNumber > $latest) {
+                $latest = $changeNumber;
+            }
+        }
+
+        return sprintf('%05s', $latest + 1);
     }
 
     /**
