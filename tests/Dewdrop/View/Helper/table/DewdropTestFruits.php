@@ -1,6 +1,6 @@
 <?php
 
-namespace DewdropTest;
+namespace DewdropViewHelperTest;
 
 use Dewdrop\Db\Table;
 

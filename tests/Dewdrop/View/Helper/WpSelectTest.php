@@ -106,7 +106,7 @@ class WpSelectTest extends PHPUnit_Framework_TestCase
         $db = new \Dewdrop\Db\Adapter\Mock();
 
         require_once __DIR__ . '/table/DewdropTestFruits.php';
-        $table = new \DewdropTest\DewdropTestFruits($db);
+        $table = new \DewdropViewHelperTest\DewdropTestFruits($db);
 
         $this->view->wpSelect($table->field('name'));
     }
