@@ -2,7 +2,7 @@
 
 namespace Dewdrop\Admin\Page;
 
-use Dewdrop\Db\Test\DbTestCase;
+use Dewdrop\Test\DbTestCase;
 use Dewdrop\Db\Adapter;
 use Dewdrop\Paths;
 use Dewdrop\Request;

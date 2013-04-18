@@ -1,6 +1,10 @@
 <?php
 
-class Dewdrop_Db_SelectTest extends PHPUnit_Framework_TestCase
+namespace Dewdrop\Db;
+
+use Dewdrop\Test\BaseTestCase;
+
+class SelectTest extends BaseTestCase
 {
     protected $db = null;
 

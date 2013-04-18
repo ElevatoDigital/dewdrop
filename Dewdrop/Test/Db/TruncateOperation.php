@@ -8,7 +8,7 @@
  * @license   https://github.com/DeltaSystems/dewdrop/LICENSE
  */
 
-namespace Dewdrop\Db\Test;
+namespace Dewdrop\Test\Db;
 
 /**
  * A custom truncate operation that works with tables that are referenced by

@@ -4,9 +4,10 @@ namespace Dewdrop\Fields;
 
 use Dewdrop\Db\Adapter\Mock as MockAdapter;
 use Dewdrop\Exception;
+use Dewdrop\Test\BaseTestCase;
 use Zend\InputFilter\InputFilter;
 
-class EditTest extends \PHPUnit_Framework_TestCase
+class EditTest extends BaseTestCase
 {
     private $fields;
 

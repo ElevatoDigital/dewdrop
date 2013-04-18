@@ -2,7 +2,9 @@
 
 namespace Dewdrop\View;
 
-class ViewTest extends \PHPUnit_Framework_TestCase
+use Dewdrop\Test\BaseTestCase;
+
+class ViewTest extends BaseTestCase
 {
     private $view;
 

@@ -2,7 +2,7 @@
 
 namespace Dewdrop\Db;
 
-use Dewdrop\Db\Test\DbTestCase;
+use Dewdrop\Test\DbTestCase;
 
 class AdapterTest extends DbTestCase
 {

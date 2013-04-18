@@ -2,7 +2,9 @@
 
 namespace Dewdrop;
 
-class RequestTest extends \PHPUnit_Framework_TestCase
+use Dewdrop\Test\BaseTestCase;
+
+class RequestTest extends BaseTestCase
 {
     private $request;
 

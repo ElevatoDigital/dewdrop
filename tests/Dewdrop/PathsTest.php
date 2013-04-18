@@ -2,7 +2,9 @@
 
 namespace Dewdrop;
 
-class PathsTest extends \PHPUnit_Framework_TestCase
+use Dewdrop\Test\BaseTestCase;
+
+class PathsTest extends BaseTestCase
 {
     protected $paths;
 

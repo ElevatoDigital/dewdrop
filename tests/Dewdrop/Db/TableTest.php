@@ -2,7 +2,9 @@
 
 namespace Dewdrop\Db;
 
-class TableTest extends Test\DbTestCase
+use Dewdrop\Test\DbTestCase;
+
+class TableTest extends DbTestCase
 {
     /**
      * @var \DewdropTest\DewdropTestFruits

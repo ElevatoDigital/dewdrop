@@ -2,11 +2,10 @@
 
 namespace Dewdrop\View\Helper;
 
+use Dewdrop\Test\BaseTestCase;
 use Dewdrop\View\View;
-use PHPUnit_Framework_TestCase;
-use Zend\Dom\Query as DomQuery;
 
-class WpSelectTest extends PHPUnit_Framework_TestCase
+class WpSelectTest extends BaseTestCase
 {
     private $view;
 
@@ -148,24 +147,5 @@ class WpSelectTest extends PHPUnit_Framework_TestCase
                 'name'    => 'test'
             )
         );
-    }
-
-    /**
-     * Assert that the supplied CSS selector matches the supplied HTML.
-     */
-    public function assertMatchesDomQuery($selector, $html)
-    {
-        $results = $this->queryDom($selector, $html);
-
-        $this->assertTrue(
-            count($results) > 0,
-            "The HTML output does not match the DOM query \"{$selector}\"."
-        );
-    }
-
-    public function queryDom($selector, $html)
-    {
-        $query = new DomQuery($html);
-        return $query->execute($selector);
     }
 }

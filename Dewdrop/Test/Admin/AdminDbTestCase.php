@@ -1,0 +1,65 @@
+<?php
+
+/**
+ * Dewdrop
+ *
+ * @link      https://github.com/DeltaSystems/dewdrop
+ * @copyright Delta Systems (http://deltasys.com)
+ * @license   https://github.com/DeltaSystems/dewdrop/LICENSE
+ */
+
+namespace Dewdrop\Test\Admin;
+
+use Dewdrop\Test\DbTestCase;
+
+/**
+ * All admin test case classes implement this interface to ensure that all admin
+ * test cases offer the same functionality.  We can't handle this with inheritance
+ * because we must inherit different classes for stock test cases and DB test
+ * cases.  Once we can rely on PHP 5.4.x, traits will help make this simpler.
+ */
+abstract class AdminDbTestCase extends DbTestCase implements AdminInterface
+{
+    /**
+     * Initialize the admin helper for this test case.  This should be
+     * called in your test case's setUp() method so that you can dispatch
+     * pages from your component for testing.
+     *
+     * @param string $componentFolder
+     * @param string $componentNamespace
+     * @return Dewdrop\Test\Admin\AdminInterface
+     */
+    public function initHelper($componentFolder, $componentNamespace)
+    {
+        $this->helper = new Helper($this, $componentFolder, $componentNamespace);
+    }
+
+    /**
+     * Dispatch the named page with the POST and GET values supplied to
+     * the request object.  The response object will be returned so that
+     * you can examine the output, etc.
+     *
+     * @param string $name
+     * @param array $post
+     * @param array $query
+     * @return \Dewdrop\Admin\Response
+     */
+    public function dispatchPage($name, array $post = array(), array $query = array())
+    {
+        return $this->helper->dispatchPage($name, $post, $query);
+    }
+
+    /**
+     * Get a component object.  This can be useful if you don't want to
+     * execute the full page dispatch process but instead want to interact
+     * with the component object directly or run selected portions of a
+     * page's functionality after routing.
+     *
+     * @param Request $request
+     * @return \Dewdrop\Admin\ComponentAbstract
+     */
+    public function getComponent(Request $request)
+    {
+        return $this->helper->getComponent($request);
+    }
+}

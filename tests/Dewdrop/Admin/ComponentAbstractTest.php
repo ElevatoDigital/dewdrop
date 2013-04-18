@@ -2,12 +2,13 @@
 
 namespace Dewdrop\Admin;
 
+use Dewdrop\Admin\Response;
 use Dewdrop\Db\Adapter;
 use Dewdrop\Paths;
 use Dewdrop\Request;
-use Dewdrop\Admin\Response;
+use Dewdrop\Test\BaseTestCase;
 
-class ComponentAbstractTest extends \PHPUnit_Framework_TestCase
+class ComponentAbstractTest extends BaseTestCase
 {
     private $db;
 

@@ -1,8 +1,10 @@
 <?php
 
-use Dewdrop\Inflector;
+namespace Dewdrop;
 
-class Dewdrop_InflectorTest extends PHPUnit_Framework_TestCase
+use Dewdrop\Test\BaseTestCase;
+
+class InflectorTest extends BaseTestCase
 {
     /**
      * @var \Dewdrop\Inflector
