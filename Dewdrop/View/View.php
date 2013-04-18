@@ -57,6 +57,7 @@ class View
         'wpeditrow'       => '\Dewdrop\View\Helper\WpEditRow',
         'wpinputtext'     => '\Dewdrop\View\Helper\WpInputText',
         'wpinputcheckbox' => '\Dewdrop\View\Helper\WpInputCheckbox',
+        'wpselect'        => '\Dewdrop\View\Helper\WpSelect',
         'wptitle'         => '\Dewdrop\View\Helper\WpTitle',
         'wpwrap'          => '\Dewdrop\View\Helper\WpWrap'
     );
@@ -177,6 +178,26 @@ class View
         } else {
             throw new Exception("No helper with name \"{$name}\" could be found.");
         }
+    }
+
+    /**
+     * Render a partial view.  By default, the same script path used by this
+     * view is passed along.  This escaper from this view is also passed to
+     * the partial.
+     *
+     * @param string $template
+     * @param array $data
+     * @return string
+     */
+    public function partial($template, array $data)
+    {
+        $partial = new View($this->escaper);
+
+        $partial
+            ->setScriptPath($this->scriptPath)
+            ->assign($data);
+
+        return $partial->render($template);
     }
 
     /**

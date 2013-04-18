@@ -92,11 +92,12 @@ class Standard
      * the file and class name (e.g. "Index", not "index").
      *
      * @param string $page
+     * @param array $params
      * @return \Dewdrop\Admin\ResponseHelper\Standard
      */
-    public function redirectToAdminPage($page)
+    public function redirectToAdminPage($page, array $params = array())
     {
-        $this->redirectUrl = $this->page->url($page);
+        $this->redirectUrl = $this->page->url($page, $params);
 
         return $this;
     }

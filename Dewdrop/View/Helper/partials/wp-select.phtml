@@ -1,0 +1,13 @@
+<select name="<?php echo $this->escapeHtmlAttr($this->name);?>" id="<?php echo $this->escapeHtmlAttr($this->id);?>">
+    <option value=""></option>
+    <?php
+    foreach ($this->options as $value => $title) {
+        printf(
+            '<option value="%s"%s>%s</option>',
+            $this->escapeHtmlAttr($value),
+            ($this->value === (string) $value ? ' selected="selected"' : ''),
+            $this->escapeHtml($title)
+        );
+    }
+    ?>
+</select>

@@ -14,8 +14,8 @@ use Dewdrop\Admin\Response;
 use Dewdrop\Db\Adapter;
 use Dewdrop\Paths;
 use Dewdrop\Request;
-use PHPUnit_Framework_TestCase;
 use Zend\Dom\Query as DomQuery;
+use PHPUnit_Framework_TestCase;
 
 /**
  * This class can be extended to easily test admin pages.  It allows you to

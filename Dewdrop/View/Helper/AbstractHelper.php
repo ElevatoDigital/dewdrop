@@ -10,8 +10,9 @@
 
 namespace Dewdrop\View\Helper;
 
-use Dewdrop\View\View;
 use Dewdrop\Db\Field;
+use Dewdrop\Exception;
+use Dewdrop\View\View;
 
 /**
  * A base class for view helpers.
@@ -134,6 +135,19 @@ abstract class AbstractHelper
         }
 
         return $this;
+    }
+
+    /**
+     * Get the helper name, which is the suffix at the end of the fully
+     * qualified class name after the final namespace separator ("\").
+     *
+     * @return string
+     */
+    protected function getHelperName()
+    {
+        $className = get_class($this);
+
+        return substr($className, strrpos($className, '\\') + 1);
     }
 
     /**
