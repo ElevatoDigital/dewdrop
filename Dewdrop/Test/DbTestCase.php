@@ -13,6 +13,7 @@ namespace Dewdrop\Test;
 use Dewdrop\Test\Db\TruncateOperation;
 use PHPUnit_Extensions_Database_TestCase;
 use PDO;
+use Zend\Dom\Query as DomQuery;
 
 /**
  * This class be extended in your PHPUnit tests to provide PHPUnit with a

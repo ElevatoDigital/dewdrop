@@ -126,6 +126,28 @@ abstract class ComponentAbstract
     }
 
     /**
+     * Create a page object matching the current selected page name, either
+     * supplied to this method explicitly or as returned by the
+     * determineCurrentPage() method.
+     *
+     * @param $page string
+     * @return PageAbstract
+     */
+    public function createPageObject($page = null)
+    {
+        $reflectedClass = new ReflectionClass($this);
+
+        $pageKey   = ($page ?: $this->determineCurrentPage());
+        $pageFile  = dirname($reflectedClass->getFileName()) . '/' . $pageKey . '.php';
+        $className = $reflectedClass->getNamespaceName() . '\\' . $pageKey;
+
+        require_once $pageFile;
+        $page = new $className($this, $this->request, $pageFile);
+
+        return $page;
+    }
+
+    /**
      * This is the callback we added to the "admin_menu" action in the
      * register() method.  It essentially tells WP to call this component's
      * route() method whenever the component is accessed.
@@ -426,27 +448,5 @@ abstract class ComponentAbstract
         }
 
         return (count($segments) ? '&' . implode('&', $segments) : '');
-    }
-
-    /**
-     * Create a page object matching the current selected page name, either
-     * supplied to this method explicitly or as returned by the
-     * determineCurrentPage() method.
-     *
-     * @param $page string
-     * @return PageAbstract
-     */
-    private function createPageObject($page = null)
-    {
-        $reflectedClass = new ReflectionClass($this);
-
-        $pageKey   = ($page ?: $this->determineCurrentPage());
-        $pageFile  = dirname($reflectedClass->getFileName()) . '/' . $pageKey . '.php';
-        $className = $reflectedClass->getNamespaceName() . '\\' . $pageKey;
-
-        require_once $pageFile;
-        $page = new $className($this, $this->request, $pageFile);
-
-        return $page;
     }
 }

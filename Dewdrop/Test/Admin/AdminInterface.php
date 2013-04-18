@@ -36,6 +36,28 @@ interface AdminInterface
     public function dispatchPage($name, array $post = array(), array $query = array());
 
     /**
+     * Get an object for the named page.  Allows you to play with the page outside
+     * the stock dispatch loop implemented in ComponentAbstract.
+     *
+     * @param string $name
+     * @param array $post
+     * @param array $query
+     * @return \Dewdrop\Admin\Page\PageAbstract
+     */
+    public function getPage($name, $post = array(), $query = array());
+
+    /**
+     * Complete the init and process portions of the dispatch loop so that we can
+     * return the response helper for testing.
+     *
+     * @param string $name
+     * @param array $post
+     * @param array $query
+     * @return \Dewdrop\Admin\ResponseHelper\Standard
+     */
+    public function getResponseHelper($name, $post = array(), $query = array());
+
+    /**
      * Get a component object.  This can be useful if you don't want to
      * execute the full page dispatch process but instead want to interact
      * with the component object directly or run selected portions of a
@@ -45,4 +67,11 @@ interface AdminInterface
      * @return \Dewdrop\Admin\ComponentAbstract
      */
     public function getComponent(Request $request);
+
+    /**
+     * Get a Dewdrop DB adapter.
+     *
+     * @return \Dewdrop\Db\Adapter
+     */
+    public function getDb();
 }

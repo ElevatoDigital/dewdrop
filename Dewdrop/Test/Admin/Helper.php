@@ -28,6 +28,13 @@ use wpdb;
 class Helper
 {
     /**
+     * The DB adapter used by generated components and pages.
+     *
+     * @var \Dewdrop\Db\Adapter
+     */
+    private $db;
+
+    /**
      * The PHPUnit test case this helper was created by.
      *
      * @var PHPUnit_Framework_TestCase
@@ -74,8 +81,7 @@ class Helper
      */
     public function dispatchPage($name, array $post = array(), array $query = array())
     {
-        $method    = (count($post) ? 'POST' : 'GET');
-        $request   = new Request($post, $query, $method);
+        $request   = $this->createRequest($post, $query);
         $component = $this->getComponent($request);
 
         $response = $this->testCase->getMock(
@@ -90,6 +96,48 @@ class Helper
     }
 
     /**
+     * Get an object for the named page.  Allows you to play with the page outside
+     * the stock dispatch loop implemented in ComponentAbstract.
+     *
+     * @param string $name
+     * @param array $post
+     * @param array $query
+     * @return \Dewdrop\Admin\Page\PageAbstract
+     */
+    public function getPage($name, $post = array(), $query = array())
+    {
+        $request   = $this->createRequest($post, $query);
+        $component = $this->getComponent($request);
+
+        return $component->createPageObject($name);
+    }
+
+    /**
+     * Complete the init and process portions of the dispatch loop so that we can
+     * return the response helper for testing.
+     *
+     * @param string $name
+     * @param array $post
+     * @param array $query
+     * @return \Dewdrop\Admin\ResponseHelper\Standard
+     */
+    public function getResponseHelper($name, $post = array(), $query = array())
+    {
+        $page   = $this->getPage($name, $post, $query);
+        $helper = null;
+
+        $page->init();
+
+        if ($page->shouldProcess()) {
+            $helper = $page->createResponseHelper();
+
+            $page->process($helper);
+        }
+
+        return $helper;
+    }
+
+    /**
      * Get a component object, injecting the supplied request so that we can
      * test different responses.
      *
@@ -98,15 +146,43 @@ class Helper
      */
     public function getComponent(Request $request)
     {
-        $wpdb = new wpdb(DB_USER, DB_PASSWORD, DB_NAME, DB_HOST);
-        $db   = new Adapter($wpdb);
-
         $paths = new Paths();
         $file  = $paths->getAdmin() . '/' . $this->componentFolder . '/Component.php';
 
         $className = 'Admin\\' . $this->componentNamespace . '\\Component';
 
         require_once $file;
-        return new $className($db, $paths, $request);
+        return new $className($this->getDb(), $paths, $request);
+    }
+
+    /**
+     * Get a Dewdrop DB adapter.
+     *
+     * @return \Dewdrop\Db\Adapter
+     */
+    public function getDb()
+    {
+        if (!$this->db) {
+            $wpdb     = new wpdb(DB_USER, DB_PASSWORD, DB_NAME, DB_HOST);
+            $this->db = new Adapter($wpdb);
+        }
+
+        return $this->db;
+    }
+
+    /**
+     * Create a request using the supplied POST and GET values.  If there are any
+     * POST values, we set the request method to POST.
+     *
+     * @param array $post
+     * @param arary $query
+     * @return \Dewdrop\Request
+     */
+    private function createRequest($post = array(), $query = array())
+    {
+        $method  = (count($post) ? 'POST' : 'GET');
+        $request = new Request($post, $query, $method);
+
+        return $request;
     }
 }

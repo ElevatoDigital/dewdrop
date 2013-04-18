@@ -111,10 +111,37 @@ class Standard
      */
     public function execute()
     {
+        $this
+            ->executeCallbacks()
+            ->executeSuccessMessage()
+            ->executeRedirect();
+
+        return $this;
+    }
+
+    /**
+     * Run any queued callbacks.  Normally, this will just be called by the
+     * execute() method, but sometimes in testing, you may want to selectively
+     * execute portions of the response payload.
+     *
+     * @return \Dewdrop\Admin\ResopnseHelper\Standard
+     */
+    public function executeCallbacks()
+    {
         foreach ($this->callbacks as $callback) {
             call_user_func($callback);
         }
 
+        return $this;
+    }
+
+    /**
+     * Set the success message, if one has been assigned.
+     *
+     * @return \Dewdrop\Admin\ResopnseHelper\Standard
+     */
+    public function executeSuccessMessage()
+    {
         if ($this->successMessage) {
             // No sessions in WP, so we're using a cookie for this for now
             setcookie(
@@ -123,10 +150,22 @@ class Standard
             );
         }
 
+        return $this;
+    }
+
+    /**
+     * Execute the assigned redirect.
+     *
+     * @return \Dewdrop\Admin\ResopnseHelper\Standard
+     */
+    public function executeRedirect()
+    {
         if ($this->redirectUrl) {
             wp_safe_redirect($this->redirectUrl);
             exit;
         }
+
+        return $this;
     }
 
     /**
