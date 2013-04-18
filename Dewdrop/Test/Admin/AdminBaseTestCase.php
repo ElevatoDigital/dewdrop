@@ -34,6 +34,19 @@ abstract class AdminBaseTestCase extends BaseTestCase implements AdminInterface
     }
 
     /**
+     * Whether to mock the execution of the queued response helper actions.
+     *
+     * @param boolean $mockResponseHelper
+     * @return \Dewdrop\Test\Admin\AdminInterface
+     */
+    public function setMockResponseHelper($mockResponseHelper)
+    {
+        $this->helper->setMockResponseHelper($mockResponseHelper);
+
+        return $this;
+    }
+
+    /**
      * Dispatch the named page with the POST and GET values supplied to
      * the request object.  The response object will be returned so that
      * you can examine the output, etc.

@@ -56,6 +56,13 @@ class Helper
     private $componentNamespace;
 
     /**
+     * Whether to mock the execution of response helper actions.
+     *
+     * @var boolean
+     */
+    private $mockResponseHelper = false;
+
+    /**
      * Create new helper object for the supplied test case.
      *
      * @param TestCase $testCase
@@ -67,6 +74,19 @@ class Helper
         $this->testCase           = $testCase;
         $this->componentFolder    = $componentFolder;
         $this->componentNamespace = $componentNamespace;
+    }
+
+    /**
+     * Whether to mock the execution of the queued response helper actions.
+     *
+     * @param boolean $mockResponseHelper
+     * @return \Dewdrop\Test\Admin\Helper
+     */
+    public function setMockResponseHelper($mockResponseHelper)
+    {
+        $this->mockResponseHelper = $mockResponseHelper;
+
+        return $this;
     }
 
     /**
@@ -84,9 +104,15 @@ class Helper
         $request   = $this->createRequest($post, $query);
         $component = $this->getComponent($request);
 
+        $mockedMethods = array('render');
+
+        if ($this->mockResponseHelper) {
+            $mockedMethods[] = 'executeHelper';
+        }
+
         $response = $this->testCase->getMock(
             '\Dewdrop\Admin\Response',
-            array('render', 'executeHelper'),
+            $mockedMethods,
             array()
         );
 

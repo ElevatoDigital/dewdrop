@@ -112,9 +112,14 @@ class Standard
     public function execute()
     {
         $this
-            ->executeCallbacks()
-            ->executeSuccessMessage()
-            ->executeRedirect();
+            ->executeCallbacks();
+
+        // Don't execute header modifying actions when on CLI
+        if ('cli' !== php_sapi_name()) {
+            $this
+                ->executeSuccessMessage()
+                ->executeRedirect();
+        }
 
         return $this;
     }

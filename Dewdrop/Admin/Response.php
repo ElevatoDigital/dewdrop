@@ -171,6 +171,16 @@ class Response
     }
 
     /**
+     * When this object is used as a string, return the output.
+     *
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->getOutput();
+    }
+
+    /**
      * This is separated into its own method to allow mocking of queued
      * action execution during testing.
      *
