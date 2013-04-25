@@ -196,6 +196,19 @@ abstract class Table
     }
 
     /**
+     * Allow setting of custom row class for this table.
+     *
+     * @param string $rowClass
+     * @return \Dewdrop\Db\Table
+     */
+    public function setRowClass($rowClass)
+    {
+        $this->rowClass = $rowClass;
+
+        return $this;
+    }
+
+    /**
      * Override the default singular title.
      *
      * @param string $singularTitle

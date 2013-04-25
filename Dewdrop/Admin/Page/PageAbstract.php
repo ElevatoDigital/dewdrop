@@ -127,7 +127,10 @@ abstract class PageAbstract
     /**
      * Assign variables to your page's view and render the output.
      */
-    abstract public function render();
+    public function render()
+    {
+
+    }
 
     /**
      * You can call renderView() directly from your render() method.  Or, if
