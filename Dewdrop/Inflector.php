@@ -177,6 +177,31 @@ class Inflector
     }
 
     /**
+     * Generate a list, separated by commas and the specified conjunction,
+     * depending on the number of items provided.
+     *
+     * @param array $items
+     * @param string $conjunction
+     * @return string
+     */
+    public function listWithConjunction(array $items, $conjunction = 'and')
+    {
+        if (1 === count($items)) {
+            return current($items);
+        }
+
+        $last = array_pop($items);
+
+        if (1 === count($items)) {
+            $list = current($items);
+        } else {
+            $list = implode(', ', $items);
+        }
+
+        return $list . ' ' . $conjunction . ' ' . $last;
+    }
+
+    /**
      * Converts an underscored or CamelCase word into a English
      * sentence.
      *
