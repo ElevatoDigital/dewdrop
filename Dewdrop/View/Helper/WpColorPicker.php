@@ -73,24 +73,51 @@ class WpColorPicker extends AbstractHelper
      */
     public function directArray(array $options)
     {
+        extract($this->prepareOptionsArray($options));
+
+        if (null === $id) {
+            $id = $name;
+        }
+
+        if (null === $defaultColor) {
+            $defaultColor = '#ffffff';
+        }
+
         wp_enqueue_style('wp-color-picker');
         wp_enqueue_script('wp-color-picker');
 
         $this->view->inlineScript(
             'wp-color-picker.js',
             array(
-                'defaultColor' => $options['defaultColor'],
-                'palettes'     => $options['palettes'],
-                'id'           => $options['id']
+                'defaultColor' => $defaultColor,
+                'palettes'     => $palettes,
+                'id'           => $id
             )
         );
 
         return $this->view->wpInputText(
             array(
-                'name'    => $options['name'],
-                'id'      => $options['id'],
-                'value'   => $options['value']
+                'name'    => $name,
+                'id'      => $id,
+                'value'   => $value
             )
         );
+    }
+
+    /**
+     * Prepare the options array for the directArray() method, checking that
+     * required options are set.
+     *
+     * @param array $options
+     * @return array
+     */
+    private function prepareOptionsArray(array $options)
+    {
+        $this
+            ->checkRequired($options, array('name', 'value'))
+            ->ensurePresent($options, array('id', 'defaultColor'))
+            ->ensureArray($options, array('palettes'));
+
+        return $options;
     }
 }

@@ -142,4 +142,28 @@ class WpColorPickerTest extends BaseTestCase
         $this->assertMatchesDomQuery('input[id="dewdrop_test_fruits_name"]', $out);
         $this->assertContains('ff0000', $out);
     }
+
+    /**
+     * @expectedException \Dewdrop\Exception
+     */
+    public function testLeavingOutNameArgumentThrowsException()
+    {
+        $out = $this->view->wpColorPicker(
+            array(
+                'value' => null
+            )
+        );
+    }
+
+    /**
+     * @expectedException \Dewdrop\Exception
+     */
+    public function testLeavingOutValueArgumentThrowsException()
+    {
+        $out = $this->view->wpColorPicker(
+            array(
+                'name' => 'test'
+            )
+        );
+    }
 }
