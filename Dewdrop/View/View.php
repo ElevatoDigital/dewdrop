@@ -287,6 +287,19 @@ class View
     }
 
     /**
+     * This will encode the supplied input as JSON using flags that
+     * make it safe to embed that JSON in an HTML context like an
+     * inline script block.
+     *
+     * @param mixed $input
+     * @return string
+     */
+    public function encodeJsonHtmlSafe($input)
+    {
+        return json_encode($input, JSON_HEX_QUOT|JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS);
+    }
+
+    /**
      * Escape a URL.
      *
      * @see \Zend\Escaper\Escaper::escapeUrl
