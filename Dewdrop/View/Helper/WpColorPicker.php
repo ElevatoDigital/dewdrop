@@ -48,6 +48,23 @@ class WpColorPicker extends AbstractHelper
     }
 
     /**
+     * Render the color picker with explicitly passed arguments.
+     *
+     * @param string $name
+     * @param string $value
+     * @return string
+     */
+    public function directExplicit($name, $value)
+    {
+        return $this->directArray(
+            array(
+                'name'  => $name,
+                'value' => $value
+            )
+        );
+    }
+
+    /**
      * Use the supplied key-value options array to render the color
      * picker.
      *
@@ -57,7 +74,6 @@ class WpColorPicker extends AbstractHelper
     public function directArray(array $options)
     {
         wp_enqueue_style('wp-color-picker');
-
         wp_enqueue_script('wp-color-picker');
 
         $this->view->inlineScript(
