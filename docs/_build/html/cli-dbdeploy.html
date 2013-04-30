@@ -1,0 +1,190 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>dbdeploy &mdash; Dewdrop 0.8 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.8',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Dewdrop 0.8 documentation" href="index.html" />
+    <link rel="up" title="CLI" href="cli.html" />
+    <link rel="prev" title="CLI" href="cli.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="cli.html" title="CLI"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Dewdrop 0.8 documentation</a> &raquo;</li>
+          <li><a href="cli.html" accesskey="U">CLI</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <span class="target" id="module-dewdrop"></span><span class="target" id="module-dewdrop.cli"></span><div class="section" id="dbdeploy">
+<h1>dbdeploy<a class="headerlink" href="#dbdeploy" title="Permalink to this headline">¶</a></h1>
+<p>The dbdeploy command uses a log to track and manage changes to your database
+schema and fixtures.  When running the dbdeploy command, it checks the
+<tt class="docutils literal"><span class="pre">dbdeploy_changelog</span></tt> table against the available SQL revision files in
+your plugin, and applies those scripts that aren&#8217;t already present in the
+change log.</p>
+<p>dbdeploy can be very useful when you&#8217;re coordinating changes to your database
+with other developers or even just as a single developer running your plugin
+in multiple environments (e.g. developing in one environment, testing in a
+staging environment, and then ultimately deploying to production).</p>
+<p>The dbdeploy command will look for SQL change files in your plugin&#8217;s <tt class="docutils literal"><span class="pre">db/</span></tt>
+folder.  If expects the file names to be of the form
+&#8220;xxxxx-brief-description-of-change.sql&#8221; where &#8220;xxxxx&#8221; is the revision
+number padded with zeros.  For example, your change file might be named
+&#8220;00003-add-table-for-whozeewhatzits.sql&#8221;.</p>
+<div class="section" id="basic-usage">
+<h2>Basic Usage<a class="headerlink" href="#basic-usage" title="Permalink to this headline">¶</a></h2>
+<p>Apply all available revisions:</p>
+<div class="highlight-python"><pre>./dewdrop dbdeploy</pre>
+</div>
+<p>Check to see what revision is currently applied and which are available:</p>
+<div class="highlight-python"><pre>./dewdrop dbdeploy status</pre>
+</div>
+</div>
+<div class="section" id="creating-new-tables">
+<h2>Creating New Tables<a class="headerlink" href="#creating-new-tables" title="Permalink to this headline">¶</a></h2>
+<p>A couple notes about creating new database tables.  First, we highly
+recommend that you create your tables using the InnoDB storage engine
+and the UTF-8 character set:</p>
+<div class="highlight-python"><pre>CREATE TABLE whozeewhatzits (
+    whozeewhatzit_id INTEGER PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(128) NOT NULL,
+    foo_id INTEGER NOT NULL,
+    INDEX (name),
+    INDEX (foo_id),
+    FOREIGN KEY (foo_id) REFERENCES foos (foo_id)
+) ENGINE=InnoDB CHARSET=utf8;</pre>
+</div>
+<p>Second, Dewdrop also provides the <tt class="docutils literal"><span class="pre">gen-db-table</span></tt> command, which will
+create a new dbdeploy SQL file and a model class for your new table.
+After running <tt class="docutils literal"><span class="pre">gen-db-table</span></tt>, you&#8217;ll can edit the SQL file to include
+the columns and indexes you need.</p>
+</div>
+<div class="section" id="dbdeploy-automatically-updates-db-metadata">
+<h2>dbdeploy Automatically Updates DB Metadata<a class="headerlink" href="#dbdeploy-automatically-updates-db-metadata" title="Permalink to this headline">¶</a></h2>
+<p>Once it is done applying available revisions, dbdeploy will execute the
+<tt class="docutils literal"><span class="pre">db-metadata</span></tt> command automatically, updating the metadata definition
+files used by Dewdrop DB.</p>
+</div>
+<div class="section" id="back-filling-the-log">
+<h2>Back-filling the Log<a class="headerlink" href="#back-filling-the-log" title="Permalink to this headline">¶</a></h2>
+<p>If for some reason your changelog has become out of sync with the actual
+state of your database schema, you can back-fill the log so that it
+will reflect the fact that some revisions have alrady been applied.  This
+can be useful if, for example, someone has manually applied a schema
+revision rather than using dbdeploy.  To back-fill the changelog up to
+revision number 5, run:</p>
+<div class="highlight-python"><pre>./dewdrop dbdeploy backfill --revision=5 --changeset=plugin</pre>
+</div>
+</div>
+<div class="section" id="dbdeploy-manages-multiple-change-sets">
+<h2>dbdeploy Manages Multiple Change Sets<a class="headerlink" href="#dbdeploy-manages-multiple-change-sets" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">db/</span></tt> folder of your plugin is actually only one of 3 change sets
+managed by Dewdrop&#8217;s dbdeploy command.  Whenever you run dbdeploy, it will
+also check for revisions to the DB tables need by Dewdrop&#8217;s core features
+and Dewdrop&#8217;s unit tests.  You generally should not need to worry about
+these changes.  You&#8217;ll notice these separate change sets when checking
+dbdeploy&#8217;s status or updating Dewdrop, but otherwise, you will not need
+to interact with them unless you are working on Dewdrop&#8217;s core functionality.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">dbdeploy</a><ul>
+<li><a class="reference internal" href="#basic-usage">Basic Usage</a></li>
+<li><a class="reference internal" href="#creating-new-tables">Creating New Tables</a></li>
+<li><a class="reference internal" href="#dbdeploy-automatically-updates-db-metadata">dbdeploy Automatically Updates DB Metadata</a></li>
+<li><a class="reference internal" href="#back-filling-the-log">Back-filling the Log</a></li>
+<li><a class="reference internal" href="#dbdeploy-manages-multiple-change-sets">dbdeploy Manages Multiple Change Sets</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="cli.html"
+                        title="previous chapter">CLI</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/cli-dbdeploy.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="cli.html" title="CLI"
+             >previous</a> |</li>
+        <li><a href="index.html">Dewdrop 0.8 documentation</a> &raquo;</li>
+          <li><a href="cli.html" >CLI</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Delta Systems Group.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>
