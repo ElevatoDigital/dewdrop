@@ -50,8 +50,10 @@ class View
      */
     private $helperClasses = array(
         'adminurl'        => '\Dewdrop\View\Helper\AdminUrl',
+        'inlinescript'    => '\Dewdrop\View\Helper\InlineScript',
         'wpadminnotice'   => '\Dewdrop\View\Helper\WpAdminNotice',
         'wpcheckboxlist'  => '\Dewdrop\View\Helper\WpCheckboxList',
+        'wpcolorpicker'   => '\Dewdrop\View\Helper\WpColorPicker',
         'wpeditform'      => '\Dewdrop\View\Helper\WpEditForm',
         'wpeditor'        => '\Dewdrop\View\Helper\WpEditor',
         'wpeditrow'       => '\Dewdrop\View\Helper\WpEditRow',
