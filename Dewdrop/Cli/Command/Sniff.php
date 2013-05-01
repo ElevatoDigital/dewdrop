@@ -96,7 +96,9 @@ class Sniff extends CommandAbstract
         }
 
         $cmd = sprintf(
-            '%s --standard=%s --ignore=*/Zend/* --ignore=*/tests/* --ignore=*/models/metadata/* %s %s',
+            '%s --standard=%s --extensions=php '
+            . '--ignore=*/Zend/* --ignore=*/tests/* --ignore=*/models/metadata/* '
+            . '%s %s',
             $this->phpcs,
             escapeshellarg($this->standard),
             $this->getFallbackArgString(),
