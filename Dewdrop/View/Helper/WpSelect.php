@@ -41,9 +41,13 @@ class WpSelect extends AbstractHelper
      */
     public function directField(Field $field)
     {
-        throw new Exception(
-            'Passing a field to WpSelect is not currently supported because '
-            . 'there is no OptionPairs API.'
+        return $this->directArray(
+            array(
+                'name'    => $field->getControlName(),
+                'id'      => $field->getHtmlId(),
+                'options' => $field->getOptionPairs()->fetch(),
+                'value'   => $field->getValue()
+            )
         );
     }
 

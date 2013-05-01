@@ -10,6 +10,7 @@
 
 namespace Dewdrop\Db;
 
+use Dewdrop\Fields\OptionPairs;
 use Zend\InputFilter\Input;
 use Zend\Filter;
 use Zend\Validator;
@@ -109,6 +110,14 @@ class Field
     private $inputFilter;
 
     /**
+     * A \Dewdrop\Fields\OptionPairs object for use in retrieving key-value
+     * pair options for a foreign key field.
+     *
+     * @var \Dewdrop\Fields\OptionPairs
+     */
+    private $optionPairs;
+
+    /**
      * Whether this field is required or not
      *
      * @var boolean
@@ -129,6 +138,16 @@ class Field
         $this->table    = $table;
         $this->name     = $name;
         $this->metadata = $metadata;
+    }
+
+    /**
+     * Get a reference to the table that generated this field object.
+     *
+     * @return \Dewdrop\Db\Table
+     */
+    public function getTable()
+    {
+        return $this->table;
     }
 
     /**
@@ -330,6 +349,22 @@ class Field
         }
 
         return $this->inputFilter;
+    }
+
+    /**
+     * Get an OptionPairs object for this field.  Allows you to easily
+     * fetch key-value option pairs for foreign keys.
+     *
+     * @return \Dewdrop\Fields\OptionPairs
+     */
+    public function getOptionPairs()
+    {
+        if (null === $this->optionPairs) {
+            $this->optionPairs = new OptionPairs($this->table->getAdapter());
+            $this->optionPairs->setField($this);
+        }
+
+        return $this->optionPairs;
     }
 
     /**
