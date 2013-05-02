@@ -96,6 +96,11 @@ class Wiring
      */
     public function autoRegisterAdminComponents()
     {
+        // Don't both registering components if we're not in the WP admin area
+        if (!is_admin()) {
+            return;
+        }
+
         $path = $this->paths->getAdmin();
         $dir  = opendir($path);
 
