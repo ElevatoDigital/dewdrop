@@ -102,6 +102,9 @@ abstract class ComponentAbstract
     public function register()
     {
         add_action('admin_menu', array($this, 'registerMenuPage'));
+
+        // Also allow routing via WP's ajax facility to avoid rendering layout
+        add_action('wp_ajax_' . $this->getSlug(), array($this, 'route'));
     }
 
     /**
