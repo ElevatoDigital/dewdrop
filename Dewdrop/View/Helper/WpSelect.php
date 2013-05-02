@@ -32,12 +32,11 @@ class WpSelect extends AbstractHelper
     }
 
     /**
-     * Because we don't yet have an OptionPairs API added to Dewdrop\Db\Field,
-     * we don't support passing a field directly to this view helper to generate
-     * the <select>.
+     * Use a \Dewdrop\Db\Field object to render the select tag.  The OptionPairs
+     * API will be used to retrieve the actual options allowed for this control.
      *
      * @param Field $field
-     * @throws \Dewdrop\Exception
+     * @return string
      */
     public function directField(Field $field)
     {
