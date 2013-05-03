@@ -10,7 +10,7 @@
 
 namespace Dewdrop\View\Helper;
 
-use \Dewdrop\Db\Field;
+use \Dewdrop\Db\ManyToMany\Field;
 use \Dewdrop\Exception;
 
 /**
@@ -33,17 +33,21 @@ class WpCheckboxList extends AbstractHelper
     }
 
     /**
-     * Throw an exception if a field object is passed to this helper.
-     *
-     * We will likely have field support for this view helper once an
-     * abstraction is in place for managing many-to-many relationships.
+     * Use a ManyToMany field to render the checkbox list.
      *
      * @param Field $field
      * @return string
      */
     protected function directField(Field $field)
     {
-        throw new Exception('Passing a field object to WpCheckboxList is not currently supported.');
+        return $this->directArray(
+            array(
+                'name'    => $field->getControlName(),
+                'id'      => $field->getHtmlId(),
+                'value'   => $field->getValue(),
+                'options' => $field->getOptionPairs()->fetch()
+            )
+        );
     }
 
     /**

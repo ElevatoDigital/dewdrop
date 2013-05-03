@@ -11,8 +11,8 @@
 namespace Dewdrop\Db;
 
 use Dewdrop\Fields\OptionPairs;
-use Zend\InputFilter\Input;
 use Zend\Filter;
+use Zend\InputFilter\Input;
 use Zend\Validator;
 
 /**
@@ -23,6 +23,37 @@ use Zend\Validator;
  */
 class Field
 {
+    /**
+     * A \Dewdrop\Fields\OptionPairs object for use in retrieving key-value
+     * pair options for a foreign key field.
+     *
+     * @var \Dewdrop\Fields\OptionPairs
+     */
+    protected $optionPairs;
+
+    /**
+     * The table this field is associated with.
+     *
+     * @var \Dewdrop\Db\Table
+     */
+    protected $table;
+
+    /**
+     * The row this field is associated with.  There will not always be a row
+     * associated with the field.  The getValue() and setValue() methods will
+     * not be functional unless a row is present.
+     *
+     * @var \Dewdrop\Db\Row
+     */
+    protected $row;
+
+    /**
+     * Whether this field is required or not
+     *
+     * @var boolean
+     */
+    protected $required;
+
     /**
      * How this field should be labeled when included in UI such as form fields
      * or table headers.
@@ -38,22 +69,6 @@ class Field
      * @var string
      */
     private $note = '';
-
-    /**
-     * The table this field is associated with.
-     *
-     * @var \Dewdrop\Db\Table
-     */
-    private $table;
-
-    /**
-     * The row this field is associated with.  There will not always be a row
-     * associated with the field.  The getValue() and setValue() methods will
-     * not be functional unless a row is present.
-     *
-     * @var \Dewdrop\Db\Row
-     */
-    private $row;
 
     /**
      * The name of the column this field represents.
@@ -108,21 +123,6 @@ class Field
      * @var \Zend\InputFilter\Filter
      */
     private $inputFilter;
-
-    /**
-     * A \Dewdrop\Fields\OptionPairs object for use in retrieving key-value
-     * pair options for a foreign key field.
-     *
-     * @var \Dewdrop\Fields\OptionPairs
-     */
-    private $optionPairs;
-
-    /**
-     * Whether this field is required or not
-     *
-     * @var boolean
-     */
-    private $required;
 
     /**
      * Create new field with a reference to the table that instantiated it,
@@ -361,7 +361,17 @@ class Field
     {
         if (null === $this->optionPairs) {
             $this->optionPairs = new OptionPairs($this->table->getAdapter());
-            $this->optionPairs->setField($this);
+
+            $ref = $this->table->getMetadata('references', $this->name);
+
+            if ($ref) {
+                $this->optionPairs->setOptions(
+                    array(
+                        'tableName'   => $ref['table'],
+                        'valueColumn' => $ref['column']
+                    )
+                );
+            }
         }
 
         return $this->optionPairs;
@@ -425,7 +435,7 @@ class Field
      * @param Input $inputFilter
      * @return void
      */
-    private function addFiltersAndValidatorsUsingMetadata(Input $inputFilter)
+    protected function addFiltersAndValidatorsUsingMetadata(Input $inputFilter)
     {
         $validators = $inputFilter->getValidatorChain();
         $filters    = $inputFilter->getFilterChain();

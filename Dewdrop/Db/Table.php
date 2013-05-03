@@ -12,6 +12,8 @@ namespace Dewdrop\Db;
 
 use Dewdrop\Paths;
 use Dewdrop\Exception;
+use Dewdrop\Db\ManyToMany\Field as ManyToManyField;
+use Dewdrop\Db\ManyToMany\Relationship as ManyToManyRelationship;
 use Dewdrop\Db\Row;
 use Dewdrop\Db\Field;
 
@@ -28,6 +30,14 @@ abstract class Table
      * @var array
      */
     private $fields = array();
+
+    /**
+     * The ManyToMany relationships that have been added to this table.  These
+     * relationships integrate with the other aspects of the DB API.
+     *
+     * @var array
+     */
+    private $manyToMany = array();
 
     /**
      * Callbacks assigned during the init() method of your table sub-class,
@@ -121,6 +131,106 @@ abstract class Table
     abstract public function init();
 
     /**
+     * Register a many-to-many relationship with this table.  This will allow
+     * you to retrieve and set the values for this relationship from row
+     * objects and also generate field objects representing this relationship.
+     *
+     * Generally, supplying the relationship name and the cross-reference table
+     * name are all you need to do to register the relationship.  However, if
+     * Dewdrop cannot determine the additional pieces of information needed to
+     * support the relationship, you can specify those manually using the
+     * additional options array.
+     *
+     * Once registered, you can use the relationship name you supplied as if it
+     * was a normal field.  So, you can do things like:
+     *
+     * <pre>
+     * $row->field('my_relationship_name');
+     * </pre>
+     *
+     * Or:
+     *
+     * <pre>
+     * $this->insert(
+     *     array(
+     *         'name'                 => 'Concrete DB column value',
+     *         'foo_id'               => 2,
+     *         'my_relationship_name' => array(1, 2, 3)
+     *     )
+     * );
+     * </pre>
+     *
+     * In the latter example, Dewdrop will automatically save the cross-reference
+     * table values following the primary INSERT query.
+     *
+     * @param string $relationshipName
+     * @param string $xrefTableName
+     * @param array $additionalOptions
+     */
+    public function hasMany($relationshipName, $xrefTableName, array $additionalOptions = array())
+    {
+        $relationship = new ManyToManyRelationship($this, $xrefTableName);
+
+        $relationship->setOptions($additionalOptions);
+
+        if (array_key_exists($relationshipName, $this->manyToMany)) {
+            throw new Exception(
+                "Db\\Table: A ManyToMany relationship named \"$relationshipName\" already"
+                . 'exists on this table.  Please supply an alternative relationship name '
+                . 'as the second parameter to the hasMany() method.'
+            );
+        }
+
+        $this->manyToMany[$relationshipName] = $relationship;
+
+        return $this;
+    }
+
+    /**
+     * Determine if this table has a many-to-many relationship with the given
+     * name.
+     *
+     * @param string $name
+     * @return boolean
+     */
+    public function hasManyToManyRelationship($name)
+    {
+        return array_key_exists($name, $this->manyToMany);
+    }
+
+    /**
+     * Retrieve the many-to-many relationship with the given name.  You should
+     * call hasManyToManyRelationship() prior to this to ensure the relationship
+     * exists.
+     *
+     * @param string $name
+     * @return \Dewdrop\Db\ManyToMany\Relationship
+     */
+    public function getManyToManyRelationship($name)
+    {
+        return $this->manyToMany[$name];
+    }
+
+    /**
+     * Get an array representing the valid column names that can be get or set
+     * on a row object tied to this table.  This will include the concrete
+     * columns present in the physical database table and the many-to-many
+     * registered with and managed by this table object.
+     *
+     * @return array
+     */
+    public function getRowColumns()
+    {
+        $columns = array_keys($this->getMetadata('columns'));
+
+        foreach ($this->manyToMany as $name => $relationship) {
+            $columns[] = $name;
+        }
+
+        return $columns;
+    }
+
+    /**
      * Retrieve the field object associated with the specified name.
      *
      * @param string $name
@@ -134,11 +244,15 @@ abstract class Table
 
         $metadata = $this->getMetadata('columns', $name);
 
-        if (!$metadata) {
-            throw new Exception("Attempting to retrieve unknown column \"{$name}\"");
+        if ($metadata) {
+            $field = new Field($this, $name, $metadata);
+        } elseif (array_key_exists($name, $this->manyToMany)) {
+            $rel   = $this->manyToMany[$name];
+            $field = new ManyToManyField($this, $name, $rel->getFieldMetadata());
+            $field->setManyToManyRelationship($rel);
+        } else {
+            throw new Exception("Db\\Table: Attempting to retrieve unknown column \"{$name}\"");
         }
-
-        $field = new Field($this, $name, $metadata);
 
         // Store reference to field so we can return the same instance on subsequent calls
         $this->fields[$name] = $field;
@@ -161,10 +275,8 @@ abstract class Table
      */
     public function customizeField($name, $callback)
     {
-        $meta = $this->getMetadata('columns');
-
-        if (!isset($meta[$name])) {
-            throw new Exception("Setting customization callback for unknown column \"{$name}\"");
+        if (!$this->getMetadata('columns', $name) && !array_key_exists($name, $this->manyToMany)) {
+            throw new Exception("Db\\Table: Setting customization callback for unknown column \"{$name}\"");
         }
 
         $this->fieldCustomizationCallbacks[$name] = $callback;
@@ -298,7 +410,7 @@ abstract class Table
 
             if (!file_exists($metadataPath)) {
                 throw new Exception(
-                    'Table metadata not found.  '
+                    'Db\\Table: Table metadata not found.  '
                     . 'Run "db-metadata" command to generate it.'
                 );
             }
@@ -307,7 +419,7 @@ abstract class Table
 
             if (!is_array($this->metadata)) {
                 throw new Exception(
-                    'Failed to retrieve table metadata not found.  '
+                    'Db\\Table: Failed to retrieve table metadata not found.  '
                     . 'Run "db-metadata" command to generate it.'
                 );
             }
@@ -385,7 +497,14 @@ abstract class Table
      */
     public function insert(array $data)
     {
-        return $this->db->insert($this->tableName, $data);
+        $result = $this->db->insert(
+            $this->tableName,
+            $this->filterDataArrayForPhysicalColumns($data)
+        );
+
+        $this->saveManyToManyRelationships($data);
+
+        return $result;
     }
 
     /**
@@ -400,7 +519,15 @@ abstract class Table
      */
     public function update(array $data, $where)
     {
-        return $this->db->update($this->tableName, $data, $where);
+        $result = $this->db->update(
+            $this->tableName,
+            $this->filterDataArrayForPhysicalColumns($data),
+            $where
+        );
+
+        $this->saveManyToManyRelationships($data);
+
+        return $result;
     }
 
     /**
@@ -480,7 +607,9 @@ abstract class Table
         foreach ($pkey as $index => $column) {
             if (!isset($args[$index])) {
                 $pkeyColumnCount = count($pkey);
-                throw new Exception("You must specify a value for all {$pkeyColumnCount} primary key columns");
+                throw new Exception(
+                    "Db\\Table: You must specify a value for all {$pkeyColumnCount} primary key columns"
+                );
             }
 
             $column  = $this->db->quoteIdentifier($column);
@@ -494,5 +623,55 @@ abstract class Table
         );
 
         return $sql;
+    }
+
+    /**
+     * Filter the data array that was passed to either insert() or update() so
+     * that it only has keys that match physical database columns, not
+     * many-to-many relationships managed by this table.
+     *
+     * @param array $data
+     * @return array The filtered version of the data array.
+     */
+    private function filterDataArrayForPhysicalColumns(array $data)
+    {
+        foreach ($data as $column => $value) {
+            if (!$this->getMetadata('columns', $column)) {
+                unset($data[$column]);
+            }
+        }
+
+        return $data;
+    }
+
+    /**
+     * Save any many-to-many relationship values that were passed to
+     * insert() or update().
+     *
+     * @param array $data
+     * @return \Dewdrop\Db\Table
+     */
+    private function saveManyToManyRelationships(array $data)
+    {
+        foreach ($data as $name => $values) {
+            if ($this->hasManyToManyRelationship($name)) {
+                $relationship = $this->getManyToManyRelationship($name);
+                $anchorName   = $relationship->getXrefAnchorColumnName();
+
+                // When the anchor column already has a value, use it, otherwise get insert ID
+                if (isset($data[$anchorName]) && $data[$anchorName]) {
+                    $anchorValue = $data[$anchorName];
+                } else {
+                    $anchorValue = $this->getAdapter()->lastInsertId();
+                }
+
+                // Can only save xref values if we have anchor value
+                if ($anchorValue) {
+                    $relationship->save($values, $anchorValue);
+                }
+            }
+        }
+
+        return $this;
     }
 }

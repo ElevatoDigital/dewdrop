@@ -76,6 +76,17 @@ class Row
     private $columns;
 
     /**
+     * A map of many-to-many relationships that tracks whether their initial
+     * value has been loaded yet.  If not, the first time get() is called on
+     * this row for the relationship, the value will be loaded by the
+     * relationship's object.  This array stores the names of relationships
+     * that have been loaded already.
+     *
+     * @var array
+     */
+    private $manyToManyInitialized = array();
+
+    /**
      * Instantiate the row, checking to ensure the data array contains only
      * those columns present in the table's metadata.
      *
@@ -86,17 +97,21 @@ class Row
     {
         $this->table   = $table;
         $this->data    = $data;
-        $this->columns = $this->table->getMetadata('columns');
+        $this->columns = $this->table->getRowColumns();
 
         // Unset any data values not present in the columns array
         foreach ($this->data as $column => $value) {
-            if (!array_key_exists($column, $this->columns)) {
+            if (!in_array($column, $this->columns)) {
                 unset($this->data[$column]);
+            }
+
+            if ($this->table->hasManyToManyRelationship($column)) {
+                $this->manyToManyInitialized[] = $column;
             }
         }
 
         // Ensure each column is represented in the data array, even if null
-        foreach ($this->columns as $column => $metadata) {
+        foreach ($this->columns as $column) {
             if (!array_key_exists($column, $this->data)) {
                 $this->data[$column] = null;
             }
@@ -147,7 +162,7 @@ class Row
             return $this;
         }
 
-        if (!array_key_exists($column, $this->columns)) {
+        if (!in_array($column, $this->columns)) {
             throw new Exception("Setting value on invalid  column \"{$column}\"");
         }
 
@@ -168,8 +183,18 @@ class Row
      */
     public function get($column)
     {
-        if (!array_key_exists($column, $this->columns)) {
+        if (!in_array($column, $this->columns)) {
             throw new Exception("Getting value of invalid  column \"{$column}\"");
+        }
+
+        if ($this->table->hasManyToManyRelationship($column)
+            && !in_array($column, $this->manyToManyInitialized)
+        ) {
+            $relationship = $this->table->getManyToManyRelationship($column);
+
+            $this->manyToManyInitialized[] = $column;
+
+            $this->data[$column] = $relationship->loadInitialValue($this);
         }
 
         return $this->data[$column];

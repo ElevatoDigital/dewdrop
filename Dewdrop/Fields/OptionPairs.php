@@ -12,6 +12,7 @@ namespace Dewdrop\Fields;
 
 use Dewdrop\Db\Adapter;
 use Dewdrop\Db\Field;
+use Dewdrop\Db\ManyToMany\Field as ManyToManyField;
 use Dewdrop\Db\Select;
 use Dewdrop\Exception;
 use Dewdrop\Paths;
@@ -67,33 +68,6 @@ class OptionPairs
     public function __construct(Adapter $dbAdapter)
     {
         $this->dbAdapter = $dbAdapter;
-    }
-
-    /**
-     * Use the supplied field to set other properties on this object.  We'll
-     * look at the field's metadata to determine which table and column should
-     * be used for the option pairs.
-     *
-     * @throws \Dewdrop\Exception
-     * @param Field $field
-     * @return \Dewdrop\Fields\OptionPairs
-     */
-    public function setField(Field $field)
-    {
-        $table     = $field->getTable();
-        $name      = $field->getName();
-        $reference = $table->getMetadata('references', $name);
-
-        if (false === $reference) {
-            throw new Exception("No reference found for field \"{$table->getTableName()}:{$name}\"");
-        }
-
-        return $this->setOptions(
-            array(
-                'tableName'   => $reference['table'],
-                'valueColumn' => $reference['column']
-            )
-        );
     }
 
     /**
