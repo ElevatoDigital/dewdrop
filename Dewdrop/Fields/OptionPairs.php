@@ -327,13 +327,15 @@ class OptionPairs
 
             return $stmt->order(
                 array(
-                    $sortColumn,
-                    $primaryKey
+                    $this->tableName . '.' . $sortColumn,
+                    $this->tableName . '.' . $primaryKey
                 )
             );
+        } elseif ($this->titleColumn instanceof Expr) {
+            return $stmt->order($this->titleColumn);
+        } else {
+            return $stmt->order($this->tableName . '.' . $this->titleColumn);
         }
-
-        return $stmt->order($this->titleColumn);
     }
 
     /**
