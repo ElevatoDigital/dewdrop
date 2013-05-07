@@ -11,6 +11,7 @@
 namespace Dewdrop\Fields;
 
 use Dewdrop\Db\Adapter;
+use Dewdrop\Db\Expr;
 use Dewdrop\Db\Field;
 use Dewdrop\Db\ManyToMany\Field as ManyToManyField;
 use Dewdrop\Db\Select;
@@ -286,11 +287,15 @@ class OptionPairs
     protected function filterStmt($columns, Select $stmt)
     {
         if (array_key_exists('active', $columns)) {
-            $stmt->where('active = true');
+            $column = $this->dbAdapter->quoteIdentifier("{$this->tableName}.active");
+
+            $stmt->where("{$column} = true");
         }
 
         if (array_key_exists('deleted', $columns)) {
-            $stmt->where('deleted = false');
+            $column = $this->dbAdapter->quoteIdentifier("{$this->tableName}.deleted");
+
+            $stmt->where("{$column} = false");
         }
 
         return $stmt;
