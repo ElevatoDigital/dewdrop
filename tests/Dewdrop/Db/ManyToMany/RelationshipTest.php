@@ -194,4 +194,61 @@ class RelationshipTest extends DbTestCase
 
         $this->assertEquals('fafafafa', $relationship->getReferenceColumnName());
     }
+
+    public function testCanAutoDetectReferenceTableName()
+    {
+        $relationship = new Relationship($this->table, 'dewdrop_test_fruits_eaten_by_animals');
+
+        $this->assertEquals('dewdrop_test_fruits', $relationship->getReferenceTableName());
+    }
+
+    public function testCanAutoDetectReferenceColumnName()
+    {
+        $relationship = new Relationship($this->table, 'dewdrop_test_fruits_eaten_by_animals');
+
+        $this->assertEquals('dewdrop_test_fruit_id', $relationship->getReferenceColumnName());
+    }
+
+    public function testReturnsXrefTableReferenceColumnMetatadata()
+    {
+        $relationship = new Relationship($this->table, 'dewdrop_test_fruits_eaten_by_animals');
+        $metadata     = $relationship->getFieldMetadata();
+
+        $this->assertEquals('fruit_id', $metadata['COLUMN_NAME']);
+    }
+
+    public function testReturnsReferenceInfoForOptionPairsUtility()
+    {
+        $relationship = new Relationship($this->table, 'dewdrop_test_fruits_eaten_by_animals');
+
+        $this->assertEquals(
+            array(
+                'table'  => 'dewdrop_test_fruits',
+                'column' => 'dewdrop_test_fruit_id'
+            ),
+            $relationship->getOptionPairsReference()
+        );
+    }
+
+    /**
+     * @expectedException \Dewdrop\Exception
+     */
+    public function testUnavailableOptionPairsReferenceThrowsException()
+    {
+        $relationship = new Relationship($this->table, 'dewdrop_test_fruits_eaten_by_animals');
+
+        $relationship->setXrefReferenceColumnName('fafafafa');
+
+        $relationship->getOptionPairsReference();
+    }
+
+    /**
+     * @expectedException \Dewdrop\Exception
+     */
+    public function testMissingXrefTableMetadataThrowsException()
+    {
+        $relationship = new Relationship($this->table, 'fafafafa');
+
+        $relationship->getSourceColumnName();
+    }
 }
