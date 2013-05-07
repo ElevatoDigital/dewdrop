@@ -37,7 +37,7 @@ class InlineScript extends AbstractHelper
         $helper = $this;
 
         add_action(
-            'admin_print_footer_scripts',
+            (is_admin() ? 'admin_print_footer_scripts' : 'print_footer_scripts'),
             function () use ($helper, $templateName, $options) {
                 echo $helper->open();
                 echo $helper->partial($templateName, $options);
