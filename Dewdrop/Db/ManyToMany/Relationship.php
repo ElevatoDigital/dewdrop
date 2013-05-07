@@ -44,6 +44,15 @@ class Relationship
     private $sourceTable;
 
     /**
+     * The name of the column in the source table that is referenced by the
+     * cross-reference table.  This is typically, though not necessarily, the
+     * source table's primary key.
+     *
+     * @var string
+     */
+    private $sourceColumnName;
+
+    /**
      * The name of the cross-reference table where this relationship is stored
      * in the database.
      *
@@ -156,6 +165,53 @@ class Relationship
     }
 
     /**
+     * Set the name of the column in the source table that is referenced by
+     * the cross reference table.
+     *
+     * @param string $sourceColumnName
+     * @return \Dewdrop\Db\ManyToMany\Relationship
+     */
+    public function setSourceColumnName($sourceColumnName)
+    {
+        $this->sourceColumnName = $sourceColumnName;
+
+        return $this;
+    }
+
+    /**
+     * Get the name of the column in the source table that is refernced by
+     * the cross-reference table.  If this is not set explicitly, we'll
+     * attempt to auto-detect it using the cross-reference table's metadata,
+     * looking for any references that point back to the source table.
+     *
+     * @throws \Dewdrop\Exception
+     * @return string
+     */
+    public function getSourceColumnName()
+    {
+        if (!$this->sourceColumnName) {
+            $metadata = $this->loadXrefTableMetadata();
+
+            foreach ($metadata['references'] as $column => $reference) {
+                if ($reference['table'] === $this->sourceTable->getTableName()) {
+                    $this->sourceColumnName = $reference['column'];
+                    break;
+                }
+            }
+
+            if (!$this->sourceColumnName) {
+                throw new Exception(
+                    'ManyToMany\Relationship: Could not find many-to-many relationship '
+                    . 'source column referenced by the cross-reference table.  Please '
+                    . 'specify it manually in your hasMany() call.'
+                );
+            }
+        }
+
+        return $this->sourceColumnName;
+    }
+
+    /**
      * Set the name of the column in the cross-reference table that is used
      * to tie it back to the source table.
      *
@@ -164,7 +220,7 @@ class Relationship
      */
     public function setXrefAnchorColumnName($xrefAnchorColumnName)
     {
-        $this->xrefAnchorColumnName = $xrefAnchroColumnName;
+        $this->xrefAnchorColumnName = $xrefAnchorColumnName;
 
         return $this;
     }
@@ -176,6 +232,7 @@ class Relationship
      * reference table and return the column from the first references that
      * points back to the source table.
      *
+     * @throws \Dewdrop\Exception
      * @return string.
      */
     public function getXrefAnchorColumnName()
@@ -328,7 +385,7 @@ class Relationship
      */
     public function loadInitialValue(Row $row)
     {
-        $value = $row->get($this->getXrefAnchorColumnName());
+        $value = $row->get($this->getSourceColumnName());
 
         // If the anchor column has no value, we can assume this relationship has no value
         if (!$value) {
@@ -478,7 +535,7 @@ class Relationship
      *
      * @return array
      */
-    private function loadXrefTableMetadata()
+    protected function loadXrefTableMetadata()
     {
         if (!$this->xrefMetadata) {
             $paths = new Paths();

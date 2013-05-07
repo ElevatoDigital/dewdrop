@@ -17,27 +17,25 @@
             <value>1</value>
             <value>7</value>
         </row>
+    </table>
+    <table name="dewdrop_test_animals">
+        <column>dewdrop_test_animal_id</column>
+        <column>name</column>
+        <column>is_fierce</column>
+        <column>is_cute</column>
         <row>
-            <value>3</value>
-            <value>Blueberry</value>
             <value>1</value>
-            <value>9</value>
-        </row>
-        <row>
-            <value>4</value>
-            <value>Lemon</value>
-            <value>0</value>
-            <value>2</value>
-        </row>
-        <row>
-            <value>5</value>
-            <value>Mango</value>
+            <value>Gorilla</value>
             <value>1</value>
-            <value>10</value>
+            <value>1</value>
         </row>
     </table>
-    <!-- Added just to make sure the table is truncated -->
     <table name="dewdrop_test_fruits_eaten_by_animals">
-
+        <column>animal_id</column>
+        <column>fruit_id</column>
+        <row>
+            <value>1</value>
+            <value>1</value>
+        </row>
     </table>
 </dataset>

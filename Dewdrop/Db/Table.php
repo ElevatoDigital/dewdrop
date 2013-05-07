@@ -519,11 +519,12 @@ abstract class Table
      */
     public function update(array $data, $where)
     {
-        $result = $this->db->update(
-            $this->tableName,
-            $this->filterDataArrayForPhysicalColumns($data),
-            $where
-        );
+        $updateData = $this->filterDataArrayForPhysicalColumns($data);
+
+        // Only perform primary update statement if a physical column is being updated
+        if (count($updateData)) {
+            $result = $this->db->update($this->tableName, $updateData, $where);
+        }
 
         $this->saveManyToManyRelationships($data);
 
@@ -656,7 +657,7 @@ abstract class Table
         foreach ($data as $name => $values) {
             if ($this->hasManyToManyRelationship($name)) {
                 $relationship = $this->getManyToManyRelationship($name);
-                $anchorName   = $relationship->getXrefAnchorColumnName();
+                $anchorName   = $relationship->getSourceColumnName();
 
                 // When the anchor column already has a value, use it, otherwise get insert ID
                 if (isset($data[$anchorName]) && $data[$anchorName]) {
