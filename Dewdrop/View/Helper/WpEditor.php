@@ -46,25 +46,26 @@ class WpEditor extends AbstractHelper
 
         return $this->directArray(
             array(
-                'id'      => $field->getControlName(),
-                'content' => $field->getValue()
+                'name'  => $field->getControlName(),
+                'value' => $field->getValue(),
+                'id'    => $field->getHtmlId()
             )
         );
     }
 
     /**
-     * Explicitly specify the editor's $id and $content.
+     * Explicitly specify the editor's $name and $value.
      *
-     * @param string $id
-     * @param string $content
+     * @param string $name
+     * @param string $value
      * @return string
      */
-    public function directExplicit($id, $content)
+    public function directExplicit($name, $value)
     {
         return $this->directArray(
             array(
-                'id'      => $id,
-                'content' => $content
+                'name'  => $name,
+                'value' => $value
             )
         );
     }
@@ -78,10 +79,18 @@ class WpEditor extends AbstractHelper
     {
         extract($this->prepareOptionsArray($options));
 
+        if (!isset($settings['textarea_name'])) {
+            $settings['textarea_name'] = $name;
+        }
+
+        if (!$id) {
+            $id = $name;
+        }
+
         ob_start();
 
         wp_editor(
-            $content,
+            $value,
             $id,
             $settings
         );
@@ -90,7 +99,7 @@ class WpEditor extends AbstractHelper
     }
 
     /**
-     * Ensure that the "id" and "content" options are set and the settings
+     * Ensure that the "name" and "value" options are set and the settings
      * option is present and an array.
      *
      * @param array $options
@@ -99,8 +108,8 @@ class WpEditor extends AbstractHelper
     private function prepareOptionsArray(array $options)
     {
         $this
-            ->checkRequired($options, array('id', 'content'))
-            ->ensurePresent($options, array('settings'))
+            ->checkRequired($options, array('name', 'value'))
+            ->ensurePresent($options, array('id', 'settings'))
             ->ensureArray($options, array('settings'));
 
         return $options;
