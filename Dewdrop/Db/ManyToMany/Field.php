@@ -77,6 +77,18 @@ class Field extends BaseField
     }
 
     /**
+     * Return a reference to the field's many-to-many relationship.  Allows
+     * reconfiguration of the relationship, if needed, and can also be useful
+     * during testing.
+     *
+     * @return \Dewdrop\Db\ManyToMany\Relationship
+     */
+    public function getManyToManyRelationship()
+    {
+        return $this->manyToManyRelationship;
+    }
+
+    /**
      * When retrieving option pairs for a many-to-many relationship, we don't look
      * for the reference on the source table, like with a one-to-many relationship.
      * Instead, we look for the matching reference on the cross-reference table.
