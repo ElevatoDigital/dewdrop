@@ -353,6 +353,10 @@ class OptionPairs
      */
     protected function loadTableMetadata()
     {
+        if (!$this->tableName) {
+            throw new Exception('Table name must be set prior to loading metadata.');
+        }
+
         $paths = new Paths();
         $path  = $paths->getModels() . '/metadata/' . $this->tableName . '.php';
 

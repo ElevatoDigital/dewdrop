@@ -97,17 +97,19 @@ class WpSelectTest extends BaseTestCase
         $this->assertMatchesDomQuery('option[selected="selected"][value="1"]', $out);
     }
 
-    /**
-     * @expectedException \Dewdrop\Exception
-     */
-    public function testPassingAFieldOjbectThrowsAnException()
+    public function testCanRenderUsingAFieldObject()
     {
-        $db = new \Dewdrop\Db\Adapter\Mock();
+        $wpdb = new \wpdb(DB_USER, DB_PASSWORD, DB_NAME, DB_HOST);
+        $db   = new \Dewdrop\Db\Adapter($wpdb);
 
         require_once __DIR__ . '/table/DewdropTestFruits.php';
         $table = new \DewdropViewHelperTest\DewdropTestFruits($db);
+        $row   = $table->createRow();
 
-        $this->view->wpSelect($table->field('name'));
+        $row->field('name')->getOptionPairs()
+            ->setTableName('dewdrop_test_animals');
+
+        $this->view->wpSelect($row->field('name'));
     }
 
     /**
