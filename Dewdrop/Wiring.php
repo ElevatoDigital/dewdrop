@@ -58,34 +58,46 @@ class Wiring
      * paths for them, rather than requiring your to manually register admin
      * components, shortcodes, etc.
      *
-     * @param boolean $autoRegister
-     * @param \Dewdrop\Db\Adapter $db
-     * @param \Dewdrop\Inflector $inflector
-     * @param \Dewdrop\Autoloader $autoloader
+     * @param array $options
      */
-    public function __construct(
-        $autoRegister = true,
-        $db = null,
-        $inflector = null,
-        $autoloader = null
-    ) {
-        global $wpdb;
-
-        require_once __DIR__ . '/Autoloader.php';
-
+    public function __construct(array $options = array())
+    {
         // We use output buffering because otherwise WP will output before we can redirect, etc.
         if ('cli' !== php_sapi_name()) {
             ob_start();
         }
 
-        $this->autoloader = ($autoloader ?: new Autoloader());
-        $this->db         = ($db ?: new DbAdapter($wpdb));
-        $this->inflector  = ($inflector ?: new Inflector());
-        $this->paths      = new Paths();
+        $this->inflector = new Inflector();
+        $this->paths     = (isset($options['paths']) ? $options['paths'] : new Paths());
 
-        if ($autoRegister) {
+        if (isset($options['autoloader']) && $options['autoloader']) {
+            $this->autoloader = $options['autoloader'];
+        } else {
+            require_once __DIR__ . '/Autoloader.php';
+            $this->autolaoder = new Autoloader();
+        }
+
+        if (isset($options['db']) && $options['db']) {
+            $this->db = $options['db'];
+        } else {
+            global $wpdb;
+            $this->db = new DbAdapter($wpdb);
+        }
+
+        if (!isset($options['autoRegister']) || $options['autoRegister']) {
             $this->autoRegisterAdminComponents();
         }
+    }
+
+    /**
+     * This method is primarily around to create a seam for testing the Wiring
+     * component.  At runtime, it will just use the WP is_admin() function.
+     *
+     * @return boolean
+     */
+    public function isAdmin()
+    {
+        return is_admin();
     }
 
     /**
@@ -97,7 +109,7 @@ class Wiring
     public function autoRegisterAdminComponents()
     {
         // Don't both registering components if we're not in the WP admin area
-        if (!is_admin()) {
+        if (!$this->isAdmin()) {
             return;
         }
 
@@ -125,5 +137,45 @@ class Wiring
         $component = new $className($this->db, $this->paths);
 
         $component->register();
+    }
+
+    /**
+     * Get a reference to the assigned autoloader.
+     *
+     * @return \Dewdrop\Autoloader
+     */
+    public function getAutoloader()
+    {
+        return $this->autoloader;
+    }
+
+    /**
+     * Get a reference to the assigned DB adapter.
+     *
+     * @return \Dewdrop\Db\Adapter
+     */
+    public function getDb()
+    {
+        return $this->db;
+    }
+
+    /**
+     * Get a reference to the assigned inflector.
+     *
+     * @return \Dewdrop\Inflector
+     */
+    public function getInflector()
+    {
+        return $this->inflector;
+    }
+
+    /**
+     * Get a reference to the assigned paths object.
+     *
+     * @return \Dewdrop\Paths
+     */
+    public function getPaths()
+    {
+        return $this->paths;
     }
 }
