@@ -67,15 +67,15 @@ class Wiring
             ob_start();
         }
 
-        $this->inflector = new Inflector();
-        $this->paths     = (isset($options['paths']) ? $options['paths'] : new Paths());
-
         if (isset($options['autoloader']) && $options['autoloader']) {
             $this->autoloader = $options['autoloader'];
         } else {
             require_once __DIR__ . '/Autoloader.php';
             $this->autolaoder = new Autoloader();
         }
+
+        $this->inflector = new Inflector();
+        $this->paths     = (isset($options['paths']) ? $options['paths'] : new Paths());
 
         if (isset($options['db']) && $options['db']) {
             $this->db = $options['db'];
