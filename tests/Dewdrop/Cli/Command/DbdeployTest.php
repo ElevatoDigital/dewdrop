@@ -108,7 +108,7 @@ class DbdeployTest extends \PHPUnit_Framework_TestCase
         $command->execute();
     }
 
-    public function testBackillActionAddsToChangelog()
+    public function testBackfillActionAddsToChangelog()
     {
         $command = $this->getMockCommand();
         $command->parseArgs(array('--action=backfill', '--changeset=plugin', '--revision=1'));
@@ -195,7 +195,7 @@ class DbdeployTest extends \PHPUnit_Framework_TestCase
 
         $command->overrideChangesetPath(
             'plugin',
-            'lib/tests/Dewdrop/Cli/Command/dbdeploy-test/plugin-bad-filename'
+            'vendor/tests/Dewdrop/Cli/Command/dbdeploy-test/plugin-bad-filename'
         );
 
         $command
@@ -213,7 +213,7 @@ class DbdeployTest extends \PHPUnit_Framework_TestCase
 
         $command->overrideChangesetPath(
             'plugin',
-            'lib/tests/Dewdrop/Cli/Command/dbdeploy-test/plugin-bad-filename'
+            'vendor/tests/Dewdrop/Cli/Command/dbdeploy-test/plugin-bad-filename'
         );
 
         $command
@@ -231,7 +231,7 @@ class DbdeployTest extends \PHPUnit_Framework_TestCase
 
         $command->overrideChangesetPath(
             'plugin',
-            'lib/tests/Dewdrop/Cli/Command/dbdeploy-test/plugin-bad-filename'
+            'vendor/tests/Dewdrop/Cli/Command/dbdeploy-test/plugin-bad-filename'
         );
 
         $command
@@ -249,7 +249,7 @@ class DbdeployTest extends \PHPUnit_Framework_TestCase
 
         $command->overrideChangesetPath(
             'plugin',
-            'lib/tests/Dewdrop/Cli/Command/dbdeploy-test/plugin-bad-sql-code'
+            'vendor/tests/Dewdrop/Cli/Command/dbdeploy-test/plugin-bad-sql-code'
         );
 
         $command
@@ -272,12 +272,12 @@ class DbdeployTest extends \PHPUnit_Framework_TestCase
 
         $command->overrideChangesetPath(
             'plugin',
-            'lib/tests/Dewdrop/Cli/Command/dbdeploy-test/plugin/'
+            'vendor/tests/Dewdrop/Cli/Command/dbdeploy-test/plugin/'
         );
 
         $command->overrideChangesetPath(
             'dewdrop-test',
-            'lib/tests/Dewdrop/Cli/Command/dbdeploy-test/dewdrop-test/'
+            'vendor/tests/Dewdrop/Cli/Command/dbdeploy-test/dewdrop-test/'
         );
 
         $command->overrideChangelogTableName('dewdrop_test_dbdeploy_changelog');

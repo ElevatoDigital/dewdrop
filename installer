@@ -21,20 +21,22 @@ if (!mkdir($pluginPath)) {
 $subfolders = array(
     'admin',
     'db',
+    'lib',
     'models',
     'short-codes',
-    'tests'
+    'tests',
+    'www'
 );
 
 foreach ($subfolders as $subfolder) {
     mkdir("{$pluginPath}/{$subfolder}");
 }
 
-// Clone Dewdrop repo into lib subfolder
+// Clone Dewdrop repo into vendor subfolder
 $cmd = sprintf(
     '%s clone https://github.com/DeltaSystems/dewdrop.git %s 2>&1',
     $git,
-    escapeshellarg($pluginPath . '/lib')
+    escapeshellarg($pluginPath . '/vendor')
 );
 
 exec($cmd, $output, $exitStatus);
@@ -58,7 +60,7 @@ $template = <<<PLUGIN
  * Version: 0.1
  */
 
-require_once __DIR__ . '/lib/Dewdrop/Wiring.php';
+require_once __DIR__ . '/vendor/Dewdrop/Wiring.php';
 
 \$wiring = new \Dewdrop\Wiring();
 PLUGIN;
@@ -77,7 +79,7 @@ if ('cli' !== php_sapi_name()) {
     exit;
 }
 
-require_once __DIR__ . '/wp-content/plugins/{$pluginInfo['folder']}/lib/Dewdrop/Cli/Run.php';
+require_once __DIR__ . '/wp-content/plugins/{$pluginInfo['folder']}/vendor/Dewdrop/Cli/Run.php';
 \$cli = new \Dewdrop\Cli\Run();
 
 \$cli->run();

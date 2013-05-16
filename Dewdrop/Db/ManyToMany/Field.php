@@ -132,4 +132,15 @@ class Field extends BaseField
             $inputFilter->setAllowEmpty(true);
         }
     }
+
+    /**
+     * Override \Dewdrop\Db\Field's isTypeManyToMany() method to always return
+     * true for many-to-many fields.
+     *
+     * @return boolean
+     */
+    protected function isTypeManyToMany()
+    {
+        return true;
+    }
 }

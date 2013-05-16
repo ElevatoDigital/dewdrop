@@ -60,8 +60,8 @@ class Update extends CommandAbstract
 
         $cwd = getcwd();
 
-        // Change to lib/ folder so git isn't confused
-        chdir($this->paths->getLib());
+        // Change to vendor/ folder so git isn't confused
+        chdir($this->paths->getVendor());
 
         $cmd = sprintf(
             '%s pull',

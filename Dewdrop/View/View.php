@@ -51,6 +51,7 @@ class View
     private $helperClasses = array(
         'adminurl'        => '\Dewdrop\View\Helper\AdminUrl',
         'inlinescript'    => '\Dewdrop\View\Helper\InlineScript',
+        'ui'              => '\Dewdrop\View\Helper\Ui',
         'wpadminnotice'   => '\Dewdrop\View\Helper\WpAdminNotice',
         'wpcheckboxlist'  => '\Dewdrop\View\Helper\WpCheckboxList',
         'wpcolorpicker'   => '\Dewdrop\View\Helper\WpColorPicker',
@@ -138,6 +139,17 @@ class View
         $this->assign($name, $value);
 
         return $this;
+    }
+
+    /**
+     * Check to see if the given item is present in the view's data array.
+     *
+     * @param string $name
+     * @return boolean
+     */
+    public function __isset($name)
+    {
+        return array_key_exists($name, $this->data);
     }
 
     /**

@@ -10,6 +10,8 @@
 
 namespace Dewdrop\Fields;
 
+use Countable;
+use Iterator;
 use Dewdrop\Db\Field;
 use Dewdrop\Exception;
 use Zend\InputFilter\InputFilter;
@@ -48,7 +50,7 @@ use Zend\InputFilter\InputFilter;
  *     </li>
  * </ol>
  */
-class Edit
+class Edit implements Countable, Iterator
 {
     /**
      * The collection of fields added to this object
@@ -63,6 +65,13 @@ class Edit
      * @var \Zend\InputFilter\InputFilter
      */
     private $inputFilter;
+
+    /**
+     * Index used for iterator interface.
+     *
+     * @var integer
+     */
+    private $currentIndex = 0;
 
     /**
      * Store reference to supplied InputFilter so that fields can be added
@@ -156,5 +165,80 @@ class Edit
         }
 
         return $this;
+    }
+
+    /**
+     * Get a count of the fields added to this collection.
+     *
+     * @return integer
+     */
+    public function count()
+    {
+        return count($this->fields);
+    }
+
+    /**
+     * Retrieve the current field during iteration.
+     *
+     * @return \Dewdrop\Db\Field
+     */
+    public function current()
+    {
+        $fields = array_values($this->fields);
+
+        return $fields[$this->currentIndex];
+    }
+
+    /**
+     * Return the current index during iteration.
+     *
+     * @return integer
+     */
+    public function key()
+    {
+        return $this->currentIndex;
+    }
+
+    /**
+     * Advance to the next index during iteration.
+     *
+     * @return void
+     */
+    public function next()
+    {
+        $this->currentIndex += 1;
+    }
+
+    /**
+     * Seek to the previous index.
+     *
+     * @return void
+     */
+    public function prev()
+    {
+        $this->currentIndex -= 1;
+    }
+
+    /**
+     * Return the iteration index to the initial position.
+     *
+     * @return void
+     */
+    public function rewind()
+    {
+        $this->currentIndex = 0;
+    }
+
+    /**
+     * Test to see if an item is present at the current index during
+     * iteration.
+     *
+     * @return boolean
+     */
+    public function valid()
+    {
+        $fields = array_values($this->fields);
+
+        return array_key_exists($this->currentIndex, $fields);
     }
 }

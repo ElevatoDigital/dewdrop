@@ -116,6 +116,16 @@ class Paths
     }
 
     /**
+     * The "vendor" folder inside your plugin.
+     *
+     * @return string
+     */
+    public function getVendor()
+    {
+        return $this->pluginRoot . '/vendor';
+    }
+
+    /**
      * The folder housing your models
      *
      * @return string

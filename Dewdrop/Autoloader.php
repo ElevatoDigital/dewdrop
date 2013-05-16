@@ -34,13 +34,13 @@ class Autoloader
         require_once __DIR__ . '/Paths.php';
         $paths = new \Dewdrop\Paths();
 
-        require_once $paths->getLib() . '/Zend/Loader/AutoloaderFactory.php';
+        require_once $paths->getVendor() . '/Zend/Loader/AutoloaderFactory.php';
 
         $config = array(
             'Zend\Loader\StandardAutoloader' => array(
                 'namespaces' => array(
-                    'Dewdrop' => $paths->getLib() . '/Dewdrop',
-                    'Zend'    => $paths->getLib() . '/Zend',
+                    'Dewdrop' => $paths->getVendor() . '/Dewdrop',
+                    'Zend'    => $paths->getVendor() . '/Zend',
                     'Model'   => $paths->getModels()
                 )
             )

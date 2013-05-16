@@ -182,19 +182,6 @@ class Field
     }
 
     /**
-     * Check whether the field is of the specified type.  One or more
-     * types can be provided as individual arguments to this method.
-     * If the field matches any of the supplied types, this method
-     * will return true.
-     *
-     * @return boolean
-     */
-    public function isType()
-    {
-        return in_array($this->metadata['DATA_TYPE'], func_get_args());
-    }
-
-    /**
      * Associate a row with this field object so that it can be used to retrieve
      * and/or set the value of the associated column in the row.
      *
@@ -447,7 +434,7 @@ class Field
             $inputFilter->setAllowEmpty(true);
         }
 
-        if ($this->isType('varchar', 'char', 'text')) {
+        if ($this->isType('string')) {
             if ($metadata['LENGTH']) {
                 $validators->addValidator(new Validator\StringLength(0, $metadata['LENGTH']));
             }
@@ -456,14 +443,81 @@ class Field
             $filters->attach(new Filter\Null(Filter\Null::TYPE_STRING));
         } elseif ($this->isType('date')) {
             $validators->addValidator(new Validator\Date());
-        } elseif ($this->isType('tinyint')) {
+        } elseif ($this->isType('boolean')) {
             $filters->attach(new Filter\Int());
-        } elseif ($this->isType('int', 'integer', 'mediumint', 'smallint', 'bigint')) {
+        } elseif ($this->isType('integer')) {
             $filters->attach(new Filter\Digits());
             $validators->addValidator(new \Zend\I18n\Validator\Int());
-        } elseif ($this->isType('float', 'dec', 'decimal', 'double', 'double precision', 'fixed', 'float')) {
+        } elseif ($this->isType('float')) {
             $filters->attach(new Filter\Digits());
             $validators->addValidator(new \Zend\I18n\Validator\Flaot());
         }
+    }
+
+    /**
+     * Check whether the field is of the specified type.  One or more
+     * types can be provided as individual arguments to this method.
+     * If the field matches any of the supplied types, this method
+     * will return true.
+     *
+     * @return boolean
+     */
+    public function isType()
+    {
+        $args = func_get_args();
+
+        if (in_array($this->metadata['DATA_TYPE'], $args)) {
+            return true;
+        }
+
+        foreach ($args as $arg) {
+            $method = 'isType' . ucfirst($arg);
+
+            if (method_exists($this, $method) && $this->$method()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    protected function isTypeString()
+    {
+        return $this->isType('varchar', 'char', 'text');
+    }
+
+    protected function isTypeClob()
+    {
+        return $this->isType('text', 'mediumtext', 'longtext');
+    }
+
+    protected function isTypeBoolean()
+    {
+        return $this->isType('tinyint');
+    }
+
+    protected function isTypeNumeric()
+    {
+        return $this->isTypeInteger() || $this->isTypeFloat();
+    }
+
+    protected function isTypeInteger()
+    {
+        return $this->isType('int', 'integer', 'mediumint', 'smallint', 'bigint');
+    }
+
+    protected function isTypeFloat()
+    {
+        return $this->isType('float', 'dec', 'decimal', 'double', 'double precision', 'fixed');
+    }
+
+    protected function isTypeReference()
+    {
+        return (boolean) $this->table->getMetadata('references', $this->name);
+    }
+
+    protected function isTypeManyToMany()
+    {
+        return false;
     }
 }

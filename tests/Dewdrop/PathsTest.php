@@ -26,7 +26,7 @@ class PathsTest extends BaseTestCase
 
     public function testDewdropLib()
     {
-        $this->assertEquals($this->pluginRoot . '/lib/Dewdrop', $this->paths->getDewdropLib());
+        $this->assertEquals($this->pluginRoot . '/vendor/Dewdrop', $this->paths->getDewdropLib());
     }
 
     public function testPluginRoot()

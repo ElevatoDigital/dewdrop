@@ -77,7 +77,7 @@ class Dbdeploy extends CommandAbstract
      */
     private $changesets = array(
         'plugin'       => 'db',
-        'dewdrop-test' => 'lib/tests/db'
+        'dewdrop-test' => 'vendor/tests/db'
     );
 
     /**

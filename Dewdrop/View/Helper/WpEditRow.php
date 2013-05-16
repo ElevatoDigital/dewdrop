@@ -92,7 +92,7 @@ class WpEditRow extends AbstractHelper
      */
     protected function openArray(array $options)
     {
-        extract($this->prepareOptionsArray($options));
+        extract($this->prepareOpenOptionsArray($options));
 
         return $this->partial(
             'wp-edit-row-open.phtml',
@@ -110,10 +110,35 @@ class WpEditRow extends AbstractHelper
      */
     public function close()
     {
+        return $this->delegateByArgs(func_get_args(), 'close');
+    }
+
+    public function closeField(Field $field)
+    {
+        return $this->closeArray(
+            array(
+                'note' => $field->getNote()
+            )
+        );
+    }
+
+    public function closeExplicit($note = '')
+    {
+        return $this->closeArray(
+            array(
+                'note' => $note
+            )
+        );
+    }
+
+    public function closeArray(array $options)
+    {
+        extract($this->prepareCloseOptionsArray($options));
+
         return $this->partial(
             'wp-edit-row-close.phtml',
             array(
-
+                'note' => $note
             )
         );
     }
@@ -124,11 +149,18 @@ class WpEditRow extends AbstractHelper
      * @param array $options
      * @return array
      */
-    protected function prepareOptionsArray(array $options)
+    protected function prepareOpenOptionsArray(array $options)
     {
         $this
             ->checkRequired($options, array('label'))
             ->ensurePresent($options, array('labelFor'));
+
+        return $options;
+    }
+
+    protected function prepareCloseOptionsArray(array $options)
+    {
+        $this->ensurePresent($options, array('note'));
 
         return $options;
     }
