@@ -12,11 +12,8 @@ namespace Dewdrop\Fields;
 
 use Dewdrop\Db\Adapter;
 use Dewdrop\Db\Expr;
-use Dewdrop\Db\Field;
-use Dewdrop\Db\ManyToMany\Field as ManyToManyField;
 use Dewdrop\Db\Select;
 use Dewdrop\Exception;
-use Dewdrop\Paths;
 
 /**
  * The OptionPairs class makes it easy to retrieve a list of key-value pairs
@@ -344,9 +341,7 @@ class OptionPairs
     }
 
     /**
-     * Load the metadata for the options table.  We do this manually here, but
-     * we may eventually move the metadata loading and handling into the DB
-     * adapter class itself, if we find this code popping up in many locations.
+     * Load the metadata for the options table.
      *
      * @throws \Dewdrop\Exception
      * @return array
@@ -357,15 +352,6 @@ class OptionPairs
             throw new Exception('Table name must be set prior to loading metadata.');
         }
 
-        $paths = new Paths();
-        $path  = $paths->getModels() . '/metadata/' . $this->tableName . '.php';
-
-        if (!file_exists($path) || !is_readable($path)) {
-            throw new Exception("Could not find metadata for table \"{$this->tableName}\"");
-        }
-
-        $metadata = require $path;
-
-        return $metadata;
+        return $this->dbAdapter->getTableMetadata($this->tableName);
     }
 }

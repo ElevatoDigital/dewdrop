@@ -472,23 +472,7 @@ abstract class Table
     public function getMetadata($section = null, $index = null)
     {
         if (!$this->metadata) {
-            $metadataPath = "{$this->paths->getModels()}/metadata/{$this->tableName}.php";
-
-            if (!file_exists($metadataPath)) {
-                throw new Exception(
-                    'Db\\Table: Table metadata not found.  '
-                    . 'Run "db-metadata" command to generate it.'
-                );
-            }
-
-            $this->metadata = require $metadataPath;
-
-            if (!is_array($this->metadata)) {
-                throw new Exception(
-                    'Db\\Table: Failed to retrieve table metadata not found.  '
-                    . 'Run "db-metadata" command to generate it.'
-                );
-            }
+            $this->metadata = $this->db->getTableMetadata($this->tableName);
         }
 
         if ($section && $index) {
