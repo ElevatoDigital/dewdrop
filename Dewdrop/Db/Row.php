@@ -76,15 +76,13 @@ class Row
     private $columns;
 
     /**
-     * A map of many-to-many relationships that tracks whether their initial
+     * A map of many-to-many and EAV fieldsthat tracks whether their initial
      * value has been loaded yet.  If not, the first time get() is called on
-     * this row for the relationship, the value will be loaded by the
-     * relationship's object.  This array stores the names of relationships
-     * that have been loaded already.
+     * this row for the field, the value will be loaded from the database.
      *
      * @var array
      */
-    private $manyToManyInitialized = array();
+    private $virtualFieldsInitialized = array();
 
     /**
      * Instantiate the row, checking to ensure the data array contains only
@@ -106,7 +104,9 @@ class Row
             }
 
             if ($this->table->hasManyToManyRelationship($column)) {
-                $this->manyToManyInitialized[] = $column;
+                $this->virtualFieldsInitialized[] = $column;
+            } elseif ($this->table->hasEav() && $this->table->getEav()->hasAttribute($column)) {
+                $this->virtualFieldsInitialized[] = $column;
             }
         }
 
@@ -178,26 +178,35 @@ class Row
     /**
      * Get the value of the specified column.
      *
-     * @param string $column
+     * @param string $name
      * @return mixed
      */
-    public function get($column)
+    public function get($name)
     {
-        if (!in_array($column, $this->columns)) {
-            throw new Exception("Getting value of invalid  column \"{$column}\"");
+        if (!in_array($name, $this->columns)) {
+            throw new Exception("Getting value of invalid  column \"{$name}\"");
         }
 
-        if ($this->table->hasManyToManyRelationship($column)
-            && !in_array($column, $this->manyToManyInitialized)
+        if ($this->table->hasManyToManyRelationship($name)
+            && !in_array($name, $this->virtualFieldsInitialized)
         ) {
-            $relationship = $this->table->getManyToManyRelationship($column);
+            $relationship = $this->table->getManyToManyRelationship($name);
 
-            $this->manyToManyInitialized[] = $column;
+            $this->virtualFieldsInitialized[] = $name;
 
-            $this->data[$column] = $relationship->loadInitialValue($this);
+            $this->data[$name] = $relationship->loadInitialValue($this);
         }
 
-        return $this->data[$column];
+        if ($this->table->hasEav()
+            && $this->table->getEav()->hasAttribute($name)
+            && !in_array($name, $this->virtualFieldsInitialized)
+        ) {
+            $this->virtualFieldsInitialized[] = $name;
+
+            $this->data[$name] = $this->table->getEav()->loadInitialValue($this, $name);
+        }
+
+        return $this->data[$name];
     }
 
     /**

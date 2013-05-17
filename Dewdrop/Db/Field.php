@@ -55,6 +55,13 @@ class Field
     protected $required;
 
     /**
+     * The name of the column this field represents.
+     *
+     * @var string
+     */
+    protected $name;
+
+    /**
      * How this field should be labeled when included in UI such as form fields
      * or table headers.
      *
@@ -69,13 +76,6 @@ class Field
      * @var string
      */
     private $note = '';
-
-    /**
-     * The name of the column this field represents.
-     *
-     * @var string
-     */
-    private $name;
 
     /**
      * The metadata related to this column.  The metadata includes the
@@ -481,41 +481,92 @@ class Field
         return false;
     }
 
+    /**
+     * Convenience method for checking for common string types.  You can call
+     * isType('string') to check that your field matches one of the common
+     * MySQL string types.
+     *
+     * @return boolean
+     */
     protected function isTypeString()
     {
         return $this->isType('varchar', 'char', 'text');
     }
 
+    /**
+     * Convenience method for checking for large, variable-length text data
+     * types in MySQL.  You can call isType('clob') to check to see if your
+     * field is a "character large object".
+     *
+     * @return boolean
+     */
     protected function isTypeClob()
     {
         return $this->isType('text', 'mediumtext', 'longtext');
     }
 
+    /**
+     * Convenience method to check if the field is a boolean.  You can call
+     * isType('boolean') and isType() will in turn call this method to see
+     * if the field is a boolean.
+     *
+     * @return boolean
+     */
     protected function isTypeBoolean()
     {
         return $this->isType('tinyint');
     }
 
+    /**
+     * Check to see if this field is numeric, either integer or float.  Calling
+     * isType('numeric') will delegate to this method automatically.
+     *
+     * @return boolean
+     */
     protected function isTypeNumeric()
     {
         return $this->isTypeInteger() || $this->isTypeFloat();
     }
 
+    /**
+     * Check to see if this field matches any of the common MySQL integer types.
+     * Calling isType('integer') will automatically delegate to this method.
+     *
+     * @return boolean
+     */
     protected function isTypeInteger()
     {
         return $this->isType('int', 'integer', 'mediumint', 'smallint', 'bigint');
     }
 
+    /**
+     * Check to see if this field matches any of the common MySQL float types.
+     * Calling isType('float') will automatically delegate to this method.
+     *
+     * @return boolean
+     */
     protected function isTypeFloat()
     {
         return $this->isType('float', 'dec', 'decimal', 'double', 'double precision', 'fixed');
     }
 
+    /**
+     * Check to see if this field is a foreign key.  Calling isType('reference')
+     * will automatically delegate to this method.
+     *
+     * @return boolean
+     */
     protected function isTypeReference()
     {
         return (boolean) $this->table->getMetadata('references', $this->name);
     }
 
+    /**
+     * Check to see if this is a many-to-many field.  Always false here, always true
+     * when Dewdrop\Db\ManyToMany\Field sub-classes.
+     *
+     * @return boolean
+     */
     protected function isTypeManyToMany()
     {
         return false;

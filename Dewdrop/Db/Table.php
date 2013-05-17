@@ -12,6 +12,7 @@ namespace Dewdrop\Db;
 
 use Dewdrop\Paths;
 use Dewdrop\Exception;
+use Dewdrop\Db\Eav\Definition as EavDefinition;
 use Dewdrop\Db\ManyToMany\Field as ManyToManyField;
 use Dewdrop\Db\ManyToMany\Relationship as ManyToManyRelationship;
 use Dewdrop\Db\Row;
@@ -24,6 +25,15 @@ use Dewdrop\Db\Field;
  */
 abstract class Table
 {
+    /**
+     * Field providers can check for the existence of and create objects
+     * for fields of various types (e.g. concrete DB columns or EAV
+     * fields).
+     *
+     * @var array
+     */
+    private $fieldProviders = array();
+
     /**
      * Any field objects that have been generated for this table.
      *
@@ -38,6 +48,15 @@ abstract class Table
      * @var array
      */
     private $manyToMany = array();
+
+    /**
+     * If this table has a corresponding set of EAV tables that can be used to
+     * define custom fields/attibutes for the model, this variable will be
+     * a reference to the EAV definition object.
+     *
+     * @var \Dewdrop\Db\Eav\Definition
+     */
+    private $eav;
 
     /**
      * Callbacks assigned during the init() method of your table sub-class,
@@ -115,6 +134,10 @@ abstract class Table
         $this->db    = $db;
         $this->paths = ($paths ?: new Paths());
 
+        $this->fieldProviders[] = new FieldProvider\Metadata($this);
+        $this->fieldProviders[] = new FieldProvider\ManyToMany($this);
+        $this->fieldProviders[] = new FieldProvider\Eav($this);
+
         $this->init();
 
         if (!$this->tableName) {
@@ -129,6 +152,39 @@ abstract class Table
      * @return void
      */
     abstract public function init();
+
+    /**
+     * Register an EAV definition with this table.
+     *
+     * @param array $options Additional options to pass to the EAV definition.
+     * @return \Dewdrop\Db\Table
+     */
+    public function registerEav(array $options = array())
+    {
+        $this->eav = new EavDefinition($this, $options);
+
+        return $this;
+    }
+
+    /**
+     * Check to see if this model has an EAV definition.
+     *
+     * @return boolean
+     */
+    public function hasEav()
+    {
+        return $this->eav instanceof EavDefinition;
+    }
+
+    /**
+     * Get the EAV definition associated with this table.
+     *
+     * @return \Dewdrop\Db\Eav\Definition
+     */
+    public function getEav()
+    {
+        return $this->eav;
+    }
 
     /**
      * Register a many-to-many relationship with this table.  This will allow
@@ -212,19 +268,29 @@ abstract class Table
     }
 
     /**
+     * Return array of all many-to-many relationship assigned to this table.
+     *
+     * @return array
+     */
+    public function getManyToManyRelationships()
+    {
+        return $this->manyToMany;
+    }
+
+    /**
      * Get an array representing the valid column names that can be get or set
      * on a row object tied to this table.  This will include the concrete
      * columns present in the physical database table and the many-to-many
-     * registered with and managed by this table object.
+     * or EAV fields registered with and managed by this table object.
      *
      * @return array
      */
     public function getRowColumns()
     {
-        $columns = array_keys($this->getMetadata('columns'));
+        $columns = array();
 
-        foreach ($this->manyToMany as $name => $relationship) {
-            $columns[] = $name;
+        foreach ($this->fieldProviders as $provider) {
+            $columns = array_merge($columns, $provider->getAllNames());
         }
 
         return $columns;
@@ -242,16 +308,16 @@ abstract class Table
             return $this->fields[$name];
         }
 
-        $metadata = $this->getMetadata('columns', $name);
+        $field = null;
 
-        if ($metadata) {
-            $field = new Field($this, $name, $metadata);
-        } elseif (array_key_exists($name, $this->manyToMany)) {
-            $rel   = $this->manyToMany[$name];
-            $field = new ManyToManyField($this, $name, $rel->getFieldMetadata());
-            $field->setManyToManyRelationship($rel);
-        } else {
-            throw new Exception("Db\\Table: Attempting to retrieve unknown column \"{$name}\"");
+        foreach ($this->fieldProviders as $provider) {
+            if ($provider->has($name)) {
+                $field = $provider->instantiate($name);
+            }
+        }
+
+        if (!$field) {
+            throw new Exception("Db\\Table: Attempting to retrieve unknown field \"{$name}\"");
         }
 
         // Store reference to field so we can return the same instance on subsequent calls
@@ -502,7 +568,9 @@ abstract class Table
             $this->filterDataArrayForPhysicalColumns($data)
         );
 
-        $this->saveManyToManyRelationships($data);
+        $this
+            ->saveManyToManyRelationships($data)
+            ->saveEav($data);
 
         return $result;
     }
@@ -526,7 +594,9 @@ abstract class Table
             $result = $this->db->update($this->tableName, $updateData, $where);
         }
 
-        $this->saveManyToManyRelationships($data);
+        $this
+            ->saveManyToManyRelationships($data)
+            ->saveEav($data);
 
         return $result;
     }
@@ -596,12 +666,12 @@ abstract class Table
     }
 
     /**
-     * Assemble SQL for finding a row by its primary key.
+     * Assemble WHERE clause for  for finding a row by its primary key.
      *
      * @param array $args The primary key values
      * @return string
      */
-    private function assembleFindSql(array $args)
+    public function assembleFindWhere(array $args)
     {
         $pkey = $this->getPrimaryKey();
 
@@ -613,14 +683,27 @@ abstract class Table
                 );
             }
 
-            $column  = $this->db->quoteIdentifier($column);
-            $where[] = $this->db->quoteInto("{$column} = ?", $args[$index]);
+            $where[] = $this->db->quoteInto(
+                $this->db->quoteIdentifier($column) . ' = ?',
+                $args[$index]
+            );
         }
 
+        return implode(' AND ', $where);
+    }
+
+    /**
+     * Assemble SQL for finding a row by its primary key.
+     *
+     * @param array $args The primary key values
+     * @return string
+     */
+    private function assembleFindSql(array $args)
+    {
         $sql = sprintf(
             'SELECT * FROM %s WHERE %s',
             $this->db->quoteIdentifier($this->tableName),
-            implode(' AND ', $where)
+            $this->assembleFindWhere($args)
         );
 
         return $sql;
@@ -669,6 +752,38 @@ abstract class Table
                 // Can only save xref values if we have anchor value
                 if ($anchorValue) {
                     $relationship->save($values, $anchorValue);
+                }
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Save any EAV attributes matching keys in the supplied data array.  We can
+     * only save EAV attributes, if there is a primary key value available, either
+     * via the $data array itself or the lastInsertId().
+     *
+     * @param array $data
+     * @return \Dewdrop\Db\Table
+     */
+    private function saveEav(array $data)
+    {
+        if ($this->hasEav()) {
+            $pkey = array();
+            $eav  = $this->getEav();
+
+            foreach ($this->getPrimaryKey() as $pkeyColumn) {
+                if (isset($data[$pkeyColumn]) && $data[$pkeyColumn]) {
+                    $pkey[] = $data[$pkeyColumn];
+                } else {
+                    $pkey[] = $this->getAdapter()->lastInsertId();
+                }
+            }
+
+            foreach ($data as $name => $value) {
+                if ($eav->hasAttribute($name)) {
+                    $eav->save($name, $value, $pkey);
                 }
             }
         }
