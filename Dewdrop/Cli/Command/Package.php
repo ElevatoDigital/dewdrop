@@ -98,7 +98,7 @@ class Package extends CommandAbstract
             throw new Exception("Output folder \"{$out}\" already exists.  Cannot create package.");
         }
 
-        mkdir($out);
+        $this->mkdir($out);
 
         $files = $this->findFiles($root);
 
@@ -140,6 +140,17 @@ class Package extends CommandAbstract
         }
 
         return $files;
+    }
+
+    /**
+     * Added for tests to mock away
+     *
+     * @param string $pathname
+     * @return bool
+     */
+    protected function mkdir($pathname)
+    {
+        return mkdir($pathname);
     }
 
     /**
