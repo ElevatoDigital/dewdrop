@@ -685,6 +685,40 @@ class Adapter
     }
 
     /**
+     * Returns an associative array containing all the unique constraints on a table.
+     *
+     * The array has the following format:
+     *
+     * <code>
+     * array(
+     *     'key_name' => array(
+     *         sequence_in_index => 'column_name'
+     *     )
+     * )
+     * </code>
+     *
+     * @param string $tableName
+     * @return array
+     */
+    public function listUniqueConstraints($tableName)
+    {
+        $uniqueConstraints = array();
+
+        $sql = sprintf(
+            'SHOW INDEXES FROM %s WHERE Non_unique = 0 AND Key_name != \'PRIMARY\'',
+            $this->quoteIdentifier($tableName)
+        );
+
+        $rows = $this->fetchAll($sql, array($tableName), ARRAY_A);
+
+        foreach ($rows as $row) {
+            $uniqueConstraints[$row['Key_name']][$row['Seq_in_index']] = $row['Column_name'];
+        }
+
+        return $uniqueConstraints;
+    }
+
+    /**
      * Returns the column descriptions for a table.
      *
      * The return value is an associative array keyed by the column name,
