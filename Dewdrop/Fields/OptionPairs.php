@@ -138,7 +138,7 @@ class OptionPairs
     }
 
     /**
-     * Get the \Dewdr\Db\Select that will be used for retrieving options.  If
+     * Get the \Dewdrop\Db\Select that will be used for retrieving options.  If
      * one isn't already available, it will be generated using the other
      * properties on this object.  You can call this method to get a good
      * starting point for your SQL and manipulate it from there to apply any
