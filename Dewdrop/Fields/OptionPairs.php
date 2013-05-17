@@ -78,7 +78,7 @@ class OptionPairs
      *
      * @throws \Dewdrop\Exception
      * @param array $options
-     * @return \Dewdrop\Field\OptionPairs
+     * @return \Dewdrop\Fields\OptionPairs
      */
     public function setOptions(array $options)
     {
@@ -280,7 +280,7 @@ class OptionPairs
      * If your options table has a "deleted" column, options with that
      * column set as true will be excluded.
      *
-     * @param arary $columns The columns portion of the table metadata.
+     * @param array $columns The columns portion of the table metadata.
      * @param Select $stmt
      * @return \Dewdrop\Db\Select
      */
