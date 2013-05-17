@@ -1,10 +1,11 @@
 <?php
 
 return array(
-    'titles' => array(
+    'titles'            => array(
         'singular' => '{{singular}}',
-        'plural'   => '{{plural}}'
+        'plural'   => '{{plural}}',
     ),
-    'columns' => {{columns}},
-    'references' => {{references}}
+    'columns'           => {{columns}},
+    'references'        => {{references}},
+    'uniqueConstraints' => {{uniqueConstraints}},
 );
