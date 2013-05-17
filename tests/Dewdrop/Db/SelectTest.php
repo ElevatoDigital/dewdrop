@@ -2,6 +2,9 @@
 
 namespace Dewdrop\Db;
 
+use Dewdrop\Db\Adapter\Mock;
+use Dewdrop\Db\Expr;
+use Dewdrop\Db\Select\SelectException;
 use Dewdrop\Test\BaseTestCase;
 
 class SelectTest extends BaseTestCase
@@ -22,7 +25,10 @@ class SelectTest extends BaseTestCase
      */
     protected function setUpAdapter()
     {
-        $this->db = new \Dewdrop\Db\Adapter\Mock();
+        $this->db = $this->getMock(
+            '\Dewdrop\Db\Adapter\Mock',
+            array('query')
+        );
     }
 
     /**
@@ -1631,5 +1637,112 @@ class SelectTest extends BaseTestCase
            no exceptions are thrown here, so it's all right */
         $serialize = serialize($this->select());
         //$this->assertType('string',$serialize);
+    }
+
+    public function testGetAndSetBind()
+    {
+        static $bind = array('foo' => 'bar', 'baz' => 1);
+
+        $select = $this->select();
+
+        $this->assertSame(array(), $select->getBind());
+        $this->assertSame($select, $select->bind($bind));
+        $this->assertSame($bind, $select->getBind());
+    }
+
+    public function testJoinFull()
+    {
+        $select = $this->select()
+            ->joinFull('zfbugs', '');
+
+        $this->assertRegExp(
+            '/^SELECT\s+`zfproducts`\.\*,\s+`zfbugs`\.\*\s+FROM\s+`zfproducts`\s+FULL\s+JOIN\s+`zfbugs`$/',
+            $select->assemble()
+        );
+    }
+
+    public function testJoinNatural()
+    {
+        $select = $this->select()
+            ->joinNatural('zfbugs');
+
+        $this->assertRegExp(
+            '/^SELECT\s+`zfproducts`\.\*,\s+`zfbugs`\.\*\s+FROM\s+`zfproducts`\s+NATURAL\s+JOIN\s+`zfbugs`$/',
+            $select->assemble()
+        );
+    }
+
+    public function testOrder()
+    {
+        $select = $this->select()->order('');
+
+        $this->assertRegExp(
+            '/^SELECT\s+`zfproducts`\.\*\s+FROM\s+`zfproducts`$/',
+            $select->assemble()
+        );
+
+        $select = $this->select()->order(new Expr(''));
+
+        $this->assertRegExp(
+            '/^SELECT\s+`zfproducts`\.\*\s+FROM\s+`zfproducts`$/',
+            $select->assemble()
+        );
+
+        $select->order('foo');
+
+        $this->assertRegExp(
+            '/^SELECT\s+`zfproducts`\.\*\s+FROM\s+`zfproducts`\s+ORDER\s+BY\s+`foo`\s+ASC$/',
+            $select->assemble()
+        );
+    }
+
+    public function testGetPart()
+    {
+        $select = $this->select();
+
+        $this->assertSame(
+            array(
+                'zfproducts' => array(
+                    'joinType'      => 'from',
+                    'schema'        => null,
+                    'tableName'     => 'zfproducts',
+                    'joinCondition' => null,
+                ),
+            ),
+            $select->getPart($select::FROM)
+        );
+
+        try {
+            $this->select()->getPart('foo');
+        } catch (SelectException $e) {
+            $this->assertContains('Invalid Select part \'foo\'', $e->getMessage());
+        }
+    }
+
+    public function testQuery()
+    {
+        $select = $this->select();
+
+        $this->db
+            ->expects($this->once())
+            ->method('query');
+
+        $select->query();
+    }
+
+    public function testGetAdapter()
+    {
+        $this->assertSame($this->db, $this->select()->getAdapter());
+    }
+
+    public function testJoinUsingInternalException()
+    {
+        $select = new Select($this->db);
+
+        try {
+            $select->joinUsingInternal('type', 'name', 'cond');
+        } catch (SelectException $e) {
+            $this->assertSame('You can only perform a joinUsing after specifying a FROM table', $e->getMessage());
+        }
     }
 }

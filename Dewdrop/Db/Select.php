@@ -645,22 +645,12 @@ class Select
     /**
      * Executes the current select object and returns the result
      *
-     * @param integer $fetchMode OPTIONAL
-     * @param  mixed  $bind An array of data to bind to the placeholders.
-     * @return PDO_Statement|Zend_Db_Statement
+     * @param  mixed $bind An array of data to bind to the placeholders.
+     * @return mixed
      */
-    public function query($fetchMode = null, $bind = array())
+    public function query($bind = array())
     {
-        if (!empty($bind)) {
-            $this->bind($bind);
-        }
-
-        $stmt = $this->adapter->query($this);
-        if ($fetchMode == null) {
-            $fetchMode = $this->adapter->getFetchMode();
-        }
-        $stmt->setFetchMode($fetchMode);
-        return $stmt;
+        return $this->adapter->query($this, $bind);
     }
 
     /**

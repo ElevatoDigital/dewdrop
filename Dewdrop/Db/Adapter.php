@@ -93,7 +93,7 @@ class Adapter
      *
      * @var \wpdb
      */
-    private $wpdb;
+    protected $wpdb;
 
     /**
      * Create new adapter using the wpdb object as the driver
