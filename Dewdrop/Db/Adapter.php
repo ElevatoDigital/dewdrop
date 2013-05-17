@@ -11,6 +11,7 @@
 namespace Dewdrop\Db;
 
 use Dewdrop\Exception;
+use Dewdrop\Paths;
 
 /**
  * This database adapter largely mirrors the Zend_Db API from Zend Framework 1.
@@ -116,6 +117,27 @@ class Adapter
     public function getConnection()
     {
         return $this->wpdb;
+    }
+
+    /**
+     * Returns table metadata information.
+     *
+     * @param string $table
+     * @return array
+     * @throws \Dewdrop\Exception
+     */
+    public function getTableMetadata($table)
+    {
+        $paths = new Paths();
+        $path  = $paths->getModels() . '/metadata/' . $table . '.php';
+
+        if (!file_exists($path) || !is_readable($path)) {
+            throw new Exception("Could not find metadata for table \"{$this->tableName}\"");
+        }
+
+        $metadata = require $path;
+
+        return $metadata;
     }
 
     /**

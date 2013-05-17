@@ -431,7 +431,7 @@ class Relationship
      * source table itself, in the case of a many-to-many relationship, that reference
      * is instead on the cross-reference table.
      *
-     * @throws Dewdrop\Exception
+     * @throws \Dewdrop\Exception
      * @return array
      */
     public function getOptionPairsReference()
@@ -538,17 +538,7 @@ class Relationship
     protected function loadXrefTableMetadata()
     {
         if (!$this->xrefMetadata) {
-            $paths = new Paths();
-            $path  = $paths->getModels() . '/metadata/' . $this->xrefTableName . '.php';
-
-            if (!file_exists($path) || !is_readable($path)) {
-                throw new Exception(
-                    'ManyToMany\Relationship: Could not find metadata for table '
-                    . '"' . $this->xrefTableName . '"'
-                );
-            }
-
-            $this->xrefMetadata = require $path;
+            $this->xrefMetadata = $this->sourceTable->getAdapter()->getTableMetadata($this->xrefTableName);
         }
 
         return $this->xrefMetadata;
