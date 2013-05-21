@@ -113,6 +113,13 @@ class WpEditRow extends AbstractHelper
         return $this->delegateByArgs(func_get_args(), 'close');
     }
 
+    /**
+     * Use the supplied field to render the closing tags.  The field's
+     * note will be used, if it is set.
+     *
+     * @param Field $field
+     * @return string
+     */
     public function closeField(Field $field)
     {
         return $this->closeArray(
@@ -122,6 +129,13 @@ class WpEditRow extends AbstractHelper
         );
     }
 
+    /**
+     * Close the edit row, explicitly specifying the arguments, in this
+     * case the note that will be displayed with the row.
+     *
+     * @param string $note
+     * @return string
+     */
     public function closeExplicit($note = '')
     {
         return $this->closeArray(
@@ -131,6 +145,12 @@ class WpEditRow extends AbstractHelper
         );
     }
 
+    /**
+     * Close edit row, specifying options as a name-value array.
+     *
+     * @param array $options
+     * @return string
+     */
     public function closeArray(array $options)
     {
         extract($this->prepareCloseOptionsArray($options));
@@ -158,6 +178,12 @@ class WpEditRow extends AbstractHelper
         return $options;
     }
 
+    /**
+     * Ensure the "note" option is present prior to rendering closing partial.
+     *
+     * @param array $options
+     * @return $options
+     */
     protected function prepareCloseOptionsArray(array $options)
     {
         $this->ensurePresent($options, array('note'));
