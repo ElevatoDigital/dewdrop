@@ -12,6 +12,7 @@ namespace Dewdrop\Fields;
 
 use Dewdrop\Db\Field;
 use Dewdrop\Db\Eav\Field as EavField;
+use Dewdrop\Exception;
 
 /**
  * This class detects the appropriate view helper for editing a
