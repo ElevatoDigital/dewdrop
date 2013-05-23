@@ -95,4 +95,19 @@ class EditTest extends BaseTestCase
 
         $this->assertEquals(0, $this->row->get('is_delicious'));
     }
+
+    public function testCanIterateOverFieldCollection()
+    {
+        $this->fields
+            ->add($this->row->field('name'))
+            ->add($this->row->field('is_delicious'));
+
+        $count = 0;
+
+        foreach ($this->fields as $field) {
+            $count += 1;
+        }
+
+        $this->assertEquals(2, $count);
+    }
 }
