@@ -59,6 +59,20 @@ class DetectEditHelper extends AbstractHelper
     }
 
     /**
+     * Override the default EditHelperDetector object.  Primarily helpful
+     * during testing.
+     *
+     * @param EditHelperDetector $editHelperDetector
+     * @return \Dewdrop\View\Helper\DetectEditHelper
+     */
+    public function setDetector(EditHelperDetector $editHelperDetector)
+    {
+        $this->detector = $editHelperDetector;
+
+        return $this;
+    }
+
+    /**
      * Get the \Dewdrop\Fields\EditHelperDetector object for use in this helper.
      * We lazy-load the detector whenever render() or customize() are first
      * called.
