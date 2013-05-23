@@ -36,6 +36,7 @@ class Run
         'Package',
         'GenAdminComponent',
         'GenDbTable',
+        'GenEav',
         'DewdropTest',
         'DewdropDoc'
     );

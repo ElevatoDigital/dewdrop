@@ -52,8 +52,9 @@ class WpEditRow extends AbstractHelper
     {
         return $this->openArray(
             array(
-                'label'    => $field->getLabel(),
-                'labelFor' => $field->getHtmlId()
+                'label'     => $field->getLabel(),
+                'labelFor'  => $field->getHtmlId(),
+                'hideLabel' => $field->isType('boolean')
             )
         );
     }
@@ -97,8 +98,9 @@ class WpEditRow extends AbstractHelper
         return $this->partial(
             'wp-edit-row-open.phtml',
             array(
-                'label'    => $label,
-                'labelFor' => $labelFor
+                'label'     => $label,
+                'labelFor'  => $labelFor,
+                'hideLabel' => $hideLabel
             )
         );
     }
@@ -173,7 +175,7 @@ class WpEditRow extends AbstractHelper
     {
         $this
             ->checkRequired($options, array('label'))
-            ->ensurePresent($options, array('labelFor'));
+            ->ensurePresent($options, array('labelFor', 'hideLabel'));
 
         return $options;
     }

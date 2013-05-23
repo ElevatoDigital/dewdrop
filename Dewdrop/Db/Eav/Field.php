@@ -26,6 +26,14 @@ class Field extends BaseField
     private $definition;
 
     /**
+     * The attribute information associated with this field in the EAV
+     * definition.
+     *
+     * @var array
+     */
+    private $attribute;
+
+    /**
      * Set the EAV definition that contains the attribute represented by
      * this field object.
      *
@@ -35,13 +43,34 @@ class Field extends BaseField
     public function setDefinition(Definition $definition)
     {
         $this->definition = $definition;
-
-        $attribute = $this->definition->getAttribute($this->name);
+        $this->attribute  = $this->definition->getAttribute($this->name);
 
         $this
-            ->setLabel($attribute['label'])
-            ->setNote($attribute['note']);
+            ->setLabel($this->attribute['label'])
+            ->setNote($this->attribute['note']);
 
         return $this;
+    }
+
+    /**
+     * Get the name of the edit view helper assigned to this field in the
+     * EAV definition.
+     *
+     * @return string
+     */
+    public function getEditHelperName()
+    {
+        return $this->attribute['edit_helper'];
+    }
+
+    /**
+     * Get the name of the display view helper assigned to this field in the
+     * EAV definition.
+     *
+     * @return string
+     */
+    public function getDisplayHelperName()
+    {
+        return $this->attribute['display_helper'];
     }
 }

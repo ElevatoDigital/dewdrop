@@ -1,10 +1,12 @@
 <tr valign="top">
     <th scope="row">
         <?php
-        if (!$this->labelFor) {
-            echo $this->escapeHtml($this->label);
-        } else {
-            echo '<label for="' . $this->escapeHtmlAttr($this->labelFor) . '">' . $this->escapeHtml($this->label) . '</label>';
+        if (!$this->hideLabel) {
+            if (!$this->labelFor) {
+                echo $this->escapeHtml($this->label);
+            } else {
+                echo '<label for="' . $this->escapeHtmlAttr($this->labelFor) . '">' . $this->escapeHtml($this->label) . '</label>';
+            }
         }
         ?>
     </th>
