@@ -12,6 +12,7 @@ namespace Dewdrop\Fields;
 
 use Countable;
 use Dewdrop\Db\Adapter as DbAdapter;
+use Dewdrop\Exception;
 use Iterator;
 
 /**

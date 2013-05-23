@@ -100,7 +100,7 @@ class EditHelperDetectorTest extends BaseTestCase
     {
         $db = new \Dewdrop\Db\Adapter\Mock();
 
-        require_once __DIR__ . '/edit-helper-detector/DewdropTestFruits.php';
+        require_once __DIR__ . '/test-tables/DewdropTestFruits.php';
         $table = new \DewdropFieldsTest\DewdropTestFruits($db);
         $row   = $table->createRow();
 
