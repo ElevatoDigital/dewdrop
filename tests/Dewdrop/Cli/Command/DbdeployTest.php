@@ -86,7 +86,7 @@ class DbdeployTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             2,
-            $db->fetchOne('SELECT COUNT(*) FROM dewdrop_test_dbdeploy_changelog')
+            $db->fetchOne("SELECT COUNT(*) FROM dewdrop_test_dbdeploy_changelog")
         );
     }
 
@@ -278,6 +278,11 @@ class DbdeployTest extends \PHPUnit_Framework_TestCase
         $command->overrideChangesetPath(
             'dewdrop-test',
             'vendor/tests/Dewdrop/Cli/Command/dbdeploy-test/dewdrop-test/'
+        );
+
+        $command->overrideChangesetPath(
+            'dewdrop-core',
+            'vendor/tests/Dewdrop/Cli/Command/dbdeploy-test/dewdrop-core/'
         );
 
         $command->overrideChangelogTableName('dewdrop_test_dbdeploy_changelog');
