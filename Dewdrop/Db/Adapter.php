@@ -132,7 +132,7 @@ class Adapter
         $path  = $paths->getModels() . '/metadata/' . $table . '.php';
 
         if (!file_exists($path) || !is_readable($path)) {
-            throw new Exception("Could not find metadata for table \"{$this->tableName}\"");
+            throw new Exception("Could not find metadata for table \"{$table}\"");
         }
 
         $metadata = require $path;
