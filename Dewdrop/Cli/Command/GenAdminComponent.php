@@ -19,8 +19,10 @@ namespace Dewdrop\Cli\Command;
  * |~admin/
  * | `~my-component/
  * |   |~view-scripts/
+ * |   | |-edit.phtml
  * |   | `-index.phtml
  * |   |-Component.php
+ * |   |-Edit.php
  * |   `-Index.php
  * </code>
  */
@@ -42,6 +44,13 @@ class GenAdminComponent extends CommandAbstract
      * @var string
      */
     private $folder;
+
+    /**
+     * The name of the model class that will be used in your plugin.
+     *
+     * @var string
+     */
+    private $model;
 
     /**
      * The namespace that will be used for all component classes.  If not
@@ -85,14 +94,26 @@ class GenAdminComponent extends CommandAbstract
             array('n')
         );
 
+        $this->addArg(
+            'model',
+            'The model class for the component',
+            self::ARG_OPTIONAL,
+            array('m')
+        );
+
         $this->addExample(
-            'Generate a component with the title "Fruits" and folder name auto-detected',
+            'Generate a component with the title "Fruits" and folder and model names auto-detected',
             "./dewdrop gen-admin-component 'Fruits'"
         );
 
         $this->addExample(
-            'Manually set a folder name',
+            'Manually set a folder name, model name auto-detected',
             "./dewdrop gen-admin-component 'Fruits' -f 'manual-folder-name'"
+        );
+
+        $this->addExample(
+            'Manually set folder and model names',
+            "./dewdrop gen-admin-component 'Manage Fruits' -f 'super-fruits' -m 'Fruits'"
         );
     }
 
@@ -105,6 +126,10 @@ class GenAdminComponent extends CommandAbstract
     {
         if (!$this->folder) {
             $this->folder = $this->inflectFolderFromTitle();
+        }
+
+        if (!$this->model) {
+            $this->model = $this->inflectModelFromTitle();
         }
 
         $path   = $this->getComponentPath();
@@ -120,33 +145,59 @@ class GenAdminComponent extends CommandAbstract
 
         $templateReplacements = array(
             '{{namespace}}' => ($this->namespace ?: $this->inflectNamespaceFromFolder()),
-            '{{title}}'     => str_replace("'", "\'", $this->title)
+            '{{title}}'     => str_replace("'", "\'", $this->title),
+            '{{model}}'     => $this->model ?: $this->inflectModelFromTitle(),
         );
 
-        $this->writeFile(
+        $templatesDir = __DIR__ . '/gen-templates/admin-component';
+
+        $this->writeFileFromTemplate(
             "{$newDir}/Component.php",
-            str_replace(
-                array_keys($templateReplacements),
-                $templateReplacements,
-                file_get_contents(__DIR__ . '/gen-templates/admin-component/Component.tpl')
-            )
+            "{$templatesDir}/Component.tpl",
+            $templateReplacements
         );
 
-        $this->writeFile(
+        $this->writeFileFromTemplate(
+            "{$newDir}/Edit.php",
+            "{$templatesDir}/Edit.tpl",
+            $templateReplacements
+        );
+
+        $this->writeFileFromTemplate(
             "{$newDir}/Index.php",
-            str_replace(
-                array_keys($templateReplacements),
-                $templateReplacements,
-                file_get_contents(__DIR__ . '/gen-templates/admin-component/Index.tpl')
-            )
+            "{$templatesDir}/Index.tpl",
+            $templateReplacements
         );
 
         $this->createFolder("{$newDir}/view-scripts");
 
-        $this->writeFile(
-            "{$newDir}/view-scripts/index.phtml",
-            file_get_contents(__DIR__ . '/gen-templates/admin-component/view-scripts/index.tpl')
+        $viewScriptDir          = "{$newDir}/view-scripts";
+        $viewScriptTemplatesDir = "{$templatesDir}/view-scripts";
+
+        $this->writeFileFromTemplate(
+            "{$viewScriptDir}/edit.phtml",
+            "{$viewScriptTemplatesDir}/edit.tpl",
+            $templateReplacements
         );
+
+        $this->writeFileFromTemplate(
+            "{$viewScriptDir}/index.phtml",
+            "{$viewScriptTemplatesDir}/index.tpl",
+            $templateReplacements
+        );
+    }
+
+    /**
+     * Set the model class of the component
+     *
+     * @param string $model
+     * @return \Dewdrop\Cli\Command\GenAdminComponent
+     */
+    public function setModel($model)
+    {
+        $this->model = $model;
+
+        return $this;
     }
 
     /**
@@ -237,6 +288,26 @@ class GenAdminComponent extends CommandAbstract
     }
 
     /**
+     * @param string $file
+     * @param string $template
+     * @param array $replacements
+     * @return \Dewdrop\Cli\Command\GenAdminComponent
+     */
+    protected function writeFileFromTemplate($file, $template, array $replacements = array())
+    {
+        $this->writeFile(
+            $file,
+            str_replace(
+                array_keys($replacements),
+                $replacements,
+                file_get_contents($template)
+            )
+        );
+
+        return $this;
+    }
+
+    /**
      * Check to see if the component folder already exists.
      *
      * This is a separate method so that it's easy to mock during testing.
@@ -275,6 +346,29 @@ class GenAdminComponent extends CommandAbstract
         );
 
         return $folder;
+    }
+
+    /**
+     * Inflect model name from title, removing any leading non-alphabetic characters, removing any non-alphanumeric
+     * characters, and upper-casing the first character.
+     *
+     * For example:
+     *
+     * My Super New Component
+     *
+     * Becomes:
+     *
+     * MySuperNewComponent
+     *
+     * @return string
+     */
+    private function inflectModelFromTitle()
+    {
+        $model = preg_replace('/^[^a-z]+/i', '', $this->title);
+        $model = preg_replace('/[^a-z0-9]/i', '', $model);
+        $model = ucfirst($model);
+
+        return $model;
     }
 
     /**
