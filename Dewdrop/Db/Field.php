@@ -536,7 +536,8 @@ class Field
      */
     protected function isTypeInteger()
     {
-        return $this->isType('int', 'integer', 'mediumint', 'smallint', 'bigint');
+        return 'integer' === $this->metadata['DATA_TYPE'] ||
+            $this->isType('int', 'mediumint', 'smallint', 'bigint');
     }
 
     /**
@@ -547,7 +548,8 @@ class Field
      */
     protected function isTypeFloat()
     {
-        return $this->isType('float', 'dec', 'decimal', 'double', 'double precision', 'fixed');
+        return 'float' === $this->metadata['DATA_TYPE'] ||
+            $this->isType('dec', 'decimal', 'double', 'double precision', 'fixed');
     }
 
     /**

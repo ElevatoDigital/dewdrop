@@ -253,4 +253,22 @@ class TableTest extends DbTestCase
         $this->assertSame(3, count($fruits));
         $this->assertEquals(3, $fruits[0][$idField]);
     }
+
+    public function testFetchAdminListing()
+    {
+        $fruits = $this->table->fetchAdminListing();
+
+        $this->assertInternalType('array', $fruits);
+        $this->assertSame(5, count($fruits));
+        $previousFruitId = 0;
+        foreach ($fruits as $fruit) {
+            $this->assertInternalType('array', $fruit);
+            $this->assertArrayHasKey('dewdrop_test_fruit_id', $fruit);
+            $this->assertGreaterThan($previousFruitId, $fruit['dewdrop_test_fruit_id']);
+            $previousFruitId = $fruit['dewdrop_test_fruit_id'];
+            $this->assertArrayHasKey('name', $fruit);
+            $this->assertArrayHasKey('is_delicious', $fruit);
+            $this->assertArrayHasKey('level_of_deliciousness', $fruit);
+        }
+    }
 }

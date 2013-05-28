@@ -216,6 +216,22 @@ class Dewdrop_Cli_Command_GenAdminComponentTest extends PHPUnit_Framework_TestCa
             ->method('writeFile');
 
         $gen
+            ->expects($this->at(4))
+            ->method('writeFile');
+
+        $gen
+            ->expects($this->at(5))
+            ->method('writeFile');
+
+        $gen
+            ->expects($this->at(6))
+            ->method('writeFile');
+
+        $gen
+            ->expects($this->exactly(5))
+            ->method('writeFile');
+
+        $gen
             ->parseArgs(
                 array(
                     '-t',

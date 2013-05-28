@@ -154,6 +154,26 @@ abstract class Table
     abstract public function init();
 
     /**
+     * Return a listing for the admin.
+     *
+     * @return array
+     */
+    public function fetchAdminListing()
+    {
+        $orderSpec = array();
+
+        foreach ($this->getPrimaryKey() as $primaryKeyColumn) {
+            $orderSpec[] = $primaryKeyColumn;
+        }
+
+        $select = $this->select()
+            ->from($this->getTableName())
+            ->order($orderSpec);
+
+        return $this->db->fetchAll($select);
+    }
+
+    /**
      * Register an EAV definition with this table.
      *
      * @param array $options Additional options to pass to the EAV definition.
