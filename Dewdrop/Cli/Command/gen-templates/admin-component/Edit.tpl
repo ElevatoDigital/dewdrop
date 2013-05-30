@@ -11,7 +11,7 @@ class Edit extends EditAbstract
 
     public function init()
     {
-        $this->row = $this->findRowById({{model}});
+        $this->row = $this->findRowById('{{model}}');
 
         $table = $this->row->getTable();
 

@@ -19,9 +19,11 @@ class Index extends PageAbstract
 
     public function render()
     {
-        $this->view->assign(array(
-            'primaryKeyColumns' => $this->model->getPrimaryKey(),
-            'rows'              => $this->rows,
-        ));
+        $this->view->assign(
+            array(
+                'primaryKeyColumns' => $this->model->getPrimaryKey(),
+                'rows'              => $this->rows,
+            )
+        );
     }
 }
