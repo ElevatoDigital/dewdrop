@@ -288,6 +288,8 @@ class GenAdminComponent extends CommandAbstract
     }
 
     /**
+     * Write a file at the specified path using the given template and placeholder replacement data.
+     *
      * @param string $file
      * @param string $template
      * @param array $replacements
