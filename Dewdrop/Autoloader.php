@@ -28,21 +28,28 @@ class Autoloader
      * Create auto-loader instance that allows access to Dewdrop, Zend, and
      * plugin model classes without needing to require the files defining
      * them explicitly.
+     *
+     * @param array $customNamespaces Any namespaces you'd like added to the
+     *     autoloader config.
      */
-    public function __construct()
+    public function __construct(array $customNamespaces = array())
     {
         require_once __DIR__ . '/Paths.php';
         $paths = new \Dewdrop\Paths();
 
         require_once $paths->getVendor() . '/Zend/Loader/AutoloaderFactory.php';
 
+        $defaultNamespaces = array(
+            'Dewdrop' => $paths->getVendor() . '/Dewdrop',
+            'Zend'    => $paths->getVendor() . '/Zend',
+            'Model'   => $paths->getModels()
+        );
+
+        $namespaces = array_merge($defaultNamespaces, $customNamespaces);
+
         $config = array(
             'Zend\Loader\StandardAutoloader' => array(
-                'namespaces' => array(
-                    'Dewdrop' => $paths->getVendor() . '/Dewdrop',
-                    'Zend'    => $paths->getVendor() . '/Zend',
-                    'Model'   => $paths->getModels()
-                )
+                'namespaces' => $namespaces
             )
         );
 
