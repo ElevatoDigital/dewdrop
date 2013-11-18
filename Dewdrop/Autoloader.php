@@ -20,7 +20,7 @@ class Autoloader
     /**
      * Zend autoloader instance created by this class
      *
-     * @var \Zend\Loader\Autoloader\StandardAutoloader
+     * @var \Zend\Loader\StandardAutoloader
      */
     private $autoloader;
 
@@ -31,8 +31,9 @@ class Autoloader
      *
      * @param array $customNamespaces Any namespaces you'd like added to the
      *     autoloader config.
+     * @param array $prefixes
      */
-    public function __construct(array $customNamespaces = array())
+    public function __construct(array $customNamespaces = array(), array $prefixes = array())
     {
         require_once __DIR__ . '/Paths.php';
         $paths = new \Dewdrop\Paths();
@@ -49,7 +50,8 @@ class Autoloader
 
         $config = array(
             'Zend\Loader\StandardAutoloader' => array(
-                'namespaces' => $namespaces
+                'namespaces' => $namespaces,
+                'prefixes'   => $prefixes,
             )
         );
 
