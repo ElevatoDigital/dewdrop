@@ -98,7 +98,7 @@ class Run
     public function __construct(array $args = null, $command = null, $renderer = null)
     {
         require_once dirname(__DIR__) . '/Autoloader.php';
-        $this->autoloader = new \Dewdrop\Autoloader(dirname(dirname(__DIR__)));
+        $this->autoloader = new \Dewdrop\Autoloader();
 
         $this->args     = ($args ?: array_slice($_SERVER['argv'], 2));
         $this->renderer = ($renderer ?: new Renderer\Markdown());
