@@ -52,12 +52,16 @@ class ComponentAbstractTest extends BaseTestCase
             array()
         );
 
+        $this->request->setQuery('page', 'Animals');
+
         $response
             ->expects($this->once())
             ->method('setPage')
             ->with(new \PHPUnit_Framework_Constraint_IsInstanceOf('\DewdropTest\Admin\Animals\RouteTest'));
 
-        $this->component->route(null, $response);
+        $this->component
+            ->adminInit(null, $response)
+            ->route();
     }
 
     public function testWillRouteToIndexPageWhenNothingSpecifiedInQueryString()
@@ -68,12 +72,16 @@ class ComponentAbstractTest extends BaseTestCase
             array()
         );
 
+        $this->request->setQuery('page', 'Animals');
+
         $response
             ->expects($this->once())
             ->method('setPage')
             ->with(new \PHPUnit_Framework_Constraint_IsInstanceOf('\DewdropTest\Admin\Animals\Index'));
 
-        $this->component->route(null, $response);
+        $this->component
+            ->adminInit(null, $response)
+            ->route();
     }
 
     public function testGeneratesUrlForSpecifiedPageWithNoSubmenusOrParams()

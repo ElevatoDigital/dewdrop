@@ -70,6 +70,8 @@ abstract class ComponentAbstract
      */
     private $request;
 
+    private $response;
+
     /**
      * Create a component instance using the DB adapter creating by the Wiring
      * class.
@@ -101,6 +103,7 @@ abstract class ComponentAbstract
      */
     public function register()
     {
+        add_action('admin_init', array($this, 'adminInit'));
         add_action('admin_menu', array($this, 'registerMenuPage'));
 
         // Also allow routing via WP's ajax facility to avoid rendering layout
@@ -108,24 +111,58 @@ abstract class ComponentAbstract
     }
 
     /**
-     * Route requests to this component to the specified in the "route"
-     * parameter of the query string, if set.  This allows us to manage multiple
-     * pages in a component without having to hook into WP again for every page.
+     * Handle the admin_init action.  All page handling is done on admin_init
+     * so we have the opportunity to run code prior to WP rendering any output.
      *
      * @param string $page The name of the page to route to (e.g. "Index" or "Edit").
      * @param Response $response Inject a response object, usually for tests.
+     *
+     * @return \Dewdrop\Admin\ComponentAbstract
      */
-    public function route($page = null, Response $response = null)
+    public function adminInit($page = null, Response $response = null)
     {
-        $page = $this->createPageObject($page);
+        if ($this->isCurrentlyActive()) {
+            $page = $this->createPageObject($page);
 
-        if (null === $response) {
-            $response = new Response();
+            if (null === $response) {
+                $response = new Response();
+            }
+
+            $response->setPage($page);
+            $this->dispatchPage($page, $response);
+
+            $this->response = $response;
         }
 
-        $response->setPage($page);
-        $this->dispatchPage($page, $response);
-        $response->render();
+        return $this;
+    }
+
+    /**
+     * Check to see if this component is currently being accessed.  We do this
+     * manually because we want to know whether the component is in use before
+     * WP would itself be able to tell us.  This allows us to dispatch pages on
+     * admin_init, which is early enough in the process that we can easily enqueue
+     * other resources.  Also, this gives us the chance to run code before WP has
+     * rendered any output.
+     *
+     * @return boolean
+     */
+    protected function isCurrentlyActive()
+    {
+        return preg_match('/^' . $this->getSlug() . '($|\/)/i', $this->request->getQuery('page')) ||
+            $this->getSlug() === $this->request->getPost('action');
+    }
+
+    /**
+     * Route requests to this component to the specified in the "route"
+     * parameter of the query string, if set.  This allows us to manage multiple
+     * pages in a component without having to hook into WP again for every page.
+     */
+    public function route()
+    {
+        if ($this->response) {
+            $this->response->render();
+        }
     }
 
     /**
