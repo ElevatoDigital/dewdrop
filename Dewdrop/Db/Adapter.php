@@ -425,6 +425,10 @@ class Adapter
      */
     public function quote($value, $type = null)
     {
+        if (null === $value) {
+            return 'null';
+        }
+
         if ($value instanceof Select) {
             return '(' . $value->assemble() . ')';
         }

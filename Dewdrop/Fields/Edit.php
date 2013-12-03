@@ -152,7 +152,9 @@ class Edit implements Countable, Iterator
     {
         foreach ($values as $key => $value) {
             if ($this->has($key)) {
-                $this->get($key)->setValue($value);
+                $field = $this->get($key);
+
+                $field->setValue($field->getFilterChain()->filter($value));
             }
         }
 
