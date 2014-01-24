@@ -219,12 +219,6 @@ class Row
         if (!$this->isNew()) {
             $updateData = $this->data;
 
-            foreach ($this->table->getMetadata('columns') as $column => $metadata) {
-                if ($metadata['IDENTITY'] && $metadata['PRIMARY']) {
-                    unset($updateData[$column]);
-                }
-            }
-
             $this->table->update($updateData, $this->assembleUpdateWhereClause());
         } else {
             $this->table->insert($this->data);

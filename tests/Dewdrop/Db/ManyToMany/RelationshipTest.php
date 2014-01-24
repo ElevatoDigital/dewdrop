@@ -73,6 +73,8 @@ class RelationshipTest extends DbTestCase
 
         $row
             ->set('name', 'T-Rex')
+            ->set('is_fierce', true)
+            ->set('is_cute', false)
             ->save();
 
         $this->assertEquals(0, count($row->get('fruits')));
