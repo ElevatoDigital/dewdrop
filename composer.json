@@ -4,7 +4,7 @@
         "bin/dewdrop"
     ],
     "autolaod": {
-        "psr-0": {"Dewdrop\\": "Dewdrop/"}
+        "psr-4": {"Dewdrop\\": "Dewdrop/"}
     },
     "require": {
         "php": ">=5.4.0",
