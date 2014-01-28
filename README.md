@@ -19,33 +19,6 @@ how to get your development environment running smoothly:
 * Darby Felton, Delta Systems
 
 
-Quick Start
------------
-
-### Step 1
-
-Download and install the latest release of WordPress:
-    
-<http://wordpress.org/latest.zip>
-
-### Step 2
-
-Run the Dewdrop installer script in your terminal from within the root folder 
-of your WordPress installation (the folder containing your wp-config.php file):
-
-    php <(curl -sS https://raw.github.com/DeltaSystems/dewdrop/master/installer)
-
-### Done
-
-Once the installer completes, you'll have a new plugin in place with the default
-Dewdrop layout.  Additionally, the Dewdrop library and it's dependencies will be
-wired in and accessible via the command line tool.
-
-See what's available to you by running:
-
-    ./dewdrop help
-
-
 API docs and test reports
 -------------------------
 
