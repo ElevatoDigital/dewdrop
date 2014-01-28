@@ -1,0 +1,19 @@
+{
+    "name": "deltasystems/dewdrop",
+    "bin": [
+        "dewdrop"
+    ],
+    "require": {
+        "php": ">=5.4.0",
+        "phpunit/dbunit": "1.*",
+        "phpunit/phpunit": "3.*",
+        "phpunit/phpunit-mock-objects": "1.*",
+        "zendframework/zend-dom": "2.*",
+        "zendframework/zend-escaper": "2.*",
+        "zendframework/zend-filter": "2.*",
+        "zendframework/zend-i18n": "2.*",
+        "zendframework/zend-inputfilter": "2.*",
+        "zendframework/zend-log": "2.*",
+        "zendframework/zend-validator": "2.*",
+    }
+}

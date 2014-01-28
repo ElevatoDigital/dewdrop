@@ -1,0 +1,11 @@
+#!/usr/bin/env php
+<?php
+
+if ('cli' !== php_sapi_name()) {
+    exit;
+}
+
+require_once 'vendor/autoload.php';
+
+$cli = new \Dewdrop\Cli\Run();
+$cli->run();
