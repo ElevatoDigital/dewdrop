@@ -3,7 +3,7 @@
     "bin": [
         "bin/dewdrop"
     ],
-    "autolaod": {
+    "autoload": {
         "psr-4": {"Dewdrop\\": ""}
     },
     "require": {
