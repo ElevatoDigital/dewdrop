@@ -11,6 +11,7 @@
         "phpunit/dbunit": "1.*",
         "phpunit/phpunit": "3.*",
         "phpunit/phpunit-mock-objects": "1.*",
+        "zendframework/zend-console": "2.*",
         "zendframework/zend-dom": "2.*",
         "zendframework/zend-escaper": "2.*",
         "zendframework/zend-filter": "2.*",
