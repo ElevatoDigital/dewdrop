@@ -199,4 +199,71 @@ class RowTest extends DbTestCase
         $this->assertSame(4, count($fruits));
         $this->assertEquals(2, $fruits[0][$idField]);
     }
+
+    public function testSettingPropertyWithObjectSyntaxIsAllowed()
+    {
+        $row = $this->table->createRow();
+        $row->name = 'Apple';
+        $this->assertEquals($row->get('name'), 'Apple');
+    }
+
+    public function testSettingPropertyWithArraySyntaxIsAllowed()
+    {
+        $row = $this->table->createRow();
+        $row['name'] = 'Apple';
+        $this->assertEquals($row->get('name'), 'Apple');
+    }
+
+    public function testGettingPropertyWithObjectSyntaxIsAllowed()
+    {
+        $row = $this->table->createRow();
+        $row->set('name', 'Apple');
+        $this->assertEquals($row->name, 'Apple');
+    }
+
+    public function testGettingPropertyWithArraySyntaxIsAllowed()
+    {
+        $row = $this->table->createRow();
+        $row->set('name', 'Apple');
+        $this->assertEquals($row['name'], 'Apple');
+    }
+
+    public function testCanCheckForColumnExistenceWithHasMethod()
+    {
+        $row = $this->table->createRow();
+        $this->assertTrue($row->has('name'));
+        $this->assertFalse($row->has('fafafafa'));
+    }
+
+    public function testCanCheckForColumnExistenceWithObjectSyntax()
+    {
+        $row = $this->table->createRow();
+        $this->assertTrue(isset($row->name));
+        $this->assertFalse(isset($row->fafafafa));
+    }
+
+    public function testCanCheckForColumnExistenceWithArraySyntax()
+    {
+        $row = $this->table->createRow();
+        $this->assertTrue(isset($row['name']));
+        $this->assertFalse(isset($row['fafafafa']));
+    }
+
+    /**
+     * @expectedException \Dewdrop\Exception
+     */
+    public function testCannotUnsetColumnWithObjectSyntax()
+    {
+        $row = $this->table->createRow();
+        unset($row->name);
+    }
+
+    /**
+     * @expectedException \Dewdrop\Exception
+     */
+    public function testCannotUnsetColumnWithArraySyntax()
+    {
+        $row = $this->table->createRow();
+        unset($row['name']);
+    }
 }

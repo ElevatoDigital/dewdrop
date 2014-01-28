@@ -10,6 +10,7 @@
 
 namespace Dewdrop\Db;
 
+use ArrayAccess;
 use Dewdrop\Exception;
 
 /**
@@ -33,6 +34,23 @@ use Dewdrop\Exception;
  * );
  * </code>
  *
+ * Setting and retrieving values can also be done via direct object or array-style
+ * use of the object:
+ *
+ * <code>
+ * // Access a column's value with object syntax
+ * echo $row->column_name;
+ *
+ * // Access a column's value with array syntax
+ * echo $row['column_name'];
+ *
+ * // Set a column's value with object syntax
+ * $row->column_name = 'Value';
+ *
+ * // Set a column's value with array syntax
+ * $row['column_name'] = 'Value';
+ * </code>
+ *
  * Once the columns have been assigned the desired values, you can call save(),
  * which will either update or insert the row depending upon whether it already
  * exists in the database.  After saving, the row's data is automatically
@@ -51,7 +69,7 @@ use Dewdrop\Exception;
  * APIs, leveraging the database metadata to add validators, retrieve lists
  * of options, etc.
  */
-class Row
+class Row implements ArrayAccess
 {
     /**
      * The data represented by this row.
@@ -142,6 +160,41 @@ class Row
     }
 
     /**
+     * Allow setting of data properties on this row via direct object property
+     * syntax:
+     *
+     * <code>
+     * $row->property_id = $value;
+     * </code>
+     *
+     * @param string $key
+     * @param mixed $value
+     * @return void
+     */
+    public function __set($key, $value)
+    {
+        $this->set($key, $value);
+    }
+
+    /**
+     * Allow setting of data properties on this row via direct array syntax:
+     *
+     * <code>
+     * $row['property_id'] = $value;
+     * </code>
+     *
+     * This is part of the ArrayAccess interface built into PHP.
+     *
+     * @param string $key
+     * @param mixed $value
+     * @return void
+     */
+    public function offsetSet($key, $value)
+    {
+        $this->set($key, $value);
+    }
+
+    /**
      * The the value of one or more columns on this row.
      *
      * If $name is a string, that single column will be set.  If $name is an
@@ -176,6 +229,38 @@ class Row
     }
 
     /**
+     * Allow retrieval of data values via direct object property access:
+     *
+     * <code>
+     * echo $row->property_id;
+     * </code>
+     *
+     * @param string $key
+     * @return mixed
+     */
+    public function __get($key)
+    {
+        return $this->get($key);
+    }
+
+    /**
+     * Allow retrieval of data values via direct array access:
+     *
+     * <code>
+     * echo $row['property_id'];
+     * </code>
+     *
+     * This method is part of the ArrayAccess interface built into PHP.
+     *
+     * @param string $key
+     * @return mixed
+     */
+    public function offsetGet($key)
+    {
+        return $this->get($key);
+    }
+
+    /**
      * Get the value of the specified column.
      *
      * @param string $name
@@ -207,6 +292,72 @@ class Row
         }
 
         return $this->data[$name];
+    }
+
+    /**
+     * Test to see if a given column exists on this row using object syntax:
+     *
+     * <code>
+     * isset($row->column_name);
+     * </code>
+     *
+     * @param string $key
+     * @return boolean
+     */
+    public function __isset($key)
+    {
+        return $this->has($key);
+    }
+
+    /**
+     * Test to see if a given column exists on this row using array syntax:
+     *
+     * <code>
+     * isset($row['column_name']);
+     * </code>
+     *
+     * This method is part of the ArrayAccess interface built into PHP.
+     *
+     * @param string $key
+     * @return boolean
+     */
+    public function offsetExists($key)
+    {
+        return $this->has($key);
+    }
+
+    /**
+     * Test to see if the given column exists on this row.
+     *
+     * @param string $name
+     * @return boolean
+     */
+    public function has($name)
+    {
+        return array_key_exists($name, $this->data);
+    }
+
+    /**
+     * We do not allow unsetting columns on a row.
+     *
+     * @param string $key
+     * @throws \Dewdrop\Exception
+     */
+    public function __unset($key)
+    {
+        throw new Exception('Cannot unset columns on a Row object');
+    }
+
+    /**
+     * Even though this method is required by the ArrayAccess interface,
+     * we do not allow unsetting columns on a row.
+     *
+     * @param string $key
+     * @throws \Dewdrop\Exception
+     */
+    public function offsetUnset($key)
+    {
+        throw new Exception('Cannot unset columns on a Row object');
     }
 
     /**
