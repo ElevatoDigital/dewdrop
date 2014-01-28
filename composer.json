@@ -3,6 +3,9 @@
     "bin": [
         "dewdrop"
     ],
+    "autolaod": {
+        "psr-0": {"Dewdrop\\": "Dewdrop/"}
+    },
     "require": {
         "php": ">=5.4.0",
         "phpunit/dbunit": "1.*",
