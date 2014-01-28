@@ -48,13 +48,6 @@ class Run
     private $commands = array();
 
     /**
-     * The autoloader instance used for class loading.
-     *
-     * @var \Dewdrop\Autoloader
-     */
-    private $autoloader;
-
-    /**
      * The arguments that should be supplied to the executed command.  By
      * default these will be taken from the command line directly, using
      * every element in the $_SERVER['argv'] array starting at index 2.
@@ -96,9 +89,6 @@ class Run
      */
     public function __construct(array $args = null, $command = null, $renderer = null)
     {
-        require_once dirname(__DIR__) . '/Autoloader.php';
-        $this->autoloader = new \Dewdrop\Autoloader();
-
         $this->args     = ($args ?: array_slice($_SERVER['argv'], 2));
         $this->renderer = ($renderer ?: new Renderer\Markdown());
 
