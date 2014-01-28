@@ -32,7 +32,7 @@ abstract class BaseTestCase extends PHPUnit_Framework_TestCase implements DomInt
 
         $this->assertTrue(
             count($results) > 0,
-            "The HTML output does not match the DOM query \"{$selector}\"."
+            "The HTML output does not match the DOM query \"{$selector}\".  Output: " . $html
         );
     }
 

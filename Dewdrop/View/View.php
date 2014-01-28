@@ -52,6 +52,7 @@ class View
         'adminurl'         => '\Dewdrop\View\Helper\AdminUrl',
         'detectedithelper' => '\Dewdrop\View\Helper\DetectEditHelper',
         'inlinescript'     => '\Dewdrop\View\Helper\InlineScript',
+        'textarea'         => '\Dewdrop\View\Helper\Textarea',
         'ui'               => '\Dewdrop\View\Helper\Ui',
         'wpadminnotice'    => '\Dewdrop\View\Helper\WpAdminNotice',
         'wpcheckboxlist'   => '\Dewdrop\View\Helper\WpCheckboxList',
