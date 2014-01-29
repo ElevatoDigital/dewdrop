@@ -15,8 +15,8 @@ class PathsTest extends BaseTestCase
     public function setUp()
     {
         $this->paths      = new Paths();
-        $this->wpRoot     = realpath(__DIR__ . '/../../../../../../');
-        $this->pluginRoot = realpath(__DIR__ . '/../../../');
+        $this->wpRoot     = ABSPATH;
+        $this->pluginRoot = rtrim($this->wpRoot, '/') . '/' . Config::getInstance()->get('wp')->pluginPath;
     }
 
     public function testWpRoot()
@@ -26,7 +26,10 @@ class PathsTest extends BaseTestCase
 
     public function testDewdropLib()
     {
-        $this->assertEquals($this->pluginRoot . '/vendor/Dewdrop', $this->paths->getDewdropLib());
+        $this->assertEquals(
+            realpath(__DIR__ . '/../../'),
+            $this->paths->getDewdropLib()
+        );
     }
 
     public function testPluginRoot()

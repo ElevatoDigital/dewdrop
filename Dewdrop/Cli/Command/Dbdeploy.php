@@ -75,11 +75,7 @@ class Dbdeploy extends CommandAbstract
      *
      * @var array
      */
-    private $changesets = array(
-        'plugin'       => 'db',
-        'dewdrop-core' => 'vendor/db',
-        'dewdrop-test' => 'vendor/tests/db'
-    );
+    private $changesets = array();
 
     /**
      * The name of the changelog table.  This is not intended to be modified
@@ -105,6 +101,10 @@ class Dbdeploy extends CommandAbstract
      */
     public function init()
     {
+        $this->changesets['plugin']       = $this->paths->getPluginRoot() . '/db';
+        $this->changesets['dewdrop-core'] = $this->paths->getDewdropLib() . '/db';
+        $this->changesets['dewdrop-test'] = $this->paths->getDewdropLib() . '/tests/db';
+
         $this
             ->setDescription('Update database schema using dbdeploy')
             ->setCommand('dbdeploy')
@@ -633,7 +633,6 @@ class Dbdeploy extends CommandAbstract
     private function getChangeFiles($currentRevision, $path)
     {
         $out   = array();
-        $path  = $this->paths->getPluginRoot() . '/' . $path;
         $files = glob("{$path}/*.sql");
 
         foreach ($files as $file) {

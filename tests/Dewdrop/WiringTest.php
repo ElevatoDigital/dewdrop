@@ -39,22 +39,6 @@ class WiringTest extends BaseTestCase
         );
     }
 
-    public function testCanOverrideDefaultAutoloader()
-    {
-        $autoloader = new \Dewdrop\Autoloader();
-
-        $wiring = new Wiring(
-            array(
-                'autoloader' => $autoloader
-            )
-        );
-
-        $this->assertEquals(
-            spl_object_hash($autoloader),
-            spl_object_hash($wiring->getAutoloader())
-        );
-    }
-
     public function testCanRegisterAdminComponents()
     {
         $paths = $this->getMock(

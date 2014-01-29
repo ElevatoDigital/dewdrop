@@ -10,6 +10,8 @@
 
 namespace Dewdrop;
 
+use Dewdrop\Exception;
+
 /**
  * This utility makes it easier to navigate the WP environment by supplying
  * quick access to common Dewdrop paths.  Being out in the middle of the plugins
@@ -50,23 +52,31 @@ class Paths
      */
     public function __construct()
     {
-        $this->wpRoot     = realpath(__DIR__ . '/../../../../../');
-        $this->dewdropLib = __DIR__;
-        $this->pluginRoot = realpath($this->dewdropLib . '/../../');
+        if (defined('ABSPATH')) {
+            $this->wpRoot = ABSPATH;
+        }
+
+        $this->dewdropLib = realpath(__DIR__ . '/../');
+        $this->pluginRoot = realpath(Config::getInstance()->get('wp')->pluginPath);
     }
 
     /**
      * The root of the WP install (i.e. where wp-config.php lives)
      *
+     * @throws \Dewdrop\Exception
      * @return string
      */
     public function getWpRoot()
     {
+        if (null === $this->wpRoot) {
+            throw new Exception('Not running in WordPress');
+        }
+
         return $this->wpRoot;
     }
 
     /**
-     * The Dewdrop folder inside "lib"
+     * The Dewdrop folder inside "vendor"
      *
      * @return string
      */

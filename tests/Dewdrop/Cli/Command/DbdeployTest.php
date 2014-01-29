@@ -2,15 +2,20 @@
 
 namespace Dewdrop\Cli\Command;
 
+use Dewdrop\Paths;
+
 class DbdeployTest extends \PHPUnit_Framework_TestCase
 {
     private $renderer;
 
     private $runner;
 
+    private $paths;
+
     public function setUp()
     {
         $this->renderer = new \Dewdrop\Cli\Renderer\Mock();
+        $this->paths    = new Paths();
 
         $this->runner = $this->getMock(
             '\Dewdrop\Cli\Run',
@@ -195,7 +200,7 @@ class DbdeployTest extends \PHPUnit_Framework_TestCase
 
         $command->overrideChangesetPath(
             'plugin',
-            'vendor/tests/Dewdrop/Cli/Command/dbdeploy-test/plugin-bad-filename'
+            $this->paths->getDewdropLib() . '/tests/Dewdrop/Cli/Command/dbdeploy-test/plugin-bad-filename'
         );
 
         $command
@@ -213,7 +218,7 @@ class DbdeployTest extends \PHPUnit_Framework_TestCase
 
         $command->overrideChangesetPath(
             'plugin',
-            'vendor/tests/Dewdrop/Cli/Command/dbdeploy-test/plugin-bad-filename'
+            $this->paths->getDewdropLib() . '/tests/Dewdrop/Cli/Command/dbdeploy-test/plugin-bad-filename'
         );
 
         $command
@@ -231,7 +236,7 @@ class DbdeployTest extends \PHPUnit_Framework_TestCase
 
         $command->overrideChangesetPath(
             'plugin',
-            'vendor/tests/Dewdrop/Cli/Command/dbdeploy-test/plugin-bad-filename'
+            $this->paths->getDewdropLib() . '/tests/Dewdrop/Cli/Command/dbdeploy-test/plugin-bad-filename'
         );
 
         $command
@@ -249,7 +254,7 @@ class DbdeployTest extends \PHPUnit_Framework_TestCase
 
         $command->overrideChangesetPath(
             'plugin',
-            'vendor/tests/Dewdrop/Cli/Command/dbdeploy-test/plugin-bad-sql-code'
+            $this->paths->getDewdropLib() . '/tests/Dewdrop/Cli/Command/dbdeploy-test/plugin-bad-sql-code'
         );
 
         $command
@@ -259,7 +264,6 @@ class DbdeployTest extends \PHPUnit_Framework_TestCase
 
         $command->parseArgs(array());
         $this->assertFalse($command->execute());
-
     }
 
     private function getMockCommand(array $methodsToMock = array())
@@ -272,17 +276,17 @@ class DbdeployTest extends \PHPUnit_Framework_TestCase
 
         $command->overrideChangesetPath(
             'plugin',
-            'vendor/tests/Dewdrop/Cli/Command/dbdeploy-test/plugin/'
+            $this->paths->getDewdropLib() . '/tests/Dewdrop/Cli/Command/dbdeploy-test/plugin/'
         );
 
         $command->overrideChangesetPath(
             'dewdrop-test',
-            'vendor/tests/Dewdrop/Cli/Command/dbdeploy-test/dewdrop-test/'
+            $this->paths->getDewdropLib() . '/tests/Dewdrop/Cli/Command/dbdeploy-test/dewdrop-test/'
         );
 
         $command->overrideChangesetPath(
             'dewdrop-core',
-            'vendor/tests/Dewdrop/Cli/Command/dbdeploy-test/dewdrop-core/'
+            $this->paths->getDewdropLib() . '/tests/Dewdrop/Cli/Command/dbdeploy-test/dewdrop-core/'
         );
 
         $command->overrideChangelogTableName('dewdrop_test_dbdeploy_changelog');

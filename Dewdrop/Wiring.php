@@ -10,7 +10,6 @@
 
 namespace Dewdrop;
 
-use Dewdrop\Autoloader;
 use Dewdrop\Db\Adapter as DbAdapter;
 use Dewdrop\Paths;
 
@@ -39,13 +38,6 @@ class Wiring
     protected $inflector;
 
     /**
-     * The autoloader used for Dewdrop, Zend, and model class loading
-     *
-     * @var \Dewdrop\Autoloader
-     */
-    protected $autoloader;
-
-    /**
      * Paths utility for finding our way around the plugin
      *
      * @var \Dewdrop\Paths
@@ -65,13 +57,6 @@ class Wiring
         // We use output buffering because otherwise WP will output before we can redirect, etc.
         if ('cli' !== php_sapi_name()) {
             ob_start();
-        }
-
-        if (isset($options['autoloader']) && $options['autoloader']) {
-            $this->autoloader = $options['autoloader'];
-        } else {
-            require_once __DIR__ . '/Autoloader.php';
-            $this->autolaoder = new Autoloader();
         }
 
         $this->inflector = new Inflector();
@@ -137,16 +122,6 @@ class Wiring
         $component = new $className($this->db, $this->paths);
 
         $component->register();
-    }
-
-    /**
-     * Get a reference to the assigned autoloader.
-     *
-     * @return \Dewdrop\Autoloader
-     */
-    public function getAutoloader()
-    {
-        return $this->autoloader;
     }
 
     /**

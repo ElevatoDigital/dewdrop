@@ -28,7 +28,6 @@ class Run
      */
     private $commandClasses = array(
         'Help',
-        'Update',
         'Sniff',
         'Dbdeploy',
         'DbMetadata',
@@ -187,10 +186,8 @@ class Run
     public function connectDb()
     {
         if (!$this->dbAdapter) {
-            $paths = new Paths();
-
-            require_once $paths->getWpRoot() . '/wp-config.php';
-            require_once $paths->getWpRoot() . '/wp-includes/wp-db.php';
+            require_once 'wp-config.php';
+            require_once 'wp-includes/wp-db.php';
 
             global $wpdb;
 
