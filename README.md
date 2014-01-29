@@ -5,6 +5,38 @@ Dewdrop makes writing complex WordPress plugins simpler by providing a
 sensible project layout and developer tools.
 
 
+Quick Start
+-----------
+
+Dewdrop can be used in two contexts: stand-alone PHP applications and WordPress
+plugins.  Depending upon which context you're working in, getting started varies
+slightly.
+
+### WordPress Plugins
+
+#### 1. Create a folder for your own WordPress plugin inside the plugins folder of your installation.
+#### 2. Create a composer.json file that requires the "deltasystems/dewdrop" library.  
+
+```json
+{
+    "require": {
+        "deltasystems/dewdrop": "0.9.*"
+    }
+}
+```
+#### 3. If you don't have Composer available, you will want to download it as described on Packagist (<http://packagist.org/>).  Once installed run `php composer.phar install --prefer-dist` to install Dewdrop and its dependencies.
+#### 4. After Composer has installed Dewdrop, you'll want to run a few commands to kick things off.
+
+```bash
+$ ./vendor/bin/dewdrop wp-init       # Create common folders for WordPress plugins
+$ ./vendor/bin/dewdrop dbdeploy      # Create stock database tables used by Dewdrop
+$ ./vendor/bin/dewdrop dewdrop-test  # Run the Dewdrop test suite to ensure everything is working as expected
+```
+
+### Standalone Applications
+
+Quick start instructions for standalone will be posted soon.
+
 Contributing
 ------------
 
