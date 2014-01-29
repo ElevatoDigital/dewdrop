@@ -14,9 +14,9 @@ slightly.
 
 ### WordPress Plugins
 
-1. Create a folder for your own WordPress plugin inside the plugins folder of your installation.
+*Step 1.* Create a folder for your own WordPress plugin inside the plugins folder of your installation.
 
-2. Create a composer.json file that requires the "deltasystems/dewdrop" library.  
+*Step 2.* Create a composer.json file that requires the "deltasystems/dewdrop" library.  
 
 ```json
 {
@@ -26,9 +26,9 @@ slightly.
 }
 ```
 
-3. If you don't have Composer available, you will want to download it as described on Packagist (<http://packagist.org/>).  Once installed run `php composer.phar install --prefer-dist` to install Dewdrop and its dependencies.
+*Step 3.* If you don't have Composer available, you will want to download it as described on Packagist (<http://packagist.org/>).  Once installed run `php composer.phar install --prefer-dist` to install Dewdrop and its dependencies.
 
-4. After Composer has installed Dewdrop, you'll want to run a few commands to kick things off.
+*Step 4.* After Composer has installed Dewdrop, you'll want to run a few commands to kick things off.
 
 ```bash
 $ ./vendor/bin/dewdrop wp-init       # Create common folders for WordPress plugins
