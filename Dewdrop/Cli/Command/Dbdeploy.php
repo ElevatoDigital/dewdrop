@@ -139,17 +139,17 @@ class Dbdeploy extends CommandAbstract
 
         $this->addExample(
             'Apply all new dbdeploy scripts to your database',
-            './dewdrop dbdeploy'
+            './vendor/bin/dewdrop dbdeploy'
         );
 
         $this->addExample(
             'Check your database to see if any scripts need to be applied',
-            './dewdrop dbdeploy status'
+            './vendor/bin/dewdrop dbdeploy status'
         );
 
         $this->addExample(
             'Backfill your changelog up to a certain revision number',
-            './dewdrop dbdeploy backfill --revision=5 --changeset=plugin'
+            './vendor/bin/dewdrop dbdeploy backfill --revision=5 --changeset=plugin'
         );
     }
 

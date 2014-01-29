@@ -36,7 +36,8 @@ class Run
         'GenDbTable',
         'GenEav',
         'DewdropTest',
-        'DewdropDoc'
+        'DewdropDoc',
+        'WpInit'
     );
 
     /**
@@ -79,6 +80,13 @@ class Run
     private $dbAdapter;
 
     /**
+     * A \Dewdrop\Paths instance to help in navigating the filesystem.
+     *
+     * @var \Dewdrop\Paths
+     */
+    private $paths;
+
+    /**
      * Create the CLI runner, giving users the ability to inject non-default
      * args, command name, and renderer (primarily for testing purposes).
      *
@@ -90,6 +98,7 @@ class Run
     {
         $this->args     = ($args ?: array_slice($_SERVER['argv'], 2));
         $this->renderer = ($renderer ?: new Renderer\Markdown());
+        $this->paths    = new Paths();
 
         if ($command) {
             $this->command = $command;
@@ -186,8 +195,8 @@ class Run
     public function connectDb()
     {
         if (!$this->dbAdapter) {
-            require_once 'wp-config.php';
-            require_once 'wp-includes/wp-db.php';
+            require_once $this->paths->getRoot() . '/wp-config.php';
+            require_once $this->paths->getRoot() . '/wp-includes/wp-db.php';
 
             global $wpdb;
 

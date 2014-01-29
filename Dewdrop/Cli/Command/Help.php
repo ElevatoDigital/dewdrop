@@ -46,7 +46,7 @@ class Help extends CommandAbstract
 
         $this->addExample(
             'Get additional information about the "lint" command',
-            './dewdrop help lint'
+            './vendor/bin/dewdrop help lint'
         );
     }
 

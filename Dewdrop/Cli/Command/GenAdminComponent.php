@@ -103,17 +103,17 @@ class GenAdminComponent extends CommandAbstract
 
         $this->addExample(
             'Generate a component with the title "Fruits" and folder and model names auto-detected',
-            "./dewdrop gen-admin-component 'Fruits'"
+            "./vendor/bin/dewdrop gen-admin-component 'Fruits'"
         );
 
         $this->addExample(
             'Manually set a folder name, model name auto-detected',
-            "./dewdrop gen-admin-component 'Fruits' -f 'manual-folder-name'"
+            "./vendor/bin/dewdrop gen-admin-component 'Fruits' -f 'manual-folder-name'"
         );
 
         $this->addExample(
             'Manually set folder and model names',
-            "./dewdrop gen-admin-component 'Manage Fruits' -f 'super-fruits' -m 'Fruits'"
+            "./vendor/bin/dewdrop gen-admin-component 'Manage Fruits' -f 'super-fruits' -m 'Fruits'"
         );
     }
 

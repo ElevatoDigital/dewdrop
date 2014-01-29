@@ -59,7 +59,7 @@ class GenDbTable extends CommandAbstract
 
         $this->addExample(
             'Add a new table named "fruits" and auto-detect the model class name',
-            './dewdrop gen-db-table fruits'
+            './vendor/bin/dewdrop gen-db-table fruits'
         );
     }
 
@@ -157,7 +157,7 @@ class GenDbTable extends CommandAbstract
      */
     protected function renderSuccessMessage($dbdeployFile, $modelFile)
     {
-        $base = $this->paths->getWpRoot();
+        $base = $this->paths->getRoot();
 
         $files = array(
             'dbdeploy' => str_replace($base, '', $dbdeployFile),

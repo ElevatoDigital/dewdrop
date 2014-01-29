@@ -27,7 +27,7 @@ class Paths
      *
      * @var string
      */
-    protected $wpRoot;
+    protected $root;
 
     /**
      * The location of the Dewdrop libraries.
@@ -52,12 +52,9 @@ class Paths
      */
     public function __construct()
     {
-        if (defined('ABSPATH')) {
-            $this->wpRoot = ABSPATH;
-        }
-
+        $this->root       = $this->detectRoot();
+        $this->pluginRoot = $this->detectPluginRoot();
         $this->dewdropLib = realpath(__DIR__ . '/../');
-        $this->pluginRoot = realpath(Config::getInstance()->get('wp')->pluginPath);
     }
 
     /**
@@ -66,13 +63,24 @@ class Paths
      * @throws \Dewdrop\Exception
      * @return string
      */
-    public function getWpRoot()
+    public function getRoot()
     {
-        if (null === $this->wpRoot) {
+        if (null === $this->root) {
             throw new Exception('Not running in WordPress');
         }
 
-        return $this->wpRoot;
+        return $this->root;
+    }
+
+    /**
+     * This is just an alias to getRoot().  Used by some older Dewdrop code.
+     *
+     * @deprecated
+     * @return string
+     */
+    public function getWpRoot()
+    {
+        return $this->getRoot();
     }
 
     /**
@@ -93,6 +101,17 @@ class Paths
     public function getPluginRoot()
     {
         return $this->pluginRoot;
+    }
+
+    /**
+     * Just an alias for getPluginRoot() that can be called when not using
+     * Dewdrop in the context of a WordPress plugin.
+     *
+     * @return string
+     */
+    public function getAppRoot()
+    {
+        return $this->getPluginRoot();
     }
 
     /**
@@ -163,5 +182,47 @@ class Paths
     public function getTests()
     {
         return $this->pluginRoot . '/tests';
+    }
+
+    /**
+     * Detect the root path for this application.  This is either the
+     * main working directory for a standalone application, or the WordPress
+     * root folder in WP plugin -- the folder containing wp-config.php.
+     *
+     * @return string
+     */
+    protected function detectRoot()
+    {
+        if (false === stripos(__DIR__, 'wp-content/plugins')) {
+            // Running as a stand-alone app
+            $out = getcwd();
+        } else {
+            // Running inside a WordPress plugin
+            $out = substr(
+                __DIR__,
+                0,
+                strpos(__DIR__, 'wp-content/plugins')
+            );
+        }
+
+        return rtrim($out, '/');
+    }
+
+    /**
+     * Detect the plugin or app root folder.  In a standalone app, this is the
+     * same folder that is found with detectRoot().  In a WordPress app, it is the
+     * folder housing the plugin based on Dewdrop.
+     *
+     * @return string
+     */
+    protected function detectPluginRoot()
+    {
+        if (false === stripos(__DIR__, 'wp-content/plugins')) {
+            $out = $this->root;
+        } else {
+            $out = realpath(__DIR__ . '/../../../../');
+        }
+
+        return rtrim($out, '/');
     }
 }

@@ -68,7 +68,7 @@ class DewdropTest extends CommandAbstract
             $this->phpunit = $this->autoDetectExecutable('phpunit');
         }
 
-        $testPath = $this->paths->getVendor() . '/tests';
+        $testPath = $this->paths->getVendor() . '/deltasystems/dewdrop/tests';
 
         $cmd = sprintf(
             '%s -c %s %s',

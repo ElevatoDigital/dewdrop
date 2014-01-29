@@ -36,7 +36,7 @@ class DbMetadata extends CommandAbstract
 
         $this->addExample(
             'Basic usage to update metadata for all tables in your DB',
-            './dewdrop db-metadata'
+            './vendor/bin/dewdrop db-metadata'
         );
     }
 

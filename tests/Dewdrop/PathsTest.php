@@ -8,20 +8,20 @@ class PathsTest extends BaseTestCase
 {
     protected $paths;
 
-    protected $wpRoot;
+    protected $root;
 
     protected $pluginRoot;
 
     public function setUp()
     {
         $this->paths      = new Paths();
-        $this->wpRoot     = ABSPATH;
-        $this->pluginRoot = rtrim($this->wpRoot, '/') . '/' . Config::getInstance()->get('wp')->pluginPath;
+        $this->root       = rtrim(ABSPATH, '/');
+        $this->pluginRoot = realpath(__DIR__ . '/../../../../..');
     }
 
-    public function testWpRoot()
+    public function testRoot()
     {
-        $this->assertEquals($this->wpRoot, $this->paths->getWpRoot());
+        $this->assertEquals($this->root, $this->paths->getRoot());
     }
 
     public function testDewdropLib()

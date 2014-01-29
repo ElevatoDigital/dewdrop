@@ -67,7 +67,7 @@ abstract class CommandAbstract
      * command class for execution.  For example, when running the
      * dewdrop CLI tool like this:
      *
-     * ./dewdrop command-name
+     * ./vendor/bin/dewdrop command-name
      *
      * \Dewdrop\Cli\Run will select the command class that has a command
      * class that has a $command property value of "command-name"
@@ -108,7 +108,7 @@ abstract class CommandAbstract
      * In Dewdrop, if your command had a primary argument of "name" and the
      * user supplied this input:
      *
-     * ./dewdrop my-command --folder=example "Example Name Value"
+     * ./vendor/bin/dewdrop my-command --folder=example "Example Name Value"
      *
      * The argument parser would set the name argument's value to "Example Name
      * Value" because that is the value expression not explicitly assigned to
@@ -117,7 +117,7 @@ abstract class CommandAbstract
      * Users can still explicitly set the argument name for the primary argument,
      * too, if they prefer:
      *
-     * ./dewdrop --name="Example Name Value"
+     * ./vendor/bin/dewdrop --name="Example Name Value"
      *
      * @var string
      */
@@ -217,11 +217,11 @@ abstract class CommandAbstract
      * formats of argument and value.  For example, all of these inputs are
      * equivalent:
      *
-     * ./dewdrop my-command --argument-name=value
-     * ./dewdrop my-command --argument-name value
-     * ./dewdrop my-command --argument-alias=value
-     * ./dewdrop my-command -argument-alias=value
-     * ./dewdrop my-command -argument-alias value
+     * ./vendor/bin/dewdrop my-command --argument-name=value
+     * ./vendor/bin/dewdrop my-command --argument-name value
+     * ./vendor/bin/dewdrop my-command --argument-alias=value
+     * ./vendor/bin/dewdrop my-command -argument-alias=value
+     * ./vendor/bin/dewdrop my-command -argument-alias value
      *
      * In short, you can use one or two dashes at the beginning of the argument
      * name and you can separate the value from the name with either a space
@@ -525,11 +525,11 @@ abstract class CommandAbstract
      * This content can be accessed by called "--help" on this command
      * directly:
      *
-     * ./dewdrop my-command --help
+     * ./vendor/bin/dewdrop my-command --help
      *
      * Or, you can use the built-in help command to access it:
      *
-     * ./dewdrop help my-command
+     * ./vendor/bin/dewdrop help my-command
      *
      * @return void
      */

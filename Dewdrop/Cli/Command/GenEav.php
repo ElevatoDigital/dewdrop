@@ -22,7 +22,7 @@ use Dewdrop\Inflector;
  * the EAV tables to link to:
  *
  * <pre>
- * ./dewdrop gen-eav --table-name widgets
+ * ./vendor/bin/dewdrop gen-eav --table-name widgets
  * </pre>
  */
 class GenEav extends CommandAbstract
@@ -73,7 +73,7 @@ class GenEav extends CommandAbstract
 
         $this->addExample(
             'Generate EAV attribute and value tables attached to your "staff" entity table',
-            './dewdrop gen-eav staff'
+            './vendor/bin/dewdrop gen-eav staff'
         );
     }
 
