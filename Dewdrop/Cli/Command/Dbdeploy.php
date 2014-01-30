@@ -45,7 +45,7 @@ class Dbdeploy extends CommandAbstract
     private $action;
 
     /**
-     * The path the mysql binary.  If not specified, we'll attempt to
+     * The path to the mysql binary.  If not specified, we'll attempt to
      * auto-detect it.
      *
      * @var string

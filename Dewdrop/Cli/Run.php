@@ -28,16 +28,17 @@ class Run
      */
     private $commandClasses = array(
         'Help',
-        'Sniff',
+        'WpInit',
         'Dbdeploy',
         'DbMetadata',
         'Lint',
         'GenAdminComponent',
         'GenDbTable',
         'GenEav',
+        'Sniff',
         'DewdropTest',
         'DewdropDoc',
-        'WpInit'
+        'DewdropDev',
     );
 
     /**
