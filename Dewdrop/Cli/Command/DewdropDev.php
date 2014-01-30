@@ -25,7 +25,7 @@ class DewdropDev extends CommandAbstract
      *
      * @var string
      */
-    private $dewdropUrl = 'git@github.com:DeltaSystems/dewdrop.git';
+    private $dewdropUrl = 'https://github.com/DeltaSystems/dewdrop.git';
 
     /**
      * Configure the command metadata and help information.
@@ -117,7 +117,7 @@ class DewdropDev extends CommandAbstract
         }
 
         $cmd = sprintf(
-            '%s %s %s',
+            '%s clone %s %s 2>&1',
             $this->git,
             escapeshellarg($this->dewdropUrl),
             escapeshellarg($path)
