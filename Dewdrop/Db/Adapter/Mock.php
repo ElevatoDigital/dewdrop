@@ -11,6 +11,7 @@
 namespace Dewdrop\Db\Adapter;
 
 use Dewdrop\Db\Adapter as WpdbAdapter;
+use Dewdrop\Db\Driver\Mock as MockDriver;
 
 /**
  * A mock adapter that uses a mock wpdb connection with no actual
@@ -20,12 +21,14 @@ use Dewdrop\Db\Adapter as WpdbAdapter;
  */
 class Mock extends WpdbAdapter
 {
+    protected $driver;
+
     /**
      * Override default adapter constructor because we no longer need to accept
      * $wpdb when just using a mock adapter for testing.
      */
-    public function __construct()
+    public function __construct($driver = null)
     {
-        $this->wpdb = new MockWpdb();
+        $this->driver = new MockDriver($this);
     }
 }

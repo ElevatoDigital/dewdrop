@@ -14,7 +14,7 @@ use Dewdrop\Db\Field;
 use Dewdrop\Exception;
 
 /**
- * Render a basic HTML <select> element using the supplied options.
+ * Render a basic HTML &lt;select&gt; element using the supplied options.
  */
 class WpSelect extends AbstractHelper
 {

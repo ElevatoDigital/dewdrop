@@ -25,9 +25,12 @@ class SelectTest extends BaseTestCase
      */
     protected function setUpAdapter()
     {
+        global $wpdb;
+
         $this->db = $this->getMock(
-            '\Dewdrop\Db\Adapter\Mock',
-            array('query')
+            '\Dewdrop\Db\Adapter',
+            array('query'),
+            array($wpdb)
         );
     }
 

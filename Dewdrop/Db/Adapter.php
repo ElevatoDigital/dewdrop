@@ -10,8 +10,10 @@
 
 namespace Dewdrop\Db;
 
+use Dewdrop\Db\Driver\Wpdb as WpdbDriver;
 use Dewdrop\Exception;
 use Dewdrop\Paths;
+use wpdb;
 
 /**
  * This database adapter largely mirrors the Zend_Db API from Zend Framework 1.
@@ -23,6 +25,14 @@ use Dewdrop\Paths;
  */
 class Adapter
 {
+    const OBJECT = 'OBJECT';
+
+    const OBJECT_K = 'OBJECT_K';
+
+    const ARRAY_A = 'ARRAY_A';
+
+    const ARRAY_N = 'ARRAY_N';
+
     /**
      * Use the INT_TYPE, BIGINT_TYPE, and FLOAT_TYPE with the quote() method.
      */
@@ -76,47 +86,39 @@ class Adapter
     protected $autoQuoteIdentifiers = true;
 
     /**
-     * How to fetch results.  The should be one of the constants defined by
-     * wpdb:
+     * The driver for this adapter.  Enables handling platform-specific
+     * API for wpdb, MySQL, and Postgres.
      *
-     * - ARRAY_A: An associative array
-     * - ARRAY_N: An array with numeric indexes
-     * - OBJECT: Use stdClass objects
-     * - OBJECT_K: Also uses stdClass objects, but the array containing all
-     *      the row objects uses the primar key as its index
-     *
-     * @var string
+     * @var \Dewdrop\Db\Driver\DriverInterface
      */
-    protected $fetchMode = ARRAY_A;
-
-    /**
-     * The wpdb adapter used as a driver for this adapter.
-     *
-     * @var \wpdb
-     */
-    protected $wpdb;
+    protected $driver;
 
     /**
      * Create new adapter using the wpdb object as the driver
      *
-     * @param \wpdb $wpdb
+     * @param mixed $driver
      */
-    public function __construct(\wpdb $wpdb)
+    public function __construct($driver = null)
     {
-        $this->wpdb = $wpdb;
+        if (null === $driver) {
+        }
 
-        $this->wpdb->suppress_errors = true;
+        if ($driver instanceof wpdb) {
+            $driver = new WpdbDriver($this, $driver);
+        }
+
+        $this->driver = $driver;
     }
 
     /**
      * Returns the underlying database connection object or resource.
      * If not presently connected, this initiates the connection.
      *
-     * @return wpdb
+     * @return mixed
      */
     public function getConnection()
     {
-        return $this->wpdb;
+        return $this->driver->getConnection();
     }
 
     /**
@@ -160,14 +162,7 @@ class Adapter
      */
     public function fetchAll($sql, $bind = array(), $fetchMode = null)
     {
-        if (null === $fetchMode) {
-            $fetchMode = $this->fetchMode;
-        }
-
-        $sql = $this->prepare($sql, $bind);
-        $rs  = $this->execWpdb($this->wpdb->get_results($sql, $fetchMode));
-
-        return $rs;
+        return $this->driver->fetchAll($sql, $bind, $fetchMode);
     }
 
     /**
@@ -179,7 +174,7 @@ class Adapter
      */
     public function fetchCol($sql, $bind = array())
     {
-        return $this->execWpdb($this->wpdb->get_col($this->prepare($sql, $bind)));
+        return $this->driver->fetchCol($sql, $bind);
     }
 
     /**
@@ -235,7 +230,7 @@ class Adapter
      */
     public function fetchOne($sql, $bind = array())
     {
-        return $this->execWpdb($this->wpdb->get_var($this->prepare($sql, $bind)));
+        return $this->driver->fetchOne($sql, $bind);
     }
 
     /**
@@ -280,7 +275,7 @@ class Adapter
      */
     public function lastInsertId()
     {
-        return $this->wpdb->insert_id;
+        return $this->driver->lastInsertId();
     }
 
     /**
@@ -355,13 +350,13 @@ class Adapter
      * Run the supplied query, binding the supplied data to the statement
      * prior to execution.
      *
-     * @param string|\Dewdrop\Db\Adapter
+     * @param string|\Dewdrop\Db\Select
      * @param array $bind
      * @return mixed
      */
     public function query($sql, $bind = array())
     {
-        return $this->execWpdb($this->wpdb->query($this->prepare($sql, $bind)));
+        return $this->driver->query($sql, $bind);
     }
 
     /**
@@ -624,7 +619,7 @@ class Adapter
      */
     public function getQuoteIdentifierSymbol()
     {
-        return "`";
+        return $this->driver->getQuoteIdentifierSymbol();
     }
 
     /**
@@ -685,29 +680,7 @@ class Adapter
      */
     public function listForeignKeyReferences($tableName)
     {
-        $sql = 'SELECT
-                    column_name,
-                    referenced_table_name,
-                    referenced_column_name
-                FROM information_schema.key_column_usage
-                WHERE
-                    table_name = ?
-                    AND referenced_table_name IS NOT NULL
-                    AND referenced_column_name IS NOT NULL';
-
-        $dbInfo     = $this->fetchAll($sql, array($tableName), ARRAY_A);
-        $references = array();
-
-        foreach ($dbInfo as $reference) {
-            $column = $reference['column_name'];
-
-            $references[$column] = array(
-                'table'  => $reference['referenced_table_name'],
-                'column' => $reference['referenced_column_name']
-            );
-        }
-
-        return $references;
+        return $this->driver->listForeignKeyReferences($tableName);
     }
 
     /**
@@ -728,20 +701,7 @@ class Adapter
      */
     public function listUniqueConstraints($tableName)
     {
-        $uniqueConstraints = array();
-
-        $sql = sprintf(
-            'SHOW INDEXES FROM %s WHERE Non_unique = 0 AND Key_name != \'PRIMARY\'',
-            $this->quoteIdentifier($tableName)
-        );
-
-        $rows = $this->fetchAll($sql, array($tableName), ARRAY_A);
-
-        foreach ($rows as $row) {
-            $uniqueConstraints[$row['Key_name']][$row['Seq_in_index']] = $row['Column_name'];
-        }
-
-        return $uniqueConstraints;
+        return $this->driver->listUniqueConstraints($tableName);
     }
 
     /**
@@ -773,73 +733,7 @@ class Adapter
      */
     public function describeTable($tableName)
     {
-        $sql    = 'DESCRIBE ' . $this->quoteIdentifier($tableName, true);
-        $result = $this->fetchAll($sql, array(), ARRAY_A);
-        $desc   = array();
-
-        $row_defaults = array(
-            'Length'          => null,
-            'Scale'           => null,
-            'Precision'       => null,
-            'Unsigned'        => null,
-            'Primary'         => false,
-            'PrimaryPosition' => null,
-            'Identity'        => false
-        );
-        $i = 1;
-        $p = 1;
-        foreach ($result as $key => $row) {
-            $row = array_merge($row_defaults, $row);
-            if (preg_match('/unsigned/', $row['Type'])) {
-                $row['Unsigned'] = true;
-            }
-            if (preg_match('/^((?:var)?char)\((\d+)\)/', $row['Type'], $matches)) {
-                $row['Type'] = $matches[1];
-                $row['Length'] = $matches[2];
-            } elseif (preg_match('/^decimal\((\d+),(\d+)\)/', $row['Type'], $matches)) {
-                $row['Type'] = 'decimal';
-                $row['Precision'] = $matches[1];
-                $row['Scale'] = $matches[2];
-            } elseif (preg_match('/^float\((\d+),(\d+)\)/', $row['Type'], $matches)) {
-                $row['Type'] = 'float';
-                $row['Precision'] = $matches[1];
-                $row['Scale'] = $matches[2];
-            } elseif (preg_match('/^((?:big|medium|small|tiny)?int)\((\d+)\)/', $row['Type'], $matches)) {
-                $row['Type'] = $matches[1];
-                /**
-                 * The optional argument of a MySQL int type is not precision
-                 * or length; it is only a hint for display width.
-                 */
-            }
-            if (strtoupper($row['Key']) == 'PRI') {
-                $row['Primary'] = true;
-                $row['PrimaryPosition'] = $p;
-                if ($row['Extra'] == 'auto_increment') {
-                    $row['Identity'] = true;
-                } else {
-                    $row['Identity'] = false;
-                }
-                ++$p;
-            }
-            $desc[$this->foldCase($row['Field'])] = array(
-                'SCHEMA_NAME'      => null, // @todo
-                'TABLE_NAME'       => $this->foldCase($tableName),
-                'COLUMN_NAME'      => $this->foldCase($row['Field']),
-                'COLUMN_POSITION'  => $i,
-                'DATA_TYPE'        => $row['Type'],
-                'DEFAULT'          => $row['Default'],
-                'NULLABLE'         => (bool) ($row['Null'] == 'YES'),
-                'LENGTH'           => $row['Length'],
-                'SCALE'            => $row['Scale'],
-                'PRECISION'        => $row['Precision'],
-                'UNSIGNED'         => $row['Unsigned'],
-                'PRIMARY'          => $row['Primary'],
-                'PRIMARY_POSITION' => $row['PrimaryPosition'],
-                'IDENTITY'         => $row['Identity']
-            );
-            ++$i;
-        }
-        return $desc;
+        return $this->driver->describeTable($tableName);
     }
 
     /**
@@ -902,24 +796,5 @@ class Adapter
 
         $where = implode(' AND ', $where);
         return $where;
-    }
-
-    /**
-     * This method wraps all calls to wpdb.  It is used to catch errors
-     * generated by database usage in wpdb and bubble them up as thrown
-     * exceptions, which work more consistently in other environments
-     * than the quirky error tracking wpdb does internally.
-     *
-     * @param mixed $wpdbResult
-     * @throws \Dewdrop\Exception
-     * @return mixed
-     */
-    private function execWpdb($wpdbResult)
-    {
-        if ($this->wpdb->last_error) {
-            throw new Exception($this->wpdb->last_error);
-        }
-
-        return $wpdbResult;
     }
 }

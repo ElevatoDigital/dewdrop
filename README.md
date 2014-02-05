@@ -57,7 +57,8 @@ how to get your development environment running smoothly:
 API docs and test reports
 -------------------------
 
-You can view our latest build results at:
+You can view our latest build results, including API documentation and test
+reports, at:
 
 <http://ci.deltasys.com/dewdrop/>
 
