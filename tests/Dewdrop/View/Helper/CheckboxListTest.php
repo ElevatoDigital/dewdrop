@@ -5,7 +5,7 @@ namespace Dewdrop\View\Helper;
 use Dewdrop\View\View;
 use Dewdrop\Test\BaseTestCase;
 
-class WpCheckboxListTest extends BaseTestCase
+class CheckboxListTest extends BaseTestCase
 {
     private $view;
 
@@ -16,7 +16,7 @@ class WpCheckboxListTest extends BaseTestCase
 
     public function testWillRenderListItemsForEachOption()
     {
-        $out = $this->view->wpCheckboxList(
+        $out = $this->view->checkboxList(
             array(
                 'name' => 'fafafafa',
                 'options' => array(
@@ -32,7 +32,7 @@ class WpCheckboxListTest extends BaseTestCase
 
     public function testItemsInTheValuesArrayAreChecked()
     {
-        $out = $this->view->wpCheckboxList(
+        $out = $this->view->checkboxList(
             array(
                 'name' => 'fafafafa',
                 'options' => array(
@@ -49,7 +49,7 @@ class WpCheckboxListTest extends BaseTestCase
 
     public function testCanRenderWithExplicitlyPassedArguments()
     {
-        $out = $this->view->wpCheckboxList(
+        $out = $this->view->checkboxList(
             'fafafafa',
             array(
                 1 => 'First',

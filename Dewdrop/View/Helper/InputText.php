@@ -12,14 +12,20 @@ namespace Dewdrop\View\Helper;
 
 use Dewdrop\Db\Field;
 
-
 /**
- * Render a basic HTML &lt;select&gt; element using the supplied options.
+ * Render a text input node.  This helper can optionally leverage a
+ * \Dewdrop\Db\Field object to set its options.
+ *
+ * Example usage:
+ *
+ * <code>
+ * echo $this->wpInputText($this->fields->get('animals:latin_name'));
+ * </code>
  */
-class Select extends AbstractHelper
+class InputText extends AbstractHelper
 {
     /**
-     * Render the <select>.
+     * Render the input.
      *
      * This method will delegate to directField(), directExplicit(), or
      * directArray() depending upon the arguments that are passed to it.
@@ -32,74 +38,78 @@ class Select extends AbstractHelper
     }
 
     /**
-     * Use a \Dewdrop\Db\Field object to render the select tag.  The OptionPairs
-     * API will be used to retrieve the actual options allowed for this control.
+     * Use the supplied \Dewdrop\Db\Field object to set the helper's options
+     * and then render the input.
      *
      * @param Field $field
      * @return string
      */
-    public function directField(Field $field)
+    protected function directField(Field $field)
     {
         return $this->directArray(
             array(
-                'name'    => $field->getControlName(),
-                'id'      => $field->getHtmlId(),
-                'options' => $field->getOptionPairs()->fetch(),
-                'value'   => $field->getValue()
+                'name'  => $field->getControlName(),
+                'id'    => $field->getHtmlId(),
+                'value' => $field->getValue()
             )
         );
     }
 
     /**
-     * Specify the basic options available for this view helper explicitly, as
-     * basic PHP args.
+     * Explicitly set the basic arguments for this helper and then render the
+     * input.
      *
-     * @param string $name The name attribute for the <select>.
-     * @param array $options The key-value pairs representing the select options.
-     * @param mixed $value The selected value.
+     * @param string $name
+     * @param boolean $value
+     * @param string $class
      * @return string
      */
-    public function directExplicit($name, array $options, $value)
+    protected function directExplicit($name, $value, $class = null)
     {
         return $this->directArray(
             array(
                 'name'    => $name,
                 'value'   => $value,
-                'options' => $options
+                'classes' => ($class ? array($class) : null)
             )
         );
     }
 
     /**
-     * Render the <select> using an array of name-value options.
+     * Set the helper's options using an array of key-value pairs and then
+     * render the input.
      *
      * @param array $options
      * @return string
      */
-    public function directArray(array $options)
+    protected function directArray(array $options)
     {
         extract($this->prepareOptionsArray($options));
+
+        if (0 === count($classes)) {
+            $classes[] = 'regular-text';
+        }
 
         if (null === $id) {
             $id = $name;
         }
 
-        $value = (string) $value;
-
         return $this->partial(
-            'select.phtml',
+            'input-text.phtml',
             array(
                 'name'    => $name,
                 'id'      => $id,
                 'value'   => $value,
-                'options' => $options
+                'classes' => $classes
             )
         );
     }
 
     /**
      * Prepare the options array for the directArray() method, checking that
-     * required options are set.
+     * required options are set, ensuring "classes" is an array and adding
+     * "classes" and "id" to the options array, if they are not present
+     * already.
      *
      * @param array $options
      * @return array
@@ -107,9 +117,9 @@ class Select extends AbstractHelper
     private function prepareOptionsArray(array $options)
     {
         $this
-            ->checkRequired($options, array('name', 'value', 'options'))
-            ->ensurePresent($options, array('id'))
-            ->ensureArray($options, array('options'));
+            ->checkRequired($options, array('name', 'value'))
+            ->ensurePresent($options, array('classes', 'id'))
+            ->ensureArray($options, array('classes'));
 
         return $options;
     }
