@@ -49,9 +49,14 @@ class View
      * @var array
      */
     private $helperClasses = array(
+        'adminnotice'      => '\Dewdrop\View\Helper\AdminNotice',
         'adminurl'         => '\Dewdrop\View\Helper\AdminUrl',
+        'checkboxlist'     => '\Dewdrop\View\Helper\CheckboxList',
         'detectedithelper' => '\Dewdrop\View\Helper\DetectEditHelper',
+        'editform'         => '\Dewdrop\View\Helper\EditForm',
         'inlinescript'     => '\Dewdrop\View\Helper\InlineScript',
+        'inputcheckbox'    => '\Dewdrop\View\Helper\InputCheckbox',
+        'inputtext'        => '\Dewdrop\View\Helper\InputText',
         'select'           => '\Dewdrop\View\Helper\Select',
         'textarea'         => '\Dewdrop\View\Helper\Textarea',
         'wpadminnotice'    => '\Dewdrop\View\Helper\WpAdminNotice',
@@ -64,6 +69,7 @@ class View
         'wpinputtext'      => '\Dewdrop\View\Helper\WpInputText',
         'wpselect'         => '\Dewdrop\View\Helper\WpSelect',
         'wpwrap'           => '\Dewdrop\View\Helper\WpWrap',
+        'wrap'             => '\Dewdrop\View\Helper\Wrap',
     );
 
     /**
