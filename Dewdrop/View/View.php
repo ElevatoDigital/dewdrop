@@ -52,19 +52,18 @@ class View
         'adminurl'         => '\Dewdrop\View\Helper\AdminUrl',
         'detectedithelper' => '\Dewdrop\View\Helper\DetectEditHelper',
         'inlinescript'     => '\Dewdrop\View\Helper\InlineScript',
+        'select'           => '\Dewdrop\View\Helper\Select',
         'textarea'         => '\Dewdrop\View\Helper\Textarea',
-        'ui'               => '\Dewdrop\View\Helper\Ui',
         'wpadminnotice'    => '\Dewdrop\View\Helper\WpAdminNotice',
         'wpcheckboxlist'   => '\Dewdrop\View\Helper\WpCheckboxList',
         'wpcolorpicker'    => '\Dewdrop\View\Helper\WpColorPicker',
         'wpeditform'       => '\Dewdrop\View\Helper\WpEditForm',
         'wpeditor'         => '\Dewdrop\View\Helper\WpEditor',
         'wpeditrow'        => '\Dewdrop\View\Helper\WpEditRow',
-        'wpinputtext'      => '\Dewdrop\View\Helper\WpInputText',
         'wpinputcheckbox'  => '\Dewdrop\View\Helper\WpInputCheckbox',
+        'wpinputtext'      => '\Dewdrop\View\Helper\WpInputText',
         'wpselect'         => '\Dewdrop\View\Helper\WpSelect',
-        'wptitle'          => '\Dewdrop\View\Helper\WpTitle',
-        'wpwrap'           => '\Dewdrop\View\Helper\WpWrap'
+        'wpwrap'           => '\Dewdrop\View\Helper\WpWrap',
     );
 
     /**

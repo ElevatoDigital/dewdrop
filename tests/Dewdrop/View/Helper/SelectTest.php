@@ -5,7 +5,7 @@ namespace Dewdrop\View\Helper;
 use Dewdrop\Test\BaseTestCase;
 use Dewdrop\View\View;
 
-class WpSelectTest extends BaseTestCase
+class SelectTest extends BaseTestCase
 {
     private $view;
 
@@ -16,7 +16,7 @@ class WpSelectTest extends BaseTestCase
 
     public function testCanRenderSelectWithExplicitlyPassedArguments()
     {
-        $out = $this->view->wpSelect(
+        $out = $this->view->select(
             'my_select',
             array(
                 1 => 'Option 1',
@@ -35,7 +35,7 @@ class WpSelectTest extends BaseTestCase
 
     public function testCanRenderSelectWithArgumentsPassedAsArray()
     {
-        $out = $this->view->wpSelect(
+        $out = $this->view->select(
             array(
                 'name'    => 'my_select',
                 'options' => array(
@@ -56,7 +56,7 @@ class WpSelectTest extends BaseTestCase
 
     public function testIdEqualsNameWhenIdIsntSpecifiedManually()
     {
-        $out = $this->view->wpSelect(
+        $out = $this->view->select(
             'my_select',
             array(
                 1 => 'Option 1',
@@ -71,7 +71,7 @@ class WpSelectTest extends BaseTestCase
 
     public function testCanExplicitlySetIdToBeDifferentThanName()
     {
-        $out = $this->view->wpSelect(
+        $out = $this->view->select(
             array(
                 'name'    => 'my_select_name',
                 'id'      => 'my_select_id',
@@ -86,7 +86,7 @@ class WpSelectTest extends BaseTestCase
 
     public function testValuesAreCastToStringPriorToComparison()
     {
-        $out = $this->view->wpSelect(
+        $out = $this->view->select(
             array(
                 'name'    => 'my_select_name',
                 'options' => array(1 => 'Sole Option'),
@@ -109,7 +109,7 @@ class WpSelectTest extends BaseTestCase
         $row->field('name')->getOptionPairs()
             ->setTableName('dewdrop_test_animals');
 
-        $this->view->wpSelect($row->field('name'));
+        $this->view->select($row->field('name'));
     }
 
     /**
@@ -117,7 +117,7 @@ class WpSelectTest extends BaseTestCase
      */
     public function testOmittingNameArgumentThrowsException()
     {
-        $this->view->wpSelect(
+        $this->view->select(
             array(
                 'options' => array(),
                 'value'   => null
@@ -130,7 +130,7 @@ class WpSelectTest extends BaseTestCase
      */
     public function testOmittingOptionsArgumentThrowsException()
     {
-        $this->view->wpSelect(
+        $this->view->select(
             array(
                 'name'  => 'test',
                 'value' => null
@@ -143,7 +143,7 @@ class WpSelectTest extends BaseTestCase
      */
     public function testOmittingValueArgumentThrowsException()
     {
-        $this->view->wpSelect(
+        $this->view->select(
             array(
                 'options' => array(),
                 'name'    => 'test'
