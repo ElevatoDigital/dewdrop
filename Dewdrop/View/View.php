@@ -53,6 +53,7 @@ class View
         'adminurl'         => '\Dewdrop\View\Helper\AdminUrl',
         'checkboxlist'     => '\Dewdrop\View\Helper\CheckboxList',
         'detectedithelper' => '\Dewdrop\View\Helper\DetectEditHelper',
+        'editform'         => '\Dewdrop\View\Helper\EditForm',
         'inlinescript'     => '\Dewdrop\View\Helper\InlineScript',
         'inputcheckbox'    => '\Dewdrop\View\Helper\InputCheckbox',
         'inputtext'        => '\Dewdrop\View\Helper\InputText',
@@ -68,6 +69,7 @@ class View
         'wpinputtext'      => '\Dewdrop\View\Helper\WpInputText',
         'wpselect'         => '\Dewdrop\View\Helper\WpSelect',
         'wpwrap'           => '\Dewdrop\View\Helper\WpWrap',
+        'wrap'             => '\Dewdrop\View\Helper\Wrap',
     );
 
     /**
