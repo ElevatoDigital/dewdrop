@@ -49,4 +49,14 @@ class ZendInstanceTest extends BaseTestCase
 
         $this->assertInstanceOf('\Zend\View\Helper\HeadScript', $headScript);
     }
+
+    /**
+     * @return void
+     */
+    public function testGetHeadstyleFromView()
+    {
+        $headStyle = $this->view->headStyle();
+
+        $this->assertInstanceOf('\Zend\View\Helper\HeadStyle', $headStyle);
+    }
 }

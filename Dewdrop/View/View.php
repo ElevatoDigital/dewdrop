@@ -57,6 +57,7 @@ class View
         'headlink'         => '\Zend\View\Helper\HeadLink',
         'headmeta'         => '\Zend\View\Helper\HeadMeta',
         'headscript'       => '\Zend\View\Helper\HeadScript',
+        'headstyle'        => '\Zend\View\Helper\HeadStyle',
         'inlinescript'     => '\Dewdrop\View\Helper\InlineScript',
         'inputcheckbox'    => '\Dewdrop\View\Helper\InputCheckbox',
         'inputtext'        => '\Dewdrop\View\Helper\InputText',
