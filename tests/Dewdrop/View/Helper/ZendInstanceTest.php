@@ -33,6 +33,16 @@ class ZendInstanceTest extends BaseTestCase
     /**
      * @return void
      */
+    public function testGetHeadmetaFromView()
+    {
+        $headMeta = $this->view->headMeta();
+
+        $this->assertInstanceOf('\Zend\View\Helper\HeadMeta', $headMeta);
+    }
+
+    /**
+     * @return void
+     */
     public function testGetHeadscriptFromView()
     {
         $headScript = $this->view->headScript();
