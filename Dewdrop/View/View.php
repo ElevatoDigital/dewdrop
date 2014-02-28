@@ -57,6 +57,7 @@ class View
         'wpadminnotice'    => '\Dewdrop\View\Helper\WpAdminNotice',
         'wpcheckboxlist'   => '\Dewdrop\View\Helper\WpCheckboxList',
         'wpcolorpicker'    => '\Dewdrop\View\Helper\WpColorPicker',
+        'wpdatepicker'     => '\Dewdrop\View\Helper\WpDatePicker',
         'wpeditform'       => '\Dewdrop\View\Helper\WpEditForm',
         'wpeditor'         => '\Dewdrop\View\Helper\WpEditor',
         'wpeditrow'        => '\Dewdrop\View\Helper\WpEditRow',
