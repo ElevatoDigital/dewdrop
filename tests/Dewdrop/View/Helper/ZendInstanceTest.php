@@ -5,7 +5,7 @@ namespace Dewdrop\View\Helper;
 use Dewdrop\Test\BaseTestCase;
 use Dewdrop\View\View;
 
-class HeadLinkTest extends BaseTestCase
+class ZendInstanceTest extends BaseTestCase
 {
     /**
      * @var View
@@ -23,10 +23,20 @@ class HeadLinkTest extends BaseTestCase
     /**
      * @return void
      */
-    public function testGetInstanceFromView()
+    public function testGetHeadlinkFromView()
     {
         $headLink = $this->view->headLink();
 
         $this->assertInstanceOf('\Zend\View\Helper\HeadLink', $headLink);
+    }
+
+    /**
+     * @return void
+     */
+    public function testGetHeadscriptFromView()
+    {
+        $headScript = $this->view->headScript();
+
+        $this->assertInstanceOf('\Zend\View\Helper\HeadScript', $headScript);
     }
 }
