@@ -54,6 +54,7 @@ class View
         'checkboxlist'     => '\Dewdrop\View\Helper\CheckboxList',
         'detectedithelper' => '\Dewdrop\View\Helper\DetectEditHelper',
         'editform'         => '\Dewdrop\View\Helper\EditForm',
+        'headlink'         => '\Zend\View\Helper\HeadLink',
         'inlinescript'     => '\Dewdrop\View\Helper\InlineScript',
         'inputcheckbox'    => '\Dewdrop\View\Helper\InputCheckbox',
         'inputtext'        => '\Dewdrop\View\Helper\InputText',
