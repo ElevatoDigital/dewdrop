@@ -20,8 +20,13 @@ slightly.
 
 ```json
 {
+    "autoload": {
+        "psr-4": {
+            "Model\\": "models/"
+        }
+    },
     "require": {
-        "deltasystems/dewdrop": "0.9.*"
+        "deltasystems/dewdrop": "dev-master"
     }
 }
 ```
