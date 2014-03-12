@@ -45,14 +45,14 @@ work on Composer updates!
 
 *Step 4.* After Composer has installed Dewdrop, you'll want to run a few commands to kick things off.
 
-*Step 5.* Proceed with your plugin development as described in the
-[WordPress Codex](https://codex.wordpress.org/Writing_a_Plugin).
-
 ```bash
 $ ./vendor/bin/dewdrop wp-init       # Create common folders for WordPress plugins
 $ ./vendor/bin/dewdrop dbdeploy      # Create stock database tables used by Dewdrop
 $ ./vendor/bin/dewdrop dewdrop-test  # Run the Dewdrop test suite to ensure everything is working as expected
 ```
+
+*Step 5.* Proceed with your plugin development as described in the
+[WordPress Codex](https://codex.wordpress.org/Writing_a_Plugin).
 
 ### Standalone Applications
 
