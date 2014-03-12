@@ -31,6 +31,21 @@ slightly.
 }
 ```
 
+**NOTE:** If you will be contributing to Dewdrop, add the following structure to the JSON above so that Composer uses a
+Git clone for the Dewdrop dependency. Keep your work committed in branches other than develop and master to avoid losing
+work on Composer updates!
+
+```json
+{
+    "repositories": [
+        {
+            "type": "git",
+            "url":  "git@github.com:DeltaSystems/dewdrop.git"
+        }
+    ]
+}
+```
+
 *Step 3.* If you don't have Composer available, you will want to download it as described on Packagist (<http://packagist.org/>).  Once installed run `php composer.phar install --prefer-dist` to install Dewdrop and its dependencies.
 
 *Step 4.* After Composer has installed Dewdrop, you'll want to run a few commands to kick things off.

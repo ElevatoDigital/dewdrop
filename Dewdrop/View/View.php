@@ -49,22 +49,31 @@ class View
      * @var array
      */
     private $helperClasses = array(
+        'adminnotice'      => '\Dewdrop\View\Helper\AdminNotice',
         'adminurl'         => '\Dewdrop\View\Helper\AdminUrl',
+        'checkboxlist'     => '\Dewdrop\View\Helper\CheckboxList',
         'detectedithelper' => '\Dewdrop\View\Helper\DetectEditHelper',
+        'editform'         => '\Dewdrop\View\Helper\EditForm',
+        'headlink'         => '\Zend\View\Helper\HeadLink',
+        'headmeta'         => '\Zend\View\Helper\HeadMeta',
+        'headscript'       => '\Zend\View\Helper\HeadScript',
+        'headstyle'        => '\Zend\View\Helper\HeadStyle',
         'inlinescript'     => '\Dewdrop\View\Helper\InlineScript',
+        'inputcheckbox'    => '\Dewdrop\View\Helper\InputCheckbox',
+        'inputtext'        => '\Dewdrop\View\Helper\InputText',
+        'select'           => '\Dewdrop\View\Helper\Select',
         'textarea'         => '\Dewdrop\View\Helper\Textarea',
-        'ui'               => '\Dewdrop\View\Helper\Ui',
         'wpadminnotice'    => '\Dewdrop\View\Helper\WpAdminNotice',
         'wpcheckboxlist'   => '\Dewdrop\View\Helper\WpCheckboxList',
         'wpcolorpicker'    => '\Dewdrop\View\Helper\WpColorPicker',
         'wpeditform'       => '\Dewdrop\View\Helper\WpEditForm',
         'wpeditor'         => '\Dewdrop\View\Helper\WpEditor',
         'wpeditrow'        => '\Dewdrop\View\Helper\WpEditRow',
-        'wpinputtext'      => '\Dewdrop\View\Helper\WpInputText',
         'wpinputcheckbox'  => '\Dewdrop\View\Helper\WpInputCheckbox',
+        'wpinputtext'      => '\Dewdrop\View\Helper\WpInputText',
         'wpselect'         => '\Dewdrop\View\Helper\WpSelect',
-        'wptitle'          => '\Dewdrop\View\Helper\WpTitle',
-        'wpwrap'           => '\Dewdrop\View\Helper\WpWrap'
+        'wpwrap'           => '\Dewdrop\View\Helper\WpWrap',
+        'wrap'             => '\Dewdrop\View\Helper\Wrap',
     );
 
     /**
@@ -155,7 +164,7 @@ class View
     }
 
     /**
-     * When calling an unkonwn method on this view, pass the method name to
+     * When calling an unknown method on this view, pass the method name to
      * the helper() method and call the helper's direct() method.  Using the
      * __call() magic method in this way allows using helpers in this manner:
      *
@@ -165,6 +174,8 @@ class View
      *
      * $this->helper('helperName')->direct('arg1', $arg2);
      *
+     * If the direct() method is unavailable, the helper instance is returned instead.
+     *
      * @param string $method
      * @param array $args
      * @return \Dewdrop\View\Helper\AbstractHelper
@@ -173,7 +184,11 @@ class View
     {
         $helper = $this->helper($method);
 
-        return call_user_func_array(array($helper, 'direct'), $args);
+        if (method_exists($helper, 'direct')) {
+            return call_user_func_array(array($helper, 'direct'), $args);
+        } else {
+            return $helper;
+        }
     }
 
     /**

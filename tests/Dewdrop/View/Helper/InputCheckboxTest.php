@@ -2,11 +2,10 @@
 
 namespace Dewdrop\View\Helper;
 
-use Dewdrop\Db\Field;
 use Dewdrop\Test\BaseTestCase;
 use Dewdrop\View\View;
 
-class WpInputCheckboxTest extends BaseTestCase
+class InputCheckboxTest extends BaseTestCase
 {
     private $view;
 
@@ -17,7 +16,7 @@ class WpInputCheckboxTest extends BaseTestCase
 
     public function testCanRenderUsingExplictArguments()
     {
-        $out = $this->view->wpInputCheckbox('fafafafa', false, 'Just a checkbox');
+        $out = $this->view->inputCheckbox('fafafafa', false, 'Just a checkbox');
 
         $this->assertMatchesDomQuery('input[type="checkbox"][name="fafafafa"][id="fafafafa"]', $out);
         $this->assertMatchesDomQuery('label[for="fafafafa"]', $out);
@@ -27,14 +26,14 @@ class WpInputCheckboxTest extends BaseTestCase
 
     public function testWillEscapeLabelContent()
     {
-        $out = $this->view->wpInputCheckbox('fafafafa', false, 'Escaped & Safe');
+        $out = $this->view->inputCheckbox('fafafafa', false, 'Escaped & Safe');
 
         $this->assertContains('&amp;', $out);
     }
 
     public function testWillEscapeIdAttribute()
     {
-        $out = $this->view->wpInputCheckbox(
+        $out = $this->view->inputCheckbox(
             array(
                 'id'    => 'fafa&fafa',
                 'value' => false,
@@ -48,7 +47,7 @@ class WpInputCheckboxTest extends BaseTestCase
 
     public function testWillEscapeNameAttribute()
     {
-        $out = $this->view->wpInputCheckbox(
+        $out = $this->view->inputCheckbox(
             array(
                 'name'  => 'fafa&fafa',
                 'value' => false,
@@ -62,7 +61,7 @@ class WpInputCheckboxTest extends BaseTestCase
 
     public function testWillRenderCheckedAttribute()
     {
-        $out = $this->view->wpInputCheckbox('fafafafa', true, 'This is Checked');
+        $out = $this->view->inputCheckbox('fafafafa', true, 'This is Checked');
 
         $this->assertMatchesDomQuery('input[checked="checked"]', $out);
     }
@@ -72,7 +71,7 @@ class WpInputCheckboxTest extends BaseTestCase
      */
     public function testLackOfNameArgumentWillThrowException()
     {
-        $this->view->wpInputCheckbox(
+        $this->view->inputCheckbox(
             array(
                 'value' => false
             )
@@ -84,7 +83,7 @@ class WpInputCheckboxTest extends BaseTestCase
      */
     public function testLackOfValueArgumentWillThrowException()
     {
-        $this->view->wpInputCheckbox(
+        $this->view->inputCheckbox(
             array(
                 'name' => 'fafafafa'
             )
@@ -100,7 +99,7 @@ class WpInputCheckboxTest extends BaseTestCase
         $row   = $table->createRow();
         $field = $row->field('is_delicious');
 
-        $out = $this->view->wpInputCheckbox($field);
+        $out = $this->view->inputCheckbox($field);
 
         $this->assertMatchesDomQuery(
             'input[name="' . $field->getControlName() . '"]',

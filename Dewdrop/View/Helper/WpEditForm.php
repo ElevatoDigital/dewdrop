@@ -16,58 +16,17 @@ namespace Dewdrop\View\Helper;
  * Example usage:
  *
  * <code>
- * echo $this->wpEditForm()->open('Add New Animal');
+ * echo $this->editForm()->open('Add New Animal');
  *
  * echo $this->wpEditRow()->open($this->fields->get('animal:latin_name'));
- * echo $this->wpInputText($this->fields->get('animal:latin_name'));
+ * echo $this->inputText($this->fields->get('animal:latin_name'));
  * echo $this->wpEditRow()->close();
  *
- * echo $this->wpEditForm()->close();
+ * echo $this->editForm()->close();
  * </code>
+ *
+ * @deprecated See \Dewdrop\View\Helper\EditForm
  */
-class WpEditForm extends AbstractHelper
+class WpEditForm extends EditForm
 {
-    /**
-     * Open the form.
-     *
-     * If no action is provided, the form will submit to the current page.
-     *
-     * @param string $title
-     * @param array $errors
-     * @param string $method
-     * @param string $action
-     * @return string
-     */
-    public function open($title, $errors = array(), $method = 'POST', $action = null)
-    {
-        return $this->partial(
-            'wp-edit-form-open.phtml',
-            array(
-                'wrap'   => $this->view->wpWrap()->open(),
-                'title'  => $title,
-                'method' => $method,
-                'errors' => $errors,
-                'action' => ($action ?: $_SERVER['REQUEST_URI'])
-            )
-        );
-    }
-
-    /**
-     * Close the form.
-     *
-     * You can optionally provide a different title for the submit button.
-     *
-     * @param string $buttonTitle
-     * @return string
-     */
-    public function close($buttonTitle = 'Save Changes')
-    {
-        return $this->partial(
-            'wp-edit-form-close.phtml',
-            array(
-                'buttonTitle' => $buttonTitle,
-                'wrap'        => $this->view->wpWrap()->close()
-            )
-        );
-    }
 }
