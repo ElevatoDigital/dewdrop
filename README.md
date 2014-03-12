@@ -20,6 +20,12 @@ slightly.
 
 ```json
 {
+    "repositories": [
+        {
+            "type": "git",
+            "url":  "git@github.com:DeltaSystems/dewdrop.git"
+        }
+    ],
     "require": {
         "deltasystems/dewdrop": "0.9.*"
     }
