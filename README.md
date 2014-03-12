@@ -20,15 +20,24 @@ slightly.
 
 ```json
 {
+    "require": {
+        "deltasystems/dewdrop": "0.9.*"
+    }
+}
+```
+
+**NOTE:** If you will be contributing to Dewdrop, add the following structure to the JSON above so that Composer uses a
+Git clone for the Dewdrop dependency. Keep your work committed in branches other than develop and master to avoid losing
+work on Composer updates!
+
+```json
+{
     "repositories": [
         {
             "type": "git",
             "url":  "git@github.com:DeltaSystems/dewdrop.git"
         }
-    ],
-    "require": {
-        "deltasystems/dewdrop": "0.9.*"
-    }
+    ]
 }
 ```
 
