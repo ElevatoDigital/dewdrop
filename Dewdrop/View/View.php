@@ -357,6 +357,18 @@ class View
     }
 
     /**
+     * @param string $name
+     * @param string $class
+     * @return View
+     */
+    public function setHelperClass($name, $class)
+    {
+        $this->helperClasses[$name] = $class;
+
+        return $this;
+    }
+
+    /**
      * Create an instance of helper associated with the provided name and
      * store that instance in the $helpers property so that it can be retrieved
      * on any subsequent calls.
