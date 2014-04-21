@@ -6,7 +6,20 @@ use Dewdrop\Test\BaseTestCase;
 
 class ViewTest extends BaseTestCase
 {
+    /**
+     * @var View
+     */
     private $view;
+
+    /**
+     * @return string[][]
+     */
+    public function providerHelperClass()
+    {
+        return [
+            ['something', '\Dewdrop\View\Helper\SubNamespace\SomeThing'],
+        ];
+    }
 
     public function setUp()
     {
@@ -184,4 +197,17 @@ class ViewTest extends BaseTestCase
     }
 
     // }}}
+
+    /**
+     * @dataProvider providerHelperClass()
+     * @param string $name
+     * @param string $class
+     * @return void
+     */
+    public function testSetHelperClass($name, $class)
+    {
+        $this->view->setHelperClass($name, $class);
+
+        $this->assertInstanceOf($class, $this->view->helper($name));
+    }
 }
