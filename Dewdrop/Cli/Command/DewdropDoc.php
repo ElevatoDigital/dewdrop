@@ -79,7 +79,7 @@ class DewdropDoc extends CommandAbstract
         $cmd = sprintf(
             "%s --sourcecode --defaultpackagename=Dewdrop --title=Dewdrop --ignore=*.phtml -d %s %s",
             $this->phpdoc,
-            escapeshellarg($this->paths->getDewdropLib()),
+            escapeshellarg($this->paths->getDewdropLib() . '/Dewdrop'),
             $this->getFallbackArgString()
         );
 

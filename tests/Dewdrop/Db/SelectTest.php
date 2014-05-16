@@ -25,13 +25,15 @@ class SelectTest extends BaseTestCase
      */
     protected function setUpAdapter()
     {
-        global $wpdb;
-
         $this->db = $this->getMock(
             '\Dewdrop\Db\Adapter',
             array('query'),
-            array($wpdb)
+            array()
         );
+
+        $driver = new \Dewdrop\Db\Driver\Mock($this->db);
+
+        $this->db->setDriver($driver);
     }
 
     /**

@@ -19,9 +19,6 @@ class GenDbTableTest extends \PHPUnit_Framework_TestCase
             array('halt'),
             array(array(), 'gen-admin-component', $this->renderer)
         );
-
-        // Ensuring we have a mysql connection resource.  Fails in testing sometimes.
-        $this->runner->connectDb()->getConnection()->db_connect();
     }
 
     public function testAbortsWhenModelAlreadyExists()

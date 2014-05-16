@@ -7,6 +7,13 @@ use Dewdrop\Wiring;
 
 class WiringTest extends BaseTestCase
 {
+    public function setUp()
+    {
+        if (!defined('WPINC')) {
+            $this->markTestSkipped('Not running in a WP environment.');
+        }
+    }
+
     public function testCanOverrideDefaultPaths()
     {
         $paths = new \Dewdrop\Paths();

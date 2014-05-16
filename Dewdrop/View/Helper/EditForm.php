@@ -70,4 +70,4 @@ class EditForm extends AbstractHelper
             )
         );
     }
-} 
+}

@@ -58,7 +58,14 @@ class Request
     {
         $this->post   = ($post ?: $_POST);
         $this->query  = ($query ?: $_GET);
-        $this->method = ($method ?: $_SERVER['REQUEST_METHOD']);
+
+        if (null !== $method) {
+            $this->method = $method;
+        } elseif (isset($_SERVER['REQUEST_METHOD'])) {
+            $this->method = $_SERVER['REQUEST_METHOD'];
+        } else {
+            $this->method = 'GET';
+        }
     }
 
     /**

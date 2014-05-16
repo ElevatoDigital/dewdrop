@@ -638,7 +638,7 @@ abstract class Table
         return $this->db->fetchRow(
             $this->assembleFindSql($args),
             array(),
-            ARRAY_A
+            Adapter::ARRAY_A
         );
     }
 
@@ -664,7 +664,7 @@ abstract class Table
     public function fetchRow($sql)
     {
         $className = $this->rowClass;
-        $data      = $this->db->fetchRow($sql, array(), ARRAY_A);
+        $data      = $this->db->fetchRow($sql, array(), Adapter::ARRAY_A);
 
         return new $className($this, $data);
     }
@@ -724,7 +724,9 @@ abstract class Table
     private function filterDataArrayForPhysicalColumns(array $data)
     {
         foreach ($data as $column => $value) {
-            if (!$this->getMetadata('columns', $column)) {
+            $metadata = $this->getMetadata('columns', $column);
+
+            if (!$metadata || ($metadata['PRIMARY'] && null === $value)) {
                 unset($data[$column]);
             }
         }

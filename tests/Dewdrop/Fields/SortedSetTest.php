@@ -41,7 +41,7 @@ class SortedSetTest extends BaseTestCase
         $count = 0;
 
         foreach ($this->set as $field) {
-            $count += $field;
+            $count += 1;
         }
 
         $this->assertEquals(3, $count);

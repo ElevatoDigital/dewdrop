@@ -99,8 +99,7 @@ class SelectTest extends BaseTestCase
 
     public function testCanRenderUsingAFieldObject()
     {
-        $wpdb = new \wpdb(DB_USER, DB_PASSWORD, DB_NAME, DB_HOST);
-        $db   = new \Dewdrop\Db\Adapter($wpdb);
+        $db = $GLOBALS['dewdrop_pimple']['db'];
 
         require_once __DIR__ . '/table/DewdropTestFruits.php';
         $table = new \DewdropViewHelperTest\DewdropTestFruits($db);

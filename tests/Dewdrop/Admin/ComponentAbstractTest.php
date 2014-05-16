@@ -18,11 +18,14 @@ class ComponentAbstractTest extends BaseTestCase
 
     public function setUp()
     {
+        if (!defined('WPINC')) {
+            $this->markTestSkipped('ComponentAbstract currently only works in WP.');
+        }
+
         $this->paths   = new Paths();
         $this->request = new Request();
 
-        $wpdb = new \wpdb(DB_USER, DB_PASSWORD, DB_NAME, DB_HOST);
-        $this->db = new Adapter($wpdb);
+        $this->db = $GLOBALS['dewdrop_pimple']['db'];
 
         require_once __DIR__ . '/test-components/animals/Component.php';
         $this->component = new \DewdropTest\Admin\Animals\Component($this->db, $this->paths, $this->request);

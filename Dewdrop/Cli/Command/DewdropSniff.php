@@ -11,10 +11,10 @@
 namespace Dewdrop\Cli\Command;
 
 /**
- * Use PHP_CodeSniffer to check that your plugin code conforms to your coding
+ * Use PHP_CodeSniffer to check that the Dewdrop code conforms to your coding
  * style of choice.  By default, we use the PSR-2 coding style.
  */
-class Sniff extends CommandAbstract
+class DewdropSniff extends CommandAbstract
 {
     /**
      * The path to the phpcs executable.  We'll attempt to auto-detect if it
@@ -39,11 +39,11 @@ class Sniff extends CommandAbstract
     public function init()
     {
         $this
-            ->setDescription('Run PHP_CodeSniffer on your plugin to ensure it follows coding style guidelines')
-            ->setCommand('sniff')
+            ->setDescription('Run PHP_CodeSniffer on Dewdrop to ensure it follows coding style guidelines')
+            ->setCommand('dewdrop-sniff')
             ->setSupportFallbackArgs(true)
-            ->addAlias('code-sniff')
-            ->addAlias('cs');
+            ->addAlias('dewdrop-code-sniff')
+            ->addAlias('dewdrop-cs');
 
         $this->addArg(
             'phpcs',
@@ -95,14 +95,15 @@ class Sniff extends CommandAbstract
             $this->phpcs = $this->autoDetectExecutable('phpcs');
         }
 
+        $pluginRoot = $this->paths->getPluginRoot();
+
         $cmd = sprintf(
             '%s --standard=%s --extensions=php '
-            . '--ignore=*/vendor/* --ignore=*/tests/* --ignore=*/www/* --ignore=*/.git/* '
             . '%s %s',
             $this->phpcs,
             escapeshellarg($this->standard),
             $this->getFallbackArgString(),
-            escapeshellarg($this->paths->getPluginRoot())
+            escapeshellarg($pluginRoot . '/vendor/deltasystems/dewdrop/Dewdrop')
         );
 
         $this->passthru($cmd);

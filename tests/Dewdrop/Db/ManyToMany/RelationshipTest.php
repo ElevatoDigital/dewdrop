@@ -16,9 +16,7 @@ class RelationshipTest extends DbTestCase
     {
         parent::setUp();
 
-        $wpdb = new \wpdb(DB_USER, DB_PASSWORD, DB_NAME, DB_HOST);
-
-        $this->db = new Adapter($wpdb);
+        $this->db = $GLOBALS['dewdrop_pimple']['db'];
 
         require_once __DIR__ . '/table-classes/Animals.php';
         $this->table = new \DewdropTest\Db\ManyToMany\Animals($this->db);

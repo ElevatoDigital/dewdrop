@@ -161,7 +161,7 @@ class Edit implements Countable, Iterator
         // When not checked, checkboxes are excluded from POST in full.
         // This loop works around that quirk.
         foreach ($this->fields as $field) {
-            if ($field->isType('tinyint') && !array_key_exists($field->getControlName(), $values)) {
+            if ($field->isType('tinyint', 'bool') && !array_key_exists($field->getControlName(), $values)) {
                 $field->setValue(0);
             }
         }

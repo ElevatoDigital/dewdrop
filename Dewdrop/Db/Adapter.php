@@ -10,6 +10,7 @@
 
 namespace Dewdrop\Db;
 
+use Dewdrop\Db\Driver\DriverInterface;
 use Dewdrop\Db\Driver\Wpdb as WpdbDriver;
 use Dewdrop\Exception;
 use Dewdrop\Paths;
@@ -46,6 +47,8 @@ class Adapter
     const CASE_LOWER = 2;
     const CASE_NATURAL = 0;
     const CASE_UPPER = 1;
+
+    protected $caseFolding = self::CASE_NATURAL;
 
     /**
      * Keys are UPPERCASE SQL datatypes or the constants
@@ -94,20 +97,33 @@ class Adapter
     protected $driver;
 
     /**
+     * The name of the table that was affected by the most recent call to insert()
+     * is stored here so that we can use it to retrieve the last insert ID when
+     * using PostgreSQL.
+     *
+     * @var mixed
+     */
+    protected $lastInsertTableName;
+
+    /**
      * Create new adapter using the wpdb object as the driver
      *
      * @param mixed $driver
      */
     public function __construct($driver = null)
     {
-        if (null === $driver) {
-        }
-
         if ($driver instanceof wpdb) {
             $driver = new WpdbDriver($this, $driver);
         }
 
         $this->driver = $driver;
+    }
+
+    public function setDriver(DriverInterface $driver)
+    {
+        $this->driver = $driver;
+
+        return $this;
     }
 
     /**
@@ -210,7 +226,7 @@ class Adapter
      */
     public function fetchPairs($sql, $bind = array())
     {
-        $rs  = $this->fetchAll($sql, $bind, ARRAY_N);
+        $rs  = $this->fetchAll($sql, $bind, self::ARRAY_N);
         $out = array();
 
         foreach ($rs as $row) {
@@ -262,13 +278,16 @@ class Adapter
              . ' (' . implode(', ', $cols) . ') '
              . 'VALUES (' . implode(', ', $vals) . ')';
 
-        $bind = array_values($bind);
+        $bind   = array_values($bind);
+        $result = $this->query($sql, $bind);
 
-        return $this->query($sql, $bind);
+        $this->lastInsertTableName = $table;
+
+        return $result;
     }
 
     /**
-     * Get the last insert ID from \wpdb after performing an insert on a table
+     * Get the last insert ID from after performing an insert on a table
      * with an auto-incrementing primary key.
      *
      * @return integer
@@ -276,6 +295,18 @@ class Adapter
     public function lastInsertId()
     {
         return $this->driver->lastInsertId();
+    }
+
+    /**
+     * Retrieve the name of the table affected by the last call to insert().
+     * Allows us to get last insert ID when using drivers that don't have a
+     * function for that built-in (i.e. pgsql).
+     *
+     * @return string
+     */
+    public function getLastInsertTableName()
+    {
+        return $this->lastInsertTableName;
     }
 
     /**
@@ -657,7 +688,7 @@ class Adapter
      */
     public function listTables()
     {
-        return $this->fetchCol('SHOW TABLES');
+        return $this->driver->listTables();
     }
 
     /**
@@ -750,7 +781,7 @@ class Adapter
      */
     public function foldCase($key)
     {
-        switch ($this->_caseFolding) {
+        switch ($this->caseFolding) {
             case self::CASE_LOWER:
                 $value = strtolower((string) $key);
                 break;

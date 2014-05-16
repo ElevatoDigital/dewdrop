@@ -30,13 +30,20 @@ abstract class DbTestCase extends PHPUnit_Extensions_Database_TestCase implement
      */
     final public function getConnection()
     {
-        $connection = new PDO(
-            'mysql:dbname=' . DB_NAME . ';host=' . DB_HOST,
-            DB_USER,
-            DB_PASSWORD
-        );
+        if (!defined('WPINC')) {
+            return $this->createDefaultDbConnection(
+                $GLOBALS['dewdrop_pimple']['db']->getConnection(),
+                $GLOBALS['dewdrop_pimple']['config']['db']['name']
+            );
+        } else {
+            $connection = new PDO(
+                'mysql:dbname=' . DB_NAME . ';host=' . DB_HOST,
+                DB_USER,
+                DB_PASSWORD
+            );
 
-        return $this->createDefaultDBConnection($connection, DB_NAME);
+            return $this->createDefaultDBConnection($connection, DB_NAME);
+        }
     }
 
     /**
@@ -48,11 +55,9 @@ abstract class DbTestCase extends PHPUnit_Extensions_Database_TestCase implement
      */
     public function getSetUpOperation()
     {
-        $cascadeTruncates = true;
-
         return new \PHPUnit_Extensions_Database_Operation_Composite(
             array(
-                new TruncateOperation($cascadeTruncates),
+                new TruncateOperation(true),
                 \PHPUnit_Extensions_Database_Operation_Factory::INSERT()
             )
         );

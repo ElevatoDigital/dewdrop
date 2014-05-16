@@ -13,6 +13,7 @@
 
 namespace Dewdrop\Cli;
 
+use Dewdrop\Bootstrap\Detector as BootstrapDetector;
 use Dewdrop\Paths;
 use Dewdrop\Db\Adapter;
 
@@ -36,9 +37,10 @@ class Run
         'GenDbTable',
         'GenEav',
         'Sniff',
-        'DewdropTest',
-        'DewdropDoc',
         'DewdropDev',
+        'DewdropDoc',
+        'DewdropSniff',
+        'DewdropTest',
     );
 
     /**
@@ -87,6 +89,8 @@ class Run
      */
     private $paths;
 
+    private $pimple;
+
     /**
      * Create the CLI runner, giving users the ability to inject non-default
      * args, command name, and renderer (primarily for testing purposes).
@@ -97,15 +101,21 @@ class Run
      */
     public function __construct(array $args = null, $command = null, $renderer = null)
     {
+        $this->pimple   = BootstrapDetector::findPimple();
         $this->args     = ($args ?: array_slice($_SERVER['argv'], 2));
         $this->renderer = ($renderer ?: new Renderer\Markdown());
-        $this->paths    = new Paths();
+        $this->paths    = (isset($this->pimple['paths']) ? $this->pimple['paths'] : new Paths());
 
         if ($command) {
             $this->command = $command;
         } elseif (isset($_SERVER['argv'][1])) {
             $this->command = $_SERVER['argv'][1];
         }
+    }
+
+    public function getPimple()
+    {
+        return $this->pimple;
     }
 
     /**
@@ -196,12 +206,7 @@ class Run
     public function connectDb()
     {
         if (!$this->dbAdapter) {
-            require_once $this->paths->getRoot() . '/wp-config.php';
-            require_once $this->paths->getRoot() . '/wp-includes/wp-db.php';
-
-            global $wpdb;
-
-            $this->dbAdapter = new Adapter($wpdb);
+            $this->dbAdapter = $this->pimple['db'];
         }
 
         return $this->dbAdapter;

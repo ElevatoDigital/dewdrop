@@ -12,7 +12,6 @@ namespace Dewdrop\View\Helper;
 
 use Dewdrop\Db\Field;
 
-
 /**
  * Render a basic HTML &lt;select&gt; element using the supplied options.
  */

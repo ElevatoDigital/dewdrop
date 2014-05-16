@@ -53,6 +53,14 @@ class Dbdeploy extends CommandAbstract
     private $mysql;
 
     /**
+     * The path to the psql binary.  If not specified, we'll attempt to
+     * auto-detect it.
+     *
+     * @var string
+     */
+    private $psql;
+
+    /**
      * When running the backfill action, the revision up to which you'd like
      * to backfill your database's changelog.
      *
@@ -92,7 +100,9 @@ class Dbdeploy extends CommandAbstract
      *
      * @var string
      */
-    private $mysqlOutput = '';
+    private $commandOutput = '';
+
+    private $dbType;
 
     /**
      * Set basic command information, arguments and examples
@@ -101,9 +111,11 @@ class Dbdeploy extends CommandAbstract
      */
     public function init()
     {
+        $this->dbType = $this->runner->getPimple()['config']['db']['type'];
+
         $this->changesets['plugin']       = $this->paths->getPluginRoot() . '/db';
-        $this->changesets['dewdrop-core'] = $this->paths->getDewdropLib() . '/db';
-        $this->changesets['dewdrop-test'] = $this->paths->getDewdropLib() . '/tests/db';
+        $this->changesets['dewdrop-core'] = $this->paths->getDewdropLib() . '/db/' . $this->dbType;
+        $this->changesets['dewdrop-test'] = $this->paths->getDewdropLib() . '/tests/db/' . $this->dbType;
 
         $this
             ->setDescription('Update database schema using dbdeploy')
@@ -121,6 +133,12 @@ class Dbdeploy extends CommandAbstract
         $this->addArg(
             'mysql',
             'The path to the mysql binary',
+            self::ARG_OPTIONAL
+        );
+
+        $this->addArg(
+            'psql',
+            'The path to the psql binary',
             self::ARG_OPTIONAL
         );
 
@@ -271,7 +289,7 @@ class Dbdeploy extends CommandAbstract
                         false // Don't display help content
                     );
 
-                    $this->renderer->text($this->mysqlOutput);
+                    $this->renderer->text($this->commandOutput);
 
                     return false;
                 }
@@ -519,7 +537,7 @@ class Dbdeploy extends CommandAbstract
     protected function createChangelog()
     {
         $tempFile = tempnam(sys_get_temp_dir(), 'dewdrop.cli.');
-        $template = __DIR__ . '/dbdeploy/dbdeploy-changelog.sql';
+        $template = __DIR__ . '/dbdeploy/' . $this->dbType . '/dbdeploy-changelog.sql';
 
         $content = str_replace(
             '{{table_name}}',
@@ -595,19 +613,7 @@ class Dbdeploy extends CommandAbstract
      */
     protected function runSqlScript($path)
     {
-        if (null === $this->mysql) {
-            $this->mysql = $this->autoDetectExecutable('mysql');
-        }
-
-        $cmd = sprintf(
-            '%s --user=%s --password=%s --host=%s %s < %s 2>&1',
-            $this->mysql,
-            escapeshellarg(DB_USER),
-            escapeshellarg(DB_PASSWORD),
-            escapeshellarg(DB_HOST),
-            escapeshellarg(DB_NAME),
-            escapeshellarg($path)
-        );
+        $cmd = $this->prepareSqlCommand($path);
 
         // Initializing exit status to failed state
         $exitStatus = 1;
@@ -615,12 +621,46 @@ class Dbdeploy extends CommandAbstract
         $this->exec($cmd, $output, $exitStatus);
 
         if (isset($output) && is_array($output)) {
-            $this->mysqlOutput = implode(PHP_EOL, $output);
+            $this->commandOutput = implode(PHP_EOL, $output);
         } else {
-            $this->mysqlOutput = '';
+            $this->commandOutput = '';
         }
 
         return 0 === $exitStatus;
+    }
+
+    protected function prepareSqlCommand($path)
+    {
+        if ('pgsql' === $this->dbType) {
+            if (null === $this->psql) {
+                $this->psql = $this->autoDetectExecutable('psql');
+            }
+
+            $config = $this->runner->getPimple()['config']['db'];
+
+            return sprintf(
+                '%s -U %s -h %s %s < %s 2>&1',
+                $this->psql,
+                escapeshellarg($config['username']),
+                escapeshellarg($config['host']),
+                escapeshellarg($config['name']),
+                escapeshellarg($path)
+            );
+        } else {
+            if (null === $this->mysql) {
+                $this->mysql = $this->autoDetectExecutable('mysql');
+            }
+
+            return sprintf(
+                '%s --user=%s --password=%s --host=%s %s < %s 2>&1',
+                $this->mysql,
+                escapeshellarg(DB_USER),
+                escapeshellarg(DB_PASSWORD),
+                escapeshellarg(DB_HOST),
+                escapeshellarg(DB_NAME),
+                escapeshellarg($path)
+            );
+        }
     }
 
     /**

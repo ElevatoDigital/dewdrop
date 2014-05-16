@@ -21,6 +21,10 @@ class EditAbstractTest extends DbTestCase
     {
         parent::setUp();
 
+        if (!defined('WPINC')) {
+            $this->markTestSkipped('Admin components currently only work in WP.');
+        }
+
         $this->paths   = new Paths();
         $this->request = new Request();
 

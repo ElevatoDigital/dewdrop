@@ -72,6 +72,11 @@ class Paths
         return $this->root;
     }
 
+    public function isWp()
+    {
+        return false !== stripos(__DIR__, 'wp-content/plugins');
+    }
+
     /**
      * This is just an alias to getRoot().  Used by some older Dewdrop code.
      *
@@ -164,6 +169,13 @@ class Paths
         return $this->pluginRoot . '/models';
     }
 
+    public function setModels($models)
+    {
+        $this->models = $models;
+
+        return $this;
+    }
+
     /**
      * The folder housing your shortcodes
      *
@@ -193,9 +205,9 @@ class Paths
      */
     protected function detectRoot()
     {
-        if (false === stripos(__DIR__, 'wp-content/plugins')) {
+        if (!$this->isWp()) {
             // Running as a stand-alone app
-            $out = getcwd();
+            $out = $this->detectPluginRoot();
         } else {
             // Running inside a WordPress plugin
             $out = substr(
@@ -209,19 +221,19 @@ class Paths
     }
 
     /**
-     * Detect the plugin or app root folder.  In a standalone app, this is the
-     * same folder that is found with detectRoot().  In a WordPress app, it is the
-     * folder housing the plugin based on Dewdrop.
+     * Detect the plugin or app root folder.  In a standalone app, we traverse up
+     * the filesystem until we exit the Composer-created vendor folder.  Using this
+     * approach, rather than just grabbing the current working directory, allows
+     * Dewdrop to work consistently regardless of whether the application is all
+     * running inside the document root or with only a front controller in the
+     * document root and the remainder of the code stored elsewhere.  In a
+     * WordPress app, it is the folder housing the plugin based on Dewdrop.
      *
      * @return string
      */
     protected function detectPluginRoot()
     {
-        if (false === stripos(__DIR__, 'wp-content/plugins')) {
-            $out = $this->root;
-        } else {
-            $out = realpath(__DIR__ . '/../../../../');
-        }
+        $out = realpath(__DIR__ . '/../../../../');
 
         return rtrim($out, '/');
     }
