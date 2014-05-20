@@ -274,14 +274,20 @@ class DbdeployTest extends \PHPUnit_Framework_TestCase
             array($this->runner, $this->renderer)
         );
 
+        $dbTypeSuffix = 'pgsql';
+
+        if (defined('WPINC')) {
+            $dbTypeSuffix = 'mysql';
+        }
+
         $command->overrideChangesetPath(
             'plugin',
-            $this->paths->getDewdropLib() . '/tests/Dewdrop/Cli/Command/dbdeploy-test/plugin/'
+            $this->paths->getDewdropLib() . '/tests/Dewdrop/Cli/Command/dbdeploy-test/plugin/' . $dbTypeSuffix
         );
 
         $command->overrideChangesetPath(
             'dewdrop-test',
-            $this->paths->getDewdropLib() . '/tests/Dewdrop/Cli/Command/dbdeploy-test/dewdrop-test/'
+            $this->paths->getDewdropLib() . '/tests/Dewdrop/Cli/Command/dbdeploy-test/dewdrop-test/' . $dbTypeSuffix
         );
 
         $command->overrideChangesetPath(
@@ -304,7 +310,7 @@ class DbdeployTest extends \PHPUnit_Framework_TestCase
         $command->overrideChangesetPath('fadfafafafafaf', '');
     }
 
-    public function testCustomMysqlBinaryAffectsRunSqlScript()
+    public function testCustomBinaryAffectsRunSqlScript()
     {
         $command = $this->getMockCommand(array('exec'));
 
@@ -313,7 +319,12 @@ class DbdeployTest extends \PHPUnit_Framework_TestCase
             ->method('exec')
             ->with(new \PHPUnit_Framework_Constraint_StringStartsWith('fafafafa'));
 
-        $command->parseArgs(array('--action=status', '--mysql=fafafafa'));
+        if (defined('WPINC')) {
+            $command->parseArgs(array('--action=status', '--mysql=fafafafa'));
+        } else {
+            $command->parseArgs(array('--action=status', '--psql=fafafafa'));
+        }
+
         $command->execute();
     }
 

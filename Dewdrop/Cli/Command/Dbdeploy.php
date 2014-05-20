@@ -10,7 +10,6 @@
 
 namespace Dewdrop\Cli\Command;
 
-use Dewdrop\Cli\Command\DbMetadata;
 use Dewdrop\Exception;
 
 /**
@@ -198,6 +197,19 @@ class Dbdeploy extends CommandAbstract
     }
 
     /**
+     * Manually set the path to the psql binary
+     *
+     * @param string $psql
+     * @return \Dewdrop\Cli\Command\Dbdeploy
+     */
+    public function setPsql($psql)
+    {
+        $this->psql = $psql;
+
+        return $this;
+    }
+
+    /**
      * When running the backfill action, set the revision number to backfill to.
      *
      * @param integer $revision
@@ -232,7 +244,7 @@ class Dbdeploy extends CommandAbstract
      * the changelog table is present and then delegate the remainder of the
      * work to the action's own method.
      *
-     * @return void
+     * @return boolean
      */
     public function execute()
     {
@@ -261,7 +273,7 @@ class Dbdeploy extends CommandAbstract
      * Run any available updates.  If no updates are available, we display
      * status information instead.
      *
-     * @return void
+     * @return boolean
      */
     public function executeUpdate()
     {
@@ -316,6 +328,8 @@ class Dbdeploy extends CommandAbstract
                 'subhead'
             );
         }
+
+        return true;
     }
 
     /**
@@ -323,7 +337,7 @@ class Dbdeploy extends CommandAbstract
      * revision and any update scripts that need to be run to bring it
      * up to date.
      *
-     * @return void
+     * @return boolean
      */
     public function executeStatus()
     {
@@ -347,6 +361,8 @@ class Dbdeploy extends CommandAbstract
         foreach ($filesByChangeset as $changeset => $changes) {
             $this->renderStatusForChangeset($changeset, $changes['current'], $changes['files']);
         }
+
+        return true;
     }
 
     /**
@@ -399,7 +415,7 @@ class Dbdeploy extends CommandAbstract
      * of dbdeploy to skip those scripts and move on to those you know still
      * need to be applied to your database.
      *
-     * @return void
+     * @return boolean
      */
     public function executeBackfill()
     {
@@ -442,6 +458,8 @@ class Dbdeploy extends CommandAbstract
             ->newline();
 
         $this->renderFileList('Changelog entries inserted', $files, 'subhead');
+
+        return true;
     }
 
     /**
@@ -546,7 +564,7 @@ class Dbdeploy extends CommandAbstract
         );
 
         if (!file_exists($tempFile) || !is_writable($tempFile)) {
-            throw Exception('Could not write to temporary file for dbdeploy changelog.');
+            throw new Exception('Could not write to temporary file for dbdeploy changelog.');
         }
 
         file_put_contents($tempFile, $content, LOCK_EX);
@@ -556,7 +574,7 @@ class Dbdeploy extends CommandAbstract
         // WARNING: Notice the error suppression "@" operator!  Used because
         //          failure is also reported by unlink() return value.
         if (!@unlink($tempFile)) {
-            throw Exception('Could not delete temporary dbdeploy changelog file.');
+            throw new Exception('Could not delete temporary dbdeploy changelog file.');
         }
 
         return $result;
@@ -639,7 +657,7 @@ class Dbdeploy extends CommandAbstract
             $config = $this->runner->getPimple()['config']['db'];
 
             return sprintf(
-                '%s -U %s -h %s %s < %s 2>&1',
+                '%s -v ON_ERROR_STOP=1 -U %s -h %s %s < %s 2>&1',
                 $this->psql,
                 escapeshellarg($config['username']),
                 escapeshellarg($config['host']),
@@ -651,6 +669,8 @@ class Dbdeploy extends CommandAbstract
                 $this->mysql = $this->autoDetectExecutable('mysql');
             }
 
+            /** Constants referenced here defined by WP, not our code */
+            /** @noinspection PhpUndefinedConstantInspection */
             return sprintf(
                 '%s --user=%s --password=%s --host=%s %s < %s 2>&1',
                 $this->mysql,
@@ -742,7 +762,7 @@ class Dbdeploy extends CommandAbstract
     private function renderFileList($header, array $files, $rendererMethod)
     {
         if (!count($files)) {
-            return false;
+            return;
         }
 
         if ('subhead' === $rendererMethod) {
