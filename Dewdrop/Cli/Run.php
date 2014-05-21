@@ -19,6 +19,14 @@ use Dewdrop\Db\Adapter;
 
 /**
  * This class is responsible for handling execution of CLI commands.
+ *
+ * If you need to add CLI commands that are not provided by Dewdrop out of
+ * the box, provide an array of command classnames in a Pimple resource
+ * called "cli-commands".  We use this special Pimple resource for custom
+ * command injection because it's not possible to define a custom Run
+ * instance in Pimple altogether, like we do for custom view helpers for
+ * example.  Run is a "root" class in the sense that it is responsible
+ * for finding and kicking off the bootstrap directly.
  */
 class Run
 {
@@ -222,10 +230,16 @@ class Run
     protected function instantiateCommands()
     {
         foreach ($this->commandClasses as $commandClass) {
-            require_once __DIR__ . '/Command/' . $commandClass . '.php';
             $fullClassName = '\Dewdrop\Cli\Command\\' . $commandClass;
 
             $this->commands[$commandClass] = new $fullClassName($this, $this->renderer);
+        }
+
+        // Add any custom commands defined in Pimple's "cli-commands" resource
+        if (isset($this->pimple['cli-commands'])) {
+            foreach ($this->pimple['cli-commands'] as $className) {
+                $this->commands[$className] = new $className($this, $this->renderer);
+            }
         }
     }
 }

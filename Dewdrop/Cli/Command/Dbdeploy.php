@@ -10,6 +10,12 @@
 
 namespace Dewdrop\Cli\Command;
 
+use Dewdrop\Db\Dbdeploy\Changeset;
+use Dewdrop\Db\Dbdeploy\ChangelogGateway;
+use Dewdrop\Db\Dbdeploy\CliExec;
+use Dewdrop\Db\Dbdeploy\Command\Backfill;
+use Dewdrop\Db\Dbdeploy\Command\Status;
+use Dewdrop\Db\Dbdeploy\Command\Apply;
 use Dewdrop\Exception;
 
 /**
@@ -259,14 +265,28 @@ class Dbdeploy extends CommandAbstract
             );
         }
 
+        $config = $this->runner->getPimple()['config']['db'];
+
+        $cliExec = new CliExec(
+            $config['type'],
+            $config['username'],
+            $config['password'],
+            $config['host'],
+            $config['name'],
+            ('psql' === $this->dbType ? $this->psql : $this->mysql)
+        );
+
         $this->db = $this->runner->connectDb();
 
-        if (!$this->changelogExists() && !$this->createChangelog()) {
-            return $this->abort('Could not create dbdeploy changelog table.');
+        $gateway    = new ChangelogGateway($this->db, $cliExec, $this->dbType, $this->changelogTableName);
+        $changesets = array();
+
+        foreach ($this->changesets as $name => $path) {
+            $changesets[] = new Changeset($gateway, $name, $path);
         }
 
         $method = 'execute' . ucfirst($this->action);
-        return $this->$method();
+        return $this->$method($changesets, $gateway, $cliExec);
     }
 
     /**
@@ -275,56 +295,29 @@ class Dbdeploy extends CommandAbstract
      *
      * @return boolean
      */
-    public function executeUpdate()
+    public function executeUpdate(array $changesets, ChangelogGateway $changelogGateway, CliExec $cliExec)
     {
-        $filesByChangeset = $this->getFilesByChangeset($count);
+        $command = new Apply($changelogGateway, $changesets, $cliExec, $this->changeset);
 
-        // Could not retrieve files collection
-        if (false === $filesByChangeset) {
-            return false;
+        $command->execute();
+
+        if (!$command->getChangesAppliedCount()) {
+            return $this->executeStatus($changesets);
         }
 
-        if (!$count) {
-            return $this->executeStatus();
-        }
-
-        foreach ($filesByChangeset as $changeset => $changes) {
-            foreach ($changes['files'] as $file) {
-                $start   = date('Y-m-d G:i:s');
-                $success = $this->runSqlScript($file);
-
-                if (!$success) {
-                    $filename = basename($file);
-
-                    $this->abort(
-                        "Stopping dbdeploy run because of error in script: {$filename}.",
-                        false // Don't display help content
-                    );
-
-                    $this->renderer->text($this->commandOutput);
-
-                    return false;
-                }
-
-                $end = date('Y-m-d G:i:s');
-
-                $this->updateChangelog($changeset, $file, $start, $end);
-            }
-        }
-
-        $suffix  = (1 === $count ? '' : 's');
+        $suffix  = (1 === $command->getChangesAppliedCount() ? '' : 's');
 
         $this->refreshDbMetadata();
 
         $this->renderer
             ->title('dbdeploy Complete')
-            ->success("Successfully applied $count change file{$suffix}.")
+            ->success("Successfully applied {$command->getChangesAppliedCount()} change file{$suffix}.")
             ->newline();
 
-        foreach ($filesByChangeset as $changeset => $changes) {
+        foreach ($command->getAppliedFilesByChangeset() as $changeset => $changes) {
             $this->renderFileList(
                 "Change files applied to \"{$changeset}\" changeset",
-                $changes['files'],
+                $changes,
                 'subhead'
             );
         }
@@ -337,28 +330,26 @@ class Dbdeploy extends CommandAbstract
      * revision and any update scripts that need to be run to bring it
      * up to date.
      *
+     * @param array $changesets
      * @return boolean
      */
-    public function executeStatus()
+    public function executeStatus(array $changesets)
     {
-        $filesByChangeset = $this->getFilesByChangeset($count);
+        $command = new Status($changesets);
 
-        // Couldn't get files collection
-        if (false === $filesByChangeset) {
-            return false;
-        }
+        $command->execute();
 
         $this->renderer->title('dbdeploy Status');
 
-        if (!$count) {
+        if (!$command->getAvailableChangesCount()) {
             $this->renderer->success('Your database schema is up to date.');
-        } elseif (1 === $count) {
-            $this->renderer->warn("You need to run {$count} dbdeploy script.");
+        } elseif (1 === $command->getAvailableChangesCount()) {
+            $this->renderer->warn("You need to run {$command->getAvailableChangesCount()} dbdeploy script.");
         } else {
-            $this->renderer->warn("You need to run {$count} dbdeploy scripts.");
+            $this->renderer->warn("You need to run {$command->getAvailableChangesCount()} dbdeploy scripts.");
         }
 
-        foreach ($filesByChangeset as $changeset => $changes) {
+        foreach ($command->getAvailableChangesBySet() as $changeset => $changes) {
             $this->renderStatusForChangeset($changeset, $changes['current'], $changes['files']);
         }
 
@@ -417,47 +408,24 @@ class Dbdeploy extends CommandAbstract
      *
      * @return boolean
      */
-    public function executeBackfill()
+    public function executeBackfill(array $changesets, ChangelogGateway $changelogGateway)
     {
-        if (null === $this->revision) {
-            return $this->abort('The revision arg is required for the backfill action.');
+        $command = new Backfill($changelogGateway, $changesets, $this->changeset, $this->revision);
+
+        $command->execute();
+
+        if (!$command->getChangesAppliedCount()) {
+            return $this->executeStatus($changesets);
         }
 
-        if (null === $this->changeset) {
-            return $this->abort('You must specify a changeset when backfilling your changelog.');
-        }
-
-        $current = $this->getCurrentRevision($this->changeset);
-        $files   = $this->getChangeFiles($current, $this->changesets[$this->changeset]);
-
-        // Abort was called because a file was named improperly
-        if (false === $files) {
-            return false;
-        }
-
-        $count = count($files);
-
-        if (!$count) {
-            return $this->executeStatus();
-        }
-
-        foreach ($files as $file) {
-            $timestamp = date('Y-m-d G:i:s');
-            $revision  = $this->getFileChangeNumber($file);
-
-            if ($revision <= $this->revision) {
-                $this->updateChangelog($this->changeset, $file, $timestamp, $timestamp);
-            }
-        }
-
-        $suffix  = (1 === $count ? '' : 's');
+        $suffix  = (1 === $command->getChangesAppliedCount() ? '' : 's');
 
         $this->renderer
             ->title('dbdeploy Backfill Complete')
-            ->text("Successfully backfilled changelog entries for $count change file{$suffix}.")
+            ->text("Successfully backfilled changelog entries for {$command->getChangesAppliedCount()} change file{$suffix}.")
             ->newline();
 
-        $this->renderFileList('Changelog entries inserted', $files, 'subhead');
+        $this->renderFileList('Changelog entries inserted', $command->getAppliedFiles(), 'subhead');
 
         return true;
     }
@@ -485,258 +453,6 @@ class Dbdeploy extends CommandAbstract
                 . 'and any words included in the file name are separated by hyphens.'
             )
             ->newline();
-    }
-
-    /**
-     * Get all change files that need to be run grouped by changeset.  The
-     * return value will be an array following this structure:
-     *
-     * <code>
-     * array(
-     *     'changeset-name' => array(
-     *         'current' => 0,
-     *         'files'   => array(
-     *
-     *         )
-     *     )
-     * )
-     * </code>
-     *
-     * @param integer $count
-     * @return array
-     */
-    private function getFilesByChangeset(&$count = 0)
-    {
-        $filesByChangeset = array();
-
-        $count = 0;
-
-        foreach ($this->changesets as $changeset => $path) {
-            if ($this->changeset && $changeset !== $this->changeset) {
-                continue;
-            }
-
-            $current = $this->getCurrentRevision($changeset);
-            $files   = $this->getChangeFiles($current, $path);
-
-            // Abort was called because a file was named improperly
-            if (false === $files) {
-                return false;
-            }
-
-            $filesByChangeset[$changeset] = array(
-                'current' => $current,
-                'files'   => $files
-            );
-
-            $count += count($files);
-        }
-
-        return $filesByChangeset;
-    }
-
-    /**
-     * Check to see if the changelog table already exists.
-     *
-     * @return boolean
-     */
-    protected function changelogExists()
-    {
-        return in_array($this->changelogTableName, $this->db->listTables());
-    }
-
-    /**
-     * Create the changelog table by running the SQL script included with
-     * Dewdrop.
-     *
-     * @throws \Dewdrop\Exception
-     * @return boolean Whether it was successfully created.
-     */
-    protected function createChangelog()
-    {
-        $tempFile = tempnam(sys_get_temp_dir(), 'dewdrop.cli.');
-        $template = __DIR__ . '/dbdeploy/' . $this->dbType . '/dbdeploy-changelog.sql';
-
-        $content = str_replace(
-            '{{table_name}}',
-            $this->changelogTableName,
-            file_get_contents($template)
-        );
-
-        if (!file_exists($tempFile) || !is_writable($tempFile)) {
-            throw new Exception('Could not write to temporary file for dbdeploy changelog.');
-        }
-
-        file_put_contents($tempFile, $content, LOCK_EX);
-
-        $result = $this->runSqlScript($tempFile);
-
-        // WARNING: Notice the error suppression "@" operator!  Used because
-        //          failure is also reported by unlink() return value.
-        if (!@unlink($tempFile)) {
-            throw new Exception('Could not delete temporary dbdeploy changelog file.');
-        }
-
-        return $result;
-    }
-
-    /**
-     * Update the changelog with a record for a newly executed file.
-     *
-     * @param string $changeset
-     * @param string $file
-     * @param string $startDt
-     * @param string $completeDt
-     */
-    private function updateChangelog($changeset, $file, $startDt, $completeDt)
-    {
-        $this->db->insert(
-            $this->changelogTableName,
-            array(
-                'change_number' => $this->getFileChangeNumber($file),
-                'delta_set'     => $changeset,
-                'start_dt'      => $startDt,
-                'complete_dt'   => $completeDt,
-                'applied_by'    => (isset($_SERVER['USER']) ? $_SERVER['USER'] : 'unknown'),
-                'description'   => $file
-            )
-        );
-    }
-
-    /**
-     * Determine the current DB revision by looking for the maximum
-     * change_number value in the changelog table.
-     *
-     * @param string $changeset
-     * @return integer
-     */
-    private function getCurrentRevision($changeset)
-    {
-        return (int) $this->db->fetchOne(
-            sprintf(
-                'SELECT MAX(change_number) FROM %s WHERE delta_set = ?',
-                $this->db->quoteIdentifier($this->changelogTableName)
-            ),
-            array(
-                'delta_set' => $changeset
-            )
-        );
-    }
-
-    /**
-     * Run the specified SQL script through the mysql binary.
-     *
-     * @param string $path
-     * @return boolean Whether the mysql command ran successfully.
-     */
-    protected function runSqlScript($path)
-    {
-        $cmd = $this->prepareSqlCommand($path);
-
-        // Initializing exit status to failed state
-        $exitStatus = 1;
-
-        $this->exec($cmd, $output, $exitStatus);
-
-        if (isset($output) && is_array($output)) {
-            $this->commandOutput = implode(PHP_EOL, $output);
-        } else {
-            $this->commandOutput = '';
-        }
-
-        return 0 === $exitStatus;
-    }
-
-    protected function prepareSqlCommand($path)
-    {
-        if ('pgsql' === $this->dbType) {
-            if (null === $this->psql) {
-                $this->psql = $this->autoDetectExecutable('psql');
-            }
-
-            $config = $this->runner->getPimple()['config']['db'];
-
-            return sprintf(
-                '%s -v ON_ERROR_STOP=1 -U %s -h %s %s < %s 2>&1',
-                $this->psql,
-                escapeshellarg($config['username']),
-                escapeshellarg($config['host']),
-                escapeshellarg($config['name']),
-                escapeshellarg($path)
-            );
-        } else {
-            if (null === $this->mysql) {
-                $this->mysql = $this->autoDetectExecutable('mysql');
-            }
-
-            /** Constants referenced here defined by WP, not our code */
-            /** @noinspection PhpUndefinedConstantInspection */
-            return sprintf(
-                '%s --user=%s --password=%s --host=%s %s < %s 2>&1',
-                $this->mysql,
-                escapeshellarg(DB_USER),
-                escapeshellarg(DB_PASSWORD),
-                escapeshellarg(DB_HOST),
-                escapeshellarg(DB_NAME),
-                escapeshellarg($path)
-            );
-        }
-    }
-
-    /**
-     * Get the files with a change number greater than the current revision.
-     *
-     * @param integer $currentRevision
-     * @param string $path The path relative to the plugin root folder.
-     * @return array The files that need to be run.
-     */
-    private function getChangeFiles($currentRevision, $path)
-    {
-        $out   = array();
-        $files = glob("{$path}/*.sql");
-
-        foreach ($files as $file) {
-            $changeNumber = $this->getFileChangeNumber($file);
-            $filename     = basename($file);
-
-            if (!preg_match('/^[0-9]{5}-/', $filename)) {
-                return $this->abort("Change file \"$filename\" does not follow the dbdeploy naming conventions.");
-            }
-
-            if ($changeNumber > $currentRevision) {
-                $out[$changeNumber] = realpath($file);
-            }
-        }
-
-        ksort($out);
-
-        return $out;
-    }
-
-    /**
-     * Determine the change number for the provided file name.  Files should be
-     * named in this format:
-     *
-     * 00001-short-description-of-change.sql
-     *
-     * Where "00001" is the change number padded with zeros to 5 digits in order
-     * to ensure future changes sort nicely in a file listing and the change number
-     * and any words included in the file name are separated by hyphens.
-     *
-     * @param string $file
-     * @return integer
-     */
-    private function getFileChangeNumber($file)
-    {
-        $file = basename($file);
-
-        $changeNumber = (int) substr(
-            $file,
-            0,
-            strpos($file, '-')
-        );
-
-        return $changeNumber;
     }
 
     /**
