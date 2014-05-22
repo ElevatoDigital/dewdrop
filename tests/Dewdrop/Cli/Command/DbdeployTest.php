@@ -222,7 +222,7 @@ class DbdeployTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Dewdrop\Db\Dbdeploy\Exception
+     * @expectedException Dewdrop\Db\Dbdeploy\Exception\ScriptExecutionFailed
      */
     public function testFailedSqlScriptRunAborts()
     {
