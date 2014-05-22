@@ -84,7 +84,7 @@ class CliExec
      * @param string $binaryPath
      * @throws Exception
      */
-    public function __construct($dbType, $username, $password, $hostname, $dbName, $binaryPath)
+    public function __construct($dbType, $username, $password, $hostname, $dbName, $binaryPath = null)
     {
         // Be nice to people using "psql" instead of "pgsql"
         if ('psql' === $dbType) {

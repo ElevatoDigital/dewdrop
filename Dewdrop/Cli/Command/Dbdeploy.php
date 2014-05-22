@@ -129,7 +129,7 @@ class Dbdeploy extends CommandAbstract
 
         $this->addPrimaryArg(
             'action',
-            'Which action to execution: status, backfill or update [default]',
+            'Which action to execute: status, backfill or update [default]',
             self::ARG_OPTIONAL
         );
 
