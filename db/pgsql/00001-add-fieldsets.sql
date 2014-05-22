@@ -15,7 +15,7 @@ CREATE TABLE dewdrop_fieldset_fields (
     dewdrop_fieldset_group_id INTEGER REFERENCES dewdrop_fieldset_groups,
     fieldset_name VARCHAR(32) REFERENCES dewdrop_fieldsets NOT NULL,
     field_name VARCHAR(255) NOT NULL,
-    sort_index INTEGER NOT NULL DEFAULT 999999,
-    INDEX (dewdrop_fieldset_group_id)
+    sort_index INTEGER NOT NULL DEFAULT 999999
 );
 
+CREATE INDEX dewdrop_fieldset_fields_group_id_idx ON dewdrop_fieldset_fields (dewdrop_fieldset_group_id);

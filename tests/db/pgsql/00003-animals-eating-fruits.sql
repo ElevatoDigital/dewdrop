@@ -4,4 +4,4 @@ CREATE TABLE dewdrop_test_fruits_eaten_by_animals (
     PRIMARY KEY(animal_id, fruit_id)
 );
 
-CREATE INDEX dtfeba_fruit_id_idx ON dewdrop_tests_fruits_eaten_by_animals (fruit_id);
+CREATE INDEX dtfeba_fruit_id_idx ON dewdrop_test_fruits_eaten_by_animals (fruit_id);
