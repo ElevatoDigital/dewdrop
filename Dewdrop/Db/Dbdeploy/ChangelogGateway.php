@@ -11,28 +11,67 @@
 namespace Dewdrop\Db\Dbdeploy;
 
 use Dewdrop\Db\Adapter as DbAdapter;
+use Dewdrop\Db\Dbdeploy\Exception;
 
+/**
+ * This class enables other dbdeploy classes to access the dbdeploy
+ * changelog database table without having to depend upon direct
+ * access to the database.  This makes it easier to mock and test
+ * the other classes in the dbdeploy module by isolating the database
+ * to a single location.
+ */
 class ChangelogGateway
 {
     /**
+     * The database adapter used to read and write to the database.
+     *
      * @var \Dewdrop\Db\Adapter
      */
     private $dbAdapter;
 
+    /**
+     *
+     * The database type we're interacting with.  Currently has to be
+     * either "pgsql" or "mysql".
+     *
+     * @var string
+     */
     private $dbType;
 
+    /**
+     * An object used to run SQL scripts through the psql or mysql CLI
+     * tools.
+     *
+     * @var CliExec
+     */
     private $cliExec;
 
     /**
+     * The name of the changelog table in the database.  Mostly only
+     * changed for testing purposes.
+     *
      * @var string
      */
     private $tableName;
 
     /**
+     * The changelog gateway using a DB adapter and a CliExec object to
+     * interact with the database.  It will use either psql or mysql
+     * depending upon the $dbType you supply.  For testing, or if you
+     * really need a different changelog table name in your application,
+     * you can optionally change the table name as well.
+     *
      * @param DbAdapter $dbAdapter
+     * @param CliExec $cliExec
+     * @param string $dbType Either "pgsql" or "mysql"
+     * @param string $tableName
      */
     public function __construct(DbAdapter $dbAdapter, CliExec $cliExec, $dbType, $tableName = 'dbdeploy_changelog')
     {
+        if ('psql' === $dbType) {
+            $dbType = 'pgsql';
+        }
+
         $this->dbAdapter = $dbAdapter;
         $this->cliExec   = $cliExec;
         $this->dbType    = $dbType;
@@ -60,6 +99,20 @@ class ChangelogGateway
         );
     }
 
+    /**
+     * Log the execution of a SQL script to the changelog table.  The
+     * $startTime and $endTime params should be supplied in ISO format
+     * (i.e. yyyy-mm-dd hh:mm:ss).  The $file param should be the full
+     * path to the file, not just the base file name.
+     *
+     * @param string $changesetName
+     * @param int $number
+     * @param string $file
+     * @param string $appliedBy
+     * @param string $startTime
+     * @param string $endTime
+     * @return int
+     */
     public function logAppliedFile($changesetName, $number, $file, $appliedBy, $startTime, $endTime)
     {
         return $this->dbAdapter->insert(
@@ -75,11 +128,24 @@ class ChangelogGateway
         );
     }
 
+    /**
+     * Check to see if the changelog table exists in the database already.
+     *
+     * @return bool
+     */
     protected function tableExists()
     {
         return in_array($this->tableName, $this->dbAdapter->listTables());
     }
 
+    /**
+     * Create the changelog table in the database.  The SQL script used will
+     * vary for MySQL and Postgres, though only slightly to account for InnoDB
+     * use, etc.
+     *
+     * @return bool
+     * @throws Exception
+     */
     protected function createTable()
     {
         $tempFile = tempnam(sys_get_temp_dir(), 'dewdrop.db.dbdeploy.');

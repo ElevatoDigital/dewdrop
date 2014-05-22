@@ -13,10 +13,10 @@ namespace Dewdrop\Db\Dbdeploy\Exception;
 use Dewdrop\Db\Dbdeploy\Exception as BaseException;
 
 /**
- * This exception is thrown when a SQL file in a changeset's path
- * does not match the expected xxxxx-short-description.sql style.
+ * This exception is thrown when a SQL script triggers an error
+ * during execution.
  */
-class InvalidFilename extends BaseException
+class ScriptExecutionFailed extends BaseException
 {
 
 }

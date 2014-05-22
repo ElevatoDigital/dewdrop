@@ -13,6 +13,16 @@ namespace Dewdrop\Db\Dbdeploy;
 use GlobIterator;
 use Dewdrop\Db\Dbdeploy\Exception\InvalidFilename;
 
+/**
+ * This class simplifies interacting with a dbdeploy changeset.
+ * Given a changeset name, which is used when logging the applied
+ * changes in the database, and a filesystem path, where the SQL
+ * scripts can be found, this class can tell you:
+ *
+ * 1. What revisions have already been applied to the database?
+ * 2. What new revisions are available to apply?
+ * 3. What are the paths to the available SQL files?
+ */
 class Changeset
 {
     /**
@@ -36,6 +46,12 @@ class Changeset
      */
     private $path;
 
+    /**
+     * All the files available in this changeset (applied already or not).
+     * Populated and "cached" when calling findFilesInPath().
+     *
+     * @var array
+     */
     private $availableFiles = array();
 
     /**
@@ -53,6 +69,9 @@ class Changeset
     }
 
     /**
+     * Get the name of this changeset.  Useful from the context of Command
+     * objects interacting with multiple changesets.
+     *
      * @return string
      */
     public function getName()
@@ -60,11 +79,22 @@ class Changeset
         return $this->name;
     }
 
+    /**
+     * Check the DB changelog to find the highest revision number that has
+     * been applied for this changeset.
+     *
+     * @return int
+     */
     public function getCurrentRevision()
     {
         return $this->changelogGateway->getCurrentRevisionForChangeset($this->name);
     }
 
+    /**
+     * Check to see the maximum available revision number for this changeset.
+     *
+     * @return int
+     */
     public function getAvailableRevision()
     {
         $changeNumbers = array_keys($this->findFilesInPath());
@@ -72,19 +102,33 @@ class Changeset
         return array_pop($changeNumbers);
     }
 
+    /**
+     * Get an array of the files that have already been applied to the
+     * databse for this changeset.  Note that the keys of the array are
+     * the revision change numbers.
+     *
+     * @return array
+     */
     public function getAppliedFiles()
     {
         $appliedFiles = array();
 
         foreach ($this->findFilesInPath() as $changeNumber => $file) {
             if ($changeNumber <= $this->getCurrentRevision()) {
-                $appliedFiles[] = $file;
+                $appliedFiles[$changeNumber] = $file;
             }
         }
 
         return $appliedFiles;
     }
 
+    /**
+     * Get an array of the files that have not yet been applied to the
+     * databse for this changeset.  Note that the keys of the array are
+     * the revision change numbers.
+     *
+     * @return array
+     */
     public function getNewFiles()
     {
         $newFiles = array();
@@ -98,6 +142,13 @@ class Changeset
         return $newFiles;
     }
 
+    /**
+     * Find all valid SQL files in this changeset's path, whether they've
+     * been applied already or not.  Note that the array keys are the
+     * revision change numbers.
+     *
+     * @return array
+     */
     private function findFilesInPath()
     {
         if (!count($this->availableFiles)) {
