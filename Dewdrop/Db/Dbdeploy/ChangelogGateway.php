@@ -30,7 +30,6 @@ class ChangelogGateway
     private $dbAdapter;
 
     /**
-     *
      * The database type we're interacting with.  Currently has to be
      * either "pgsql" or "mysql".
      *
@@ -76,10 +75,6 @@ class ChangelogGateway
         $this->cliExec   = $cliExec;
         $this->dbType    = $dbType;
         $this->tableName = $tableName;
-
-        if (!$this->tableExists()) {
-            $this->createTable();
-        }
     }
 
     /**
@@ -90,6 +85,10 @@ class ChangelogGateway
      */
     public function getCurrentRevisionForChangeset($changesetName)
     {
+        if (!$this->tableExists()) {
+            $this->createTable();
+        }
+
         return (int) $this->dbAdapter->fetchOne(
             sprintf(
                 'SELECT MAX(change_number) FROM %s WHERE delta_set = ?',
@@ -115,6 +114,10 @@ class ChangelogGateway
      */
     public function logAppliedFile($changesetName, $number, $file, $appliedBy, $startTime, $endTime)
     {
+        if (!$this->tableExists()) {
+            $this->createTable();
+        }
+
         return $this->dbAdapter->insert(
             $this->tableName,
             array(
