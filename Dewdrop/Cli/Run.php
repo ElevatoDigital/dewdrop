@@ -16,6 +16,7 @@ namespace Dewdrop\Cli;
 use Dewdrop\Bootstrap\Detector as BootstrapDetector;
 use Dewdrop\Paths;
 use Dewdrop\Db\Adapter;
+use Pimple;
 
 /**
  * This class is responsible for handling execution of CLI commands.
@@ -97,6 +98,12 @@ class Run
      */
     private $paths;
 
+    /**
+     * The Pimple DI container associated with this application.  Found
+     * via the application's bootstrap class.
+     *
+     * @var Pimple
+     */
     private $pimple;
 
     /**
@@ -121,6 +128,11 @@ class Run
         }
     }
 
+    /**
+     * Grab the Pimple DI container associated with this application.
+     *
+     * @return Pimple
+     */
     public function getPimple()
     {
         return $this->pimple;

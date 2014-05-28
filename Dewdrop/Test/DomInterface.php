@@ -10,6 +10,10 @@
 
 namespace Dewdrop\Test;
 
+/**
+ * This interface contains a couple methods that are used by other Dewdrop
+ * test classes to make it easier to write tests that query the DOM.
+ */
 interface DomInterface
 {
     /**

@@ -39,7 +39,7 @@ class TruncateOperation extends \PHPUnit_Extensions_Database_Operation_Truncate
             ";
 
             if (defined('WPINC')) {
-                $query .= " CASCADE";
+                $query .= "";
             } else {
                 $query .= " RESTART IDENTITY CASCADE";
             }

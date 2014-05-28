@@ -70,8 +70,6 @@ abstract class ComponentAbstract
      */
     private $request;
 
-    private $response;
-
     /**
      * Create a component instance using the DB adapter creating by the Wiring
      * class.

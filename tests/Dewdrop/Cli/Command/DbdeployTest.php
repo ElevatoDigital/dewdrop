@@ -43,22 +43,6 @@ class DbdeployTest extends \PHPUnit_Framework_TestCase
         $command->execute();
     }
 
-    public function testChangelogTableIsCreatedSuccessfully()
-    {
-        $command = $this->getMockCommand(array('executeUpdate'));
-
-        $command
-            ->expects($this->once())
-            ->method('executeUpdate');
-
-        $command->parseArgs(array());
-        $command->execute();
-
-        $db = $this->runner->connectDb();
-
-        $this->assertContains('dewdrop_test_dbdeploy_changelog', $db->listTables());
-    }
-
     public function testRunningAllChangesetsAddsTwoTablesAndTwoLogEntries()
     {
         $command = $this->getMockCommand();
@@ -308,7 +292,7 @@ class DbdeployTest extends \PHPUnit_Framework_TestCase
         $db = $this->runner->connectDb();
 
         if ($db->getConnection() instanceof \wpdb) {
-            // Forcing reconnect because of quirky wpdb during testing with logs of queries
+            // Forcing reconnect because of quirky wpdb during testing with lots of queries
             // @see http://core.trac.wordpress.org/ticket/23085
             $db->getConnection()->db_connect();
         }

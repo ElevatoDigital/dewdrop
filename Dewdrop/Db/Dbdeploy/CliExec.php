@@ -174,19 +174,25 @@ class CliExec
     private function createCmd($path)
     {
         if ('pgsql' === $this->dbType) {
-            $template = '%s -v ON_ERROR_STOP=1 -U %s -h %s %s < %s 2>&1';
+            return sprintf(
+                '%s -v ON_ERROR_STOP=1 -U %s -h %s %s < %s 2>&1',
+                $this->detectExecutable(),
+                escapeshellarg($this->username),
+                escapeshellarg($this->hostname),
+                escapeshellarg($this->dbName),
+                escapeshellarg($path)
+            );
         } else {
-            $template = '%s --user=%s --password=%s --host=%s %s < %s 2>&1';
+            return sprintf(
+                '%s --user=%s --password=%s --host=%s %s < %s 2>&1',
+                $this->detectExecutable(),
+                escapeshellarg($this->username),
+                escapeshellarg($this->password),
+                escapeshellarg($this->hostname),
+                escapeshellarg($this->dbName),
+                escapeshellarg($path)
+            );
         }
-
-        return sprintf(
-            $template,
-            $this->detectExecutable(),
-            escapeshellarg($this->username),
-            escapeshellarg($this->hostname),
-            escapeshellarg($this->dbName),
-            escapeshellarg($path)
-        );
     }
 
     /**

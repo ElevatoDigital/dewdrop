@@ -45,7 +45,7 @@ class Markdown implements RendererInterface
      * =====
      * </code>
      *
-     * @param string
+     * @param string $title
      * @returns RendererInterface
      */
     public function title($title)
@@ -68,7 +68,7 @@ class Markdown implements RendererInterface
      * -------
      * </code>
      *
-     * @param string
+     * @param string $subhead
      * @returns RendererInterface
      */
     public function subhead($subhead)
@@ -83,7 +83,7 @@ class Markdown implements RendererInterface
     /**
      * Display a single line or block of text.
      *
-     * @param string
+     * @param string $text
      * @returns RendererInterface
      */
     public function text($text)
@@ -142,7 +142,7 @@ class Markdown implements RendererInterface
      * Display a success message using green color on the console to make it
      * easier to spot at a glance.
      *
-     * @param string
+     * @param string $message
      * @returns RendererInterface
      */
     public function success($message)
@@ -159,7 +159,7 @@ class Markdown implements RendererInterface
      * Display a warning message using yellow color on the console to make it
      * easier to spot at a glance.
      *
-     * @param string
+     * @param string $warning
      * @returns RendererInterface
      */
     public function warn($warning)
@@ -176,7 +176,7 @@ class Markdown implements RendererInterface
      * Display an error message using red color on the console to make it
      * easier to spot.
      *
-     * @param string
+     * @param string $error
      * @returns RendererInterface
      */
     public function error($error)

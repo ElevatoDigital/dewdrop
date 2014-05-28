@@ -75,7 +75,7 @@ class Mock implements DriverInterface
      * Fetch a single scalar value from the results of the supplied SQL
      * statement.
      *
-     * @param string|\Dewdrop\Db\Select
+     * @param string|\Dewdrop\Db\Select $sql
      * @param array $bind
      * @return mixed
      */
@@ -88,7 +88,7 @@ class Mock implements DriverInterface
      * Run the supplied query, binding the supplied data to the statement
      * prior to execution.
      *
-     * @param string|\Dewdrop\Db\Select
+     * @param string|\Dewdrop\Db\Select $sql
      * @param array $bind
      * @return mixed
      */

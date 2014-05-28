@@ -19,6 +19,9 @@ use Dewdrop\Exception;
  */
 class WpInit extends CommandAbstract
 {
+    /**
+     * Setup the arguments, examples and aliases for this command.
+     */
     public function init()
     {
         $this

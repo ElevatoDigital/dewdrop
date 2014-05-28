@@ -72,9 +72,15 @@ class Paths
         return $this->root;
     }
 
+    /**
+     * Check to see if we're running in WP.  We currently just look for
+     * the WPINC constant, but there might be better ways of detecting this.
+     *
+     * @return boolean
+     */
     public function isWp()
     {
-        return false !== stripos(__DIR__, 'wp-content/plugins');
+        return defined('WPINC');
     }
 
     /**
@@ -167,13 +173,6 @@ class Paths
     public function getModels()
     {
         return $this->pluginRoot . '/models';
-    }
-
-    public function setModels($models)
-    {
-        $this->models = $models;
-
-        return $this;
     }
 
     /**

@@ -31,7 +31,7 @@ interface ProviderInterface
     /**
      * Create a \Dewdrop\Db\Field object for the field with the given name.
      *
-     * @param string
+     * @param string $name
      * @return \Dewdrop\Db\Field
      */
     public function instantiate($name);

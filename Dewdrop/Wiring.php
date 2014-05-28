@@ -19,6 +19,8 @@ use Dewdrop\Paths;
  * things off for other parts of your Dewdrop-based plugin, this class also
  * servers as a form of "root" class, passing core resources like the
  * \Dewdrop\Db\Adapter to other areas.
+ *
+ * @deprecated
  */
 class Wiring
 {

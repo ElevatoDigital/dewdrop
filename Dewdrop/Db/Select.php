@@ -825,7 +825,7 @@ class Select
      * @param string $name
      * @param string $cond
      * @param string|array $cols
-     * @param string schema
+     * @param string $schema
      * @return \Dewdrop\Db\Select This \Dewdrop\Db\Select object.
      */
     public function joinUsingInternal($type, $name, $cond, $cols = '*', $schema = null)

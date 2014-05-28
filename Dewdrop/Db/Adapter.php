@@ -48,6 +48,11 @@ class Adapter
     const CASE_NATURAL = 0;
     const CASE_UPPER = 1;
 
+    /**
+     * How to handle case folding for keys in result sets.
+     *
+     * @var int
+     */
     protected $caseFolding = self::CASE_NATURAL;
 
     /**
@@ -119,6 +124,13 @@ class Adapter
         $this->driver = $driver;
     }
 
+    /**
+     * Set the driver that will be used by this adapter to communicate directly
+     * with the RDBMS.
+     *
+     * @param DriverInterface $driver
+     * @return \Dewdrop\Db\Adapter
+     */
     public function setDriver(DriverInterface $driver)
     {
         $this->driver = $driver;
@@ -240,7 +252,7 @@ class Adapter
      * Fetch a single scalar value from the results of the supplied SQL
      * statement.
      *
-     * @param string|\Dewdrop\Db\Select
+     * @param string|\Dewdrop\Db\Select $sql
      * @param array $bind
      * @return mixed
      */
@@ -381,7 +393,7 @@ class Adapter
      * Run the supplied query, binding the supplied data to the statement
      * prior to execution.
      *
-     * @param string|\Dewdrop\Db\Select
+     * @param string|\Dewdrop\Db\Select $sql
      * @param array $bind
      * @return mixed
      */
