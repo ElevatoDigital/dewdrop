@@ -10,9 +10,11 @@
 
 namespace Dewdrop\Bootstrap;
 
+use Dewdrop\Bootstrap;
 use Dewdrop\Config;
 use Dewdrop\Db\Adapter as DbAdapter;
 use Dewdrop\Exception;
+use Dewdrop\Inflector;
 use Dewdrop\Paths;
 use Dewdrop\Request;
 use Dewdrop\View\View;
@@ -36,6 +38,10 @@ class Detector
      */
     public static function findPimple()
     {
+        if (Bootstrap::hasInstance()) {
+            return Bootstrap::getInstance();
+        }
+
         $config = new Config();
 
         if (!$config->has('bootstrap')) {
@@ -53,6 +59,8 @@ class Detector
 
             self::validatePimple($pimple);
             self::augmentPimpleWithDefaultResources($pimple);
+
+            Bootstrap::setInstance($pimple);
 
             return $pimple;
         }
@@ -76,7 +84,7 @@ class Detector
      * @param Pimple $pimple
      * @return void
      */
-    protected static function validatePimple(Pimple $pimple)
+    public static function validatePimple(Pimple $pimple)
     {
         if (!isset($pimple['config'])) {
             throw new Exception('Pimple must provide a config resource.');
@@ -102,12 +110,28 @@ class Detector
      * @param Pimple $pimple
      * @return void
      */
-    protected static function augmentPimpleWithDefaultResources(Pimple $pimple)
+    public static function augmentPimpleWithDefaultResources(Pimple $pimple)
     {
         if (!isset($pimple['dewdrop-request'])) {
             $pimple['dewdrop-request'] = $pimple->share(
                 function () {
                     return new Request();
+                }
+            );
+        }
+
+        if (!isset($pimple['paths'])) {
+            $pimple['paths'] = $pimple->share(
+                function () {
+                    return new Paths();
+                }
+            );
+        }
+
+        if (!isset($pimple['inflector'])) {
+            $pimple['inflector'] = $pimple->share(
+                function () {
+                    return new Inflector();
                 }
             );
         }

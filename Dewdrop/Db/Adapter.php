@@ -779,6 +779,16 @@ class Adapter
         return $this->driver->describeTable($tableName);
     }
 
+    public function beginTransaction()
+    {
+        return $this->driver->beginTransaction();
+    }
+
+    public function commit()
+    {
+        return $this->driver->commit();
+    }
+
     /**
      * Helper method to change the case of the strings used
      * when returning result sets in FETCH_ASSOC and FETCH_BOTH

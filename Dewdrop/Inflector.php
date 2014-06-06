@@ -287,6 +287,16 @@ class Inflector
     }
 
     /**
+     * Just like underscore(), but with hyphens.
+     *
+     * @return string
+     */
+    public function hyphenize($word)
+    {
+        return str_replace('_', '-', $this->underscore($word));
+    }
+
+    /**
      * Returns a human-readable string from $word
      *
      * Returns a human-readable string from $word, by replacing

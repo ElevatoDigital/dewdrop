@@ -10,6 +10,7 @@
 
 namespace Dewdrop\Db;
 
+use Dewdrop\Fields\FieldAbstract;
 use Dewdrop\Fields\OptionPairs;
 use Zend\Filter;
 use Zend\InputFilter\Input;
@@ -21,7 +22,7 @@ use Zend\Validator;
  * how the field should be labeled, any notes that should be displayed with
  * it, any validators that should be included, etc.
  */
-class Field
+class Field extends FieldAbstract
 {
     /**
      * A \Dewdrop\Fields\OptionPairs object for use in retrieving key-value
@@ -124,6 +125,16 @@ class Field
      */
     private $inputFilter;
 
+    private $id;
+
+    protected $visible = array(FieldAbstract::AUTHORIZATION_ALLOW_ALL);
+
+    protected $sortable = array(FieldAbstract::AUTHORIZATION_ALLOW_ALL);
+
+    protected $filterable = array(FieldAbstract::AUTHORIZATION_ALLOW_ALL);
+
+    protected $editable = array(FieldAbstract::AUTHORIZATION_ALLOW_ALL);
+
     /**
      * Create new field with a reference to the table that instantiated it,
      * the name of the DB column it represents and metadata from the DB about
@@ -224,6 +235,18 @@ class Field
     public function getName()
     {
         return $this->name;
+    }
+
+    public function setId($id)
+    {
+        $this->id = $id;
+
+        return $this;
+    }
+
+    public function getId()
+    {
+        return $this->id ?: $this->getControlName();
     }
 
     /**

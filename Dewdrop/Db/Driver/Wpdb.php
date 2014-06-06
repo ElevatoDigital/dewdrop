@@ -353,4 +353,14 @@ class Wpdb implements DriverInterface
 
         return $wpdbResult;
     }
+
+    public function beginTransaction()
+    {
+        return $this->query('START TRANSACTION');
+    }
+
+    public function commit()
+    {
+        return $this->query('COMMIT');
+    }
 }

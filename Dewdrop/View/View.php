@@ -11,6 +11,7 @@
 namespace Dewdrop\View;
 
 use Dewdrop\Exception;
+use Dewdrop\Request;
 use Zend\Escaper\Escaper;
 
 /**
@@ -44,36 +45,48 @@ class View
     private $scriptPath;
 
     /**
+     * The current HTTP request.
+     *
+     * @var \Dewdrop\Request
+     */
+    private $request;
+
+    /**
      * The available helper names and their associated classes.
      *
      * @var array
      */
     private $helperClasses = array(
-        'adminnotice'      => '\Dewdrop\View\Helper\AdminNotice',
-        'adminurl'         => '\Dewdrop\View\Helper\AdminUrl',
-        'checkboxlist'     => '\Dewdrop\View\Helper\CheckboxList',
-        'detectedithelper' => '\Dewdrop\View\Helper\DetectEditHelper',
-        'editform'         => '\Dewdrop\View\Helper\EditForm',
-        'headlink'         => '\Zend\View\Helper\HeadLink',
-        'headmeta'         => '\Zend\View\Helper\HeadMeta',
-        'headscript'       => '\Zend\View\Helper\HeadScript',
-        'headstyle'        => '\Zend\View\Helper\HeadStyle',
-        'inlinescript'     => '\Dewdrop\View\Helper\InlineScript',
-        'inputcheckbox'    => '\Dewdrop\View\Helper\InputCheckbox',
-        'inputtext'        => '\Dewdrop\View\Helper\InputText',
-        'select'           => '\Dewdrop\View\Helper\Select',
-        'textarea'         => '\Dewdrop\View\Helper\Textarea',
-        'wpadminnotice'    => '\Dewdrop\View\Helper\WpAdminNotice',
-        'wpcheckboxlist'   => '\Dewdrop\View\Helper\WpCheckboxList',
-        'wpcolorpicker'    => '\Dewdrop\View\Helper\WpColorPicker',
-        'wpeditform'       => '\Dewdrop\View\Helper\WpEditForm',
-        'wpeditor'         => '\Dewdrop\View\Helper\WpEditor',
-        'wpeditrow'        => '\Dewdrop\View\Helper\WpEditRow',
-        'wpinputcheckbox'  => '\Dewdrop\View\Helper\WpInputCheckbox',
-        'wpinputtext'      => '\Dewdrop\View\Helper\WpInputText',
-        'wpselect'         => '\Dewdrop\View\Helper\WpSelect',
-        'wpwrap'           => '\Dewdrop\View\Helper\WpWrap',
-        'wrap'             => '\Dewdrop\View\Helper\Wrap',
+        'adminnotice'           => '\Dewdrop\View\Helper\AdminNotice',
+        'adminurl'              => '\Dewdrop\View\Helper\AdminUrl',
+        'bootstraptable'        => '\Dewdrop\View\Helper\BootstrapTable',
+        'bootstrapcolumnsmodal' => '\Dewdrop\View\Helper\BootstrapColumnsModal',
+        'checkboxlist'          => '\Dewdrop\View\Helper\CheckboxList',
+        'detectedithelper'      => '\Dewdrop\View\Helper\DetectEditHelper',
+        'editform'              => '\Dewdrop\View\Helper\EditForm',
+        'headlink'              => '\Zend\View\Helper\HeadLink',
+        'headmeta'              => '\Zend\View\Helper\HeadMeta',
+        'headscript'            => '\Zend\View\Helper\HeadScript',
+        'headstyle'             => '\Zend\View\Helper\HeadStyle',
+        'inlinescript'          => '\Dewdrop\View\Helper\InlineScript',
+        'inputcheckbox'         => '\Dewdrop\View\Helper\InputCheckbox',
+        'inputtext'             => '\Dewdrop\View\Helper\InputText',
+        'select'                => '\Dewdrop\View\Helper\Select',
+        'table'                 => '\Dewdrop\View\Helper\Table',
+        'tablecellrenderer'     => '\Dewdrop\View\Helper\TableCellRenderer',
+        'textarea'              => '\Dewdrop\View\Helper\Textarea',
+        'wpadminnotice'         => '\Dewdrop\View\Helper\WpAdminNotice',
+        'wpcheckboxlist'        => '\Dewdrop\View\Helper\WpCheckboxList',
+        'wpcolorpicker'         => '\Dewdrop\View\Helper\WpColorPicker',
+        'wpeditform'            => '\Dewdrop\View\Helper\WpEditForm',
+        'wpeditor'              => '\Dewdrop\View\Helper\WpEditor',
+        'wpeditrow'             => '\Dewdrop\View\Helper\WpEditRow',
+        'wpinputcheckbox'       => '\Dewdrop\View\Helper\WpInputCheckbox',
+        'wpinputtext'           => '\Dewdrop\View\Helper\WpInputText',
+        'wpselect'              => '\Dewdrop\View\Helper\WpSelect',
+        'wptable'               => '\Dewdrop\View\Helper\WpTable',
+        'wpwrap'                => '\Dewdrop\View\Helper\WpWrap',
+        'wrap'                  => '\Dewdrop\View\Helper\Wrap',
     );
 
     /**
@@ -82,9 +95,10 @@ class View
      *
      * @param Escaper $escaper
      */
-    public function __construct(Escaper $escaper = null)
+    public function __construct(Escaper $escaper = null, Request $request = null)
     {
         $this->escaper = ($escaper ?: new Escaper());
+        $this->request = ($request ?: new Request());
     }
 
     /**
@@ -229,6 +243,17 @@ class View
             ->assign($data);
 
         return $partial->render($template);
+    }
+
+    /**
+     * Get the current Request object for access to GET or POST data
+     * from helpers.
+     *
+     * @return \Dewdrop\Request
+     */
+    public function getRequest()
+    {
+        return $this->request;
     }
 
     /**

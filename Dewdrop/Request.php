@@ -68,6 +68,12 @@ class Request
         }
     }
 
+    public function isAjax()
+    {
+        return isset($_SERVER['HTTP_X_REQUESTED_WITH']) &&
+            'xmlhttprequest' === strtolower($_SERVER['HTTP_X_REQUESTED_WITH']);
+    }
+
     /**
      * Whether the request is a POST.
      *

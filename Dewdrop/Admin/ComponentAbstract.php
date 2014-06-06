@@ -10,12 +10,13 @@
 
 namespace Dewdrop\Admin;
 
-use ReflectionClass;
 use Dewdrop\Admin\Page\PageAbstract;
 use Dewdrop\Admin\Response;
 use Dewdrop\Db\Adapter;
+use Dewdrop\Admin\PageFactory\Files as PageFilesFactory;
 use Dewdrop\Paths;
 use Dewdrop\Request;
+use Pimple;
 
 /**
  * This class enables you to define how your component should appear and wire
@@ -25,6 +26,15 @@ use Dewdrop\Request;
  */
 abstract class ComponentAbstract
 {
+    /**
+     * An array of submenu pages that have been added by calling addToSubmenu().
+     * These are actually tied in by registerMenuPage() after the admin_menu
+     * hook is triggered.
+     *
+     * @var array
+     */
+    protected $submenuPages = array();
+
     /**
      * The title to display for this component in the WP admin navigation.
      *
@@ -55,20 +65,21 @@ abstract class ComponentAbstract
     private $menuPosition;
 
     /**
-     * An array of submenu pages that have been added by calling addToSubmenu().
-     * These are actually tied in by registerMenuPage() after the admin_menu
-     * hook is triggered.
-     *
-     * @var array
-     */
-    private $submenuPages = array();
-
-    /**
      * A request object that makes it easier to work with GET and POST
      *
      * @var \Dewdrop\Request
      */
-    private $request;
+    protected $request;
+
+    private $inflector;
+
+    private $name;
+
+    private $pimple;
+
+    private $pageFactories = array();
+
+    protected $redirector;
 
     /**
      * Create a component instance using the DB adapter creating by the Wiring
@@ -78,15 +89,52 @@ abstract class ComponentAbstract
      * @param Paths $paths
      * @param Request $request
      */
-    public function __construct(Adapter $db, Paths $paths = null, Request $request = null)
+    public function __construct(Pimple $pimple, $componentName)
     {
-        $this->db      = $db;
-        $this->paths   = ($paths ?: new Paths());
-        $this->request = ($request ?: new Request());
+        $this->pimple    = $pimple;
+        $this->db        = $pimple['db'];
+        $this->paths     = $pimple['paths'];
+        $this->request   = $pimple['dewdrop-request'];
+        $this->inflector = $pimple['inflector'];
+        $this->name      = $componentName;
+
+        $this->pageFactories[] = new PageFilesFactory($this, $this->request);
 
         $this->init();
 
+        $this->redirector = function ($url) {
+            wp_safe_redirect($url);
+            exit;
+        };
+
         $this->checkRequiredProperties();
+    }
+
+    public function getPageFactories()
+    {
+        return $this->pageFactories;
+    }
+
+    public function addPageFactory($pageFactory)
+    {
+        $this->pageFactories[] = $pageFactory;
+
+        return $this;
+    }
+
+    public function getPath()
+    {
+        return $this->paths->getAdmin() . '/' . $this->name;
+    }
+
+    public function getInflector()
+    {
+        return $this->inflector;
+    }
+
+    public function getRequest()
+    {
+        return $this->request;
     }
 
     /**
@@ -161,28 +209,6 @@ abstract class ComponentAbstract
         if ($this->response) {
             $this->response->render();
         }
-    }
-
-    /**
-     * Create a page object matching the current selected page name, either
-     * supplied to this method explicitly or as returned by the
-     * determineCurrentPage() method.
-     *
-     * @param $page string
-     * @return PageAbstract
-     */
-    public function createPageObject($page = null)
-    {
-        $reflectedClass = new ReflectionClass($this);
-
-        $pageKey   = ($page ?: $this->determineCurrentPage());
-        $pageFile  = dirname($reflectedClass->getFileName()) . '/' . $pageKey . '.php';
-        $className = $reflectedClass->getNamespaceName() . '\\' . $pageKey;
-
-        require_once $pageFile;
-        $page = new $className($this, $this->request, $pageFile);
-
-        return $page;
     }
 
     /**
@@ -285,10 +311,21 @@ abstract class ComponentAbstract
         $this->submenuPages[] = array(
             'title'  => $title,
             'route'  => ucfirst($page),
-            'params' => $params
+            'params' => $params,
+            'url'    => $this->url($page, $params)
         );
 
         return $this;
+    }
+
+    /**
+     * Get all sub-menu pages that have been added to this component.
+     *
+     * @return array
+     */
+    public function getSubmenuPages()
+    {
+        return $this->submenuPages;
     }
 
     /**
@@ -300,6 +337,16 @@ abstract class ComponentAbstract
     public function getDb()
     {
         return $this->db;
+    }
+
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    public function getPimple()
+    {
+        return $this->pimple;
     }
 
     /**
@@ -314,6 +361,11 @@ abstract class ComponentAbstract
         $this->title = $title;
 
         return $this;
+    }
+
+    public function getTitle()
+    {
+        return $this->title;
     }
 
     /**
@@ -376,7 +428,7 @@ abstract class ComponentAbstract
         $page->init();
 
         if ($page->shouldProcess()) {
-            $responseHelper = $page->createResponseHelper();
+            $responseHelper = $page->createResponseHelper($this->redirector);
 
             $page->process($responseHelper);
 
@@ -384,8 +436,10 @@ abstract class ComponentAbstract
                 ->setWasProcessed(true)
                 ->setHelper($responseHelper);
 
-            if ($response->executeQueuedActions()) {
-                return true;
+            $result = $response->executeQueuedActions();
+
+            if ($result) {
+                return $result;
             }
         }
 
@@ -465,15 +519,12 @@ abstract class ComponentAbstract
     }
 
     /**
-     * Assemble the remainder of a URL query string.  We can assume that a
-     * query string already exists because the "page" variable must be set
-     * to get to this component in the first place, so this method's return
-     * value is always prefixed with "&" to join it to the existing value.
+     * Assemble the remainder of a URL query string.
      *
      * @param array $params
      * @return string
      */
-    private function assembleQueryString(array $params)
+    protected function assembleQueryString(array $params)
     {
         $segments = array();
 
@@ -485,6 +536,6 @@ abstract class ComponentAbstract
             );
         }
 
-        return (count($segments) ? '&' . implode('&', $segments) : '');
+        return (count($segments) ? '?' . implode('&', $segments) : '');
     }
 }

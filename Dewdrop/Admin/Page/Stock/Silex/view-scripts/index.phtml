@@ -1,0 +1,99 @@
+<nav class="navbar navbar-default navbar-admin-index" role="navigation">
+    <div class="navbar-header">
+        <button type="button" class="btn btn-primary navbar-btn">Add <?php echo $this->escapeHtml($this->singularTitle);?></button>
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#admin-index-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+        </button>
+    </div>
+
+    <div class="collapse navbar-collapse" id="admin-index-collapse">
+        <a href="<?php echo $this->escapeHtmlAttr($this->adminUrl('export', array('format' => 'csv')));?>" class="btn btn-link btn-link-first navbar-btn">Export</a>
+        <a href="#" data-toggle="modal" data-target="#adjust-columns-modal" class="btn btn-link navbar-btn">Adjust Columns</a>
+        <div class="navbar-right navbar-right-btn-group">
+            <div class="btn-group btn-group-justified">
+                <div class="btn-group">
+                    <button type="button" class="btn btn-default navbar-btn" data-toggle="collapse" data-target="#admin-filter-panel"><span class="glyphicon glyphicon-filter"></span> Filter</button>
+                </div>
+                <div class="btn-group">
+                    <button type="button" class="btn btn-default admin-btn-settings navbar-btn" data-toggle="dropdown"><span class="glyphicon glyphicon-cog"></span> Settings <span class="caret"></span></button>
+                    <ul class="dropdown-menu" role="menu">
+                        <li><a href="#">Save Current View</a></li>
+                        <li><a href="#">Manage Custom Views</a></li>
+
+                        <?php if ($this->debug):?>
+                        <li role="presentation" class="divider"></li>
+                        <li role="presentation" class="dropdown-header">Dev Tools</li>
+                        <li><a href="#">View Fields</a></li>
+                        <li><a href="#">View Listing SQL</a></li>
+                        <?php endif;?>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div id="admin-filter-panel" class="panel panel-default admin-filter-panel collapse">
+    <div class="panel-body">
+        <form action="" method="GET">
+            <div class="text-muted">
+                <small>
+                    Find <?php echo $this->escapeHtml(strtolower($this->pluralTitle));?> matching
+                    <select name="filter_operand">
+                        <option value="all">all</option>
+                        <option value="any">any</option>
+                    </select>
+                    of these filters.
+                </small>
+            </div>
+            <fieldset>
+                <div class="row">
+                    <div class="col-sm-4">
+                        <select class="form-control input-sm" name="filters[]">
+                            <option value="" disabled="disabled" selected="selected">Select a field to filter by...</option>
+                            <?php
+                            foreach ($this->listing->getFilterableFields() as $field) {
+                                printf(
+                                    '<option value="%s">%s</option>',
+                                    $this->escapeHtmlAttr($field->getId()),
+                                    $this->escapeHtml($field->getLabel())
+                                );
+                            }
+                            ?>
+                        </select>
+                    </div>
+                    <div class="col-sm-8">
+                        <div class="form-inline">
+                            <span class="glyphicon glyphicon-arrow-right visible-xs"></span>
+                            <input class="form-control input-sm" type="date" />
+                            <div class="pull-right btn-group">
+                                <button type="button" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-plus"></span></button>
+                                <button type="button" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-minus"></span></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+            <div class="footer">
+                <input type="submit" class="btn btn-success btn-sm" value="Apply Filters" />
+                <a class="btn btn-link btn-sm" href="<?php echo $this->escapeHtmlAttr($this->adminUrl('index'));?>">Clear Filters</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<?php
+echo $this->bootstrapTable(
+    $this->listing,
+    $this->tableCellRenderer(),
+    $this->visibilityFilter
+);
+
+echo $this->bootstrapColumnsModal(
+    $this->visibilityFilter,
+    $this->adminUrl('adjust-visibility')
+);
+?>

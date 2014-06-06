@@ -60,15 +60,19 @@ class Standard
      */
     private $callbacks = array();
 
+    private $redirector;
+
     /**
      * Create a new ResponseHelper, generally kicked off by a page class in
      * its createResponseHelper() method.
      *
-     * @param PageAbstract
+     * @param PageAbstract $page
+     * @param callable $redirector
      */
-    public function __construct(PageAbstract $page)
+    public function __construct(PageAbstract $page, $redirector)
     {
-        $this->page = $page;
+        $this->page       = $page;
+        $this->redirector = $redirector;
     }
 
     /**
@@ -111,17 +115,19 @@ class Standard
      */
     public function execute()
     {
+        $redirectResult = false;
+
         $this
             ->executeCallbacks();
 
         // Don't execute header modifying actions when on CLI
         if ('cli' !== php_sapi_name()) {
-            $this
-                ->executeSuccessMessage()
-                ->executeRedirect();
+            $this->executeSuccessMessage();
+
+            $redirectResult = $this->executeRedirect();
         }
 
-        return $this;
+        return $redirectResult;
     }
 
     /**
@@ -166,11 +172,10 @@ class Standard
     public function executeRedirect()
     {
         if ($this->redirectUrl) {
-            wp_safe_redirect($this->redirectUrl);
-            exit;
+            return call_user_func($this->redirector, $this->redirectUrl);
         }
 
-        return $this;
+        return false;
     }
 
     /**

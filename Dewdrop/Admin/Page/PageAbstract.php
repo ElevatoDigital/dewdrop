@@ -75,16 +75,20 @@ abstract class PageAbstract
      *
      * @param ComponentAbstract $component
      * @param Request $request
-     * @param string $pageFile
      */
-    public function __construct(ComponentAbstract $component, Request $request, $pageFile)
+    public function __construct(ComponentAbstract $component, Request $request, $viewScriptPath = null)
     {
-        $this->component = $component;
-        $this->view      = new View();
-        $this->request   = ($request ?: new Request());
+        $this->component   = $component;
+        $this->application = $component->getApplication();
+        $this->view        = $this->application['view'];
+        $this->request     = ($request ?: $this->application['dewdrop-request']);
+
+        if (null === $viewScriptPath) {
+            $viewScriptPath = $this->component->getPath() . '/view-scripts';
+        }
 
         $this->view
-            ->setScriptPath(dirname($pageFile) . '/view-scripts')
+            ->setScriptPath($viewScriptPath)
             ->helper('AdminUrl')
                 ->setPage($this);
     }
@@ -134,7 +138,7 @@ abstract class PageAbstract
 
     /**
      * You can call renderView() directly from your render() method.  Or, if
-     * your render method produce no output itself, the component will call
+     * your render method produces no output itself, the component will call
      * this method itself to automatically render your view script.
      */
     public function renderView()
@@ -165,11 +169,12 @@ abstract class PageAbstract
      * method and the helper will be injected into the page's process()
      * method rather than the standard helper created in PageAbstract.
      *
+     * @param callable $redirector
      * @return \Dewdrop\Admin\ResponseHelper\Standard
      */
-    public function createResponseHelper()
+    public function createResponseHelper($redirector)
     {
-        return new ResponseHelper($this);
+        return new ResponseHelper($this, $redirector);
     }
 
     /**

@@ -165,9 +165,13 @@ class Response
      */
     public function executeQueuedActions()
     {
-        $this->executeHelper();
+        $result = $this->executeHelper();
 
-        return $this->helper->willShortCircuitResponse();
+        if ($this->helper->willShortCircuitResponse()) {
+            return $result;
+        }
+
+        return false;
     }
 
     /**
@@ -188,6 +192,6 @@ class Response
      */
     protected function executeHelper()
     {
-        $this->helper->execute();
+        return $this->helper->execute();
     }
 }

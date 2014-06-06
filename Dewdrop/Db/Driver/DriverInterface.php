@@ -158,4 +158,8 @@ interface DriverInterface
      * @return array
      */
     public function describeTable($tableName);
+
+    public function beginTransaction();
+
+    public function commit();
 }
