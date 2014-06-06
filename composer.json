@@ -7,6 +7,7 @@
         "psr-4": {"Dewdrop\\": "Dewdrop/"}
     },
     "require": {
+        "jdorn/sql-formatter": "1.2.*",
         "nielsradstake/php-codesniffer": "1.*",
         "php": ">=5.4.0",
         "phpdocumentor/phpdocumentor": "2.*",
