@@ -779,14 +779,24 @@ class Adapter
         return $this->driver->describeTable($tableName);
     }
 
+    /**
+     * Begin a new transaction.
+     *
+     * @return void
+     */
     public function beginTransaction()
     {
         return $this->driver->beginTransaction();
     }
 
+    /**
+     * Commit the current transaction.
+     *
+     * @return void
+     */
     public function commit()
     {
-        return $this->driver->commit();
+        $this->driver->commit();
     }
 
     /**

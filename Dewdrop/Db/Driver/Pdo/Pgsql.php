@@ -459,13 +459,23 @@ class Pgsql implements DriverInterface
         return $desc;
     }
 
+    /**
+     * Start a new transaction.
+     *
+     * @return void
+     */
     public function beginTransaction()
     {
-        return $this->query('BEGIN');
+        $this->query('BEGIN');
     }
 
+    /**
+     * Commit the current transaction.
+     *
+     * @return void
+     */
     public function commit()
     {
-        return $this->query('COMMIT');
+        $this->query('COMMIT');
     }
 }

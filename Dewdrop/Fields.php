@@ -1,18 +1,275 @@
 <?php
 
+/**
+ * Dewdrop
+ *
+ * @link      https://github.com/DeltaSystems/dewdrop
+ * @copyright Delta Systems (http://deltasys.com)
+ * @license   https://github.com/DeltaSystems/dewdrop/LICENSE
+ */
+
 namespace Dewdrop;
 
+use ArrayAccess;
+use Countable;
+use Iterator;
 use Dewdrop\Db\Field as DbField;
 use Dewdrop\Exception;
 use Dewdrop\Fields\Field as CustomField;
 use Dewdrop\Fields\FieldInterface;
 
-class Fields
+/**
+ * The Fields API is at the core of many of Dewdrop's abstractions.  It has two
+ * primary goals:
+ *
+ * 1) Leverage metadata from the database (e.g. information about various
+ *    constraints, data-types, etc.) to make working with database fields in
+ *    various contexts simpler and less error-prone.
+ *
+ * 2) To allow the definition of non-DB-related fields as well, so that the
+ *    Fields API can be used to inject customizable pieces of code into
+ *    logic and rendering loops in a clean way.
+ *
+ * Adding fields is possible in a few different ways.  You can add a DB field
+ * directly from a \Dewdrop\Db\Table model:
+ *
+ * <code>
+ * $fields->add($model->field('my_field'));
+ * </code>
+ *
+ * You can add a custom field by passing an ID string to the add() method and
+ * then customizing the field:
+ *
+ * <code>
+ * $fields->add('my_custom_field_id')
+ *     ->setLabel('Just a Custom Field')
+ *     ->setVisible(true)
+ *     ->assignHelperCallback(
+ *         'TableCell.Content',
+ *         function ($helper, array $rowData) {
+ *             return 'Hello, world';
+ *         }
+ *     );
+ * </code>
+ *
+ * Or, you can instantiate and add the field object directly:
+ *
+ * <code>
+ * $field = new \Dewdrop\Fields\Field();
+ *
+ * $field
+ *     ->setId('my_custom_field_id')
+ *     ->setLabel('Just a Custom Field')
+ *     ->setVisible(true)
+ *     ->assignHelperCallback(
+ *         'TableCell.Content',
+ *         function ($helper, array $rowData) {
+ *             return 'Hello, world';
+ *         }
+ *     );
+ *
+ * $fields->add($field);
+ * </code>
+ *
+ * Once added, you can get your fields back in a number of different ways:
+ *
+ * 1) The DOM-like get(), has(), and remove() methods all take a field ID.
+ *
+ * 2) The getAll(), getVisibleFields(), getSortableFields(), getFilterableFields()
+ *    and getEditableFields() objects all will return new \Dewdrop\Fields objects
+ *    that contain only the fields allowed by the method you called.  When calling
+ *    any of this methods, you can pass any number of \Dewdrop\Fields\Filter
+ *    objects as well to futher sort or limit the fields you get back.
+ *
+ * 3) You can iterate over the Fields object just like an array.
+ *
+ * Many other objects in Dewdrop can receive a Fields collection and use it
+ * to make decisions.  For example, notable view helpers such as Table can use
+ * a collection of fields to render their headers and cells.
+ *
+ * @see \Dewdrop\Fields\Helper\HelperAbstract
+ */
+class Fields implements ArrayAccess, Iterator, Countable
 {
+    /**
+     * The fields currently contained in this collection.
+     *
+     * @var array
+     */
     private $fields = array();
 
+    /**
+     * An object implementing the \Dewdrop\Fields\UserInterface interface,
+     * which can be used to take advantage of the authorization features
+     * in the \Dewdrop\Fields API.
+     */
     private $user;
 
+    /**
+     * Optionally supply an array of fields that can be used as an initial
+     * set for this collection.
+     *
+     * @param array $fields
+     */
+    public function __construct(array $fields = null)
+    {
+        if (is_array($fields)) {
+            foreach ($fields as $field) {
+                $this->add($field);
+            }
+        }
+    }
+
+    /**
+     * Get the current field during iteration.
+     *
+     * @return FieldInterface
+     */
+    public function current()
+    {
+        return current($this->fields);
+    }
+
+    /**
+     * Get the ID of the current field to be used as the key during iteration.
+     *
+     * @return string
+     */
+    public function key()
+    {
+        return current($this->fields)->getId();
+    }
+
+    /**
+     * Advance to the next field during iteration.
+     *
+     * @return FieldInterface
+     */
+    public function next()
+    {
+        return next($this->fields);
+    }
+
+    /**
+     * Rewind the iteration pointer.
+     *
+     * @return void
+     */
+    public function rewind()
+    {
+        reset($this->fields);
+    }
+
+    /**
+     * Check to see if we can continue with iteration.
+     *
+     * @return boolean
+     */
+    public function valid()
+    {
+        $key = key($this->fields);
+
+        return (null !== $key && false !== $key);
+    }
+
+    /**
+     * Count the number of fields in this collection.
+     *
+     * @return integer
+     */
+    public function count()
+    {
+        return count($this->fields);
+    }
+
+    /**
+     * Allow addition/replacement of Field objects on this collection via array
+     * syntax:
+     *
+     * <code>
+     * $fields['id'] = $field;
+     * </code>
+     *
+     * This is part of the ArrayAccess interface built into PHP.
+     *
+     * @param string $offset
+     * @param mixed $value
+     * @return void
+     */
+    public function offsetSet($offset, $value)
+    {
+        if (!$value instanceof FieldInterface) {
+            throw new Exception('\Dewdrop\Fields only excepts field objects');
+        }
+
+        if (is_string($offset) && !is_number($offset)) {
+            $value->setId($offset);
+
+            if ($this->has($offset)) {
+                $this->remove($offset);
+            }
+        }
+
+        $this->add($value);
+    }
+
+    /**
+     * Get a field by its ID using ArrayAccess syntax.
+     *
+     * <code>
+     * echo $fields['id']->getLabel();
+     * </code>
+     *
+     * This method is part of the ArrayAccess interface built into PHP.
+     *
+     * @param string $offset
+     * @return mixed
+     */
+    public function offsetGet($offset)
+    {
+        return $this->get($offset);
+    }
+
+    /**
+     * Test to see if the specified field ID exists in this Fields collection
+     * using isset():
+     *
+     * <code>
+     * isset($fields['id']);
+     * </code>
+     *
+     * This method is part of the ArrayAccess interface built into PHP.
+     *
+     * @param string $offset
+     * @return boolean
+     */
+    public function offsetExists($offset)
+    {
+        return $this->has($offset);
+    }
+
+    /**
+     * Allow removal of a field via ArrayAccess syntax:
+     *
+     * <code>
+     * unset($fields['id']);
+     * </code>
+     *
+     * @param string $offset
+     * @return void
+     */
+    public function offsetUnset($offset)
+    {
+        $this->remove($offset);
+    }
+
+    /**
+     * Set the UserInterface object that can be used by the
+     * authorization-related features in \Dewdrop\Fields.
+     *
+     * @param UserInterface $user
+     * @return Fields
+     */
     public function setUser(UserInterface $user)
     {
         $this->user = $user;
@@ -20,6 +277,12 @@ class Fields
         return $this;
     }
 
+    /**
+     * Check to see if a field with the given ID exists in this collection.
+     *
+     * @param string $id
+     * @return boolean
+     */
     public function has($id)
     {
         foreach ($this->fields as $field) {
@@ -31,6 +294,12 @@ class Fields
         return false;
     }
 
+    /**
+     * Get the field matching the supplied ID from this collection.
+     *
+     * @param string $id
+     * @return FieldInterface
+     */
     public function get($id)
     {
         foreach ($this->fields as $field) {
@@ -42,6 +311,20 @@ class Fields
         return null;
     }
 
+    /**
+     * Add the supplied field to this collection.  Can be a FieldInterface
+     * object or a string, in which case a new custom field will be added
+     * with the supplied string as its ID.
+     *
+     * The newly added FieldInterface object is returned from this method
+     * so that it can be further customized immediately, using method
+     * chaining.  Once you've completed calling methods on the FieldInterface
+     * object itself, you can call any \Dewdrop\Fields methods to return
+     * execution to that context.
+     *
+     * @param mixed $field
+     * @return FieldInterface
+     */
     public function add($field)
     {
         if (is_string($field)) {
@@ -61,40 +344,115 @@ class Fields
         return $field;
     }
 
+    /**
+     * Remove the field with the given ID from this collection.
+     *
+     * @param string $id
+     * @return Fields
+     */
+    public function remove($id)
+    {
+        foreach ($this->fields as $index => $field) {
+            if ($field->getId() === $id) {
+                unset($this->fields[$index]);
+                break;
+            }
+        }
+
+        $this->fields = array_values($this->fields);
+
+        return $this;
+    }
+
+    /**
+     * Get all the fields currently in this collection.
+     *
+     * @return Fields
+     */
+    public function getAll()
+    {
+        return new Fields($this->fields);
+    }
+
+    /**
+     * Get any fields that are visible and pass the supplied filters.  Note that
+     * you can either pass a single \Dewdrop\Fields\Filter or an array of them.
+     *
+     * @param mixed $filters
+     * @return Fields
+     */
     public function getVisibleFields($filters = null)
     {
         return $this->getFieldsPassingMethodCheck('isVisible', $filters);
     }
 
+    /**
+     * Get any fields that are sortable and pass the supplied filters.  Note that
+     * you can either pass a single \Dewdrop\Fields\Filter or an array of them.
+     *
+     * @param mixed $filters
+     * @return Fields
+     */
     public function getSortableFields($filters = null)
     {
         return $this->getFieldsPassingMethodCheck('isSortable', $filters);
     }
 
+    /**
+     * Get any fields that are editable and pass the supplied filters.  Note that
+     * you can either pass a single \Dewdrop\Fields\Filter or an array of them.
+     *
+     * @param mixed $filters
+     * @return Fields
+     */
     public function getEditableFields($filters = null)
     {
         return $this->getFieldsPassingMethodCheck('isEditable', $filters);
     }
 
+    /**
+     * Get any fields that are filterable and pass the supplied filters.  Note that
+     * you can either pass a single \Dewdrop\Fields\Filter or an array of them.
+     *
+     * @param mixed $filters
+     * @return Fields
+     */
     public function getFilterableFields($filters = null)
     {
         return $this->getFieldsPassingMethodCheck('isFilterable', $filters);
     }
 
+    /**
+     * Get any fields that return true when the supplied method is called  and pass
+     * the supplied filters.  Note that you can either pass a single
+     * \Dewdrop\Fields\Filter or an array of them.
+     *
+     * @param string $fieldMethodName
+     * @param mixed $filters
+     * @return Fields
+     */
     protected function getFieldsPassingMethodCheck($fieldMethodName, $filters)
     {
-        $fields = array();
+        $fields = new Fields();
 
         foreach ($this->fields as $field) {
             if ($field->$fieldMethodName($this->user)) {
-                $fields[$field->getId()] = $field;
+                $fields->add($field);
             }
         }
 
         return $this->applyFilters($fields, $filters);
     }
 
-    protected function applyFilters(array $fields, $filters)
+    /**
+     * Apply the supplied filters to the Fields.  You can pass no filters,
+     * a single filter, or an array of filters.
+     *
+     * @param Fields $fields
+     * @param mixed $filters
+     * @return Fields
+     */
+    protected function applyFilters(Fields $fields, $filters)
     {
         if (!$filters) {
             return $fields;

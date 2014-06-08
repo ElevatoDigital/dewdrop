@@ -1,38 +1,69 @@
 <?php
 
+/**
+ * Dewdrop
+ *
+ * @link      https://github.com/DeltaSystems/dewdrop
+ * @copyright Delta Systems (http://deltasys.com)
+ * @license   https://github.com/DeltaSystems/dewdrop/LICENSE
+ */
+
 namespace Dewdrop\Fields;
 
-use Dewdrop\Db\Adapter as DbAdapter;
 use Dewdrop\Db\Select;
 use Dewdrop\Fields;
-use Dewdrop\Fields\Filter\Visibility as VisibilityFilter;
-use Dewdrop\Fields\Helper\SelectSort;
-use Dewdrop\Request;
+use Dewdrop\Fields\Helper\SelectModifierInterface;
 
+/**
+ * The Listing class wraps a Select object and applies a number of SelectModifier
+ * objects to it, making it easy to sort, filter, etc.  You can optionally specify
+ * a prefix for the Listing, which it will pass along to all its modifiers,
+ * allowing you to use multiple Listings on a single request without their GET
+ * and POST variables conflicting with one another.
+ */
 class Listing
 {
-    private $db;
-
-    private $request;
-
+    /**
+     * The Select that will be used throughout this Listing.
+     *
+     * @var Select
+     */
     private $select;
 
-    private $fields;
-
+    /**
+     * An optional prefix to use when reading/writing request parameters in
+     * this listing and its modifiers.
+     *
+     * @var string
+     */
     private $prefix = '';
 
-    private $visibilityFilter;
+    /**
+     * An array of SelectModifier objects used to automatically modify the
+     * Select object.
+     *
+     * @var array
+     */
+    private $selectModifiers = array();
 
-    public function __construct(DbAdapter $db, Select $select, Fields $fields, Request $request = null)
+    /**
+     * Supply the Select object that will be manipulated by this listing.
+     *
+     * @param Select $select
+     */
+    public function __construct(Select $select)
     {
-        $this->db      = $db;
-        $this->select  = $select;
-        $this->fields  = $fields;
-        $this->request = ($request ?: new Request());
-
-        $this->selectSortHelper = new SelectSort($db);
+        $this->select = $select;
     }
 
+    /**
+     * Set a prefix for this listing and any of its modifiers.  This can
+     * aid in avoiding GET/POST variable naming conflicts when including
+     * multiple listings on a single page.
+     *
+     * @param string $prefix
+     * @return \Dewdrop\Fields\Listing
+     */
     public function setPrefix($prefix)
     {
         $this->prefix = $prefix;
@@ -40,35 +71,60 @@ class Listing
         return $this;
     }
 
+    /**
+     * Get the prefix that should be used for GET/POST params by this
+     * Listing and its modifiers.
+     *
+     * @return string
+     */
     public function getPrefix()
     {
         return $this->prefix;
     }
 
-    public function getFields()
+    /**
+     * Register a new SelectModifierInterface object with this listing.  Each
+     * modifier will get the opportunity to alter the Select prior to its being
+     * run.
+     *
+     * @param SelectModifierInterface $selectModifier
+     * @return \Dewdrop\Fields\Listing
+     */
+    public function registerSelectModifier(SelectModifierInterface $selectModifier)
     {
-        return $this->fields;
+        $this->selectModifiers[] = $selectModifier;
+
+        return $this;
     }
 
-    public function getSelectSortHelper()
+    /**
+     * Get the Select object after all modifiers have been applied to it.  This
+     * can be useful if you'd like to see the Select (or its resulting SQL code)
+     * will all modifications applied, in case you need to debug or troubleshoot
+     * the code.
+     *
+     * @param Fields $fields
+     * @return Select
+     */
+    public function getModifiedSelect(Fields $fields)
     {
-        return $this->selectSortHelper;
+        $select = clone($this->select);
+
+        foreach ($this->selectModifiers as $modifier) {
+            $select = $modifier->modifySelect($fields, $this->select, $this->prefix);
+        }
+
+        return $select;
     }
 
-    public function fetchData()
+    /**
+     * Fetch the data for this listing, passing the supplied \Dewdrop\Fields
+     * object to all modifiers before fetching the data from the DB.
+     *
+     * @return array
+     */
+    public function fetchData(Fields $fields)
     {
-        $select = $this->selectSortHelper->sortByRequest(
-            $this->fields->getSortableFields(),
-            $this->select,
-            $this->request,
-            $this->prefix
-        );
-
-        return $this->db->fetchAll($select);
-    }
-
-    public function __call($method, array $args)
-    {
-        return call_user_func_array(array($this->fields, $method), $args);
+        return $this->select->getAdapter()->fetchAll($this->getModifiedSelect($fields));
     }
 }

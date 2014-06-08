@@ -12,7 +12,7 @@ class AdjustVisibility extends PageAbstract
         $selections = $this->request->getPost('visible_columns');
 
         if (is_array($selections)) {
-            $this->component->getVisibilityFilter()->save($selections);
+            $this->component->getVisibilityFilter()->save($this->component->getFields(), $selections);
         }
 
         $responseHelper->redirectToAdminPage('index');

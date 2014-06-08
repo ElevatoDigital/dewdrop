@@ -289,6 +289,7 @@ class Inflector
     /**
      * Just like underscore(), but with hyphens.
      *
+     * @param string $word
      * @return string
      */
     public function hyphenize($word)

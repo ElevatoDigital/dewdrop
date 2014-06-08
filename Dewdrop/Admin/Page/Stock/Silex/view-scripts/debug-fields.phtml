@@ -1,0 +1,163 @@
+<div class="page-header">
+    <h1><span class="glyphicon glyphicon-wrench"></span> View Fields</h1>
+</div>
+
+<?php
+$this->displayFields
+    ->add('id')
+        ->setVisible(true)
+        ->setLabel('ID')
+        ->assignHelperCallback(
+            'TableCell.Content',
+            function ($helper, array $rowData) {
+                return $helper->getEscaper()->escapeHtml($rowData['id']);
+            }
+        )
+    ->add('label')
+        ->setVisible(true)
+        ->setLabel('Label')
+        ->assignHelperCallback(
+            'TableCell.Content',
+            function ($helper, array $rowData) {
+                return $helper->getEscaper()->escapeHtml($rowData['label']);
+            }
+        )
+    ->add('is_db')
+        ->setVisible(true)
+        ->setLabel('Type')
+        ->assignHelperCallback(
+            'TableCell.Content',
+            function ($helper, array $rowData) {
+                return ($rowData['is_db'] ? 'DB' : 'Custom');
+            }
+        )
+    ->add('callbacks')
+        ->setVisible(true)
+        ->setLabel('Custom Helper Callbacks')
+        ->assignHelperCallback(
+            'TableCell.Content',
+            function ($helper, array $rowData) {
+                $callbacks = $rowData['callbacks'];
+
+                if (!is_array($callbacks) || !count($callbacks)) {
+                    return '<span class="text-muted">None</span>';
+                } else {
+                    return $this->partial(
+                        'debug-fields-callbacks.phtml',
+                        array(
+                            'fieldIndex' => $rowData['index'],
+                            'callbacks'  => $callbacks,
+                            'fieldId'    => $rowData['id']
+                        )
+                    );
+                }
+            }
+    );
+
+$permissions = array('visible', 'sortable', 'filterable', 'editable');
+
+foreach ($permissions as $permission) {
+    $this->displayFields->add($permission)
+        ->setVisible(true)
+        ->setLabel(ucfirst($permission))
+        ->assignHelperCallback(
+            'TableCell.Content',
+            function ($helper, array $rowData) use ($permission) {
+                $icons = array(
+                    'all'    => 'ok text-success',
+                    'none'   => 'ban-circle text-danger',
+                    'custom' => 'asterisk text-info'
+                );
+
+                $value = $rowData[$permission];
+
+                return sprintf(
+                    '<span class="glyphicon glyphicon-%s"></span>',
+                    $helper->getEscaper()->escapeHtmlAttr($icons[$value])
+                );
+            }
+        );
+}
+
+$data  = array();
+$index = 0;
+
+foreach ($this->componentFields->getAll() as $field) {
+    $row = array(
+        'id'        => $field->getId(),
+        'index'     => $index,
+        'is_db'     => ($field instanceof \Dewdrop\Db\Field),
+        'label'     => $field->getLabel(),
+        'callbacks' => $field->getAllHelperCallbacks(),
+    );
+
+    foreach ($permissions as $permission) {
+        $method = 'get' . ucfirst($permission) . 'Setting';
+        $value  = $field->$method();
+
+        if (0 === count($value)) {
+            $setting = 'none';
+        } elseif (in_array(\Dewdrop\Fields\FieldAbstract::AUTHORIZATION_ALLOW_ALL, $value)) {
+            $setting = 'all';
+        } else {
+            $setting = 'custom';
+        }
+
+        $row[$permission] = $setting;
+    }
+
+    $data[] = $row;
+
+    $index += 1;
+}
+
+echo $this->bootstrapTable(
+    $this->displayFields->getVisibleFields(),
+    $data
+);
+?>
+
+<div class="well">
+<div class="row">
+    <div class="col-sm-4">
+        <h4>Field Types</h4>
+        <p>
+            There are 2 types of fields in the Dewdrop API: DB and Custom.
+            DB fields directly represent a column or relationship in the
+            database.  Custom fields were added in code and do not
+            necessarily connect to the database at all.
+        </p>
+    </div>
+    <div class="col-sm-4">
+        <h4>Custom Helper Callbacks</h4>
+        <p>
+            Custom callbacks allow you to alter the behavior of your field in
+            various contexts.  For example, you can change the way your field
+            is rendered in an HTML table cell by assigning a callback for the
+            TableCell.Content helper.
+        </p>
+        <p>
+            This table doesn't show callbacks assigned on
+            individual pages.  Rather, it represents callbacks defined at the
+            compoment or model level of your app.  Clicking on a custom
+            callback displays its source code.
+        </p>
+    </div>
+    <div class="col-sm-4">
+        <h4>Permissions</h4>
+        <p>
+            Fields in Dewdrop can have any of 4 capabilities: visilibility,
+            sortability, filterability, and editability.  By default, DB
+            fields have all 4 capabilities.  Custom fields have none.  These
+            capabilities can be enabled and disabled globally or for
+            specific user roles.
+        </p>
+        <h5>Permissions Icon Key</h5>
+        <ul class="list-group">
+            <li class="list-group-item"><span class="text-success glyphicon glyphicon-ok"></span> Allowed for All</li>
+            <li class="list-group-item"><span class="text-danger glyphicon glyphicon-ban-circle"></span> Forbidden for All</li>
+            <li class="list-group-item"><span class="text-info glyphicon glyphicon-asterisk"></span> Custom Settings Applied</li>
+        </ul>
+    </div>
+</div>
+</div>

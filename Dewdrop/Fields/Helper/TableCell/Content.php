@@ -92,6 +92,7 @@ class Content extends HelperAbstract
     /**
      * Set an alternative format for date rendering.  Uses PHP's date() syntax.
      *
+     * @param string $dateFormat
      * @return \Dewdrop\Fields\Helper\TableCell\Content
      */
     public function setDateFormat($dateFormat)
@@ -104,6 +105,7 @@ class Content extends HelperAbstract
     /**
      * Set an alternative format for time rendering.  Uses PHP's date() syntax.
      *
+     * @param string $timeFormat
      * @return \Dewdrop\Fields\Helper\TableCell\Content
      */
     public function setTimeFormat($timeFormat)

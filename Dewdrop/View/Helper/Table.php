@@ -11,7 +11,7 @@
 namespace Dewdrop\View\Helper;
 
 use Dewdrop\Exception;
-use Dewdrop\Fields\Listing;
+use Dewdrop\Fields;
 use Dewdrop\Fields\Helper\TableCell as TableCellHelper;
 
 /**
@@ -27,19 +27,18 @@ class Table extends AbstractHelper
             return $this;
         }
 
-        if (!isset($args[0]) || !$args[0] instanceof Listing ||
-            !isset($args[1]) || !$args[1] instanceof TableCellHelper
+        if (!isset($args[0]) || !$args[0] instanceof Fields ||
+            !isset($args[1]) || !is_array($args[1])
         ) {
-            throw new Exception('Table helper takes either no arguments or a Listing object and TableCell helper.');
+            throw new Exception('Table helper takes either no arguments or an array of fields and an array of data');
         } else {
-            $listing    = $args[0];
-            $cellHelper = $args[1];
-            $filters    = (isset($args[2]) ? $args[2] : null);
-            $fields     = $listing->getVisibleFields($filters);
+            $fields   = $args[0];
+            $data     = $args[1];
+            $renderer = (isset($args[2]) ? $args[2] : $this->view->tableCellRenderer());
 
             return $this->open()
-                . $this->renderHead($fields, $cellHelper)
-                . $this->renderBody($listing->fetchData(), $fields, $cellHelper)
+                . $this->renderHead($fields, $renderer)
+                . $this->renderBody($fields, $data, $renderer)
                 . $this->close();
         }
     }
@@ -54,7 +53,7 @@ class Table extends AbstractHelper
         return '</table>';
     }
 
-    public function renderHead(array $fields, TableCellHelper $renderer)
+    public function renderHead(Fields $fields, TableCellHelper $renderer)
     {
         $out = '<thead>';
 
@@ -68,7 +67,7 @@ class Table extends AbstractHelper
             } else {
                 $out .= $this->renderSortLink(
                     $content,
-                    $field->getId(),
+                    $field->getQueryStringId(),
                     ('asc' === $this->view->getRequest()->getQuery('dir') ? 'desc' : 'asc')
                 );
             }
@@ -81,7 +80,7 @@ class Table extends AbstractHelper
         return $out;
     }
 
-    public function renderBody(array $data, array $fields, TableCellHelper $renderer)
+    public function renderBody(Fields $fields, array $data, TableCellHelper $renderer)
     {
         $rowIndex = 0;
 

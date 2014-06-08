@@ -354,13 +354,26 @@ class Wpdb implements DriverInterface
         return $wpdbResult;
     }
 
+    /**
+     * With the legacy mysql extension, which most WP installs still use, this
+     * is the only decent way to do transactions.
+     *
+     * @return void
+     */
     public function beginTransaction()
     {
-        return $this->query('START TRANSACTION');
+        $this->query('SET AUTOCOMMIT=0');
+        $this->query('START TRANSACTION');
     }
 
+    /**
+     * Commit the current transaction.
+     *
+     * @return void
+     */
     public function commit()
     {
-        return $this->query('COMMIT');
+        $this->query('COMMIT');
+        return $this->query('SET AUTOCOMMIT=1');
     }
 }

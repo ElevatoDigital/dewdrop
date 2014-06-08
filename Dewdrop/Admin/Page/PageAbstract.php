@@ -75,6 +75,7 @@ abstract class PageAbstract
      *
      * @param ComponentAbstract $component
      * @param Request $request
+     * @param string $viewScriptPath
      */
     public function __construct(ComponentAbstract $component, Request $request, $viewScriptPath = null)
     {

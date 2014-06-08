@@ -22,12 +22,14 @@
                     <ul class="dropdown-menu" role="menu">
                         <li><a href="#">Save Current View</a></li>
                         <li><a href="#">Manage Custom Views</a></li>
+                        <li><a href="#">Sort and Group Fields</a></li>
 
                         <?php if ($this->debug):?>
                         <li role="presentation" class="divider"></li>
-                        <li role="presentation" class="dropdown-header">Dev Tools</li>
-                        <li><a href="#">View Fields</a></li>
-                        <li><a href="#">View Listing SQL</a></li>
+                        <li role="presentation" class="dropdown-header"><span class="glyphicon glyphicon-wrench"></span> Dev Tools</li>
+                        <li><a href="<?php echo $this->escapeHtmlAttr($this->adminUrl('debug-fields'));?>">View Fields</a></li>
+                        <li><a href="<?php echo $this->escapeHtmlAttr($this->adminUrl('debug-listing-sql', $this->getRequest()->getQuery()));?>">View Listing SQL</a></li>
+                        <li><a href="<?php echo $this->escapeHtmlAttr($this->adminUrl('debug-pages'));?>">View Pages</a></li>
                         <?php endif;?>
                     </ul>
                 </div>
@@ -55,7 +57,7 @@
                         <select class="form-control input-sm" name="filters[]">
                             <option value="" disabled="disabled" selected="selected">Select a field to filter by...</option>
                             <?php
-                            foreach ($this->listing->getFilterableFields() as $field) {
+                            foreach ($this->fields->getFilterableFields() as $field) {
                                 printf(
                                     '<option value="%s">%s</option>',
                                     $this->escapeHtmlAttr($field->getId()),
@@ -87,13 +89,13 @@
 
 <?php
 echo $this->bootstrapTable(
-    $this->listing,
-    $this->tableCellRenderer(),
-    $this->visibilityFilter
+    $this->fields->getVisibleFields($this->visibilityFilter),
+    $this->listing->fetchData($this->fields)
 );
 
 echo $this->bootstrapColumnsModal(
-    $this->visibilityFilter,
+    $this->fields->getVisibleFields(),
+    $this->fields->getVisibleFields($this->visibilityFilter),
     $this->adminUrl('adjust-visibility')
 );
 ?>

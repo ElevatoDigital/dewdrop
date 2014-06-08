@@ -68,6 +68,13 @@ class Request
         }
     }
 
+    /**
+     * Just a simple utility method to check whether the request is an AJAX
+     * call by looking for the HTTP_X_REQUESTED_WITH header, which should be
+     * added by most (all?) major JS libraries.
+     *
+     * @return boolean
+     */
     public function isAjax()
     {
         return isset($_SERVER['HTTP_X_REQUESTED_WITH']) &&

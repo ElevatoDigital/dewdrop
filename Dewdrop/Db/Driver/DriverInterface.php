@@ -159,7 +159,17 @@ interface DriverInterface
      */
     public function describeTable($tableName);
 
+    /**
+     * Begin a new transaction.
+     *
+     * @return void
+     */
     public function beginTransaction();
 
+    /**
+     * Commit the current transaction.
+     *
+     * @return void
+     */
     public function commit();
 }

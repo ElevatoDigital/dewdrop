@@ -19,6 +19,7 @@ class Index extends PageAbstract
         $this->view->pluralTitle      = $this->component->getPrimaryModel()->getPluralTitle();
         $this->view->listing          = $listing;
         $this->view->visibilityFilter = $filter;
+        $this->view->fields           = $fields;
         $this->view->debug            = Bootstrap::getResource('debug');
     }
 }

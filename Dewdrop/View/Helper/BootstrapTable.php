@@ -19,7 +19,7 @@ class BootstrapTable extends Table
         $request = $this->view->getRequest();
         $caret   = '';
 
-        if ($fieldId === $request->getQuery('sort')) {
+        if ($fieldId === urlencode($request->getQuery('sort'))) {
             $activeDir = ('asc' === $request->getQuery('dir') ? 'asc' : 'desc');
 
             if ('asc' === $activeDir) {

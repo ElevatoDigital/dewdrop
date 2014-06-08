@@ -56,10 +56,18 @@ class Standard
     /**
      * Callbacks to run as part of executing the response
      *
-     * @param array
+     * @var array
      */
     private $callbacks = array();
 
+    /**
+     * A callable that can be used to execute the queued redirect.
+     * Redirecting varies quite a bit between WP and Silex.  In WP, it's just
+     * a normal function.  In Silex, the redirect method returns a response,
+     * which must then be returned from the controller.
+     *
+     * @var callable
+     */
     private $redirector;
 
     /**

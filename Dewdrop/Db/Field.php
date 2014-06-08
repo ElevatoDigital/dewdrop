@@ -125,14 +125,44 @@ class Field extends FieldAbstract
      */
     private $inputFilter;
 
+    /**
+     * The ID for this field.  Used when interacting with the \Dewdrop\Fields
+     * APIs.
+     *
+     * @var string
+     */
     private $id;
 
+    /**
+     * All field capabilities are enabled by default for DB (whereas all are
+     * disabled by default in custom fields).
+     *
+     * @var array
+     */
     protected $visible = array(FieldAbstract::AUTHORIZATION_ALLOW_ALL);
 
+    /**
+     * All field capabilities are enabled by default for DB (whereas all are
+     * disabled by default in custom fields).
+     *
+     * @var array
+     */
     protected $sortable = array(FieldAbstract::AUTHORIZATION_ALLOW_ALL);
 
+    /**
+     * All field capabilities are enabled by default for DB (whereas all are
+     * disabled by default in custom fields).
+     *
+     * @var array
+     */
     protected $filterable = array(FieldAbstract::AUTHORIZATION_ALLOW_ALL);
 
+    /**
+     * All field capabilities are enabled by default for DB (whereas all are
+     * disabled by default in custom fields).
+     *
+     * @var array
+     */
     protected $editable = array(FieldAbstract::AUTHORIZATION_ALLOW_ALL);
 
     /**
@@ -237,6 +267,13 @@ class Field extends FieldAbstract
         return $this->name;
     }
 
+    /**
+     * Set the ID of this field.  If no ID is set on database fields, we'll
+     * fall back to getControlName().
+     *
+     * @param string $id
+     * @return \Dewdrop\Db\Field
+     */
     public function setId($id)
     {
         $this->id = $id;
@@ -244,6 +281,12 @@ class Field extends FieldAbstract
         return $this;
     }
 
+    /**
+     * Get this field's ID.  When no ID is set on a DB field, we fall back
+     * to getControlName().
+     *
+     * @return string
+     */
     public function getId()
     {
         return $this->id ?: $this->getControlName();
@@ -341,6 +384,17 @@ class Field extends FieldAbstract
     public function getHtmlId()
     {
         return str_replace(':', '_', $this->getControlName());
+    }
+
+    /**
+     * Get a version of the control name using "+" for the model/field separator
+     * to be more friendly to query strings.
+     *
+     * @return string
+     */
+    public function getQueryStringId()
+    {
+        return str_replace(':', '+', $this->getControlName());
     }
 
     /**
