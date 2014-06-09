@@ -2,9 +2,10 @@
 
 namespace Dewdrop;
 
-use Pimple;
+use Dewdrop\Bootstrap\Detector;
+use Pimple as CorePimple;
 
-class Bootstrap
+class Pimple extends CorePimple
 {
     private static $instance;
 
@@ -15,6 +16,10 @@ class Bootstrap
 
     public static function getInstance()
     {
+        if (!self::$instance) {
+            self::$instance = Detector::findPimple();
+        }
+
         return self::$instance;
     }
 

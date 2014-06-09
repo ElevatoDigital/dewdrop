@@ -61,16 +61,20 @@ class InputText extends AbstractHelper
      *
      * @param string $name
      * @param boolean $value
-     * @param string $class
+     * @param mixed $classes
      * @return string
      */
-    protected function directExplicit($name, $value, $class = null)
+    protected function directExplicit($name, $value, $classes = null)
     {
+        if (null !== $classes && !is_array($classes)) {
+            $classes = array($classes);
+        }
+
         return $this->directArray(
             array(
                 'name'    => $name,
                 'value'   => $value,
-                'classes' => ($class ? array($class) : null)
+                'classes' => $classes
             )
         );
     }

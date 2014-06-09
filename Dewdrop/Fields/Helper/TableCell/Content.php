@@ -183,6 +183,23 @@ class Content extends HelperAbstract
     }
 
     /**
+     * A fall back method for DB reference fields.  For foreign keys, we trim
+     * the "_id" off the end and look for the resulting field in the resultset.
+     * For example, if you foreign key is "state_id", we look for a resultset
+     * key of "state" and render that value for the field.
+     *
+     * @param FieldInterface $field
+     * @param array $rowData
+     * @return string
+     */
+    protected function renderDbReference(FieldInterface $field, array $rowData)
+    {
+        $name = preg_replace('/_id$/', '', $field->getName());
+
+        return $this->escaper->escapeHtml($rowData[$name]);
+    }
+
+    /**
      * A fall back method for date fields.  Will convert the DB value to a
      * Unix timestamp and then format it with PHP's date() function.  (How
      * retro!)  You can customize the format with setDateFormat().

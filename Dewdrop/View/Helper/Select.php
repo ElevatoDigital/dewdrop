@@ -56,15 +56,21 @@ class Select extends AbstractHelper
      * @param string $name The name attribute for the <select>.
      * @param array $options The key-value pairs representing the select options.
      * @param mixed $value The selected value.
+     * @param mixed $classes Any CSS classes you'd like to add.
      * @return string
      */
-    public function directExplicit($name, array $options, $value)
+    public function directExplicit($name, array $options, $value, $classes = null)
     {
+        if (null !== $classes && !is_array($classes)) {
+            $classes = array($classes);
+        }
+
         return $this->directArray(
             array(
                 'name'    => $name,
                 'value'   => $value,
-                'options' => $options
+                'options' => $options,
+                'classes' => $classes
             )
         );
     }
@@ -83,6 +89,10 @@ class Select extends AbstractHelper
             $id = $name;
         }
 
+        if (0 === count($classes)) {
+            $classes[] = 'form-control';
+        }
+
         $value = (string) $value;
 
         return $this->partial(
@@ -91,7 +101,8 @@ class Select extends AbstractHelper
                 'name'    => $name,
                 'id'      => $id,
                 'value'   => $value,
-                'options' => $options
+                'options' => $options,
+                'classes' => $classes
             )
         );
     }
@@ -107,8 +118,8 @@ class Select extends AbstractHelper
     {
         $this
             ->checkRequired($options, array('name', 'value', 'options'))
-            ->ensurePresent($options, array('id'))
-            ->ensureArray($options, array('options'));
+            ->ensurePresent($options, array('id', 'classes'))
+            ->ensureArray($options, array('options', 'classes'));
 
         return $options;
     }

@@ -13,6 +13,7 @@ use Dewdrop\Fields;
 use Dewdrop\Fields\Filter\Visibility as VisibilityFilter;
 use Dewdrop\Fields\Helper\SelectSort;
 use Dewdrop\Fields\Listing;
+use Pimple;
 
 abstract class CrudAbstract extends Silex implements CrudInterface
 {
@@ -22,16 +23,16 @@ abstract class CrudAbstract extends Silex implements CrudInterface
 
     protected $listing;
 
-    public function __construct(SilexAdmin $admin, $componentName)
+    public function __construct(Pimple $pimple = null, $componentName = null)
     {
-        parent::__construct($admin, $componentName);
+        parent::__construct($pimple, $componentName);
 
         $this->addPageFactory(new CrudFactory($this));
 
         $this->selectSort = new SelectSort($this->getRequest());
 
         $this->visibilityFilter = new VisibilityFilter(
-            'admin/' . $this->getName(),
+            $this->getFullyQualifiedName(),
             $this->getDb()
         );
 

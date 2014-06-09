@@ -11,12 +11,14 @@
 namespace Dewdrop;
 
 use ArrayAccess;
+use ArrayIterator;
 use Countable;
-use Iterator;
+use IteratorAggregate;
 use Dewdrop\Db\Field as DbField;
 use Dewdrop\Exception;
 use Dewdrop\Fields\Field as CustomField;
 use Dewdrop\Fields\FieldInterface;
+use Dewdrop\Fields\FieldsIterator;
 
 /**
  * The Fields API is at the core of many of Dewdrop's abstractions.  It has two
@@ -89,7 +91,7 @@ use Dewdrop\Fields\FieldInterface;
  *
  * @see \Dewdrop\Fields\Helper\HelperAbstract
  */
-class Fields implements ArrayAccess, Iterator, Countable
+class Fields implements ArrayAccess, IteratorAggregate, Countable
 {
     /**
      * The fields currently contained in this collection.
@@ -120,56 +122,9 @@ class Fields implements ArrayAccess, Iterator, Countable
         }
     }
 
-    /**
-     * Get the current field during iteration.
-     *
-     * @return FieldInterface
-     */
-    public function current()
+    public function getIterator()
     {
-        return current($this->fields);
-    }
-
-    /**
-     * Get the ID of the current field to be used as the key during iteration.
-     *
-     * @return string
-     */
-    public function key()
-    {
-        return current($this->fields)->getId();
-    }
-
-    /**
-     * Advance to the next field during iteration.
-     *
-     * @return FieldInterface
-     */
-    public function next()
-    {
-        return next($this->fields);
-    }
-
-    /**
-     * Rewind the iteration pointer.
-     *
-     * @return void
-     */
-    public function rewind()
-    {
-        reset($this->fields);
-    }
-
-    /**
-     * Check to see if we can continue with iteration.
-     *
-     * @return boolean
-     */
-    public function valid()
-    {
-        $key = key($this->fields);
-
-        return (null !== $key && false !== $key);
+        return new FieldsIterator($this->fields);
     }
 
     /**

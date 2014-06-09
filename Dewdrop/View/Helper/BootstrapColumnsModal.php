@@ -13,8 +13,8 @@ class BootstrapColumnsModal extends AbstractHelper
             array(
                 'id'        => ($id ?: 'adjust-columns-modal'),
                 'actionUrl' => $actionUrl,
-                'visible'   => $visibleFields,
-                'available' => $availableFields
+                'visible'   => $visibleFields->getVisibleFields(),
+                'available' => $availableFields->getVisibleFields()
             )
         );
     }

@@ -203,4 +203,14 @@ class Mock implements DriverInterface
     {
         return array();
     }
+
+    public function beginTransaction()
+    {
+
+    }
+
+    public function commit()
+    {
+
+    }
 }

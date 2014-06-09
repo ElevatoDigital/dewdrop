@@ -32,7 +32,7 @@ class Table extends AbstractHelper
         ) {
             throw new Exception('Table helper takes either no arguments or an array of fields and an array of data');
         } else {
-            $fields   = $args[0];
+            $fields   = $args[0]->getVisibleFields();
             $data     = $args[1];
             $renderer = (isset($args[2]) ? $args[2] : $this->view->tableCellRenderer());
 

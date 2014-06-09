@@ -128,7 +128,7 @@ class Silex
         $componentName = basename($folder);
         $className     = '\Admin\\' . $this->application['inflector']->camelize($componentName) . '\Component';
 
-        $component = new $className($this, $componentName);
+        $component = new $className($this->application, $componentName);
 
         $component->register();
 

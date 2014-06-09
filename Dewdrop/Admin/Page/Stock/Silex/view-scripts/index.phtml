@@ -23,6 +23,7 @@
                         <li><a href="#">Save Current View</a></li>
                         <li><a href="#">Manage Custom Views</a></li>
                         <li><a href="#">Sort and Group Fields</a></li>
+                        <li><a href="<?php echo $this->escapeHtmlAttr($this->adminUrl('notifications'));?>">Notifications</a></li>
 
                         <?php if ($this->debug):?>
                         <li role="presentation" class="divider"></li>
@@ -30,6 +31,7 @@
                         <li><a href="<?php echo $this->escapeHtmlAttr($this->adminUrl('debug-fields'));?>">View Fields</a></li>
                         <li><a href="<?php echo $this->escapeHtmlAttr($this->adminUrl('debug-listing-sql', $this->getRequest()->getQuery()));?>">View Listing SQL</a></li>
                         <li><a href="<?php echo $this->escapeHtmlAttr($this->adminUrl('debug-pages'));?>">View Pages</a></li>
+                        <li><a href="<?php echo $this->escapeHtmlAttr($this->adminUrl('debug-test-sorting'));?>">Test Sorting</a></li>
                         <?php endif;?>
                     </ul>
                 </div>
@@ -94,7 +96,7 @@ echo $this->bootstrapTable(
 );
 
 echo $this->bootstrapColumnsModal(
-    $this->fields->getVisibleFields(),
+    $this->fields,
     $this->fields->getVisibleFields($this->visibilityFilter),
     $this->adminUrl('adjust-visibility')
 );

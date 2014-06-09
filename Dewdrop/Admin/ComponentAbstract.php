@@ -11,12 +11,14 @@
 namespace Dewdrop\Admin;
 
 use Dewdrop\Admin\Page\PageAbstract;
+use Dewdrop\Admin\PageFactory\Files as PageFilesFactory;
 use Dewdrop\Admin\Response;
 use Dewdrop\Db\Adapter;
-use Dewdrop\Admin\PageFactory\Files as PageFilesFactory;
 use Dewdrop\Paths;
+use Dewdrop\Pimple as DewdropPimple;
 use Dewdrop\Request;
 use Pimple;
+use ReflectionClass;
 
 /**
  * This class enables you to define how your component should appear and wire
@@ -71,11 +73,11 @@ abstract class ComponentAbstract
      */
     protected $request;
 
+    protected $pimple;
+
     private $inflector;
 
     private $name;
-
-    private $pimple;
 
     private $pageFactories = array();
 
@@ -85,17 +87,26 @@ abstract class ComponentAbstract
      * Create a component instance using the DB adapter creating by the Wiring
      * class.
      *
-     * @param Adapter $db
-     * @param Paths $paths
-     * @param Request $request
+     * @param Pimple $pimple
+     * @param string $componentName
      */
-    public function __construct(Pimple $pimple, $componentName)
+    public function __construct(Pimple $pimple = null, $componentName = null)
     {
-        $this->pimple    = $pimple;
-        $this->db        = $pimple['db'];
-        $this->paths     = $pimple['paths'];
-        $this->request   = $pimple['dewdrop-request'];
-        $this->inflector = $pimple['inflector'];
+        /**
+         * In normal execution, the name would be set for us, but in testing we
+         * can find it via reflection to avoid the author having to understand
+         * this bit.
+         */
+        if (null === $componentName) {
+            $reflectionClass = new ReflectionClass($this);
+            $componentName   = basename(dirname($reflectionClass->getFileName()));
+        }
+
+        $this->pimple    = ($pimple ?: DewdropPimple::getInstance());
+        $this->db        = $this->pimple['db'];
+        $this->paths     = $this->pimple['paths'];
+        $this->request   = $this->pimple['dewdrop-request'];
+        $this->inflector = $this->pimple['inflector'];
         $this->name      = $componentName;
 
         $this->pageFactories[] = new PageFilesFactory($this, $this->request);
@@ -342,6 +353,11 @@ abstract class ComponentAbstract
     public function getName()
     {
         return $this->name;
+    }
+
+    public function getFullyQualifiedName()
+    {
+        return '/application/admin/' . $this->name;
     }
 
     public function getPimple()

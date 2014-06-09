@@ -6,6 +6,7 @@ use Dewdrop\Admin\Page\PageAbstract;
 use Dewdrop\Bootstrap;
 use Dewdrop\Fields\Filter\Visibility as VisibilityFilter;
 use Dewdrop\Fields\Listing\Export\Csv as CsvExport;
+use Dewdrop\Pimple;
 
 class Index extends PageAbstract
 {
@@ -20,6 +21,6 @@ class Index extends PageAbstract
         $this->view->listing          = $listing;
         $this->view->visibilityFilter = $filter;
         $this->view->fields           = $fields;
-        $this->view->debug            = Bootstrap::getResource('debug');
+        $this->view->debug            = Pimple::getResource('debug');
     }
 }

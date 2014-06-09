@@ -66,12 +66,24 @@ class SelectSort extends HelperAbstract implements SelectModifierInterface
     }
 
     /**
+     * Replace the request on this helper.  Mostly useful during testing.
+     *
+     * @param Request $request
+     * @return SelectSort
+     */
+    public function setRequest(Request $request)
+    {
+        $this->request = $request;
+
+        return $this;
+    }
+
+    /**
      * Given the supplied $fields and \Dewdrop\Request object, find the field
      * referenced in the query string and apply its sort callback to the query.
      *
      * @param Fields $fields
      * @param Select $select
-     * @param Request $request
      * @param string $paramPrefix
      *
      * @return Select
@@ -80,7 +92,7 @@ class SelectSort extends HelperAbstract implements SelectModifierInterface
     {
         foreach ($fields->getSortableFields() as $field) {
             if ($field->getQueryStringId() === urlencode($this->request->getQuery($paramPrefix . 'sort'))) {
-                $direction = strtoupper('desc' === $this->request->getQuery($paramPrefix . 'dir') ? 'desc' : 'asc');
+                $direction = ('DESC' === strtoupper($this->request->getQuery($paramPrefix . 'dir')) ? 'DESC' : 'ASC');
 
                 $select = call_user_func(
                     $this->getFieldAssignment($field),
@@ -89,7 +101,7 @@ class SelectSort extends HelperAbstract implements SelectModifierInterface
                 );
 
                 if (!$select instanceof Select) {
-                    throw new Exception('You SelectSort callback must return the modified Select object.');
+                    throw new Exception('Your SelectSort callback must return the modified Select object.');
                 }
 
                 return $select;

@@ -10,7 +10,6 @@
 
 namespace Dewdrop\Bootstrap;
 
-use Dewdrop\Bootstrap;
 use Dewdrop\Config;
 use Dewdrop\Db\Adapter as DbAdapter;
 use Dewdrop\Exception;
@@ -38,10 +37,6 @@ class Detector
      */
     public static function findPimple()
     {
-        if (Bootstrap::hasInstance()) {
-            return Bootstrap::getInstance();
-        }
-
         $config = new Config();
 
         if (!$config->has('bootstrap')) {
@@ -59,8 +54,6 @@ class Detector
 
             self::validatePimple($pimple);
             self::augmentPimpleWithDefaultResources($pimple);
-
-            Bootstrap::setInstance($pimple);
 
             return $pimple;
         }

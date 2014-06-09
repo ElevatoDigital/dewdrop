@@ -98,6 +98,17 @@ class Listing
     }
 
     /**
+     * Get all the select modifiers that have been registered with this Listing.
+     * Mostly useful during testing.
+     *
+     * @return array
+     */
+    public function getSelectModifiers()
+    {
+        return $this->selectModifiers;
+    }
+
+    /**
      * Get the Select object after all modifiers have been applied to it.  This
      * can be useful if you'd like to see the Select (or its resulting SQL code)
      * will all modifications applied, in case you need to debug or troubleshoot
@@ -111,7 +122,7 @@ class Listing
         $select = clone($this->select);
 
         foreach ($this->selectModifiers as $modifier) {
-            $select = $modifier->modifySelect($fields, $this->select, $this->prefix);
+            $select = $modifier->modifySelect($fields, $select, $this->prefix);
         }
 
         return $select;

@@ -17,51 +17,51 @@ class EditHelperDetectorTest extends BaseTestCase
     {
         $field = $this->getTestField();
 
-        $this->detector->customizeField($field, 'wpInputCheckbox');
+        $this->detector->customizeField($field, 'inputCheckbox');
 
-        $this->assertEquals('wpInputCheckbox', $this->detector->detect($field));
+        $this->assertEquals('inputCheckbox', $this->detector->detect($field));
     }
 
     public function testForeignKeyReferenceWillUseWpSelectByDefault()
     {
         $field = $this->getTestField('reference');
 
-        $this->assertEquals('wpSelect', $this->detector->detect($field));
+        $this->assertEquals('select', $this->detector->detect($field));
     }
 
     public function testManyToManyWillUseCheckboxListByDefault()
     {
         $field = $this->getTestField('manytomany');
 
-        $this->assertEquals('wpCheckboxList', $this->detector->detect($field));
+        $this->assertEquals('checkboxList', $this->detector->detect($field));
     }
 
     public function testStringFieldWillUseWpInputTextByDefault()
     {
         $field = $this->getTestField('string');
 
-        $this->assertEquals('wpInputText', $this->detector->detect($field));
+        $this->assertEquals('inputText', $this->detector->detect($field));
     }
 
     public function testClobFieldWillUseWpInputTextByDefault()
     {
         $field = $this->getTestField('clob');
 
-        $this->assertEquals('wpInputText', $this->detector->detect($field));
+        $this->assertEquals('inputText', $this->detector->detect($field));
     }
 
     public function testNumericFieldWillUseWpInputTextByDefault()
     {
         $field = $this->getTestField('numeric');
 
-        $this->assertEquals('wpInputText', $this->detector->detect($field));
+        $this->assertEquals('inputText', $this->detector->detect($field));
     }
 
     public function testBooleanFieldWillUseCheckboxByDefault()
     {
         $field = $this->getTestField('boolean');
 
-        $this->assertEquals('wpInputCheckbox', $this->detector->detect($field));
+        $this->assertEquals('inputCheckbox', $this->detector->detect($field));
     }
 
     public function testEavFieldWillUseDefinedEditHelper()
@@ -81,9 +81,9 @@ class EditHelperDetectorTest extends BaseTestCase
         $field
             ->expects($this->once())
             ->method('getEditHelperName')
-            ->will($this->returnValue('wpInputCheckbox'));
+            ->will($this->returnValue('inputCheckbox'));
 
-        $this->assertEquals('wpInputCheckbox', $this->detector->detect($field));
+        $this->assertEquals('inputCheckbox', $this->detector->detect($field));
     }
 
     /**

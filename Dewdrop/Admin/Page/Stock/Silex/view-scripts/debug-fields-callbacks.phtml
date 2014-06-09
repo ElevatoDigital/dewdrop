@@ -36,7 +36,7 @@ foreach ($this->callbacks as $helperName => $callable) {
             }
 
             $output = '<div class="well">' . str_replace('&lt;?php<br />', '', highlight_string('<?php' . PHP_EOL . implode('', $source), true)) . '</div>';
-            $root   = \Dewdrop\Bootstrap::getResource('paths')->getRoot() . '/';
+            $root   = \Dewdrop\Pimple::getResource('paths')->getRoot() . '/';
 
             $sourceInfo = array(
                 'file'  => str_replace($root, '', $reflection->getFileName()),

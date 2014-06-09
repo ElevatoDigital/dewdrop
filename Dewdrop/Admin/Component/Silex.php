@@ -4,9 +4,10 @@ namespace Dewdrop\Admin\Component;
 
 use Dewdrop\Admin\ComponentAbstract;
 use Dewdrop\Admin\Response;
-use Dewdrop\Admin\Silex as SilexAdmin;
 use Dewdrop\Exception;
+use Dewdrop\Pimple as DewdropPimple;
 use ReflectionClass;
+use Pimple;
 use Silex\Application as SilexApplication;
 
 abstract class Silex extends ComponentAbstract
@@ -17,12 +18,13 @@ abstract class Silex extends ComponentAbstract
 
     private $shouldRenderLayout = true;
 
-    public function __construct(SilexAdmin $admin, $componentName)
+    public function __construct(Pimple $pimple = null, $componentName = null)
     {
-        $this->admin       = $admin;
-        $this->application = $admin->getApplication();
+        $this->pimple      = ($pimple ?: DewdropPimple::getInstance());
+        $this->admin       = $this->pimple['admin'];
+        $this->application = $this->pimple;
 
-        parent::__construct($admin->getApplication(), $componentName);
+        parent::__construct($this->pimple, $componentName);
 
         $this->redirector = function ($url) {
             return $this->application->redirect($url);
