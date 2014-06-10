@@ -3,11 +3,15 @@
 namespace Dewdrop;
 
 use Dewdrop\Bootstrap\Detector;
-use Pimple as CorePimple;
 
-class Pimple extends CorePimple
+class Pimple
 {
     private static $instance;
+
+    private function __construct()
+    {
+        // Cannot be instantiated
+    }
 
     public static function getResource($resourceName)
     {
@@ -16,20 +20,10 @@ class Pimple extends CorePimple
 
     public static function getInstance()
     {
-        if (!self::$instance) {
+        if (null === self::$instance) {
             self::$instance = Detector::findPimple();
         }
 
         return self::$instance;
-    }
-
-    public function hasInstance()
-    {
-        return self::$instance instanceof Pimple;
-    }
-
-    public function setInstance(Pimple $pimple)
-    {
-        self::$instance = $pimple;
     }
 }

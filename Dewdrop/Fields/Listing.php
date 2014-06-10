@@ -160,6 +160,7 @@ class Listing
     {
         $select = $this->getModifiedSelect($fields);
 
+        // @todo Remove hard-coding
         $select
             ->where('dealership_id = ?', $id);
 

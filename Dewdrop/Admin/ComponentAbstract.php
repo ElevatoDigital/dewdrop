@@ -12,6 +12,7 @@ namespace Dewdrop\Admin;
 
 use Dewdrop\Admin\Page\PageAbstract;
 use Dewdrop\Admin\PageFactory\Files as PageFilesFactory;
+use Dewdrop\Admin\PageFactory\PageFactoryInterface;
 use Dewdrop\Admin\Response;
 use Dewdrop\Db\Adapter;
 use Dewdrop\Paths;
@@ -109,7 +110,7 @@ abstract class ComponentAbstract
         $this->inflector = $this->pimple['inflector'];
         $this->name      = $componentName;
 
-        $this->pageFactories[] = new PageFilesFactory($this, $this->request);
+        $this->addPageFactory(new PageFilesFactory($this, $this->request));
 
         $this->init();
 
@@ -126,7 +127,7 @@ abstract class ComponentAbstract
         return $this->pageFactories;
     }
 
-    public function addPageFactory($pageFactory)
+    public function addPageFactory(PageFactoryInterface $pageFactory)
     {
         $this->pageFactories[] = $pageFactory;
 

@@ -8,7 +8,7 @@ use Dewdrop\Inflector;
 use Dewdrop\Request;
 use ReflectionClass;
 
-class Files
+class Files implements PageFactoryInterface
 {
     private $request;
 
@@ -36,5 +36,19 @@ class Files
         }
 
         return false;
+    }
+
+    public function listAvailablePages()
+    {
+        $pages = array();
+        $files = glob($this->component->getPath() . '/*.php');
+
+        foreach ($files as $file) {
+            $name = $this->inflector->hyphenize(basename($file, '.php'));
+
+            $pages[$name] = $file;
+        }
+
+        return $pages;
     }
 }
