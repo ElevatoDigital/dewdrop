@@ -78,7 +78,7 @@ abstract class Silex extends ComponentAbstract
                 if (!$this->shouldRenderLayout || $this->request->isAjax()) {
                     return $output;
                 } else {
-                    return $this->admin->renderLayout($output);
+                    return $this->admin->renderLayout($output, $page->getView()->headScript());
                 }
             }
         )

@@ -16,8 +16,8 @@ class ComponentTest extends PHPUnit_Framework_TestCase
     public function testAllSortableFieldsGenerateFunctioningSql()
     {
         $tester = new ListingSortTest(
-            $this->component->getListing(),
-            $this->component->getFields()
+            $this->component->getFields(),
+            $this->component->getListing()
         );
 
         $tester->runInPhpUnit($this);

@@ -20,7 +20,7 @@ use Dewdrop\Fields\FieldInterface;
  * contexts.  The most common use of this filter is to allow a user to select
  * which particular columns they'd like to be visible in a listing table.
  */
-class Visibility
+class Visibility implements FilterInterface
 {
     /**
      * The fields (by ID) that should be included by default.

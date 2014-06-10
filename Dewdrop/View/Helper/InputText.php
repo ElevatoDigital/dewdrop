@@ -42,17 +42,18 @@ class InputText extends AbstractHelper
      * and then render the input.
      *
      * @param Field $field
+     * @param array $options
      * @return string
      */
-    protected function directField(Field $field)
+    protected function directField(Field $field, array $options = array())
     {
-        return $this->directArray(
-            array(
-                'name'  => $field->getControlName(),
-                'id'    => $field->getHtmlId(),
-                'value' => $field->getValue()
-            )
+        $fieldDefaults = array(
+            'name'  => $field->getControlName(),
+            'id'    => $field->getHtmlId(),
+            'value' => $field->getValue()
         );
+
+        return $this->directArray($fieldDefaults + $options);
     }
 
     /**
@@ -101,10 +102,11 @@ class InputText extends AbstractHelper
         return $this->partial(
             'input-text.phtml',
             array(
-                'name'    => $name,
-                'id'      => $id,
-                'value'   => $value,
-                'classes' => $classes
+                'name'      => $name,
+                'id'        => $id,
+                'value'     => $value,
+                'classes'   => $classes,
+                'autofocus' => $autofocus
             )
         );
     }
@@ -122,7 +124,7 @@ class InputText extends AbstractHelper
     {
         $this
             ->checkRequired($options, array('name', 'value'))
-            ->ensurePresent($options, array('classes', 'id'))
+            ->ensurePresent($options, array('classes', 'id', 'autofocus'))
             ->ensureArray($options, array('classes'));
 
         return $options;

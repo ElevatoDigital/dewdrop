@@ -115,6 +115,17 @@ class Row implements ArrayAccess
         $this->data    = $data;
         $this->columns = $this->table->getRowColumns();
 
+        // Apply defaults for new rows
+        if (!count($this->data)) {
+            foreach ($this->columns as $column) {
+                $default = $this->table->getMetadata('columns', $column)['DEFAULT'];
+
+                if (null !== $default) {
+                    $this->data[$column] = $default;
+                }
+            }
+        }
+
         // Unset any data values not present in the columns array
         foreach ($this->data as $column => $value) {
             if (!in_array($column, $this->columns)) {
@@ -125,13 +136,6 @@ class Row implements ArrayAccess
                 $this->virtualFieldsInitialized[] = $column;
             } elseif ($this->table->hasEav() && $this->table->getEav()->hasAttribute($column)) {
                 $this->virtualFieldsInitialized[] = $column;
-            }
-        }
-
-        // Ensure each column is represented in the data array, even if null
-        foreach ($this->columns as $column) {
-            if (!array_key_exists($column, $this->data)) {
-                $this->data[$column] = null;
             }
         }
     }
@@ -291,7 +295,7 @@ class Row implements ArrayAccess
             $this->data[$name] = $this->table->getEav()->loadInitialValue($this, $name);
         }
 
-        return $this->data[$name];
+        return (isset($this->data[$name]) ? $this->data[$name] : null);
     }
 
     /**
@@ -398,7 +402,7 @@ class Row implements ArrayAccess
         $pkey = $this->table->getPrimaryKey();
 
         foreach ($pkey as $column) {
-            if ($this->data[$column]) {
+            if (isset($this->data[$column]) && $this->data[$column]) {
                 return false;
             }
         }

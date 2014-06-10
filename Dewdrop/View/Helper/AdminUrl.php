@@ -15,7 +15,7 @@ use Dewdrop\Admin\Page\PageAbstract;
 /**
  * Get a URL for a page in the current admin component.
  */
-class AdminUrl extends AbstractHelper
+class AdminUrl extends AbstractHelper implements PageDelegateInterface
 {
     /**
      * The page this helper's view is attached to.
@@ -49,5 +49,16 @@ class AdminUrl extends AbstractHelper
         $this->page = $page;
 
         return $this;
+    }
+
+    /**
+     * Return the page this helper users to geneate URLs so that partials
+     * can function properly.
+     *
+     * @return PageAbstract
+     */
+    public function getPage()
+    {
+        return $this->page;
     }
 }

@@ -16,8 +16,10 @@ class Index extends PageAbstract
         $listing = $this->component->getListing();
         $filter  = $this->component->getVisibilityFilter();
 
+        $this->view->component        = $this->component;
         $this->view->singularTitle    = $this->component->getPrimaryModel()->getSingularTitle();
         $this->view->pluralTitle      = $this->component->getPrimaryModel()->getPluralTitle();
+        $this->view->primaryKey       = $this->component->getPrimaryModel()->getPrimaryKey();
         $this->view->listing          = $listing;
         $this->view->visibilityFilter = $filter;
         $this->view->fields           = $fields;

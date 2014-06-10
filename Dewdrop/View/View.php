@@ -12,6 +12,7 @@ namespace Dewdrop\View;
 
 use Dewdrop\Exception;
 use Dewdrop\Request;
+use Dewdrop\View\Helper\PageDelegateInterface;
 use Zend\Escaper\Escaper;
 
 /**
@@ -28,7 +29,7 @@ class View
      *
      * @var array
      */
-    private $data = array();
+    private $internalViewData = array();
 
     /**
      * Helper instances created by calls to instantiateHelper().
@@ -61,7 +62,11 @@ class View
         'adminurl'              => '\Dewdrop\View\Helper\AdminUrl',
         'bootstraptable'        => '\Dewdrop\View\Helper\BootstrapTable',
         'bootstrapcolumnsmodal' => '\Dewdrop\View\Helper\BootstrapColumnsModal',
+        'bootstrapdetailsview'  => '\Dewdrop\View\Helper\BootstrapDetailsView',
         'bootstrapform'         => '\Dewdrop\View\Helper\BootstrapForm',
+        'bootstrapinputtext'    => '\Dewdrop\View\Helper\BootstrapInputText',
+        'bootstrapselect'       => '\Dewdrop\View\Helper\BootstrapSelect',
+        'bootstraptextarea'     => '\Dewdrop\View\Helper\BootstrapTextarea',
         'checkboxlist'          => '\Dewdrop\View\Helper\CheckboxList',
         'detectedithelper'      => '\Dewdrop\View\Helper\DetectEditHelper',
         'editform'              => '\Dewdrop\View\Helper\EditForm',
@@ -126,12 +131,28 @@ class View
     public function assign($name, $value = null)
     {
         if (!is_array($name)) {
-            $this->data[$name] = $value;
+            $this->internalViewData[$name] = $value;
         } else {
             foreach ($name as $index => $value) {
                 $this->assign($index, $value);
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * Register a new helper name and class name.  This can be used to replace
+     * a default helper implementation or to introduce a project-specific
+     * helper.
+     *
+     * @param string $name
+     * @param string $className The full class name/namespace.
+     * @return \Dewdrop\View\View
+     */
+    public function registerHelper($name, $className)
+    {
+        $this->helperClasses[strtolower($name)] = $className;
 
         return $this;
     }
@@ -147,8 +168,8 @@ class View
      */
     public function __get($name)
     {
-        if (isset($this->data[$name])) {
-            return $this->data[$name];
+        if (isset($this->internalViewData[$name])) {
+            return $this->internalViewData[$name];
         } else {
             return null;
         }
@@ -176,7 +197,7 @@ class View
      */
     public function __isset($name)
     {
-        return array_key_exists($name, $this->data);
+        return array_key_exists($name, $this->internalViewData);
     }
 
     /**
@@ -239,6 +260,12 @@ class View
     public function partial($template, array $data)
     {
         $partial = new View($this->escaper);
+
+        foreach ($this->helpers as $name => $helper) {
+            if ($helper instanceof PageDelegateInterface) {
+                $partial->helper($name)->setPage($helper->getPage());
+            }
+        }
 
         $partial
             ->setScriptPath($this->scriptPath)

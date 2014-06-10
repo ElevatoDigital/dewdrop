@@ -432,18 +432,26 @@ class Pgsql implements DriverInterface
                     $defaultValue = $matches[1];
                 }
             }
+            if ($row[$type] === 'bool' && $row[$default_value]) {
+                $defaultValue = ('true' === $row[$default_value] ? 1 : 0);
+            }
+            if (false !== strpos($defaultValue, '(')) {
+                $defaultValue = null;
+            }
             list($primary, $primaryPosition, $identity) = array(false, null, false);
             if ($row[$contype] == 'p') {
                 $primary = true;
                 $primaryPosition = array_search($row[$attnum], explode(',', $row[$conkey])) + 1;
                 $identity = (bool) (preg_match('/^nextval/', $row[$default_value]));
             }
+
             $desc[$this->adapter->foldCase($row[$colname])] = array(
                 'SCHEMA_NAME'      => $this->adapter->foldCase($row[$nspname]),
                 'TABLE_NAME'       => $this->adapter->foldCase($row[$relname]),
                 'COLUMN_NAME'      => $this->adapter->foldCase($row[$colname]),
                 'COLUMN_POSITION'  => $row[$attnum],
                 'DATA_TYPE'        => $row[$type],
+                'GENERIC_TYPE'     => $this->mapNativeTypeToGenericType($row[$type], $length),
                 'DEFAULT'          => $defaultValue,
                 'NULLABLE'         => (bool) ($row[$notnull] != 't'),
                 'LENGTH'           => $row[$length],
@@ -457,6 +465,87 @@ class Pgsql implements DriverInterface
         }
 
         return $desc;
+    }
+
+    public function mapNativeTypeToGenericType($nativeType, $length)
+    {
+        switch ($nativeType) {
+            case 'smallint':
+            case 'int2':
+                if ($length === 2) {
+                    $genericType = 'boolean';
+                }
+                break;
+            case 'int':
+            case 'int4':
+            case 'integer':
+            case 'serial':
+            case 'serial4':
+                $genericType = 'integer';
+                break;
+            case 'bigint':
+            case 'int8':
+            case 'bigserial':
+            case 'serial8':
+                $genericType = 'integer';
+                break;
+            case 'bool':
+            case 'boolean':
+                $genericType = 'boolean';
+                break;
+            case 'text':
+            case 'varchar':
+            case 'unknown':
+            case 'char':
+            case 'bpchar':
+                $genericType = 'text';
+                if (1 === $length) {
+                    $genericType = 'boolean';
+                } elseif (strstr($nativeType, 'text') || $length > 500) {
+                    $genericType = 'clob';
+                }
+                break;
+            case 'date':
+                $genericType = 'date';
+                break;
+            case 'datetime':
+            case 'timestamp':
+                $genericType = 'timestamp';
+                break;
+            case 'time':
+                $genericType = 'time';
+                break;
+            case 'float':
+            case 'float8':
+            case 'double':
+            case 'real':
+            case 'decimal':
+            case 'numeric':
+                $genericType = 'float';
+                break;
+            case 'money':
+                $genericType = 'money';
+                break;
+            case 'tinyblob':
+            case 'mediumblob':
+            case 'longblob':
+            case 'blob':
+            case 'bytea':
+                $genericType = 'blob';
+                break;
+            case 'oid':
+                $genericType = 'blob';
+                break;
+            case 'year':
+                $genericType = 'date';
+                break;
+            default:
+                throw new Exception(
+                    "The PostgreSQL '{$nativeType}' type is currently not supported."
+                );
+        }
+
+        return $genericType;
     }
 
     /**

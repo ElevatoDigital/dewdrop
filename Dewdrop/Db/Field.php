@@ -71,14 +71,6 @@ class Field extends FieldAbstract
     private $label;
 
     /**
-     * Any notes that should be displayed along with this field when it is
-     * displayed to users.
-     *
-     * @var string
-     */
-    private $note = '';
-
-    /**
      * The metadata related to this column.  The metadata includes the
      * following fields:
      *
@@ -322,28 +314,6 @@ class Field extends FieldAbstract
     }
 
     /**
-     * Set a note that will be displayed alongside this field when it is used
-     * in a UI.
-     *
-     * @param string $note
-     * @return \Dewdrop\Db\Field
-     */
-    public function setNote($note)
-    {
-        $this->note = $note;
-    }
-
-    /**
-     * Get the note associated with this field.
-     *
-     * @return string
-     */
-    public function getNote()
-    {
-        return $this->note;
-    }
-
-    /**
      * Manually override the default control name for this field.
      *
      * This can be useful and necessary if you are using multiple instances of
@@ -505,14 +475,14 @@ class Field extends FieldAbstract
         $filters    = $inputFilter->getFilterChain();
         $metadata   = $this->metadata;
 
-        if ($this->isRequired() && !$this->isType('tinyint')) {
+        if ($this->isRequired() && !$this->isType('boolean')) {
             $inputFilter->setAllowEmpty(false);
         } else {
             $inputFilter->setAllowEmpty(true);
         }
 
         if ($this->isType('string')) {
-            if ($metadata['LENGTH']) {
+            if ($metadata['LENGTH'] && 0 < (int) $metadata['LENGTH']) {
                 $validators->addValidator(new Validator\StringLength(0, $metadata['LENGTH']));
             }
 
@@ -543,7 +513,7 @@ class Field extends FieldAbstract
     {
         $args = func_get_args();
 
-        if (in_array($this->metadata['DATA_TYPE'], $args)) {
+        if (in_array($this->metadata['GENERIC_TYPE'], $args) || in_array($this->metadata['DATA_TYPE'], $args)) {
             return true;
         }
 
@@ -568,18 +538,6 @@ class Field extends FieldAbstract
     protected function isTypeString()
     {
         return $this->isType('varchar', 'char', 'text');
-    }
-
-    /**
-     * Convenience method for checking for large, variable-length text data
-     * types in MySQL.  You can call isType('clob') to check to see if your
-     * field is a "character large object".
-     *
-     * @return boolean
-     */
-    protected function isTypeClob()
-    {
-        return $this->isType('text', 'mediumtext', 'longtext');
     }
 
     /**

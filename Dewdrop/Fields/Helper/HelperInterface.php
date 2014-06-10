@@ -21,6 +21,14 @@ use Dewdrop\Fields\FieldInterface;
 interface HelperInterface
 {
     /**
+     * Check to see if the supplied input matches this helper's name
+     * (case-insensitive).
+     *
+     * @return boolean
+     */
+    public function matchesName($name);
+
+    /**
      * Assign one more custom per-instance callbacks for this helper.  If the
      * $arguments param is an array, this method expects that the keys will be
      * field IDs and the values will be callables, assigning custom callbacks
@@ -32,7 +40,7 @@ interface HelperInterface
      * @param callable $callable
      * @return \Dewdrop\Fields\Helper\HelperAbstract
      */
-    public function assign($assignments, $callable = null);
+    public function assign($assignments, callable $callable = null);
 
     /**
      * Get the callback that will be used for the given FieldInterface object.

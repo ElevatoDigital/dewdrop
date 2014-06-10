@@ -69,6 +69,7 @@ class Gateway extends Table
         $fields
             ->add('recipients')
                 ->setLabel('Recipients')
+                ->setNote('Enter one or more email addresses separated by commas.')
                 ->setVisible(true)
                 ->assignHelperCallback(
                     'TableCell.Content',

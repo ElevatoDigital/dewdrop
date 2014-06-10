@@ -13,6 +13,8 @@ use Dewdrop\Fields;
 use Dewdrop\Fields\Filter\Visibility as VisibilityFilter;
 use Dewdrop\Fields\Helper\SelectSort;
 use Dewdrop\Fields\Listing;
+use Dewdrop\Fields\RowLinker;
+use Dewdrop\Pimple as DewdropPimple;
 use Pimple;
 
 abstract class CrudAbstract extends Silex implements CrudInterface
@@ -23,18 +25,23 @@ abstract class CrudAbstract extends Silex implements CrudInterface
 
     protected $listing;
 
+    protected $rowLinker;
+
     public function __construct(Pimple $pimple = null, $componentName = null)
     {
-        parent::__construct($pimple, $componentName);
+        $this->pimple = ($pimple ?: DewdropPimple::getInstance());
 
-        $this->addPageFactory(new CrudFactory($this));
-
-        $this->selectSort = new SelectSort($this->getRequest());
+        $this->selectSort = new SelectSort($this->pimple['dewdrop-request']);
 
         $this->visibilityFilter = new VisibilityFilter(
             $this->getFullyQualifiedName(),
-            $this->getDb()
+            $this->pimple['db']
         );
+
+        $this->fields    = new Fields();
+        $this->rowLinker = new RowLinker($this->fields, $this->pimple['dewdrop-request']);
+
+        parent::__construct($pimple, $componentName);
 
         if (!$this->getPrimaryModel() instanceof AdminModelInterface) {
             throw new Exception(
@@ -44,8 +51,9 @@ abstract class CrudAbstract extends Silex implements CrudInterface
         }
 
         $this->listing = new Listing($this->getPrimaryModel()->selectAdminListing());
-
         $this->listing->registerSelectModifier($this->getSelectSortHelper());
+
+        $this->addPageFactory(new CrudFactory($this));
     }
 
     public function getSelectSortHelper()
@@ -75,15 +83,13 @@ abstract class CrudAbstract extends Silex implements CrudInterface
         return $this->model;
     }
 
+    public function getRowLinker()
+    {
+        return $this->rowLinker;
+    }
+
     public function getFields()
     {
-        if (!$this->fields instanceof Fields) {
-            throw new Exception(
-                'Either implement your own getFields() method or set your '
-                . 'component\'s $fields property during init().'
-            );
-        }
-
         return $this->fields;
     }
 }

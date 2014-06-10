@@ -89,6 +89,17 @@ abstract class HelperAbstract implements HelperInterface
     private $assignments = array();
 
     /**
+     * Check to see if the supplied input matches this helper's name
+     * (case-insensitive).
+     *
+     * @return boolean
+     */
+    public function matchesName($name)
+    {
+        return $this->name = strtolower($name);
+    }
+
+    /**
      * Assign one more custom per-instance callbacks for this helper.  If the
      * $arguments param is an array, this method expects that the keys will be
      * field IDs and the values will be callables, assigning custom callbacks
@@ -100,7 +111,7 @@ abstract class HelperAbstract implements HelperInterface
      * @param callable $callable
      * @return \Dewdrop\Fields\Helper\HelperAbstract
      */
-    public function assign($assignments, $callable = null)
+    public function assign($assignments, callable $callable = null)
     {
         if (!is_array($assignments)) {
             if ($assignments instanceof FieldInterface) {
@@ -179,7 +190,7 @@ abstract class HelperAbstract implements HelperInterface
      * FieldInterface object.  This method will only be called for a
      * field if no global or per-instance custom callbacks are assigned.
      * If no callback candidate is found, just return false from this method,
-     * which will be detected by getFieldsAssigned(), causing execution to
+     * which will be detected by getFieldAssignment(), causing execution to
      * halt.
      *
      * @param FieldInterface $field
@@ -194,7 +205,7 @@ abstract class HelperAbstract implements HelperInterface
      * @param callable $callable
      * @return callable
      */
-    private function wrapCallable($callable)
+    protected function wrapCallable(callable $callable)
     {
         return function () use ($callable) {
             $arguments = func_get_args();

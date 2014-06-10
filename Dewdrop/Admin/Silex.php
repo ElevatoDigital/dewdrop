@@ -13,6 +13,7 @@ namespace Dewdrop\Admin;
 use Dewdrop\View\View;
 use DirectoryIterator;
 use Silex\Application;
+use Zend\View\Helper\HeadScript;
 
 /**
  * This class is responsible for the shell-level admin functionality in Silex
@@ -144,7 +145,7 @@ class Silex
      * @param string $content
      * @return string
      */
-    public function renderLayout($content)
+    public function renderLayout($content, HeadScript $headScript = null)
     {
         $view = new View();
         $view->setScriptPath(__DIR__ . '/view-scripts');
@@ -152,7 +153,8 @@ class Silex
         $view
             ->assign('title', $this->title)
             ->assign('components', $this->components)
-            ->assign('content', $content);
+            ->assign('content', $content)
+            ->assign('viewHeadScript', $headScript);
 
         return $view->render('layout.phtml');
     }

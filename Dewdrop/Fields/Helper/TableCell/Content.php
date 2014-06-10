@@ -55,6 +55,22 @@ class Content extends HelperAbstract
     private $escaper;
 
     /**
+     * It's possible to assign callbacks based upon column position/index.  This
+     * can be useful if you want to automatically add some controls or other
+     * content to the first column, for example.
+     *
+     * @var array
+     */
+    private $callbacksByColumnPosition = array();
+
+    /**
+     * This content will be returned if any field's callback generates no output.
+     *
+     * @var string
+     */
+    private $nullContentPlaceholder = '<span class="text-muted">&lt;none&gt;</span>';
+
+    /**
      * The default format for rendering dates.  Uses PHP's date() syntax.
      *
      * @var string
@@ -90,10 +106,24 @@ class Content extends HelperAbstract
     }
 
     /**
+     * Set the content that should be returned if a field's callback returns no
+     * output.
+     *
+     * @param string $nullContentPlaceholder;
+     * @return Content
+     */
+    public function setNullContentPlaceholder($nullContentPlaceholder)
+    {
+        $this->nullContentPlaceholder = $nullContentPlaceholder;
+
+        return $this;
+    }
+
+    /**
      * Set an alternative format for date rendering.  Uses PHP's date() syntax.
      *
      * @param string $dateFormat
-     * @return \Dewdrop\Fields\Helper\TableCell\Content
+     * @return Content
      */
     public function setDateFormat($dateFormat)
     {
@@ -126,9 +156,37 @@ class Content extends HelperAbstract
      */
     public function render(FieldInterface $field, array $rowData, $rowIndex, $columnIndex)
     {
-        $callable = $this->getFieldAssignment($field);
+        if (array_key_exists($columnIndex, $this->callbacksByColumnPosition)) {
+            $callable = $this->callbacksByColumnPosition[$columnIndex];
+        } else {
+            $callable = $this->getFieldAssignment($field);
+        }
 
-        return call_user_func($callable, $rowData, $rowIndex, $columnIndex);
+        $output = call_user_func($callable, $rowData, $rowIndex, $columnIndex);
+
+        if (!trim($output)) {
+            return $this->nullContentPlaceholder;
+        } else {
+            return $output;
+        }
+    }
+
+    /**
+     * Assign a callback based upon the column position currently being
+     * displayed.  This can be useful, for example, if you'd like to display
+     * some controls/links in the first column of your table automatically.
+     * You can wrap the callback that would have been used by calling
+     * the getFieldAssignment() method with the appropriate field object.
+     *
+     * @param integer $columnIndex
+     * @param callable $callback
+     * @return Content
+     */
+    public function assignCallbackByColumnPosition($columnIndex, callable $callback)
+    {
+        $this->callbacksByColumnPosition[$columnIndex] = $this->wrapCallable($callback);
+
+        return $this;
     }
 
     /**
@@ -197,6 +255,11 @@ class Content extends HelperAbstract
         $name = preg_replace('/_id$/', '', $field->getName());
 
         return $this->escaper->escapeHtml($rowData[$name]);
+    }
+
+    protected function renderDbBoolean(FieldInterface $field, array $rowData)
+    {
+        return ($rowData[$field->getName()] ? 'Yes' : 'No');
     }
 
     /**

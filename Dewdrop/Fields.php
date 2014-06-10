@@ -100,6 +100,10 @@ class Fields implements ArrayAccess, IteratorAggregate, Countable
      */
     private $fields = array();
 
+    private $modelInstances = array();
+
+    private $modelsByName = array();
+
     /**
      * An object implementing the \Dewdrop\Fields\UserInterface interface,
      * which can be used to take advantage of the authorization features
@@ -280,7 +284,7 @@ class Fields implements ArrayAccess, IteratorAggregate, Countable
      * @param mixed $field
      * @return FieldInterface
      */
-    public function add($field)
+    public function add($field, $modelName = null)
     {
         if (is_string($field)) {
             $id    = $field;
@@ -290,6 +294,10 @@ class Fields implements ArrayAccess, IteratorAggregate, Countable
 
         if (!$field instanceof FieldInterface) {
             throw new Exception('Field must be a string or instance of \Dewdrop\Fields\FieldInterface');
+        }
+
+        if ($field instanceof DbField) {
+            $this->handleModelsForDbField($field, $modelName);
         }
 
         $field->setFieldsSet($this);
@@ -375,6 +383,49 @@ class Fields implements ArrayAccess, IteratorAggregate, Countable
     public function getFilterableFields($filters = null)
     {
         return $this->getFieldsPassingMethodCheck('isFilterable', $filters);
+    }
+
+    public function getModelsByName()
+    {
+        return $this->modelsByName;
+    }
+
+    protected function handleModelsForDbField(DbField $field, $modelName)
+    {
+        $fieldTable = $field->getTable();
+        $tableName  = $fieldTable->getTableName();
+        $tableHash  = spl_object_hash($fieldTable);
+
+        if (null === $modelName &&
+            isset($this->modelInstances[$tableName]) &&
+            $this->modelInstances[$tableName] !== $fieldTable
+        ) {
+            throw new Exception(
+                'When adding fields from two instances of the same model, you must specify '
+                . 'an alternate model name as the second paramter to add().'
+            );
+        }
+
+        if (null === $modelName) {
+            $modelName = $tableName;
+        }
+
+        if (isset($this->modelsByName[$modelName]) &&
+            $this->modelsByName[$modelName] !== $fieldTable
+        ) {
+            throw new Exception(
+                "The name '{$modelName}' has already been used with another model instance. "
+                . 'Please make sure to use model names consistently when adding fields.'
+            );
+        }
+
+        $this->modelInstances[$tableName] = $fieldTable;
+        $this->modelsByName[$modelName]   = $fieldTable;
+
+        // Update the field's control name so that generated IDs, etc., use the new name
+        if ($modelName !== $tableName) {
+            $field->setControlName($modelName . ':' . $field->getName());
+        }
     }
 
     /**

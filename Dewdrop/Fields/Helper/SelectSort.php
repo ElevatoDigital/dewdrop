@@ -58,6 +58,12 @@ class SelectSort extends HelperAbstract implements SelectModifierInterface
      */
     protected $name = 'selectsort';
 
+    private $sortedField;
+
+    private $sortedDirection;
+
+    private $defaultDirection = 'ASC';
+
     private $request;
 
     public function __construct(Request $request)
@@ -79,6 +85,23 @@ class SelectSort extends HelperAbstract implements SelectModifierInterface
     }
 
     /**
+     * Set the default direction that should be used when sorting.
+     *
+     * @param string $defaultDirection
+     * @return SelectSort
+     */
+    public function setDefaultDirection($defaultDirection)
+    {
+        $defaultDirection = strtoupper($defaultDirection);
+
+        if ('ASC' !== $defaultDirection && 'DESC' !== $defaultDirection) {
+            throw new Exception('Default direction must be ASC or DESC');
+        }
+
+        return $this;
+    }
+
+    /**
      * Given the supplied $fields and \Dewdrop\Request object, find the field
      * referenced in the query string and apply its sort callback to the query.
      *
@@ -90,9 +113,16 @@ class SelectSort extends HelperAbstract implements SelectModifierInterface
      */
     public function modifySelect(Fields $fields, Select $select, $paramPrefix = '')
     {
+        $this->sortedField     = null;
+        $this->sortedDirection = null;
+
         foreach ($fields->getSortableFields() as $field) {
             if ($field->getQueryStringId() === urlencode($this->request->getQuery($paramPrefix . 'sort'))) {
-                $direction = ('DESC' === strtoupper($this->request->getQuery($paramPrefix . 'dir')) ? 'DESC' : 'ASC');
+                if ('ASC' === $this->defaultDirection) {
+                    $direction = ('DESC' === strtoupper($this->request->getQuery($paramPrefix . 'dir')) ? 'DESC' : 'ASC');
+                } else {
+                    $direction = ('ASC' === strtoupper($this->request->getQuery($paramPrefix . 'dir')) ? 'ASC' : 'DESC');
+                }
 
                 $select = call_user_func(
                     $this->getFieldAssignment($field),
@@ -104,11 +134,54 @@ class SelectSort extends HelperAbstract implements SelectModifierInterface
                     throw new Exception('Your SelectSort callback must return the modified Select object.');
                 }
 
+                $this->sortedField     = $field;
+                $this->sortedDirection = $direction;
+
                 return $select;
             }
         }
 
+        // Sort by the first visible field that is also sortable, if no other sort was performed
+        foreach ($fields->getVisibleFields() as $field) {
+            if ($field->isSortable()) {
+                $this->sortedField     = $field;
+                $this->sortedDirection = $this->defaultDirection;
+
+                return call_user_func($this->getFieldAssignment($field), $select, $this->defaultDirection);
+            }
+        }
+
         return $select;
+    }
+
+    /**
+     * Check to see if this helper has sorted the Select by a field.
+     *
+     * @return boolean
+     */
+    public function isSorted()
+    {
+        return null !== $this->sortedField;
+    }
+
+    /**
+     * Get the field the Select is currently sorted by.
+     *
+     * @return FieldInterface
+     */
+    public function getSortedField()
+    {
+        return $this->sortedField;
+    }
+
+    /**
+     * Get the direction the Select is currently sorted.
+     *
+     * @return string
+     */
+    public function getSortedDirection()
+    {
+        return $this->sortedDirection;
     }
 
     /**
@@ -153,13 +226,11 @@ class SelectSort extends HelperAbstract implements SelectModifierInterface
             return false;
         }
 
-        if ($field->isType('boolean')) {
-            $method = 'sortDbBoolean';
-        } elseif ($field->isType('reference')) {
+        if ($field->isType('reference')) {
             $method = 'sortDbReference';
         } elseif ($field->isType('date', 'timestamp')) {
             $method = 'sortDbDate';
-        } elseif ($field->isType('manytomany', 'clob', 'string', 'numeric')) {
+        } elseif ($field->isType('manytomany', 'clob', 'string', 'numeric', 'boolean')) {
             $method = 'sortDbDefault';
         }
 

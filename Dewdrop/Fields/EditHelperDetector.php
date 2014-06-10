@@ -86,13 +86,15 @@ class EditHelperDetector
             return $this->customHelpers[$field->getControlName()];
         } elseif ($field instanceof EavField) {
             return $field->getEditHelperName();
-        } elseif ($field->isType('boolean', 'bool')) {
+        } elseif ($field->isType('boolean', 'boolean')) {
             return 'inputCheckbox';
         } elseif ($field->isType('manytomany')) {
             return 'checkboxList';
         } elseif ($field->isType('reference')) {
             return 'select';
-        } elseif ($field->isType('clob', 'string', 'numeric')) {
+        } elseif ($field->isType('clob')) {
+            return 'textarea';
+        } elseif ($field->isType('text', 'numeric')) {
             return 'inputText';
         }
 

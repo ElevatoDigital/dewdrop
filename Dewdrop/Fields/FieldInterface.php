@@ -38,6 +38,22 @@ interface FieldInterface
     public function getLabel();
 
     /**
+     * Set a note that will be displayed alongside this field when it is used
+     * in a UI.
+     *
+     * @param string $note
+     * @return FieldInterface
+     */
+    public function setNote($note);
+
+    /**
+     * Get the note associated with this field.
+     *
+     * @return string
+     */
+    public function getNote();
+
+    /**
      * Set the ID that should be used to identify this field in Fields collections.
      *
      * @param string $id

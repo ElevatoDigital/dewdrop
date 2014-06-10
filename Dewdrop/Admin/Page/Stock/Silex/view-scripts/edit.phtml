@@ -1,0 +1,6 @@
+<ol class="breadcrumb">
+    <li><a href="<?php echo $this->escapeHtmlAttr($this->adminUrl('index'));?>"><?php echo $this->escapeHtml($this->component->getTitle());?></a></li>
+    <li class="active"><?php echo ($this->isNew ? 'Add' : 'Edit');?> <?php echo $this->escapeHtml($this->model->getSingularTitle());?></li>
+</ol>
+
+<?php echo $this->bootstrapForm($this->fields, $this->rowLinker);?>

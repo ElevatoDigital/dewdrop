@@ -12,6 +12,7 @@ namespace Dewdrop\View\Helper;
 
 use Dewdrop\Exception;
 use Dewdrop\Fields;
+use Dewdrop\Fields\Helper\SelectSort;
 use Dewdrop\Fields\Helper\TableCell as TableCellHelper;
 
 /**
@@ -35,9 +36,10 @@ class Table extends AbstractHelper
             $fields   = $args[0]->getVisibleFields();
             $data     = $args[1];
             $renderer = (isset($args[2]) ? $args[2] : $this->view->tableCellRenderer());
+            $sorter   = (isset($args[3]) && $args[3] instanceof SelectSort ? $args[3] : null);
 
             return $this->open()
-                . $this->renderHead($fields, $renderer)
+                . $this->renderHead($fields, $renderer, $sorter)
                 . $this->renderBody($fields, $data, $renderer)
                 . $this->close();
         }
@@ -53,7 +55,7 @@ class Table extends AbstractHelper
         return '</table>';
     }
 
-    public function renderHead(Fields $fields, TableCellHelper $renderer)
+    public function renderHead(Fields $fields, TableCellHelper $renderer, SelectSort $sorter = null)
     {
         $out = '<thead>';
 
@@ -65,11 +67,13 @@ class Table extends AbstractHelper
             if (!$field->isSortable()) {
                 $out .= $content;
             } else {
-                $out .= $this->renderSortLink(
-                    $content,
-                    $field->getQueryStringId(),
-                    ('asc' === $this->view->getRequest()->getQuery('dir') ? 'desc' : 'asc')
-                );
+                $direction = 'asc';
+
+                if ($sorter && $sorter->getSortedField() === $field && 'ASC' === $sorter->getSortedDirection()) {
+                    $direction = 'desc';
+                }
+
+                $out .= $this->renderSortLink($content, $field->getQueryStringId(), $direction, $sorter);
             }
 
             $out .= '</th>';
@@ -114,7 +118,7 @@ class Table extends AbstractHelper
         return $out;
     }
 
-    protected function renderSortLink($content, $fieldId, $direction)
+    protected function renderSortLink($content, $fieldId, $direction, SelectSort $sorter = null)
     {
         return sprintf(
             '<a href="?sort=%s&dir=%s">%s</a>',

@@ -42,11 +42,11 @@ class Control extends HelperAbstract
         return $this->view;
     }
 
-    public function render(FieldInterface $field)
+    public function render(FieldInterface $field, $fieldPosition)
     {
         $callable = $this->getFieldAssignment($field);
 
-        return call_user_func($callable, $this->view);
+        return call_user_func($callable, $this->view, $fieldPosition);
     }
 
     public function detectCallableForField(FieldInterface $field)
@@ -55,10 +55,16 @@ class Control extends HelperAbstract
             return false;
         }
 
-        return function ($helper) use ($field) {
+        $autofocusHelpers = array('inputText', 'textarea');
+
+        return function ($helper, $view, $fieldPosition) use ($field, $autofocusHelpers) {
             $viewHelper = $this->detector->detect($field);
 
-            return $this->view->$viewHelper($field);
+            if (0 === $fieldPosition && in_array($viewHelper, $autofocusHelpers)) {
+                return $this->view->$viewHelper($field, array('autofocus' => true));
+            } else {
+                return $this->view->$viewHelper($field);
+            }
         };
     }
 }

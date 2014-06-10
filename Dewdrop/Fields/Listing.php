@@ -109,6 +109,23 @@ class Listing
     }
 
     /**
+     * Retrieve a select modifier using its name.
+     *
+     * @param string $name
+     * @return SelectModifier
+     */
+    public function getSelectModifierByName($name)
+    {
+        foreach ($this->selectModifiers as $modifier) {
+            if ($modifier->matchesName($name)) {
+                return $modifier;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Get the Select object after all modifiers have been applied to it.  This
      * can be useful if you'd like to see the Select (or its resulting SQL code)
      * will all modifications applied, in case you need to debug or troubleshoot
@@ -137,5 +154,15 @@ class Listing
     public function fetchData(Fields $fields)
     {
         return $this->select->getAdapter()->fetchAll($this->getModifiedSelect($fields));
+    }
+
+    public function fetchRow(Fields $fields, $id)
+    {
+        $select = $this->getModifiedSelect($fields);
+
+        $select
+            ->where('dealership_id = ?', $id);
+
+        return $this->select->getAdapter()->fetchRow($select);
     }
 }

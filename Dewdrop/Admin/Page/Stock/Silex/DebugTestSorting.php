@@ -12,8 +12,8 @@ class DebugTestSorting extends PageAbstract
     public function render()
     {
         $tester = new ListingSortTest(
-            $this->component->getListing(),
-            $this->component->getFields()
+            $this->component->getFields(),
+            $this->component->getListing()
         );
 
         $reflection = new ReflectionClass($this->component);

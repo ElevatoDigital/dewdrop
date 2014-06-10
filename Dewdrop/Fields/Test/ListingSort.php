@@ -16,10 +16,10 @@ class ListingSort
 {
     private $sortHelper;
 
-    public function __construct(Listing $listing, Fields $fields)
+    public function __construct(Fields $fields, Listing $listing)
     {
-        $this->listing = $listing;
         $this->fields  = $fields->getSortableFields();
+        $this->listing = $listing;
 
         $this->testSortHelperPresence();
     }

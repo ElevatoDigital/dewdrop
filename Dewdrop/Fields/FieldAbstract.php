@@ -56,6 +56,14 @@ abstract class FieldAbstract implements FieldInterface
     const AUTHORIZATION_ALLOW_ALL = 'authorization:allow:all';
 
     /**
+     * Any notes that should be displayed along with this field when it is
+     * displayed to users.
+     *
+     * @var string
+     */
+    protected $note = '';
+
+    /**
      * The Fields object this field is associated with.  This is really
      * only used to enable our streamlined method chaining.
      *
@@ -101,6 +109,30 @@ abstract class FieldAbstract implements FieldInterface
      * @var array
      */
     protected $customHelperCallbacks = array();
+
+    /**
+     * Set a note that will be displayed alongside this field when it is used
+     * in a UI.
+     *
+     * @param string $note
+     * @return FieldAbstract
+     */
+    public function setNote($note)
+    {
+        $this->note = $note;
+
+        return $this;
+    }
+
+    /**
+     * Get the note associated with this field.
+     *
+     * @return string
+     */
+    public function getNote()
+    {
+        return $this->note;
+    }
 
     /**
      * Set multiple options at once on this field using an array of

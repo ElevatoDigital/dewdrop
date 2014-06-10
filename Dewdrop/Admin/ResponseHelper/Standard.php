@@ -77,7 +77,7 @@ class Standard
      * @param PageAbstract $page
      * @param callable $redirector
      */
-    public function __construct(PageAbstract $page, $redirector)
+    public function __construct(PageAbstract $page, callable $redirector)
     {
         $this->page       = $page;
         $this->redirector = $redirector;

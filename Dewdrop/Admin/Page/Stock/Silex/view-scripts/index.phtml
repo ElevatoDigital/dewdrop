@@ -1,6 +1,6 @@
 <nav class="navbar navbar-default navbar-admin-index" role="navigation">
     <div class="navbar-header">
-        <button type="button" class="btn btn-primary navbar-btn">Add <?php echo $this->escapeHtml($this->singularTitle);?></button>
+        <a data-keyboard-role="create" href="<?php echo $this->escapeHtmlAttr($this->adminUrl('edit'));?>" class="btn btn-primary navbar-btn">Add <?php echo $this->escapeHtml($this->singularTitle);?></a>
         <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#admin-index-collapse">
             <span class="sr-only">Toggle navigation</span>
             <span class="icon-bar"></span>
@@ -15,7 +15,7 @@
         <div class="navbar-right navbar-right-btn-group">
             <div class="btn-group btn-group-justified">
                 <div class="btn-group">
-                    <button type="button" class="btn btn-default navbar-btn" data-toggle="collapse" data-target="#admin-filter-panel"><span class="glyphicon glyphicon-filter"></span> Filter</button>
+                    <button data-keyboard-role="filter" type="button" class="btn btn-default navbar-btn" data-toggle="collapse" data-target="#admin-filter-panel"><span class="glyphicon glyphicon-filter"></span> Filter</button>
                 </div>
                 <div class="btn-group">
                     <button type="button" class="btn btn-default admin-btn-settings navbar-btn" data-toggle="dropdown"><span class="glyphicon glyphicon-cog"></span> Settings <span class="caret"></span></button>
@@ -24,6 +24,7 @@
                         <li><a href="#">Manage Custom Views</a></li>
                         <li><a href="#">Sort and Group Fields</a></li>
                         <li><a href="<?php echo $this->escapeHtmlAttr($this->adminUrl('notifications'));?>">Notifications</a></li>
+                        <li><a data-toggle="modal" data-target="#keyboard-shortcuts-modal" href="#">View Keyboard Shortcuts</a></li>
 
                         <?php if ($this->debug):?>
                         <li role="presentation" class="divider"></li>
@@ -89,10 +90,87 @@
     </div>
 </div>
 
+<div class="modal fade" id="keyboard-shortcuts-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">Keyboard Shortcuts</h4>
+            </div>
+            <div class="modal-body">
+                <p>
+                    When viewing the main <?php echo $this->escapeHtml($this->component->getTitle());?> page,
+                    you can use the following keyboard shortcuts to navigate more quickly.
+                </p>
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        <button type="button" class="btn btn-default">C</button>
+                        Create <?php echo $this->escapeHtml($this->singularTitle);?>
+                    </li>
+                    <li class="list-group-item">
+                        <button type="button" class="btn btn-default">J</button>
+                        Select Next <?php echo $this->escapeHtml($this->singularTitle);?>
+                    </li>
+                    <li class="list-group-item">
+                        <button type="button" class="btn btn-default">K</button>
+                        Select Previous <?php echo $this->escapeHtml($this->singularTitle);?>
+                    </li>
+                    <li class="list-group-item">
+                        <button type="button" class="btn btn-default">E</button>
+                        Edit Selected <?php echo $this->escapeHtml($this->singularTitle);?>
+                    </li>
+                    <li class="list-group-item">
+                        <button type="button" class="btn btn-default">V</button>
+                        View Selected <?php echo $this->escapeHtml($this->singularTitle);?>
+                    </li>
+                    <li class="list-group-item">
+                        <button type="button" class="btn btn-default">/</button>
+                        Show Filters
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
 <?php
+$renderer   = $this->tableCellRenderer();
+$fields     = $this->fields->getVisibleFields($this->visibilityFilter);
+$firstField = $fields->getIterator()->current();
+
+$renderer->getContentRenderer()
+    ->assignCallbackByColumnPosition(
+        0,
+        function ($helper, $rowData, $rowIndex, $columnIndex) use ($renderer, $firstField) {
+            $out = call_user_func(
+                $renderer->getContentRenderer()->getFieldAssignment($firstField),
+                $rowData,
+                $rowIndex,
+                $columnIndex
+            );
+
+            $primaryKeyValue = array();
+
+            foreach ($this->primaryKey as $field) {
+                $primaryKeyValue[$field] = $rowData[$field];
+            }
+
+            return $this->partial(
+                'index-row-actions.phtml',
+                array(
+                    'content'       => $out,
+                    'params'        => $primaryKeyValue,
+                    'singularTitle' => $this->singularTitle
+                )
+            );
+        }
+    );
+
 echo $this->bootstrapTable(
-    $this->fields->getVisibleFields($this->visibilityFilter),
-    $this->listing->fetchData($this->fields)
+    $fields,
+    $this->listing->fetchData($this->fields),
+    $renderer,
+    $this->listing->getSelectModifierByName('SelectSort')
 );
 
 echo $this->bootstrapColumnsModal(
@@ -100,4 +178,7 @@ echo $this->bootstrapColumnsModal(
     $this->fields->getVisibleFields($this->visibilityFilter),
     $this->adminUrl('adjust-visibility')
 );
+
+$this->headScript()->appendFile('/js/stock/listing-keyboard-shortcuts.js');
+$this->headScript()->appendFile('/js/stock/modal-view.js');
 ?>
