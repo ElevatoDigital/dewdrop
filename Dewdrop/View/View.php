@@ -68,6 +68,8 @@ class View
         'bootstrapselect'       => '\Dewdrop\View\Helper\BootstrapSelect',
         'bootstraptextarea'     => '\Dewdrop\View\Helper\BootstrapTextarea',
         'checkboxlist'          => '\Dewdrop\View\Helper\CheckboxList',
+        'csvcellrenderer'       => '\Dewdrop\View\Helper\CsvCellRenderer',
+        'csvexport'             => '\Dewdrop\View\Helper\CsvExport',
         'detectedithelper'      => '\Dewdrop\View\Helper\DetectEditHelper',
         'editform'              => '\Dewdrop\View\Helper\EditForm',
         'editcontrolrenderer'   => '\Dewdrop\View\Helper\EditControlRenderer',
