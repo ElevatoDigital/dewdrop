@@ -213,4 +213,28 @@ class Mock implements DriverInterface
     {
 
     }
+
+    /**
+     * Given the supplied native data type, return a generic data type that can
+     * be used in Dewdrop to make decisions about columns/fields:
+     *
+     * 1) boolean - A true/false value.
+     * 2) integer - Whole number.
+     * 3) float - Floating point number.
+     * 4) text - Fixed-length, shorter text value.
+     * 5) clob - Character large object.  Large text field.
+     * 6) timestamp - Date and time combined.
+     * 7) date - Just a date.
+     * 8) time - Just the time.
+     * 9) money - Get money, get paid.
+     * 10) blob - Binary large object.
+     *
+     * @param string $nativeType
+     * @param mixed $length
+     * @return string
+     */
+    public function mapNativeTypeToGenericType($nativeType, $length)
+    {
+        return '';
+    }
 }

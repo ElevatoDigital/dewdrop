@@ -160,7 +160,7 @@ interface DriverInterface
     public function describeTable($tableName);
 
     /**
-     * Given the supplied native data type, return a genertic data type that can
+     * Given the supplied native data type, return a generic data type that can
      * be used in Dewdrop to make decisions about columns/fields:
      *
      * 1) boolean - A true/false value.
