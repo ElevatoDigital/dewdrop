@@ -13,7 +13,7 @@ use Dewdrop\Fields;
 use Dewdrop\Fields\Filter\Visibility as VisibilityFilter;
 use Dewdrop\Fields\Helper\SelectSort;
 use Dewdrop\Fields\Listing;
-use Dewdrop\Fields\RowLinker;
+use Dewdrop\Fields\RowEditor;
 use Dewdrop\Pimple as DewdropPimple;
 use Pimple;
 
@@ -39,7 +39,7 @@ abstract class CrudAbstract extends Silex implements CrudInterface
         );
 
         $this->fields    = new Fields();
-        $this->rowLinker = new RowLinker($this->fields, $this->pimple['dewdrop-request']);
+        $this->rowEditor = new RowEditor($this->fields, $this->pimple['dewdrop-request']);
 
         parent::__construct($pimple, $componentName);
 
@@ -49,9 +49,6 @@ abstract class CrudAbstract extends Silex implements CrudInterface
                 . 'model must implement the \Dewdrop\Db\Table\AdminModelInterface.'
             );
         }
-
-        $this->listing = new Listing($this->getPrimaryModel()->selectAdminListing());
-        $this->listing->registerSelectModifier($this->getSelectSortHelper());
 
         $this->addPageFactory(new CrudFactory($this));
     }
@@ -83,9 +80,9 @@ abstract class CrudAbstract extends Silex implements CrudInterface
         return $this->model;
     }
 
-    public function getRowLinker()
+    public function getRowEditor()
     {
-        return $this->rowLinker;
+        return $this->rowEditor;
     }
 
     public function getFields()

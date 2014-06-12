@@ -4,10 +4,13 @@ namespace Dewdrop\Admin\Page\Stock;
 
 use Dewdrop\Admin\Page\PageAbstract;
 use Dewdrop\Db\Field as DbField;
+use Dewdrop\Fields\RowEditor;
 use Dewdrop\Notification\Gateway as NotificationGateway;
 
 class NotificationEdit extends PageAbstract
 {
+    private $rowEditor;
+
     private $fields;
 
     private $row;
@@ -24,17 +27,14 @@ class NotificationEdit extends PageAbstract
             $this->component->getFields()
         );
 
-        if (!$id) {
-            $this->row = $gateway->createRow();
-        } else {
-            $this->row = $gateway->findByIdAndComponent($id, $this->component->getFullyQualifiedName());
-        }
+        $this->rowEditor = new RowEditor($this->fields, $this->request);
 
-        foreach ($this->fields as $field) {
-            if ($field instanceof DbField) {
-                $field->setRow($this->row);
-            }
-        }
+        $this->rowEditor->linkByQueryString(
+            'dewdrop_notification_subscriptions',
+            'dewdrop_notification_subscription_id'
+        );
+
+        $this->rowEditor->link();
     }
 
     public function process($responseHelper)
@@ -49,6 +49,7 @@ class NotificationEdit extends PageAbstract
         $this->view->component       = $this->component;
         $this->view->componentModel  = $this->component->getPrimaryModel();
         $this->view->fields          = $this->fields;
-        $this->view->breadcrumbTitle = ($this->row->isNew() ? 'Add' : 'Edit');
+        $this->view->rowEditor       = $this->rowEditor;
+        $this->view->breadcrumbTitle = ($this->rowEditor->isNew() ? 'Add' : 'Edit');
     }
 }

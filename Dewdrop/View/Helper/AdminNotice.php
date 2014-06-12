@@ -10,6 +10,8 @@
 
 namespace Dewdrop\View\Helper;
 
+use Dewdrop\Pimple;
+
 /**
  * Display an admin notice.  These notices will look just like the normal
  * WP messages you see, for example, when activating and deactivating
@@ -61,6 +63,10 @@ class AdminNotice extends AbstractHelper
      */
     private function loadNoticeFromCookies()
     {
+        if (!Pimple::getResource('paths')->isWp()) {
+            return '';
+        }
+
         $notice = '';
 
         if (isset($_COOKIE['dewdrop_admin_success_notice']) && $_COOKIE['dewdrop_admin_success_notice']) {

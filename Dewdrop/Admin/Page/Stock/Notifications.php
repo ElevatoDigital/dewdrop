@@ -21,7 +21,7 @@ class Notifications extends PageAbstract
         );
 
         $this->view->fields         = $fields;
-        $this->view->listing        = new Listing($select);
+        $this->view->listing        = new Listing($select, $gateway->field('dewdrop_notification_subscription_id'));
         $this->view->component      = $this->component;
         $this->view->componentModel = $this->component->getPrimaryModel();
     }

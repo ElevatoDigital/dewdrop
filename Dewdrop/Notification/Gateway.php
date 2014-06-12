@@ -6,6 +6,7 @@ use Dewdrop\Db\Expr;
 use Dewdrop\Db\Table;
 use Dewdrop\Fields;
 use Zend\Escaper\Escaper;
+use Zend\InputFilter\Input;
 
 class Gateway extends Table
 {
@@ -90,6 +91,14 @@ class Gateway extends Table
                         );
                     }
                 )
+                ->assignHelperCallback(
+                    'InputFilter',
+                    function ($helper) {
+                        $input = new Input('recipients');
+                        $input->setAllowEmpty(false);
+                        return $input;
+                    }
+                )
             ->add($this->field('dewdrop_notification_frequency_id'))
             ->add($this->field('when_added'))
                 ->assignHelperCallback(
@@ -125,6 +134,14 @@ class Gateway extends Table
                                 $options
                             )
                         );
+                    }
+                )
+                ->assignHelperCallback(
+                    'InputFilter',
+                    function ($helper) {
+                        $input = new Input('fields');
+                        $input->setAllowEmpty(false);
+                        return $input;
                     }
                 );
 

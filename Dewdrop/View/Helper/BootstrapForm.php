@@ -6,6 +6,7 @@ use Dewdrop\Exception;
 use Dewdrop\Fields;
 use Dewdrop\Fields\FieldInterface;
 use Dewdrop\Fields\Helper\EditControl as Renderer;
+use Dewdrop\Pimple;
 use Zend\InputFilter\Input;
 use Zend\InputFilter\InputFilter;
 
@@ -60,8 +61,7 @@ class BootstrapForm extends AbstractHelper
             $messages = ($input ? $input->getMessages() : null);
 
             $output .= sprintf(
-                //'<div class="form-group col-lg-6 col-md-6 col-sm-8%s">',
-                '<div class="form-group">',
+                $this->renderFormGroupOpenTag(),
                 ($messages ? ' has-feedback has-error' : '')
             );
 
@@ -91,6 +91,11 @@ class BootstrapForm extends AbstractHelper
         }
 
         return $output;
+    }
+
+    public function renderFormGroupOpenTag()
+    {
+        return '<div class="form-group">';
     }
 
     public function renderLabel(Renderer $renderer, FieldInterface $field, Input $input = null)
@@ -130,8 +135,8 @@ class BootstrapForm extends AbstractHelper
         );
     }
 
-    protected function controlRequiresLabel()
+    protected function controlRequiresLabel($output)
     {
-        return false === stripos($controlOutput, '<label') || false !== stripos($controlOutput, '<ul');
+        return false === stripos($output, '<label') || false !== stripos($output, '<ul');
     }
 }

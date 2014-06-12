@@ -54,7 +54,7 @@ class Permissions
 
         foreach ($crudPermissions as $name => $description) {
             $this
-                ->register($name, $desciption)
+                ->register($name, $description)
                 ->set($name, true);
         }
 

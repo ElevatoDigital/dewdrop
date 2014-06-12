@@ -24,7 +24,7 @@ class Crud implements PageFactoryInterface
         'export'             => '\Dewdrop\Admin\Page\Stock\Export',
         'index'              => '\Dewdrop\Admin\Page\Stock\Index',
         'notification-edit'  => '\Dewdrop\Admin\Page\Stock\NotificationEdit',
-        'notification'       => '\Dewdrop\Admin\Page\Stock\Notification',
+        'notifications'      => '\Dewdrop\Admin\Page\Stock\Notifications',
         'view'               => '\Dewdrop\Admin\Page\Stock\View'
     );
 

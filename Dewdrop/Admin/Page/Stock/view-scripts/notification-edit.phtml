@@ -20,6 +20,6 @@ $this->fields
     ->get('dewdrop_notification_subscriptions:dewdrop_notification_frequency_id')
         ->setLabel('How often should notifications be sent?');
 
-echo $this->bootstrapForm($this->fields);
+echo $this->bootstrapForm($this->fields, $this->rowEditor->getInputFilter());
 ?>
 <?php echo $this->wrap()->close();?>
