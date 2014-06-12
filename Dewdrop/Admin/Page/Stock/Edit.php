@@ -21,6 +21,8 @@ class Edit extends PageAbstract
 
         $this->isNew = $this->rowEditor->isNew();
 
+        $this->invalidSubmission = false;
+
         if ($this->isNew) {
             $this->component->getPermissions()->haltIfNotAllowed('create');
         } else {
@@ -30,29 +32,32 @@ class Edit extends PageAbstract
 
     public function process($responseHelper)
     {
-        if ($this->request->isPost() &&
-            $this->rowEditor->isValid($this->request->getPost())
-        ) {
-            $title = strtolower($this->model->getSingularTitle());
+        if ($this->request->isPost()) {
+            $this->invalidSubmission = (!$this->rowEditor->isValid($this->request->getPost()));
 
-            if ($this->isNew) {
-                $responseHelper->setSuccessMessage("Successfully saved new {$title}");
-            } else {
-                $responseHelper->setSuccessMessage("Successfully saved changes to {$title}");
+            if (!$this->invalidSubmission) {
+                $title = strtolower($this->model->getSingularTitle());
+
+                if ($this->isNew) {
+                    $responseHelper->setSuccessMessage("Successfully saved new {$title}");
+                } else {
+                    $responseHelper->setSuccessMessage("Successfully saved changes to {$title}");
+                }
+
+                $responseHelper
+                    ->run('save', array($this->rowEditor, 'save'))
+                    ->redirectToAdminPage('index');
             }
-
-            $responseHelper
-                ->run('save', array($this->rowEditor, 'save'))
-                ->redirectToAdminPage('index');
         }
     }
 
     public function render()
     {
-        $this->view->component = $this->component;
-        $this->view->isNew     = $this->isNew;
-        $this->view->fields    = $this->component->getFields();
-        $this->view->model     = $this->model;
-        $this->view->rowEditor = $this->rowEditor;
+        $this->view->component         = $this->component;
+        $this->view->isNew             = $this->isNew;
+        $this->view->fields            = $this->component->getFields();
+        $this->view->model             = $this->model;
+        $this->view->rowEditor         = $this->rowEditor;
+        $this->view->invalidSubmission = $this->invalidSubmission;
     }
 }

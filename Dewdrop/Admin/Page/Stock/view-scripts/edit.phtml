@@ -1,4 +1,11 @@
 <?php echo $this->wrap()->open();?>
+
+<?php if ($this->invalidSubmission):?>
+<div class="alert alert-danger">
+    Some errors were found in your submission.  Please double-check and try again.
+</div>
+<?php endif;?>
+
 <ol class="breadcrumb">
     <li><a href="<?php echo $this->escapeHtmlAttr($this->adminUrl('index'));?>"><?php echo $this->escapeHtml($this->component->getTitle());?></a></li>
     <li class="active"><?php echo ($this->isNew ? 'Add' : 'Edit');?> <?php echo $this->escapeHtml($this->model->getSingularTitle());?></li>

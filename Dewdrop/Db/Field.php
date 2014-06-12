@@ -496,7 +496,6 @@ class Field extends FieldAbstract
             $filters->attach(new Filter\Digits());
             $validators->addValidator(new \Zend\I18n\Validator\Int());
         } elseif ($this->isType('float')) {
-            $filters->attach(new Filter\Digits());
             $validators->addValidator(new \Zend\I18n\Validator\Float());
         }
     }
