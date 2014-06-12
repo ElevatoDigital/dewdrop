@@ -1,6 +1,6 @@
 <?php
 
-namespace Dewdrop\Admin\Page\Stock\Silex;
+namespace Dewdrop\Admin\Page\Stock;
 
 use Dewdrop\Admin\Page\PageAbstract;
 use Dewdrop\Db\Field as DbField;
@@ -14,6 +14,8 @@ class NotificationEdit extends PageAbstract
 
     public function init()
     {
+        $this->component->getPermissions()->haltIfNotAllowed('notifications');
+
         $gateway = new NotificationGateway($this->component->getDb());
         $id      = $this->request->getQuery('dewdrop_notification_subscription_id');
 

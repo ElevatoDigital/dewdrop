@@ -1,46 +1,44 @@
 <?php
 
+/**
+ * Dewdrop
+ *
+ * @link      https://github.com/DeltaSystems/dewdrop
+ * @copyright Delta Systems (http://deltasys.com)
+ * @license   https://github.com/DeltaSystems/dewdrop/LICENSE
+ */
+
 namespace Dewdrop\Admin\PageFactory;
 
 use Dewdrop\Admin\Component\CrudInterface;
-use Dewdrop\Admin\Component\Silex as SilexComponent;
-use Dewdrop\Exception;
-use Dewdrop\Fields;
-use Dewdrop\Fields\Listing;
-use Dewdrop\Inflector;
-use Dewdrop\Pimple;
 use ReflectionClass;
 
 class Crud implements PageFactoryInterface
 {
     private $pageClassMap = array(
-        'adjust-visibility' => '\Dewdrop\Admin\Page\Stock\Silex\AdjustVisibility',
-        'debug-fields'      => '\Dewdrop\Admin\Page\Stock\Silex\DebugFields',
-        'debug-listing-sql' => '\Dewdrop\Admin\Page\Stock\Silex\DebugListingSql',
-        'debug-test-sort'   => '\Dewdrop\Admin\Page\Stock\Silex\DebugTestSort',
-        'edit'              => '\Dewdrop\Admin\Page\Stock\Silex\Edit',
-        'export'            => '\Dewdrop\Admin\Page\Stock\Silex\Export',
-        'index'             => '\Dewdrop\Admin\Page\Stock\Silex\Index',
-        'notification-edit' => '\Dewdrop\Admin\Page\Stock\Silex\NotificationEdit',
-        'notification'      => '\Dewdrop\Admin\Page\Stock\Silex\Notification',
-        'view'              => '\Dewdrop\Admin\Page\Stock\Silex\View'
+        'adjust-visibility'  => '\Dewdrop\Admin\Page\Stock\AdjustVisibility',
+        'debug-fields'       => '\Dewdrop\Admin\Page\Stock\DebugFields',
+        'debug-listing-sql'  => '\Dewdrop\Admin\Page\Stock\DebugListingSql',
+        'debug-test-sorting' => '\Dewdrop\Admin\Page\Stock\DebugTestSorting',
+        'edit'               => '\Dewdrop\Admin\Page\Stock\Edit',
+        'export'             => '\Dewdrop\Admin\Page\Stock\Export',
+        'index'              => '\Dewdrop\Admin\Page\Stock\Index',
+        'notification-edit'  => '\Dewdrop\Admin\Page\Stock\NotificationEdit',
+        'notification'       => '\Dewdrop\Admin\Page\Stock\Notification',
+        'view'               => '\Dewdrop\Admin\Page\Stock\View'
     );
 
     private $component;
 
-    private $debug;
-
-    public function __construct(CrudInterface $component, $debug = null)
+    public function __construct(CrudInterface $component)
     {
         $this->component = $component;
-        $this->debug     = (null !== $debug ? $debug : Pimple::getResource('debug'));
     }
 
     public function createPage($name)
     {
-        if (0 === strpos($name, 'debug-') && !$this->debug) {
-            throw new Exception('Debugging must be enabled in Pimple to access debug pages.');
-        }
+        // Remain compatible with WP style naming
+        $name = $this->component->getInflector()->hyphenize($name);
 
         if (array_key_exists($name, $this->pageClassMap)) {
             $pageClass      = $this->pageClassMap[$name];

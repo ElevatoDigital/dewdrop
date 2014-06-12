@@ -17,6 +17,9 @@ use Dewdrop\Exception;
 use Zend\InputFilter\InputFilter;
 
 /**
+ * @deprecated
+ * @see \Dewdrop\Fields\RowEditor
+ *
  * Use the \Dewdrop\Db\Field API to manage the editing of values.
  *
  * Adding fields to this object simplifies a couple aspects of the common

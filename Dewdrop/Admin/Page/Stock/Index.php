@@ -1,6 +1,6 @@
 <?php
 
-namespace Dewdrop\Admin\Page\Stock\Silex;
+namespace Dewdrop\Admin\Page\Stock;
 
 use Dewdrop\Admin\Page\PageAbstract;
 use Dewdrop\Bootstrap;
@@ -17,6 +17,7 @@ class Index extends PageAbstract
         $filter  = $this->component->getVisibilityFilter();
 
         $this->view->component        = $this->component;
+        $this->view->permissions      = $this->component->getPermissions();
         $this->view->singularTitle    = $this->component->getPrimaryModel()->getSingularTitle();
         $this->view->pluralTitle      = $this->component->getPrimaryModel()->getPluralTitle();
         $this->view->primaryKey       = $this->component->getPrimaryModel()->getPrimaryKey();

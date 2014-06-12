@@ -4,7 +4,10 @@
         "bin/dewdrop"
     ],
     "autoload": {
-        "psr-4": {"Dewdrop\\": "Dewdrop/"}
+        "psr-4": {
+            "Dewdrop\\": "Dewdrop/",
+            "Model\\": "models"
+        }
     },
     "require": {
         "jdorn/sql-formatter": "1.2.*",

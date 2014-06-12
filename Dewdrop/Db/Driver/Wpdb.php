@@ -324,6 +324,7 @@ class Wpdb implements DriverInterface
                 'NULLABLE'         => (bool) ($row['Null'] == 'YES'),
                 'LENGTH'           => $row['Length'],
                 'SCALE'            => $row['Scale'],
+                'GENERIC_TYPE'     => $this->mapNativeTypeToGenericType($row['Type'], $row['Length']),
                 'PRECISION'        => $row['Precision'],
                 'UNSIGNED'         => $row['Unsigned'],
                 'PRIMARY'          => $row['Primary'],
@@ -352,6 +353,92 @@ class Wpdb implements DriverInterface
         }
 
         return $wpdbResult;
+    }
+
+    public function mapNativeTypeToGenericType($nativeType, $length)
+    {
+        switch ($nativeType) {
+        case 'tinyint':
+            $type = 'integer';
+
+            if (4 >= $length || preg_match('/^(is|has)/', $field['name'])) {
+                $type = 'boolean';
+            }
+            break;
+        case 'smallint':
+        case 'mediumint':
+        case 'int':
+        case 'bigint':
+        case 'integer':
+            $type = 'integer';
+            break;
+        case 'tinytext':
+        case 'mediumtext':
+        case 'longtext':
+        case 'text':
+        case 'varchar':
+        case 'string':
+        case 'char':
+            $type = 'text';
+            if ($length == '1') {
+                $type = 'boolean';
+            } elseif (strstr($nativeType, 'text')) {
+                $type = 'clob';
+            }
+            break;
+        case 'enum':
+            $type = 'text';
+            preg_match_all('/\'.+\'/U', $field['type'], $matches);
+            $length = 0;
+            $fixed = false;
+            if (is_array($matches)) {
+                foreach ($matches[0] as $value) {
+                    $length = max($length, strlen($value)-2);
+                }
+                if ($length == '1' && count($matches[0]) == 2) {
+                    $type = 'boolean';
+                }
+            }
+        case 'date':
+            $type = 'date';
+            break;
+        case 'datetime':
+        case 'timestamp':
+            $type = 'timestamp';
+            break;
+        case 'time':
+            $type = 'time';
+            break;
+        case 'float':
+        case 'double':
+        case 'real':
+        case 'unknown':
+        case 'decimal':
+        case 'numeric':
+            $type = 'float';
+            break;
+        case 'tinyblob':
+        case 'mediumblob':
+        case 'longblob':
+        case 'blob':
+            $type = 'blob';
+            $length = null;
+            break;
+        case 'binary':
+        case 'varbinary':
+            $type = 'blob';
+            break;
+        }
+
+        if (false !== stripos($nativeType, 'enum')) {
+            $type = 'text';
+        }
+
+        if (!$type) {
+            throw new Exception("Data type {$nativeType} not supported.");
+        }
+
+        return $type;
     }
 
     /**

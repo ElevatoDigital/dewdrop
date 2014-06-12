@@ -7,5 +7,7 @@ if ('cli' !== php_sapi_name()) {
 
 require_once 'vendor/autoload.php';
 
+\Dewdrop\Bootstrap\Wp::handleWpLoadGlobals();
+
 $cli = new \Dewdrop\Cli\Run();
 $cli->run();

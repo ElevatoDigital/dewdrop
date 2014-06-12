@@ -6,8 +6,12 @@ $idValue = current($params);
 ?>
 
 <div class="btn-group btn-group-justified row-actions pull-right">
+    <?php if ($this->permissions->can('edit')) :?>
     <a data-keyboard-role="edit" class="btn btn-xs btn-default" href="<?php echo $this->escapeHtmlAttr($this->adminUrl('edit', $this->params));?>">Edit</a>
+    <?php endif;?>
+    <?php if ($this->permissions->can('view')) :?>
     <a data-toggle="modal" data-target="#view-modal-<?php echo $this->escapeHtmlAttr($idValue);?>" data-loading-text="Loading..." data-keyboard-role="view" class="btn btn-xs btn-default" href="<?php echo $this->escapeHtmlAttr($this->adminUrl('view', $this->params));?>">View</a>
+    <?php endif;?>
 </div>
 
 <div class="modal fade" id="view-modal-<?php echo $this->escapeHtmlAttr($idValue);?>" tabindex="-1" role="dialog" aria-hidden="true">

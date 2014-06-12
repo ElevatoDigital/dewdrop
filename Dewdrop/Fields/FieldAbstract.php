@@ -209,6 +209,10 @@ abstract class FieldAbstract implements FieldInterface
             throw new Exception("{$method} not found on field and not Fields object assigned");
         }
 
+        if (!method_exists($this->fieldsSet, $method)) {
+            throw new Exception("{$method} not found on \Dewdrop\\Fields");
+        }
+
         return call_user_func_array(array($this->fieldsSet, $method), $args);
     }
 

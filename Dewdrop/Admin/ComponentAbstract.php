@@ -13,8 +13,10 @@ namespace Dewdrop\Admin;
 use Dewdrop\Admin\Page\PageAbstract;
 use Dewdrop\Admin\PageFactory\Files as PageFilesFactory;
 use Dewdrop\Admin\PageFactory\PageFactoryInterface;
+use Dewdrop\Admin\Permissions;
 use Dewdrop\Admin\Response;
 use Dewdrop\Db\Adapter;
+use Dewdrop\Exception;
 use Dewdrop\Paths;
 use Dewdrop\Pimple as DewdropPimple;
 use Dewdrop\Request;
@@ -82,6 +84,8 @@ abstract class ComponentAbstract
 
     private $pageFactories = array();
 
+    private $permissions;
+
     protected $redirector;
 
     /**
@@ -144,6 +148,11 @@ abstract class ComponentAbstract
         return $this->inflector;
     }
 
+    public function getPaths()
+    {
+        return $this->paths;
+    }
+
     public function getRequest()
     {
         return $this->request;
@@ -180,7 +189,7 @@ abstract class ComponentAbstract
     public function adminInit($page = null, Response $response = null)
     {
         if ($this->isCurrentlyActive()) {
-            $page = $this->createPageObject($page);
+            $page = $this->createPageObject(isset($_GET['route']) ? $_GET['route'] : 'Index');
 
             if (null === $response) {
                 $response = new Response();
@@ -193,6 +202,34 @@ abstract class ComponentAbstract
         }
 
         return $this;
+    }
+
+    public function getPermissions()
+    {
+        if (!$this->permissions) {
+            $this->permissions = new Permissions($this);
+        }
+
+        return $this->permissions;
+    }
+
+    public function createPageObject($name)
+    {
+        $page = null;
+
+        foreach ($this->getPageFactories() as $factory) {
+            $page = $factory->createPage($name);
+
+            if ($page) {
+                break;
+            }
+        }
+
+        if (!$page) {
+            throw new Exception('Could not find page');
+        }
+
+        return $page;
     }
 
     /**
@@ -470,6 +507,11 @@ abstract class ComponentAbstract
         }
 
         $response->setOutput($output);
+
+        if ($this->request->isAjax()) {
+            $response->render();
+            exit;
+        }
     }
 
     /**
@@ -543,7 +585,9 @@ abstract class ComponentAbstract
      */
     protected function assembleQueryString(array $params)
     {
-        $segments = array();
+        $segments  = array();
+        $hasQuery  = count($this->getRequest()->getQuery());
+        $separator = ($hasQuery ? '&' : '?');
 
         foreach ($params as $name => $value) {
             $segments[] = sprintf(
@@ -553,6 +597,6 @@ abstract class ComponentAbstract
             );
         }
 
-        return (count($segments) ? '?' . implode('&', $segments) : '');
+        return (count($segments) ? $separator . implode('&', $segments) : '');
     }
 }

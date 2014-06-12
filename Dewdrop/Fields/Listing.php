@@ -10,6 +10,7 @@
 
 namespace Dewdrop\Fields;
 
+use Dewdrop\Db\Field as DbField;
 use Dewdrop\Db\Select;
 use Dewdrop\Fields;
 use Dewdrop\Fields\Helper\SelectModifierInterface;
@@ -51,9 +52,15 @@ class Listing
      *
      * @param Select $select
      */
-    public function __construct(Select $select)
+    public function __construct(Select $select, DbField $primaryKey)
     {
-        $this->select = $select;
+        $this->select     = $select;
+        $this->primaryKey = $primaryKey;
+    }
+
+    public function getPrimaryKey()
+    {
+        return $this->primaryKey;
     }
 
     /**
@@ -153,16 +160,26 @@ class Listing
      */
     public function fetchData(Fields $fields)
     {
-        return $this->select->getAdapter()->fetchAll($this->getModifiedSelect($fields));
+        $data = $this->select->getAdapter()->fetchAll($this->getModifiedSelect($fields));
+
+        if (!$data) {
+            $data = array();
+        }
+
+        return $data;
     }
 
     public function fetchRow(Fields $fields, $id)
     {
         $select = $this->getModifiedSelect($fields);
 
-        // @todo Remove hard-coding
+        $quotedPrimaryKey = $select->quoteWithAlias(
+            $this->primaryKey->getTable()->getTableName(),
+            $this->primaryKey->getName()
+        );
+
         $select
-            ->where('dealership_id = ?', $id);
+            ->where("{$quotedPrimaryKey} = ?", $id);
 
         return $this->select->getAdapter()->fetchRow($select);
     }

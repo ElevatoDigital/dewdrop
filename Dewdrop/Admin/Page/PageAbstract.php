@@ -12,6 +12,7 @@ namespace Dewdrop\Admin\Page;
 
 use Dewdrop\Admin\ComponentAbstract;
 use Dewdrop\Admin\ResponseHelper\Standard as ResponseHelper;
+use Dewdrop\Pimple;
 use Dewdrop\Request;
 use Dewdrop\View\View;
 
@@ -80,8 +81,7 @@ abstract class PageAbstract
     public function __construct(ComponentAbstract $component, Request $request, $viewScriptPath = null)
     {
         $this->component   = $component;
-        $this->application = $component->getApplication();
-        $this->view        = $this->application['view'];
+        $this->view        = Pimple::getResource('view');
         $this->request     = ($request ?: $this->application['dewdrop-request']);
 
         if (null === $viewScriptPath) {
@@ -144,7 +144,20 @@ abstract class PageAbstract
      */
     public function renderView()
     {
-        return $this->view->render($this->inflectViewScriptName());
+        $output = $this->view->render($this->inflectViewScriptName());
+
+        if ($this->component->getPaths()->isWp()) {
+            $wwwPath = $this->component->getPaths()->getPluginRoot() . '/www';
+
+            foreach ($this->view->headScript() as $script) {
+                wp_enqueue_script(
+                    basename($script->attributes->src, '.js'),
+                    plugins_url('/www/' . $script->attributes['src'], $wwwPath)
+                );
+            }
+        }
+
+        return $output;
     }
 
     /**

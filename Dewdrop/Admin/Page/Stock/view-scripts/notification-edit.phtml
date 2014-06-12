@@ -1,3 +1,4 @@
+<?php echo $this->wrap()->open();?>
 <ol class="breadcrumb">
     <li><a href="<?php echo $this->escapeHtmlAttr($this->adminUrl('index'));?>"><?php echo $this->escapeHtml($this->component->getTitle());?></a></li>
     <li><a href="<?php echo $this->escapeHtmlAttr($this->adminUrl('notifications'));?>">Notifications</a></li>
@@ -21,3 +22,4 @@ $this->fields
 
 echo $this->bootstrapForm($this->fields);
 ?>
+<?php echo $this->wrap()->close();?>

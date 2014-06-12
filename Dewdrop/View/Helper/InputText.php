@@ -102,11 +102,12 @@ class InputText extends AbstractHelper
         return $this->partial(
             'input-text.phtml',
             array(
-                'name'      => $name,
-                'id'        => $id,
-                'value'     => $value,
-                'classes'   => $classes,
-                'autofocus' => $autofocus
+                'name'        => $name,
+                'id'          => $id,
+                'value'       => $value,
+                'classes'     => $classes,
+                'autofocus'   => $autofocus,
+                'placeholder' => $placeholder
             )
         );
     }
@@ -124,7 +125,7 @@ class InputText extends AbstractHelper
     {
         $this
             ->checkRequired($options, array('name', 'value'))
-            ->ensurePresent($options, array('classes', 'id', 'autofocus'))
+            ->ensurePresent($options, array('classes', 'id', 'autofocus', 'placeholder'))
             ->ensureArray($options, array('classes'));
 
         return $options;

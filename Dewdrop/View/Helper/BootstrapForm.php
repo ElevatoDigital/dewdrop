@@ -4,8 +4,10 @@ namespace Dewdrop\View\Helper;
 
 use Dewdrop\Exception;
 use Dewdrop\Fields;
-use Dewdrop\Fields\RowLinker;
+use Dewdrop\Fields\FieldInterface;
 use Dewdrop\Fields\Helper\EditControl as Renderer;
+use Zend\InputFilter\Input;
+use Zend\InputFilter\InputFilter;
 
 class BootstrapForm extends AbstractHelper
 {
@@ -21,12 +23,12 @@ class BootstrapForm extends AbstractHelper
             throw new Exception('BootstrapForm takes either no arguments or a Fields object');
         }
 
-        $fields    = $args[0];
-        $rowLinker = $args[1];
-        $renderer  = (isset($args[2]) && $args[2] instanceof Renderer ? $args[2] : $this->view->editControlRenderer());
+        $fields      = $args[0];
+        $inputFilter = $args[1];
+        $renderer    = (isset($args[2]) && $args[2] instanceof Renderer ? $args[2] : $this->view->editControlRenderer());
 
         return $this->open()
-            . $this->renderFields($fields, $rowLinker, $renderer)
+            . $this->renderFields($fields, $inputFilter, $renderer)
             . $this->renderSubmitButton()
             . $this->close();
     }
@@ -45,7 +47,7 @@ class BootstrapForm extends AbstractHelper
         return '</form>';
     }
 
-    public function renderFields(Fields $fields, RowLinker $rowLinker, Renderer $renderer)
+    public function renderFields(Fields $fields, InputFilter $inputFilter, Renderer $renderer)
     {
         $output = '';
 
@@ -53,33 +55,26 @@ class BootstrapForm extends AbstractHelper
         $fieldPosition = 0;
 
         foreach ($fields->getEditableFields() as $field) {
-            $output .= '<div class="row">';
+            $output  .= '<div class="">';
+            $input    = ($inputFilter->has($field->getId()) ? $inputFilter->get($field->getId()) : null);
+            $messages = ($input ? $input->getMessages() : null);
 
             $output .= sprintf(
-                '<div class="form-group col-lg-6 col-md-6 col-sm-8%s">',
-                ($rowLinker->hasErrors($field) ? ' has-feedback has-error' : '')
+                //'<div class="form-group col-lg-6 col-md-6 col-sm-8%s">',
+                '<div class="form-group">',
+                ($messages ? ' has-feedback has-error' : '')
             );
 
             $controlOutput = $renderer->getControlRenderer()->render($field, $fieldPosition);
 
-            // If the control renders a label itself and isn't a list, skip it here
-            if (false === stripos($controlOutput, '<label') || false !== stripos($controlOutput, '<ul')) {
-                $output .= sprintf(
-                    '<label for="%s">%s</label>',
-                    $this->view->escapeHtmlAttr($field->getHtmlId()),
-                    $renderer->getLabelRenderer()->render($field)
-                );
+            if ($this->controlRequiresLabel($controlOutput)) {
+                $output .= $this->renderLabel($renderer, $field, $input);
             }
 
             $output .= $controlOutput;
 
-            if ($rowLinker->hasErrors($field)) {
-                foreach ($rowLinker->getErrorMessages($field) as $message) {
-                    $output .= sprintf(
-                        '<div class="help-block">%s</div>',
-                        $this->view->escapeHtml($message)
-                    );
-                }
+            if ($messages) {
+                $out .= $this->renderMessages($messages);
             }
 
             if ($field->getNote()) {
@@ -98,11 +93,45 @@ class BootstrapForm extends AbstractHelper
         return $output;
     }
 
+    public function renderLabel(Renderer $renderer, FieldInterface $field, Input $input = null)
+    {
+        return sprintf(
+            '<label class="control-label" for="%s">%s%s</label>',
+            $this->view->escapeHtmlAttr($field->getHtmlId()),
+            $renderer->getLabelRenderer()->render($field),
+            ($input && !$input->allowEmpty() ? $this->renderRequiredFlag() : '')
+        );
+    }
+
+    public function renderRequiredFlag()
+    {
+        return ' <small><span title="Required" class="glyphicon glyphicon-asterisk text-danger"></span></small>';
+    }
+
+    public function renderMessages($messages)
+    {
+        $output = '';
+
+        foreach ($messages as $message) {
+            $output .= sprintf(
+                '<div class="help-block">%s</div>',
+                $this->view->escapeHtml($message)
+            );
+        }
+
+        return $output;
+    }
+
     public function renderSubmitButton($title = 'Save Changes')
     {
         return sprintf(
             '<div class="form-group"><input type="submit" value="%s" class="btn btn-primary" /></div>',
             $this->view->escapeHtmlAttr($title)
         );
+    }
+
+    protected function controlRequiresLabel()
+    {
+        return false === stripos($controlOutput, '<label') || false !== stripos($controlOutput, '<ul');
     }
 }

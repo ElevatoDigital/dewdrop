@@ -80,4 +80,12 @@ interface CrudInterface
      * @return \Dewdrop\Fields\Helper\SelectSort
      */
     public function getSelectSortHelper();
+
+    /**
+     * Get the \Dewdrop\Fields\RowEditor object that will assist with the
+     * editing of items in this component.
+     *
+     * @return \Dewdrop\Fields\RowEditor
+     */
+    public function getRowEditor();
 }

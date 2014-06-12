@@ -642,6 +642,17 @@ class Select
         return $this->parts[$part];
     }
 
+    public function quoteWithAlias($tableName, $columnName)
+    {
+        foreach ($this->getPart(self::FROM) as $queryName => $info) {
+            if ($tableName === $info['tableName']) {
+                return $this->getAdapter()->quoteIdentifier("{$queryName}.{$columnName}");
+            }
+        }
+
+        throw new SelectException("Table {$tableName} could not be found in the query.");
+    }
+
     /**
      * Executes the current select object and returns the result
      *

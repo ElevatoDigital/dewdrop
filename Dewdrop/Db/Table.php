@@ -569,7 +569,9 @@ abstract class Table
     {
         $result = $this->db->insert(
             $this->tableName,
-            $this->filterDataArrayForPhysicalColumns($data)
+            $this->augmentInsertedDataArrayWithDateFields(
+                $this->filterDataArrayForPhysicalColumns($data)
+            )
         );
 
         $this
@@ -591,7 +593,9 @@ abstract class Table
      */
     public function update(array $data, $where)
     {
-        $updateData = $this->filterDataArrayForPhysicalColumns($data);
+        $updateData = $this->augmentUpdatedDataArrayWithDateFields(
+            $this->filterDataArrayForPhysicalColumns($data)
+        );
 
         // Only perform primary update statement if a physical column is being updated
         if (count($updateData)) {
@@ -694,6 +698,28 @@ abstract class Table
         }
 
         return implode(' AND ', $where);
+    }
+
+    private function augmentInsertedDataArrayWithDateFields(array $data)
+    {
+        if ($this->getMetadata('columns', 'date_created')) {
+            $data['date_created'] = date('Y-m-d G:i:s');
+        } elseif ($this->getMetadata('columns', 'datetime_created')) {
+            $data['datetime_created'] = date('Y-m-d G:i:s');
+        }
+
+        return $this->augmentUpdatedDataArrayWithDateFields($data);
+    }
+
+    private function augmentUpdatedDataArrayWithDateFields(array $data)
+    {
+        if ($this->getMetadata('columns', 'date_updated')) {
+            $data['date_updated'] = date('Y-m-d G:i:s');
+        } elseif ($this->getMetadata('columns', 'datetime_updated')) {
+            $data['datetime_updated'] = date('Y-m-d G:i:s');
+        }
+
+        return $data;
     }
 
     /**

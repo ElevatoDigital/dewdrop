@@ -1,6 +1,6 @@
 <?php
 
-namespace Dewdrop\Admin\Page\Stock\Silex;
+namespace Dewdrop\Admin\Page\Stock;
 
 use Dewdrop\Admin\Page\PageAbstract;
 use Dewdrop\Fields;
@@ -11,6 +11,8 @@ class DebugTestSorting extends PageAbstract
 {
     public function render()
     {
+        $this->component->getPermissions()->haltIfNotAllowed('debug');
+
         $tester = new ListingSortTest(
             $this->component->getFields(),
             $this->component->getListing()

@@ -338,7 +338,7 @@ class Row implements ArrayAccess
      */
     public function has($name)
     {
-        return array_key_exists($name, $this->data);
+        return in_array($name, $this->columns);
     }
 
     /**

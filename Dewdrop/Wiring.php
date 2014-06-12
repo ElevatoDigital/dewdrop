@@ -12,6 +12,7 @@ namespace Dewdrop;
 
 use Dewdrop\Db\Adapter as DbAdapter;
 use Dewdrop\Paths;
+use Dewdrop\Pimple;
 
 /**
  * This class ties WP to your plugin by registering the necessary hooks to
@@ -121,7 +122,7 @@ class Wiring
         $className      = '\Admin\\' . $this->inflector->camelize($path) . '\Component';
 
         require_once $componentPath;
-        $component = new $className($this->db, $this->paths);
+        $component = new $className(Pimple::getInstance());
 
         $component->register();
     }

@@ -1,12 +1,12 @@
 <?php
 
-namespace Dewdrop\Admin\Page\Stock\Silex;
+namespace Dewdrop\Admin\Page\Stock;
 
 use Dewdrop\Admin\Page\PageAbstract;
 
 class Edit extends PageAbstract
 {
-    private $rowLinker;
+    private $rowEditor;
 
     private $isNew;
 
@@ -14,18 +14,24 @@ class Edit extends PageAbstract
 
     public function init()
     {
-        $this->rowLinker = $this->component->getRowLinker();
+        $this->rowEditor = $this->component->getRowEditor();
         $this->model     = $this->component->getPrimaryModel();
 
-        $this->rowLinker->apply();
+        $this->rowEditor->link();
 
-        $this->isNew = $this->rowLinker->isNew();
+        $this->isNew = $this->rowEditor->isNew();
+
+        if ($this->isNew) {
+            $this->component->getPermissions()->haltIfNotAllowed('create');
+        } else {
+            $this->component->getPermissions()->haltIfNotAllowed('edit');
+        }
     }
 
     public function process($responseHelper)
     {
         if ($this->request->isPost() &&
-            $this->rowLinker->isValid($this->request->getPost())
+            $this->rowEditor->isValid($this->request->getPost())
         ) {
             $title = strtolower($this->model->getSingularTitle());
 
@@ -36,7 +42,7 @@ class Edit extends PageAbstract
             }
 
             $responseHelper
-                ->run('save', array($this->rowLinker, 'save'))
+                ->run('save', array($this->rowEditor, 'save'))
                 ->redirectToAdminPage('index');
         }
     }
@@ -47,6 +53,6 @@ class Edit extends PageAbstract
         $this->view->isNew     = $this->isNew;
         $this->view->fields    = $this->component->getFields();
         $this->view->model     = $this->model;
-        $this->view->rowLinker = $this->rowLinker;
+        $this->view->rowEditor = $this->rowEditor;
     }
 }

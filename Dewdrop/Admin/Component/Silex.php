@@ -84,24 +84,5 @@ abstract class Silex extends ComponentAbstract
         )
         ->value('page', 'index');
     }
-
-    public function createPageObject($name)
-    {
-        $page = null;
-
-        foreach ($this->getPageFactories() as $factory) {
-            $page = $factory->createPage($name);
-
-            if ($page) {
-                break;
-            }
-        }
-
-        if (!$page) {
-            throw new Exception('Could not find page');
-        }
-
-        return $page;
-    }
 }
 

@@ -1,23 +1,31 @@
 <?php
 
+/**
+ * Dewdrop
+ *
+ * @link      https://github.com/DeltaSystems/dewdrop
+ * @copyright Delta Systems (http://deltasys.com)
+ * @license   https://github.com/DeltaSystems/dewdrop/LICENSE
+ */
+
 namespace Dewdrop\Admin\PageFactory;
 
 use Dewdrop\Admin\ComponentAbstract as Component;
-use Dewdrop\Bootstrap;
-use Dewdrop\Inflector;
-use Dewdrop\Request;
 use ReflectionClass;
 
 class Files implements PageFactoryInterface
 {
-    private $request;
-
+    /**
+     * The inflector used to convert between URL style ("page-name") pages to
+     * file names ("PageName").
+     *
+     * @var \Dewdrop\Inflector
+     */
     private $inflector;
 
     public function __construct(Component $component)
     {
         $this->component = $component;
-        $this->request   = $component->getRequest();
         $this->inflector = $component->getInflector();
     }
 
@@ -32,7 +40,7 @@ class Files implements PageFactoryInterface
 
             require_once $fullPath;
 
-            return new $pageClass($this->component, $this->request);
+            return new $pageClass($this->component, $this->component->getRequest());
         }
 
         return false;

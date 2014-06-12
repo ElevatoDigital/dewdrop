@@ -1,6 +1,6 @@
 <?php
 
-namespace Dewdrop\Admin\Page\Stock\Silex;
+namespace Dewdrop\Admin\Page\Stock;
 
 use Dewdrop\Admin\Page\PageAbstract;
 use Dewdrop\Fields\Listing;
@@ -10,6 +10,8 @@ class Notifications extends PageAbstract
 {
     public function render()
     {
+        $this->component->getPermissions()->haltIfNotAllowed('notifications');
+
         $gateway = new NotificationGateway($this->component->getDb());
         $select  = $gateway->selectByComponent($this->component->getFullyQualifiedName());
 

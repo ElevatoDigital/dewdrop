@@ -10,6 +10,7 @@
 
 namespace Dewdrop\Fields\Helper;
 
+use Dewdrop\Db\Expr;
 use Dewdrop\Db\Field as DbField;
 use Dewdrop\Db\Select;
 use Dewdrop\Fields;
@@ -97,6 +98,8 @@ class SelectSort extends HelperAbstract implements SelectModifierInterface
         if ('ASC' !== $defaultDirection && 'DESC' !== $defaultDirection) {
             throw new Exception('Default direction must be ASC or DESC');
         }
+
+        $this->defaultDirection = $defaultDirection;
 
         return $this;
     }
@@ -208,6 +211,15 @@ class SelectSort extends HelperAbstract implements SelectModifierInterface
     public function sortDbDefault(DbField $field, $select, $direction)
     {
         return $select->order("{$field->getName()} $direction");
+    }
+
+    public function sortDbReference(DbField $field, $select, $direction)
+    {
+        return $select->order(
+            new Expr(
+                "{$select->quoteWithAlias($field->getTable()->getTableName(), $field->getName())} $direction"
+            )
+        );
     }
 
     /**

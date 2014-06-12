@@ -90,6 +90,7 @@ class View
         'wpeditform'            => '\Dewdrop\View\Helper\WpEditForm',
         'wpeditor'              => '\Dewdrop\View\Helper\WpEditor',
         'wpeditrow'             => '\Dewdrop\View\Helper\WpEditRow',
+        'wpimagepicker'         => '\Dewdrop\View\Helper\WpImagePicker',
         'wpinputcheckbox'       => '\Dewdrop\View\Helper\WpInputCheckbox',
         'wpinputtext'           => '\Dewdrop\View\Helper\WpInputText',
         'wpselect'              => '\Dewdrop\View\Helper\WpSelect',
@@ -263,6 +264,11 @@ class View
     {
         $partial = new View($this->escaper);
 
+        // Pass along any custom helper class assignments to the newly created partial
+        foreach ($this->helperClasses as $name => $className) {
+            $partial->registerHelper($name, $className);
+        }
+
         foreach ($this->helpers as $name => $helper) {
             if ($helper instanceof PageDelegateInterface) {
                 $partial->helper($name)->setPage($helper->getPage());
@@ -325,7 +331,9 @@ class View
     public function render($template)
     {
         ob_start();
+
         require $this->scriptPath . '/' . basename($template);
+
         return ob_get_clean();
     }
 
