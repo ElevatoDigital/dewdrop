@@ -23,6 +23,7 @@ class CsvCellTest extends PHPUnit_Framework_TestCase
             '\Dewdrop\Fields\Helper\CsvCell\Content',
             $this->csvCellFieldsHelper->getContentRenderer()
         );
+
         $this->assertInstanceOf(
             '\Dewdrop\Fields\Helper\CsvCell\Header',
             $this->csvCellFieldsHelper->getHeaderRenderer()

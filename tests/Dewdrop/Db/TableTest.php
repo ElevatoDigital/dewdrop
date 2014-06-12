@@ -207,8 +207,12 @@ class TableTest extends DbTestCase
 
         $this->assertNull($row->get('dewdrop_test_fruit_id'));
         $this->assertNull($row->get('name'));
-        $this->assertNull($row->get('is_delicious'));
-        $this->assertNull($row->get('level_of_deliciousness'));
+
+        // This field has a default value in the schema, so its an exception
+        $this->assertEquals(1, $row->get('is_delicious'));
+
+        // This field has a default value in the schema, so its an exception
+        $this->assertEquals(0, $row->get('level_of_deliciousness'));
     }
 
     public function testCreateRowWithInitialDataSetsFieldsCorrectly()

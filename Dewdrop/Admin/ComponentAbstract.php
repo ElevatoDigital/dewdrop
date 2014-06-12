@@ -82,11 +82,15 @@ abstract class ComponentAbstract
 
     private $name;
 
+    private $path;
+
     private $pageFactories = array();
 
     private $permissions;
 
     protected $redirector;
+
+    protected $shouldRenderLayout = true;
 
     /**
      * Create a component instance using the DB adapter creating by the Wiring
@@ -95,35 +99,43 @@ abstract class ComponentAbstract
      * @param Pimple $pimple
      * @param string $componentName
      */
-    public function __construct(Pimple $pimple = null, $componentName = null)
+    public function __construct(Pimple $pimple = null)
     {
-        /**
-         * In normal execution, the name would be set for us, but in testing we
-         * can find it via reflection to avoid the author having to understand
-         * this bit.
-         */
-        if (null === $componentName) {
-            $reflectionClass = new ReflectionClass($this);
-            $componentName   = basename(dirname($reflectionClass->getFileName()));
-        }
-
+        // Retrieve required resources from Pimple to ensure they're present
         $this->pimple    = ($pimple ?: DewdropPimple::getInstance());
-        $this->db        = $this->pimple['db'];
-        $this->paths     = $this->pimple['paths'];
-        $this->request   = $this->pimple['dewdrop-request'];
-        $this->inflector = $this->pimple['inflector'];
-        $this->name      = $componentName;
+        $this->db        = $this->initPimpleResource('db');
+        $this->paths     = $this->initPimpleResource('paths');
+        $this->request   = $this->initPimpleResource('dewdrop-request');
+        $this->inflector = $this->initPimpleResource('inflector');
 
-        $this->addPageFactory(new PageFilesFactory($this, $this->request));
+        // Component metadaata retrieved via reflection
+        $reflectionClass = new ReflectionClass($this);
 
+        $this->path = dirname($reflectionClass->getFileName());
+        $this->name = basename($this->path);
+
+        // Setup the default page factory, which looks for files in the component's folder
+        $this->addPageFactory(new PageFilesFactory($this));
+
+        // Allow sub-classes to create basic resources
         $this->init();
 
+        // This should be refactored into an "environment driver" class
         $this->redirector = function ($url) {
             wp_safe_redirect($url);
             exit;
         };
 
         $this->checkRequiredProperties();
+    }
+
+    public function initPimpleResource($resourceName)
+    {
+        if (isset($this->pimple[$resourceName])) {
+            return $this->pimple[$resourceName];
+        } else {
+            return DewdropPimple::getResource($resourceName);
+        }
     }
 
     public function getPageFactories()
@@ -140,7 +152,7 @@ abstract class ComponentAbstract
 
     public function getPath()
     {
-        return $this->paths->getAdmin() . '/' . $this->name;
+        return $this->path;
     }
 
     public function getInflector()
@@ -151,6 +163,13 @@ abstract class ComponentAbstract
     public function getPaths()
     {
         return $this->paths;
+    }
+
+    public function setRequest(Request $request)
+    {
+        $this->request = $request;
+
+        return $this;
     }
 
     public function getRequest()
@@ -189,7 +208,7 @@ abstract class ComponentAbstract
     public function adminInit($page = null, Response $response = null)
     {
         if ($this->isCurrentlyActive()) {
-            $page = $this->createPageObject(isset($_GET['route']) ? $_GET['route'] : 'Index');
+            $page = $this->createPageObject($this->request->getQuery('route', 'Index'));
 
             if (null === $response) {
                 $response = new Response();
@@ -318,7 +337,7 @@ abstract class ComponentAbstract
     public function url($page, array $params = array())
     {
         $base  = get_bloginfo('wpurl') . '/wp-admin/admin.php?page=' . $this->getSlug();
-        $query = $this->assembleQueryString($params);
+        $query = $this->assembleQueryString($params, $separator = '&');
 
         foreach ($this->submenuPages as $submenu) {
             if ($submenu['route'] === $page) {
@@ -391,6 +410,13 @@ abstract class ComponentAbstract
     public function getName()
     {
         return $this->name;
+    }
+
+    public function setShouldRenderLayout($shouldRenderLayout)
+    {
+        $this->shouldRenderLayout = $shouldRenderLayout;
+
+        return $this;
     }
 
     public function getFullyQualifiedName()
@@ -508,7 +534,7 @@ abstract class ComponentAbstract
 
         $response->setOutput($output);
 
-        if ($this->request->isAjax()) {
+        if ($this->request->isAjax() || !$this->shouldRenderLayout) {
             $response->render();
             exit;
         }
@@ -581,13 +607,17 @@ abstract class ComponentAbstract
      * Assemble the remainder of a URL query string.
      *
      * @param array $params
+     * @param string $separator
      * @return string
      */
-    protected function assembleQueryString(array $params)
+    protected function assembleQueryString(array $params, $separator = null)
     {
-        $segments  = array();
-        $hasQuery  = count($this->getRequest()->getQuery());
-        $separator = ($hasQuery ? '&' : '?');
+        $segments = array();
+
+        if (null === $separator) {
+            $hasQuery  = count($this->getRequest()->getQuery());
+            $separator = ($hasQuery ? '&' : '?');
+        }
 
         foreach ($params as $name => $value) {
             $segments[] = sprintf(

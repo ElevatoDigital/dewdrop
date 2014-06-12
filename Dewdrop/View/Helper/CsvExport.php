@@ -10,7 +10,7 @@
 
 namespace Dewdrop\View\Helper;
 
-use Dewdrop\Admin\Component\Silex\CrudAbstract;
+use Dewdrop\Exception;
 use Dewdrop\Fields;
 use Dewdrop\Fields\Helper\CsvCell;
 
@@ -19,25 +19,48 @@ use Dewdrop\Fields\Helper\CsvCell;
  */
 class CsvExport extends AbstractHelper
 {
+    public function direct()
+    {
+        $args = func_get_args();
+
+        if (0 === count($args)) {
+            return $this;
+        }
+
+        if (!isset($args[0]) || !$args[0] instanceof Fields ||
+            !isset($args[1]) || !is_array($args[1])
+        ) {
+            throw new Exception('CsvExport accepts either no arguments or a CrudInterface component');
+        }
+
+        if (!isset($args[2])) {
+            $csvCellRenderer = $this->view->csvCellRenderer();
+        } elseif ($args[2] instanceof CsvCell) {
+            $csvCellRenderer = $args[2];
+        } else {
+            throw new Exception('Third argument should be null or a CsvCell helper');
+        }
+
+        $fields = $args[0];
+        $data   = $args[1];
+        $output = $this->render($fields, $data, $csvCellRenderer);
+
+        $this->sendHeaders('export.csv');
+
+        return $output;
+    }
+
     /**
-     * @param CrudAbstract $component
+     * @param CrudInterface $component
      * @return string
      */
-    public function render(CrudAbstract $component)
+    public function render(Fields $fields, array $data, CsvCell $csvCellRenderer)
     {
-        // Don't render the layout
-        $component->setShouldRenderLayout(false);
-
         // Start output buffering
         ob_start();
 
-        // Send headers
-        $this->sendHeaders();
-
         // Get the visible component fields
-        $fields = $component->getFields()->getVisibleFields();
-
-        $csvCellRenderer = $this->view->csvCellRenderer();
+        $fields = $fields->getVisibleFields();
 
         // Render header
         $csvRows[] = $this->renderHeader($fields, $csvCellRenderer);
@@ -45,7 +68,7 @@ class CsvExport extends AbstractHelper
         // Render content
         $csvRows = array_merge(
             $csvRows,
-            $this->renderContent($fields, $component->getListing()->fetchData($fields), $csvCellRenderer)
+            $this->renderContent($fields, $data, $csvCellRenderer)
         );
 
         // Output CSV data
@@ -61,8 +84,22 @@ class CsvExport extends AbstractHelper
         // Erase output buffer and turn off
         ob_end_clean();
 
-        // Return output
         return $output;
+    }
+
+    /**
+     * Set response headers for a CSV download
+     *
+     * @return void
+     */
+    public function sendHeaders($filename)
+    {
+        if (!preg_match('/\.csv$/', $filename)) {
+            $filename .= '.csv';
+        }
+
+        header('Content-Type: text/csv');
+        header("Content-Disposition: attachment; filename={$filename}");
     }
 
     /**
@@ -75,8 +112,8 @@ class CsvExport extends AbstractHelper
     {
         $outRows  = [];
         $rowIndex = 0;
-        foreach ($rows as $row) {
 
+        foreach ($rows as $row) {
             $outRow      = [];
             $columnIndex = 0;
             foreach ($fields as $field) {
@@ -105,16 +142,5 @@ class CsvExport extends AbstractHelper
         }
 
         return $header;
-    }
-
-    /**
-     * Set response headers for a CSV download
-     *
-     * @return void
-     */
-    protected function sendHeaders()
-    {
-        header('Content-Type: text/csv');
-        header("Content-Disposition: attachment; filename=export.csv");
     }
 }

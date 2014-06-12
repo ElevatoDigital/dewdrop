@@ -1,7 +1,14 @@
 <?php
 
-/* @var $csvExportHelper \Dewdrop\View\Helper\CsvExport */
-$csvExportHelper = $this->csvExport();
+// Don't render the layout
+$this->component->setShouldRenderLayout(false);
 
-echo $csvExportHelper->render($this->component);
+$fields = $this->component->getFields()->getVisibleFields();
 
+echo $this->csvExport()->render(
+    $fields,
+    $this->component->getListing()->fetchData($fields),
+    $this->csvCellRenderer()
+);
+
+echo $this->csvExport()->sendHeaders("{$this->component->getTitle()} Export.csv");

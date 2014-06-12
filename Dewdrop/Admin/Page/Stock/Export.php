@@ -1,13 +1,13 @@
 <?php
 
-namespace Dewdrop\Admin\Page\Stock\Silex;
+namespace Dewdrop\Admin\Page\Stock;
 
 use Dewdrop\Admin\Page\PageAbstract;
 
 class Export extends PageAbstract
 {
     /**
-     * @var \Dewdrop\Admin\Component\Silex\CrudAbstract
+     * @var \Dewdrop\Admin\Component\CrudInterface
      */
     protected $component;
 
@@ -16,7 +16,6 @@ class Export extends PageAbstract
      */
     public function render()
     {
-        // Inject component into view
         $this->view->assign('component', $this->component);
     }
 }

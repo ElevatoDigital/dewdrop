@@ -16,8 +16,6 @@ abstract class Silex extends ComponentAbstract
 
     protected $application;
 
-    private $shouldRenderLayout = true;
-
     public function __construct(Pimple $pimple = null, $componentName = null)
     {
         $this->pimple      = ($pimple ?: DewdropPimple::getInstance());
@@ -41,13 +39,6 @@ abstract class Silex extends ComponentAbstract
         $this->submenuPages[] = array(
             'isDivider' => true
         );
-
-        return $this;
-    }
-
-    public function setShouldRenderLayout($shouldRenderLayout)
-    {
-        $this->shouldRenderLayout = $shouldRenderLayout;
 
         return $this;
     }

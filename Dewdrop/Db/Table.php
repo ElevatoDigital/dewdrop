@@ -10,13 +10,13 @@
 
 namespace Dewdrop\Db;
 
-use Dewdrop\Paths;
-use Dewdrop\Exception;
 use Dewdrop\Db\Eav\Definition as EavDefinition;
 use Dewdrop\Db\ManyToMany\Field as ManyToManyField;
 use Dewdrop\Db\ManyToMany\Relationship as ManyToManyRelationship;
 use Dewdrop\Db\Row;
 use Dewdrop\Db\Field;
+use Dewdrop\Exception;
+use Dewdrop\Pimple;
 
 /**
  * The table class provides a gateway to the a single DB table by providing
@@ -84,13 +84,6 @@ abstract class Table
     private $db;
 
     /**
-     * Paths utility to help in finding DB metadata files
-     *
-     * @var \Dewdrop\Paths
-     */
-    private $paths;
-
-    /**
      * The name of the DB table represented by this table class.
      *
      * @var string
@@ -127,12 +120,10 @@ abstract class Table
      * Create new table object with supplied DB adapter
      *
      * @param Adapter $db
-     * @param Paths $paths
      */
-    public function __construct(Adapter $db, Paths $paths = null)
+    public function __construct(Adapter $db = null)
     {
-        $this->db    = $db;
-        $this->paths = ($paths ?: new Paths());
+        $this->db = ($db ?: Pimple::getResource('db'));
 
         $this->fieldProviders[] = new FieldProvider\Metadata($this);
         $this->fieldProviders[] = new FieldProvider\ManyToMany($this);

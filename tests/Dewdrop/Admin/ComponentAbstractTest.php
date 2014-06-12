@@ -5,6 +5,7 @@ namespace Dewdrop\Admin;
 use Dewdrop\Admin\Response;
 use Dewdrop\Db\Adapter;
 use Dewdrop\Paths;
+use Dewdrop\Pimple;
 use Dewdrop\Request;
 use Dewdrop\Test\BaseTestCase;
 
@@ -18,17 +19,18 @@ class ComponentAbstractTest extends BaseTestCase
 
     public function setUp()
     {
-        if (!defined('WPINC')) {
+        if (!Pimple::getResource('paths')->isWp()) {
             $this->markTestSkipped('ComponentAbstract currently only works in WP.');
         }
 
-        $this->paths   = new Paths();
-        $this->request = new Request();
-
-        $this->db = $GLOBALS['dewdrop_pimple']['db'];
+        $testPimple = new \Pimple();
+        $testPimple['dewdrop-request'] = new Request();
 
         require_once __DIR__ . '/test-components/animals/Component.php';
-        $this->component = new \DewdropTest\Admin\Animals\Component($this->db, $this->paths, $this->request);
+        $this->component = new \DewdropTest\Admin\Animals\Component($testPimple);
+
+        $this->request = $this->component->getRequest();
+        $this->paths   = $this->component->getPaths();
     }
 
     /**
@@ -37,7 +39,7 @@ class ComponentAbstractTest extends BaseTestCase
     public function testComponentWithEmptyInitThrowsException()
     {
         require_once __DIR__ . '/test-components/insufficient-init-method/Component.php';
-        $component = new \DewdropTest\Admin\InsufficientInitMethod\Component($this->db, $this->paths, $this->request);
+        $component = new \DewdropTest\Admin\InsufficientInitMethod\Component(Pimple::getInstance());
     }
 
     public function testGetDbReturnsAdapter()

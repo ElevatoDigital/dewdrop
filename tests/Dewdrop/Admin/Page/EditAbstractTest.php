@@ -5,6 +5,7 @@ namespace Dewdrop\Admin\Page;
 use Dewdrop\Test\DbTestCase;
 use Dewdrop\Db\Adapter;
 use Dewdrop\Paths;
+use Dewdrop\Pimple;
 use Dewdrop\Request;
 
 class EditAbstractTest extends DbTestCase
@@ -21,27 +22,27 @@ class EditAbstractTest extends DbTestCase
     {
         parent::setUp();
 
-        if (!defined('WPINC')) {
+        if (!Pimple::getResource('paths')->isWp()) {
             $this->markTestSkipped('Admin components currently only work in WP.');
         }
 
-        $this->paths   = new Paths();
-        $this->request = new Request();
-
-        $wpdb = new \wpdb(DB_USER, DB_PASSWORD, DB_NAME, DB_HOST);
-        $this->db = new Adapter($wpdb);
-
         require_once __DIR__ . '/../test-models/Animals.php';
 
+        $testPimple = new \Pimple();
+        $testPimple['dewdrop-request'] = new Request();
+
         require_once __DIR__ . '/../test-components/animals/Component.php';
-        $this->component = new \DewdropTest\Admin\Animals\Component($this->db, $this->paths, $this->request);
+        $this->component = new \DewdropTest\Admin\Animals\Component($testPimple);
 
         $file = __DIR__ . '/../test-components/animals/Edit.php';
         require_once $file;
 
+        $this->request = $this->component->getRequest();
+        $this->paths   = $this->component->getPaths();
+
         $this->page = new \DewdropTest\Admin\Animals\Edit(
             $this->component,
-            $this->request,
+            $this->component->getRequest(),
             $file
         );
     }
@@ -73,7 +74,7 @@ class EditAbstractTest extends DbTestCase
     {
         $this->request->setQuery('dewdrop_test_animal_id', 2);
 
-        $model = new \DewdropTest\Model\Animals($this->db);
+        $model = new \DewdropTest\Model\Animals(Pimple::getResource('db'));
         $row   = $this->page->findRowById('\DewdropTest\Model\Animals');
 
         $this->assertEquals(
@@ -143,7 +144,7 @@ class EditAbstractTest extends DbTestCase
 
     public function testErrorMessagesRelatedToFieldsHaveTitlePrefix()
     {
-        $model = new \DewdropTest\Model\Animals($this->db);
+        $model = new \DewdropTest\Model\Animals();
         $row   = $model->createRow();
 
         $this->request

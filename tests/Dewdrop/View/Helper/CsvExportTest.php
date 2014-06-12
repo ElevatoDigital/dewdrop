@@ -2,8 +2,6 @@
 
 namespace Dewdrop\View\Helper;
 
-use Dewdrop\Db\Table;
-use Dewdrop\Db\Table\AdminModelInterface;
 use Dewdrop\Fields;
 use Dewdrop\View\View;
 use PHPUnit_Framework_TestCase;
@@ -29,40 +27,6 @@ class CsvExportTest extends PHPUnit_Framework_TestCase
     {
         $this->view = new View();
 
-        $this->component = $this->getMockBuilder('\Dewdrop\Admin\Component\Silex\CrudAbstract')
-            ->disableOriginalConstructor()
-            ->setMethods(['getFields', 'getListing', 'getPrimaryModel'])
-            ->getMockForAbstractClass();
-
-        $model = $this->getMockBuilder('\Dewdrop\View\Helper\TestAdminModel')
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
-
-        $this->component->expects($this->any())
-            ->method('getPrimaryModel')
-            ->will($this->returnValue($model));
-
-        $this->component->expects($this->any())
-            ->method('getFields')
-            ->will($this->returnValue(new Fields()));
-
-        $listing = $this->getMockBuilder('\Dewdrop\Fields\Listing')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $listing->expects($this->any())
-            ->method('fetchData')
-            ->will($this->returnValue([]));
-
-        $this->component->expects($this->any())
-            ->method('getListing')
-            ->will($this->returnValue($listing));
-
-        /* @var $component \Dewdrop\Admin\Component\Silex\CrudAbstract|\PHPUnit_Framework_MockObject_MockObject */
-        $component = $this->component;
-        $component
-            ->setTitle('title');
-
         $this->csvExportViewHelper = $this->getMockBuilder('\Dewdrop\View\Helper\CsvExport')
             ->setConstructorArgs([$this->view])
             ->setMethods(['sendHeaders'])
@@ -74,13 +38,110 @@ class CsvExportTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf('\Dewdrop\View\Helper\CsvExport', $this->view->csvExport());
     }
 
-    public function testUsage()
+    public function testBasicUsageRendersCsv()
     {
-        $output = $this->csvExportViewHelper->render($this->component);
+        $fields = new Fields();
 
-        $this->assertInternalType('string', $output);
+        $fields
+            ->add('front')
+                ->setVisible(true)
+                ->setLabel('Front')
+                ->assignHelperCallback(
+                    'CsvCell.Content',
+                    function ($helper, $rowData) {
+                        return $rowData['test_field'];
+                    }
+                )
+            ->add('back')
+                ->setVisible(true)
+                ->setLabel('Back')
+                ->assignHelperCallback(
+                    'CsvCell.Content',
+                    function ($helper, $rowData) {
+                        return strrev($rowData['test_field']);
+                    }
+                );
+
+        $output = $this->csvExportViewHelper->direct($fields, array(array('test_field' => 'FAFAFAFA')));
+
+        $this->assertContains('Front,Back', $output);
+        $this->assertContains('FAFAFAFA,AFAFAFAF', $output);
+    }
+
+    public function testNonVisibleFieldsAreNotRendered()
+    {
+        $fields = new Fields();
+
+        $fields
+            ->add('visible')
+                ->setVisible(true)
+                ->setLabel('Visible')
+                ->assignHelperCallback(
+                    'CsvCell.Content',
+                    function ($helper, $rowData) {
+                        return 'content.visible';
+                    }
+                )
+            ->add('not_visible')
+                ->setVisible(false)
+                ->setLabel('Unseen')
+                ->assignHelperCallback(
+                    'CsvCell.Content',
+                    function ($helper, $rowData) {
+                        return 'content.unseen';
+                    }
+                );
+
+        $output = $this->csvExportViewHelper->direct($fields, array(array('test_field' => 'FAFAFAFA')));
+
+        $this->assertContains('Visible', $output);
+        $this->assertContains('content.visible', $output);
+        $this->assertNotContains('Unseen', $output);
+        $this->assertNotContains('content.unseen', $output);
+    }
+
+    public function testCanOptionallySupplyCustomRenderer()
+    {
+        $fields = new Fields();
+
+        $fields
+            ->add('custom')
+                ->setVisible(true)
+                ->setLabel('Custom')
+                ->assignHelperCallback(
+                    'CsvCell.Content',
+                    function ($helper, $rowData) {
+                        return 'shouldnotberendered';
+                    }
+                )
+            ->add('not_visible')
+                ->setVisible(false)
+                ->setLabel('Unseen')
+                ->assignHelperCallback(
+                    'CsvCell.Content',
+                    function ($helper, $rowData) {
+                        return 'content.unseen';
+                    }
+                );
+
+        $renderer = $this->view->csvCellRenderer();
+
+        $renderer->getContentRenderer()->assign(
+            'custom',
+            function ($helper, $rowData) {
+                return 'customrendering';
+            }
+        );
+
+        $output = $this->csvExportViewHelper->direct($fields, array(array('test_field' => 'FAFAFAFA')), $renderer);
+
+        $this->assertContains('customrendering', $output);
+        $this->assertNotContains('shouldnotberenderered', $output);
+    }
+
+    public function testPassingNoArgumentsToDirectReturnsHelperInstance()
+    {
+        $this->assertInstanceOf('\Dewdrop\View\Helper\CsvExport', $this->csvExportViewHelper->direct());
     }
 }
-
-abstract class TestAdminModel extends Table implements AdminModelInterface {};
 

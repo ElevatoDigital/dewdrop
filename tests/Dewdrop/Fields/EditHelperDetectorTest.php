@@ -36,18 +36,18 @@ class EditHelperDetectorTest extends BaseTestCase
         $this->assertEquals('checkboxList', $this->detector->detect($field));
     }
 
-    public function testStringFieldWillUseWpInputTextByDefault()
+    public function testStringFieldWillUseInputTextByDefault()
     {
-        $field = $this->getTestField('string');
+        $field = $this->getTestField('text');
 
         $this->assertEquals('inputText', $this->detector->detect($field));
     }
 
-    public function testClobFieldWillUseWpInputTextByDefault()
+    public function testClobFieldWillUseTextareaByDefault()
     {
         $field = $this->getTestField('clob');
 
-        $this->assertEquals('inputText', $this->detector->detect($field));
+        $this->assertEquals('textarea', $this->detector->detect($field));
     }
 
     public function testNumericFieldWillUseWpInputTextByDefault()
