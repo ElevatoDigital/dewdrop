@@ -19,6 +19,7 @@ class Crud implements PageFactoryInterface
         'debug-listing-sql' => '\Dewdrop\Admin\Page\Stock\Silex\DebugListingSql',
         'debug-test-sort'   => '\Dewdrop\Admin\Page\Stock\Silex\DebugTestSort',
         'edit'              => '\Dewdrop\Admin\Page\Stock\Silex\Edit',
+        'export'            => '\Dewdrop\Admin\Page\Stock\Silex\Export',
         'index'             => '\Dewdrop\Admin\Page\Stock\Silex\Index',
         'notification-edit' => '\Dewdrop\Admin\Page\Stock\Silex\NotificationEdit',
         'notification'      => '\Dewdrop\Admin\Page\Stock\Silex\Notification',
