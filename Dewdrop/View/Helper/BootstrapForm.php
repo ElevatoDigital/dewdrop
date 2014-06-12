@@ -74,7 +74,7 @@ class BootstrapForm extends AbstractHelper
             $output .= $controlOutput;
 
             if ($messages) {
-                $out .= $this->renderMessages($messages);
+                $output .= $this->renderMessages($messages);
             }
 
             if ($field->getNote()) {
