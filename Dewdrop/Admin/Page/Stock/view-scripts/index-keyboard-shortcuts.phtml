@@ -1,0 +1,42 @@
+<div class="modal fade" id="keyboard-shortcuts-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">Keyboard Shortcuts</h4>
+            </div>
+            <div class="modal-body">
+                <p>
+                    When viewing the main <?php echo $this->escapeHtml($this->componentTitle);?> page,
+                    you can use the following keyboard shortcuts to navigate more quickly.
+                </p>
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        <button type="button" class="btn btn-default">C</button>
+                        Create <?php echo $this->escapeHtml($this->singularTitle);?>
+                    </li>
+                    <li class="list-group-item">
+                        <button type="button" class="btn btn-default">J</button>
+                        Select Next <?php echo $this->escapeHtml($this->singularTitle);?>
+                    </li>
+                    <li class="list-group-item">
+                        <button type="button" class="btn btn-default">K</button>
+                        Select Previous <?php echo $this->escapeHtml($this->singularTitle);?>
+                    </li>
+                    <li class="list-group-item">
+                        <button type="button" class="btn btn-default">E</button>
+                        Edit Selected <?php echo $this->escapeHtml($this->singularTitle);?>
+                    </li>
+                    <li class="list-group-item">
+                        <button type="button" class="btn btn-default">V</button>
+                        View Selected <?php echo $this->escapeHtml($this->singularTitle);?>
+                    </li>
+                    <li class="list-group-item">
+                        <button type="button" class="btn btn-default">/</button>
+                        Show Filters
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

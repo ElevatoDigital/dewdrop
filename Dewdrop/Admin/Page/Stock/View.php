@@ -22,10 +22,11 @@ class View extends PageAbstract
             $params[$id] = $this->request->getQuery($id);
         }
 
-        $this->view->params        = $params;
-        $this->view->fields        = $fields;
-        $this->view->singularTitle = $this->component->getPrimaryModel()->getSingularTitle();
-        $this->view->data          = $data;
-        $this->view->permissions   = $this->component->getPermissions();
+        $this->view->params         = $params;
+        $this->view->fields         = $fields;
+        $this->view->singularTitle  = $this->component->getPrimaryModel()->getSingularTitle();
+        $this->view->data           = $data;
+        $this->view->groupingFilter = $this->component->getFieldGroupsFilter();
+        $this->view->permissions    = $this->component->getPermissions();
     }
 }

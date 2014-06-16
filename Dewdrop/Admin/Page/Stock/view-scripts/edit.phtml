@@ -11,5 +11,10 @@
     <li class="active"><?php echo ($this->isNew ? 'Add' : 'Edit');?> <?php echo $this->escapeHtml($this->model->getSingularTitle());?></li>
 </ol>
 
-<?php echo $this->bootstrapForm($this->fields, $this->rowEditor->getInputFilter());?>
+<?php
+echo $this->bootstrapForm(
+    $this->fields->getEditableFields($this->groupingFilter),
+    $this->rowEditor->getInputFilter()
+);
+?>
 <?php echo $this->wrap()->close();?>

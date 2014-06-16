@@ -19,12 +19,7 @@
 <?php
 $data = $this->listing->fetchData($this->fields);
 
-if (count($data)) {
-    echo $this->bootstrapTable(
-        $this->fields->getVisibleFields(),
-        $data
-    );
-} else {
+if (!count($data)) {
     ?>
     <div class="row">
         <div class="col-md-2"></div>
@@ -34,6 +29,24 @@ if (count($data)) {
         <div class="col-md-2"></div>
     </div>
     <?php
+} else {
+    $renderer = $this->tableCellRenderer();
+
+    $this->bootstrapRowActions()->assignCallback(
+        array(
+            'renderer'  => $renderer,
+            'field'     => $this->fields->getIterator()->current(),
+            'title'     => 'Subscription',
+            'urlFields' => 'dewdrop_notification_subscription_id',
+            'edit'      => $this->adminUrl('notification-edit', array('dewdrop_notification_subscription_id' => '%s'))
+        )
+    );
+
+    echo $this->bootstrapTable(
+        $this->fields->getVisibleFields(),
+        $data,
+        $renderer
+    );
 }
 ?>
 <?php echo $this->wrap()->close();?>

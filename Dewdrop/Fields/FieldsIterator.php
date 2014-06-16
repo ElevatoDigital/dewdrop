@@ -6,7 +6,7 @@ use Iterator;
 
 class FieldsIterator implements Iterator
 {
-    private $fields;
+    protected $fields;
 
     public function __construct(array $fields)
     {

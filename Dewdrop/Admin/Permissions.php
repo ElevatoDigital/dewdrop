@@ -47,7 +47,7 @@ class Permissions
             'edit'           => "Edit existing {$plural}",
             'export'         => 'Export data to a file',
             'filter'         => "Filter {$plural}",
-            'group-fields'   => "Sort and group {$singular} fields",
+            'sort-fields'    => "Sort and group {$singular} fields",
             'notifications'  => "Subscribe to be notified when {$plural} are added or updated",
             'view'           => "See an individual {$singular} in detail",
         );

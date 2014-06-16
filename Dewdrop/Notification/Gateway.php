@@ -77,7 +77,7 @@ class Gateway extends Table
                     function ($helper, array $rowData) use ($editUrl) {
                         return $helper->getEscaper()->escapeHtml(
                             $this->renderRecipients($rowData['dewdrop_notification_subscription_id'])
-                        ) . '<div class="pull-right row-actions"><a href="' . $editUrl . '?dewdrop_notification_subscription_id=' . $rowData['dewdrop_notification_subscription_id'] . '" class="btn btn-default btn-sm">Edit</a></div>';
+                        );
                     }
                 )
                 ->setEditable(true)

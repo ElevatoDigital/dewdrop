@@ -5,6 +5,7 @@ namespace Dewdrop\View\Helper;
 use Dewdrop\Exception;
 use Dewdrop\Fields;
 use Dewdrop\Fields\FieldInterface;
+use Dewdrop\Fields\GroupedFields;
 use Dewdrop\Fields\Helper\EditControl as Renderer;
 use Dewdrop\Pimple;
 use Zend\InputFilter\Input;
@@ -28,8 +29,14 @@ class BootstrapForm extends AbstractHelper
         $inputFilter = $args[1];
         $renderer    = (isset($args[2]) && $args[2] instanceof Renderer ? $args[2] : $this->view->editControlRenderer());
 
+        if ($fields instanceof GroupedFields && 1 < count($fields->getGroups())) {
+            $renderMethod = 'renderGroupedFields';
+        } else {
+            $renderMethod = 'renderFields';
+        }
+
         return $this->open()
-            . $this->renderFields($fields, $inputFilter, $renderer)
+            . $this->$renderMethod($fields, $inputFilter, $renderer)
             . $this->renderSubmitButton()
             . $this->close();
     }
@@ -48,6 +55,43 @@ class BootstrapForm extends AbstractHelper
         return '</form>';
     }
 
+    public function renderGroupedFields(GroupedFields $groupedFields, InputFilter $inputFilter, Renderer $renderer)
+    {
+        $output = '<ul class="nav nav-tabs">';
+
+        foreach ($groupedFields->getGroups() as $index => $group) {
+            if (count($group)) {
+                $output .= sprintf(
+                    '<li%s><a href="#group_%d" data-toggle="tab">%s</a></li>',
+                    (0 === $index ? ' class="active"' : ''),
+                    $index,
+                    $this->view->escapeHtml($group->getTitle())
+                );
+            }
+        }
+
+        $output .= '</ul>';
+        $output .= '<div class="tab-content">';
+
+        foreach ($groupedFields->getGroups() as $index => $group) {
+            if (count($group)) {
+                $output .= sprintf(
+                    '<div class="tab-pane-edit tab-pane fade%s" id="group_%d">',
+                    (0 === $index ? ' in active' : ''),
+                    $index
+                );
+
+                $output .= $this->renderFields($group, $inputFilter, $renderer);
+
+                $output .= '</div>';
+            }
+        }
+
+        $output .= '</div>';
+
+        return $output;
+    }
+
     public function renderFields(Fields $fields, InputFilter $inputFilter, Renderer $renderer)
     {
         $output = '';
@@ -62,7 +106,7 @@ class BootstrapForm extends AbstractHelper
 
             $output .= sprintf(
                 $this->renderFormGroupOpenTag(),
-                ($messages ? ' has-feedback has-error' : '')
+                ($messages ? ' has-feedback has-error alert alert-danger' : '')
             );
 
             $controlOutput = $renderer->getControlRenderer()->render($field, $fieldPosition);
@@ -95,7 +139,7 @@ class BootstrapForm extends AbstractHelper
 
     public function renderFormGroupOpenTag()
     {
-        return '<div class="form-group">';
+        return '<div class="form-group%s">';
     }
 
     public function renderLabel(Renderer $renderer, FieldInterface $field, Input $input = null)
@@ -130,7 +174,9 @@ class BootstrapForm extends AbstractHelper
     public function renderSubmitButton($title = 'Save Changes')
     {
         return sprintf(
-            '<div class="form-group"><input type="submit" value="%s" class="btn btn-primary" /></div>',
+            '<div class="form-group">
+                <input type="submit" value="%s" class="btn btn-primary" />
+            </div>',
             $this->view->escapeHtmlAttr($title)
         );
     }

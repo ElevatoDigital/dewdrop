@@ -610,14 +610,9 @@ abstract class ComponentAbstract
      * @param string $separator
      * @return string
      */
-    protected function assembleQueryString(array $params, $separator = null)
+    protected function assembleQueryString(array $params, $separator)
     {
         $segments = array();
-
-        if (null === $separator) {
-            $hasQuery  = count($this->getRequest()->getQuery());
-            $separator = ($hasQuery ? '&' : '?');
-        }
 
         foreach ($params as $name => $value) {
             $segments[] = sprintf(

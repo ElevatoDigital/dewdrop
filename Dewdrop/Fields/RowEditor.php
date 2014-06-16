@@ -287,7 +287,46 @@ class RowEditor
         if (is_callable($this->saveCallback)) {
             call_user_func($this->saveCallback, $this);
         } else {
-            foreach ($this->rowsByName as $row) {
+            $this->saveRowsByLinks($this->rowsByName);
+        }
+
+        return $this;
+    }
+
+    /**
+     * In most common cases, the rows handled by a RowEditor object are linked
+     * to one another by foreign key using the linkByField() method.  When this
+     * is the case, we can traverse those links in reverse order, saving the
+     * rows at the end of the chain of links first so that they can populate
+     * the fields on the tables farther up the chain.  Once the field links
+     * have been traversed, we can save the other rows safely.
+     *
+     * If you are not using linkByField(), you may need to provide a custom
+     * save callback that takes your situation into account.
+     *
+     * @return RowEditor
+     */
+    public function saveRowsByLinks()
+    {
+        $reverseLinks = array_reverse($this->links, true);
+        $savedRows    = array();
+
+        // First save Field links in the chain in reverse order
+        foreach ($reverseLinks as $modelName => $link) {
+            if ($link instanceof FieldLink) {
+                $row = $this->getRow($modelName);
+
+                $row->save();
+
+                $link->populateValueFromSavedRow($row);
+
+                $savedRows[] = $modelName;
+            }
+        }
+
+        // Now save any rows that weren't saved in the first loop
+        foreach ($this->rowsByName as $modelName => $row) {
+            if (!in_array($modelName, $savedRows)) {
                 $row->save();
             }
         }

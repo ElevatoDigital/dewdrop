@@ -66,6 +66,14 @@ interface CrudInterface
     public function getFields();
 
     /**
+     * Get a \Dewdrop\Fields\Filter\Groups object to allow the user to sort
+     * and group their fields.
+     *
+     * @return \Dewdrop\Fields\Filter\Groups
+     */
+    public function getFieldGroupsFilter();
+
+    /**
      * Get a \Dewdrop\Fields\Filter\Visilibility object that allows the user
      * to select which fields should be visible on listings.
      *

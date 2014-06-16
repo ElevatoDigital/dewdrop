@@ -65,6 +65,7 @@ class View
         'bootstrapdetailsview'  => '\Dewdrop\View\Helper\BootstrapDetailsView',
         'bootstrapform'         => '\Dewdrop\View\Helper\BootstrapForm',
         'bootstrapinputtext'    => '\Dewdrop\View\Helper\BootstrapInputText',
+        'bootstraprowactions'   => '\Dewdrop\View\Helper\BootstrapRowActions',
         'bootstrapselect'       => '\Dewdrop\View\Helper\BootstrapSelect',
         'bootstraptextarea'     => '\Dewdrop\View\Helper\BootstrapTextarea',
         'checkboxlist'          => '\Dewdrop\View\Helper\CheckboxList',

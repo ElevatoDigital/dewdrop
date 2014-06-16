@@ -91,4 +91,19 @@ class Field implements LinkInterface
 
         return $row;
     }
+
+    public function populateValueFromSavedRow(Row $row)
+    {
+        $references = $this->field->getTable()->getMetadata('references');
+
+        foreach ($references as $foreignKey => $referencedColumnAndTable) {
+            if ($foreignKey === $this->field->getName()) {
+                $referencedColumn = $referencedColumnAndTable['column'];
+
+                $this->field->setValue($row[$referencedColumn]);
+            }
+        }
+
+        return $this;
+    }
 }

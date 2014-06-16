@@ -4,6 +4,7 @@
         <?php if ($this->permissions->can('create')) :?>
         <a data-keyboard-role="create" href="<?php echo $this->escapeHtmlAttr($this->adminUrl('edit'));?>" class="btn btn-primary navbar-btn">Add <?php echo $this->escapeHtml($this->singularTitle);?></a>
         <?php endif;?>
+
         <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#admin-index-collapse">
             <span class="sr-only">Toggle navigation</span>
             <span class="icon-bar"></span>
@@ -16,6 +17,7 @@
         <?php if ($this->permissions->can('export')) :?>
         <a href="<?php echo $this->escapeHtmlAttr($this->adminUrl('export', array('format' => 'csv')));?>" class="btn btn-link btn-link-first navbar-btn">Export</a>
         <?php endif;?>
+
         <?php if ($this->permissions->can('adjust-columns')) :?>
         <a href="#" data-toggle="modal" data-target="#adjust-columns-modal" class="btn btn-link navbar-btn">Adjust Columns</a>
         <?php endif;?>
@@ -33,12 +35,15 @@
                         <li><a href="#">Save Current View</a></li>
                         <li><a href="#">Manage Custom Views</a></li>
                         <?php endif;?>
-                        <?php if ($this->permissions->can('group-fields')) :?>
-                        <li><a href="#">Sort and Group Fields</a></li>
+
+                        <?php if ($this->permissions->can('sort-fields')) :?>
+                        <li><a href="<?php echo $this->escapeHtmlAttr($this->adminUrl('sort-fields'));?>">Sort and Group Fields</a></li>
                         <?php endif;?>
+
                         <?php if ($this->permissions->can('notifications')) :?>
                         <li><a href="<?php echo $this->escapeHtmlAttr($this->adminUrl('notifications'));?>">Notifications</a></li>
                         <?php endif;?>
+
                         <li><a data-toggle="modal" data-target="#keyboard-shortcuts-modal" href="#">View Keyboard Shortcuts</a></li>
 
                         <?php if ($this->permissions->can('debug')):?>
@@ -75,7 +80,7 @@
                         <select class="form-control input-sm" name="filters[]">
                             <option value="" disabled="disabled" selected="selected">Select a field to filter by...</option>
                             <?php
-                            foreach ($this->fields->getFilterableFields() as $field) {
+                            foreach ($this->fields->getFilterableFields($this->groupingFilter) as $field) {
                                 printf(
                                     '<option value="%s">%s</option>',
                                     $this->escapeHtmlAttr($field->getId()),
@@ -105,92 +110,47 @@
     </div>
 </div>
 
-<div class="modal fade" id="keyboard-shortcuts-modal" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title">Keyboard Shortcuts</h4>
-            </div>
-            <div class="modal-body">
-                <p>
-                    When viewing the main <?php echo $this->escapeHtml($this->component->getTitle());?> page,
-                    you can use the following keyboard shortcuts to navigate more quickly.
-                </p>
-                <ul class="list-group">
-                    <li class="list-group-item">
-                        <button type="button" class="btn btn-default">C</button>
-                        Create <?php echo $this->escapeHtml($this->singularTitle);?>
-                    </li>
-                    <li class="list-group-item">
-                        <button type="button" class="btn btn-default">J</button>
-                        Select Next <?php echo $this->escapeHtml($this->singularTitle);?>
-                    </li>
-                    <li class="list-group-item">
-                        <button type="button" class="btn btn-default">K</button>
-                        Select Previous <?php echo $this->escapeHtml($this->singularTitle);?>
-                    </li>
-                    <li class="list-group-item">
-                        <button type="button" class="btn btn-default">E</button>
-                        Edit Selected <?php echo $this->escapeHtml($this->singularTitle);?>
-                    </li>
-                    <li class="list-group-item">
-                        <button type="button" class="btn btn-default">V</button>
-                        View Selected <?php echo $this->escapeHtml($this->singularTitle);?>
-                    </li>
-                    <li class="list-group-item">
-                        <button type="button" class="btn btn-default">/</button>
-                        Show Filters
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </div>
-</div>
+<?php
+echo $this->partial(
+    'index-keyboard-shortcuts.phtml',
+    array(
+        'componentTitle' => $this->component->getTitle(),
+        'singularTitle'  => $this->singularTitle
+    )
+);
+?>
 
 <?php
-$renderer   = $this->tableCellRenderer();
-$fields     = $this->fields->getVisibleFields($this->visibilityFilter);
-$firstField = $fields->getIterator()->current();
+$renderer = $this->tableCellRenderer();
+$fields   = $this->fields->getVisibleFields(array($this->groupingFilter, $this->visibilityFilter));
+$pkey     = $this->listing->getPrimaryKey()->getName();
 
-$renderer->getContentRenderer()
-    ->assignCallbackByColumnPosition(
-        0,
-        function ($helper, $rowData, $rowIndex, $columnIndex) use ($renderer, $firstField) {
-            $out = call_user_func(
-                $renderer->getContentRenderer()->getFieldAssignment($firstField),
-                $rowData,
-                $rowIndex,
-                $columnIndex
-            );
+$rowActionArgs = array(
+    'renderer'  => $renderer,
+    'field'     => $fields->getIterator()->current(),
+    'title'     => $this->singularTitle,
+    'urlFields' => $pkey
+);
 
-            $primaryKeyValue = array();
+if ($this->permissions->can('edit')) {
+    $rowActionArgs['edit'] = $this->adminUrl('edit', array($pkey => '%s'));
+}
 
-            foreach ($this->primaryKey as $field) {
-                $primaryKeyValue[$field] = $rowData[$field];
-            }
+if ($this->permissions->can('view')) {
+    $rowActionArgs['view'] = $this->adminUrl('view', array($pkey => '%s'));
+}
 
-            return $this->partial(
-                'index-row-actions.phtml',
-                array(
-                    'content'       => $out,
-                    'params'        => $primaryKeyValue,
-                    'singularTitle' => $this->singularTitle,
-                    'permissions'   => $this->permissions
-                )
-            );
-        }
-    );
+$this->bootstrapRowActions()->assignCallback($rowActionArgs);
 
 echo $this->bootstrapTable(
     $fields,
-    $this->listing->fetchData($this->fields),
+    $this->listing->fetchData($this->groupingFilter->apply($this->fields)),
     $renderer,
     $this->listing->getSelectModifierByName('SelectSort')
 );
 
 echo $this->bootstrapColumnsModal(
-    $this->fields,
+    $this->fields->getVisibleFields($this->groupingFilter),
     $this->fields->getVisibleFields($this->visibilityFilter),
     $this->adminUrl('adjust-visibility')
 );

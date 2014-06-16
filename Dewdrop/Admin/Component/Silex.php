@@ -48,7 +48,7 @@ abstract class Silex extends ComponentAbstract
         return '/admin/'
             . $this->getName() . '/'
             . $this->application['inflector']->hyphenize($page)
-            . $this->assembleQueryString($params);
+            . $this->assembleQueryString($params, '?');
     }
 
     public function register()

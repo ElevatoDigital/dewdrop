@@ -16,6 +16,7 @@ class Export extends PageAbstract
      */
     public function render()
     {
+        $this->component->getPermissions()->haltIfNotAllowed('export');
         $this->view->assign('component', $this->component);
     }
 }

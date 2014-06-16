@@ -20,9 +20,9 @@ class Index extends PageAbstract
         $this->view->permissions      = $this->component->getPermissions();
         $this->view->singularTitle    = $this->component->getPrimaryModel()->getSingularTitle();
         $this->view->pluralTitle      = $this->component->getPrimaryModel()->getPluralTitle();
-        $this->view->primaryKey       = $this->component->getPrimaryModel()->getPrimaryKey();
         $this->view->listing          = $listing;
         $this->view->visibilityFilter = $filter;
+        $this->view->groupingFilter   = $this->component->getFieldGroupsFilter();
         $this->view->fields           = $fields;
         $this->view->debug            = Pimple::getResource('debug');
     }
