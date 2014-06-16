@@ -574,9 +574,6 @@ class Select
                     $val = trim($matches[1]);
                     $direction = $matches[2];
                 }
-                if (preg_match('/\(.*\)/', $val)) {
-                    $val = new Expr($val);
-                }
                 $this->parts[self::ORDER][] = array($val, $direction);
             }
         }
