@@ -71,6 +71,15 @@ class Field extends FieldAbstract
     private $label;
 
     /**
+     * Typically, DB fields use IDs that are composed of the table name followed
+     * by a separator and then the field name.  If you have a naming conflict,
+     * though, you can set an alternate group name for the field.
+     *
+     * @var string
+     */
+    private $groupName;
+
+    /**
      * The metadata related to this column.  The metadata includes the
      * following fields:
      *
@@ -339,10 +348,37 @@ class Field extends FieldAbstract
     public function getControlName()
     {
         if (null === $this->controlName) {
-            $this->controlName = $this->table->getTableName() . ':' . $this->name;
+            $this->controlName = $this->getGroupName() . ':' . $this->name;
         }
 
         return $this->controlName;
+    }
+
+    /**
+     * Set an alternative group name for this field.  Typically, DB fields are
+     * by their table name, but if you have fields from multiple instances of the
+     * same model on a single request, that might cause conflicts.  In those cases,
+     * altnative group names can be used to resolve the naming conflict.
+     *
+     * @param string $groupName
+     * @return Field
+     */
+    public function setGroupName($groupName)
+    {
+        $this->groupName = $groupName;
+
+        return $this;
+    }
+
+    /**
+     * Get the group name for this field, typically the table name, unless an
+     * alterative has been set.
+     *
+     * @return string
+     */
+    public function getGroupName()
+    {
+        return $this->groupName ?: $this->table->getTableName();
     }
 
     /**

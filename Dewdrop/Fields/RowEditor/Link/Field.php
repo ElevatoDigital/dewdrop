@@ -92,6 +92,22 @@ class Field implements LinkInterface
         return $row;
     }
 
+    /**
+     * Populate the primary key value from the supplied row (already saved in
+     * the RowEditor) up to the linked field in this object.  For example, say
+     * you'd configured a link like this in your RowEditor:
+     *
+     * <code>
+     * $rowEditor->linkByField('addresses', $this->orderModel->field('address_id'));
+     * </code>
+     *
+     * Then, when this method was called, you'd get a row from the addresses
+     * table that had already been saved by the row editor.  And, using that row,
+     * this method would set the value of the orderModel's address_id field
+     * to the primary key of the addresses row.
+     *
+     * @return \Dewdrop\Fields\RowEditor\Link\Field
+     */
     public function populateValueFromSavedRow(Row $row)
     {
         $references = $this->field->getTable()->getMetadata('references');

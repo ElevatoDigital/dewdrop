@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * Dewdrop
+ *
+ * @link      https://github.com/DeltaSystems/dewdrop
+ * @copyright Delta Systems (http://deltasys.com)
+ * @license   https://github.com/DeltaSystems/dewdrop/LICENSE
+ */
+
 namespace Dewdrop\Fields\Filter;
 
 use Dewdrop\Db\Adapter as DbAdapter;
@@ -7,26 +15,80 @@ use Dewdrop\Fields;
 use Dewdrop\Fields\Exception;
 use Dewdrop\Fields\GroupedFields;
 
+/**
+ * Filter a set of fields into a \Dewdrop\Fields\GroupedFields object.
+ * Components that understand the additional APIs provided by
+ * \Dewdrop\Fields\GroupedFields object provides can then display their
+ * fields in user-defined groups, while components that are unaware of
+ * those APIs can continue using it just like a normal \Dewdrop\Fields
+ * object that is sorted in a particular order.
+ */
 class Groups implements FilterInterface
 {
+    /**
+     * A constant to help clarify that group zero is always index zero.
+     *
+     * @const
+     */
     const UNGROUPED = 0;
 
+    /**
+     * The fully qualified component name to use when storing sorting and
+     * grouping preferences in the DB.
+     *
+     * @var string
+     */
     private $componentName;
 
+    /**
+     * The DB adapter that can be used for loading and saving preferences.
+     *
+     * @var DbAdapter
+     */
     private $dbAdapter;
 
+    /**
+     * The table where the sort fields are stored in the DB.
+     *
+     * @var string
+     */
     private $fieldTableName = 'dewdrop_sorted_fields';
 
+    /**
+     * The table where the groups are stored in the DB.
+     *
+     * @var string
+     */
     private $groupTableName = 'dewdrop_field_groups';
 
+    /**
+     * A variable where we can store the data loaded from the DB so that we
+     * do not have to query for it multiple times on a single request.
+     *
+     * @var array
+     */
     private $loadedDbData;
 
+    /**
+     * Provide a component name and DB adpater that can be used when saving
+     * and loading preferences frmo the database.
+     *
+     * @param string $componentName
+     * @param DbAdapter $dbAdapter
+     */
     public function __construct($componentName, DbAdapter $dbAdapter)
     {
         $this->componentName = $componentName;
         $this->dbAdapter     = $dbAdapter;
     }
 
+    /**
+     * Manually override the name of the database table where the sorted fields
+     * are stored.  Typically only needed during testing.
+     *
+     * @param string $fieldTableName
+     * @return Groups
+     */
     public function setFieldTableName($fieldTableName)
     {
         $this->fieldTableName = $fieldTableName;
@@ -34,6 +96,13 @@ class Groups implements FilterInterface
         return $this;
     }
 
+    /**
+     * Manually override the name of the database table where the field groups
+     * are stored.  Typically only needed during testing.
+     *
+     * @param string $groupTableName
+     * @return Groups
+     */
     public function setGroupTableName($groupTableName)
     {
         $this->groupTableName = $groupTableName;
@@ -41,12 +110,39 @@ class Groups implements FilterInterface
         return $this;
     }
 
+    /**
+     * Get an array representation of the current preferences.  This is typically
+     * used by a UI/form designed to allow the user to modify the grouping and
+     * sorting preferences for a component.  The resulting array will be in the
+     * following format:
+     *
+     * <code>
+     * array(
+     *     'title'    => 'Group Title',
+     *     'caption' => 'Group caption explaining what it is.  Usually only on unsorted group.',
+     *     'fields'  => array(
+     *         array(
+     *             'id'    => 'products:name',
+     *             'label' => 'Name'
+     *         ),
+     *         array(
+     *             'id'    => 'products:price',
+     *             'label' => 'Price'
+     *         )
+     *     )
+     * )
+     * </code>
+     *
+     * @see \Dewdrop\Admin\Page\Stock\SortFields
+     * @return array
+     */
     public function getConfigForFields(Fields $fields)
     {
-        $sortedList = $this->load();
+        $sortedList  = $this->load();
+        $fieldsAdded = array();
 
         $config = array(
-            array(
+            self::UNGROUPED => array(
                 'title'   => 'Ungrouped Fields',
                 'fields'  => array(),
                 'caption' => 'These fields have not been added to a group.  They\'ll automatically be sorted into
@@ -74,12 +170,43 @@ class Groups implements FilterInterface
                 'id'    => $field->getId(),
                 'label' => $field->getLabel()
             );
+
+            $fieldsAdded[] = $field->getId();
+        }
+
+        // Throw any fields there weren't matched into the "ungrouped" set
+        foreach ($fields as $field) {
+            if (!in_array($field->getId(), $fieldsAdded)) {
+                $config[self::UNGROUPED]['fields'][] = array(
+                    'id'    => $field->getId(),
+                    'label' => $field->getLabel()
+                );
+            }
         }
 
         // Returning just the values to ensure we provide predictable numeric keys
         return array_values($config);
     }
 
+    /**
+     * Load the current preferences for this component from the database.  The
+     * information will be returned in this format:
+     *
+     * <code>
+     * array(
+     *     array(
+     *         'field_id'    => 'products:name',
+     *         'group_title' => 'My Field Group',
+     *         'group_id'    => 2
+     *     )
+     * )
+     * </code>
+     *
+     * The fields and groups will be sorted when returned from this method, so
+     * can iterate over it without having to first sort it.
+     *
+     * @return array
+     */
     public function load()
     {
         $sql = $this->dbAdapter->quoteInto(
@@ -101,6 +228,23 @@ class Groups implements FilterInterface
         return $this->dbAdapter->fetchAll($sql);
     }
 
+    /**
+     * Save the supplied configuration to the database.  We expect the info
+     * to be provided in this format:
+     *
+     * <code>
+     * array(
+     *     'title' => 'My Group Title',
+     *     'fields' => array(
+     *         array('id' => 'products:name'),
+     *         array('id' => 'products:price')
+     *     )
+     * )
+     * </code>
+     *
+     * @param array $groupConfig
+     * @return Groups
+     */
     public function save(array $groupConfig)
     {
         if (!count($groupConfig)) {
@@ -110,8 +254,18 @@ class Groups implements FilterInterface
         } else {
             $this->saveGroups($groupConfig);
         }
+
+        return $this;
     }
 
+    /**
+     * If there is only one group in the supplied config, we know that is the
+     * "ungrouped" set of fields, which is always included.  So, we can save all
+     * those fields with a null group ID.
+     *
+     * @param array $groupConfig
+     * @return void
+     */
     protected function saveUngroupedList(array $groupConfig)
     {
         $this->dbAdapter->beginTransaction();
@@ -129,6 +283,12 @@ class Groups implements FilterInterface
         $this->dbAdapter->commit();
     }
 
+    /**
+     * Save multiple groups of fields to the database.
+     *
+     * @param array $groupConfig
+     * @return void
+     */
     protected function saveGroups(array $groupConfig)
     {
         $this->dbAdapter->beginTransaction();
@@ -156,6 +316,14 @@ class Groups implements FilterInterface
         $this->dbAdapter->commit();
     }
 
+    /**
+     * Save the fields to the DB using the supplied group ID, which can be null
+     * in the case of un-grouped fields.
+     *
+     * @param array $fields
+     * @param integer $groupId
+     * @return void
+     */
     protected function saveFields(array $fields, $groupId)
     {
         foreach ($fields as $index => $field) {
@@ -169,10 +337,14 @@ class Groups implements FilterInterface
                 )
             );
         }
-
-        return $this;
     }
 
+    /**
+     * Delete any existing settings from the database.  Done inside a transaction
+     * while saving new settings.
+     *
+     * @return void
+     */
     protected function deleteCurrentSettings()
     {
         $this->dbAdapter->delete(
@@ -196,6 +368,16 @@ class Groups implements FilterInterface
         );
     }
 
+    /**
+     * Apply the filter to the supplied set of fields.  In return, you'll end
+     * up with a \Dewdrop\Fields\GroupedFields object that reflects the sort
+     * order and grouping preferences contained in this filter.  You can use
+     * that object either as a normal \Dewdrop\Fields object or you can call
+     * getGroups() on it to get the fields back in their assigned groups.
+     *
+     * @param Fields $currentFields
+     * @return GroupedFields
+     */
     public function apply(Fields $currentFields)
     {
         if (!$this->loadedDbData) {

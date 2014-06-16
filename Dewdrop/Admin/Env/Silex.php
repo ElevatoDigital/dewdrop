@@ -8,10 +8,10 @@
  * @license   https://github.com/DeltaSystems/dewdrop/LICENSE
  */
 
-namespace Dewdrop\Admin;
+namespace Dewdrop\Admin\Env;
 
+use Dewdrop\Admin\Component\ComponentAbstract;
 use Dewdrop\View\View;
-use DirectoryIterator;
 use Silex\Application;
 use Zend\View\Helper\HeadScript;
 
@@ -20,7 +20,7 @@ use Zend\View\Helper\HeadScript;
  * applications.  It will wrap Component responses in an admin shell layout when
  * appropriate, assist in the finding and registering of admin components, etc.
  */
-class Silex
+class Silex extends EnvAbstract
 {
     /**
      * The title for the admin area.  Typically your application's name, the
@@ -36,13 +36,6 @@ class Silex
      * @var Application
      */
     private $application;
-
-    /**
-     * The registered \Dewdrop\Admin\ComponentAbstract objects.
-     *
-     * @var array
-     */
-    private $components = array();
 
     /**
      * Provide a \Silex\Application object that can be used to retrieve
@@ -79,63 +72,15 @@ class Silex
         return $this;
     }
 
-    /**
-     * Look for and register all admin components in the given path.  If
-     * no path is provided, the \Dewdrop\Paths->getAdmin() method will be
-     * used to find the default admin path for the application.
-     *
-     * @param string $path
-     * @return Silex
-     */
-    public function registerComponentsInPath($path = null)
+    public function initComponent(ComponentAbstract $component)
     {
-        if (null === $path) {
-            $path = $this->application['paths']->getAdmin();
-        }
-
-        $adminFolders     = new DirectoryIterator($path);
-        $componentFolders = array();
-
-        foreach ($adminFolders as $folder) {
-            if (0 === strpos($folder, '.')) {
-                continue;
+        $this->application->match(
+            '/admin/' . $component->getName() . '/{page}',
+            function ($page) use ($component) {
+                return $component->dispatchPage($page);
             }
-
-            if (is_dir($path . '/' . $folder)) {
-                $componentFolders[] = $path . '/'. $folder;
-            }
-        }
-
-        foreach ($componentFolders as $folder) {
-            $this->registerAdminComponent($folder);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Register the single admin component located in the supplied path.  This
-     * can be useful if you want to register individual components that are
-     * outside your normal folder for admin components.  For example, if you've
-     * got some reuseable admin components in a library, or Dewdrop itself, you
-     * could register them with this method.
-     *
-     * @param string $folder
-     * @return Silex
-     */
-    public function registerAdminComponent($folder)
-    {
-        require_once $folder . '/Component.php';
-        $componentName = basename($folder);
-        $className     = '\Admin\\' . $this->application['inflector']->camelize($componentName) . '\Component';
-
-        $component = new $className($this->application, $componentName);
-
-        $component->register();
-
-        $this->components[] = $component;
-
-        return $this;
+        )
+        ->value('page', 'index');
     }
 
     /**
@@ -156,6 +101,19 @@ class Silex
             ->assign('content', $content)
             ->assign('viewHeadScript', $headScript);
 
-        return $view->render('layout.phtml');
+        return $view->render('silex.phtml');
+    }
+
+    public function url(ComponentAbstract $component, $page, array $params = array())
+    {
+        return '/admin/'
+            . $component->getName() . '/'
+            . $this->application['inflector']->hyphenize($page)
+            . $this->assembleQueryString($params, '?');
+    }
+
+    public function redirect($url)
+    {
+        return $this->application->redirect($url);
     }
 }

@@ -10,6 +10,7 @@
 
 namespace Dewdrop\Admin;
 
+use Dewdrop\Admin\Component\ComponentAbstract;
 use Dewdrop\Admin\Component\CrudInterface;
 use Dewdrop\Exception;
 use Dewdrop\Fields\UserInterface;

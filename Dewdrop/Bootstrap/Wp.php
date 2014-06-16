@@ -10,6 +10,7 @@
 
 namespace Dewdrop\Bootstrap;
 
+use Dewdrop\Admin\Env\Wp as WpAdminEnv;
 use Dewdrop\Config;
 use Dewdrop\Db\Adapter as DbAdapter;
 use Dewdrop\Db\Driver\Wpdb as WpdbDriver;
@@ -48,7 +49,8 @@ class Wp implements PimpleProviderInterface
 
         $this
             ->defineConfig()
-            ->defineDb();
+            ->defineDb()
+            ->defineAdmin();
     }
 
     /**
@@ -131,5 +133,14 @@ class Wp implements PimpleProviderInterface
         );
 
         return $this;
+    }
+
+    public function defineAdmin()
+    {
+        $this->pimple['admin'] = $this->pimple->share(
+            function () {
+                return new WpAdminEnv();
+            }
+        );
     }
 }

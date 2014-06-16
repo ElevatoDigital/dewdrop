@@ -1,11 +1,9 @@
 <?php
 
-namespace Dewdrop\Admin\Component\Silex;
+namespace Dewdrop\Admin\Component;
 
 use Dewdrop\Admin\Component\CrudInterface;
-use Dewdrop\Admin\Component\Silex;
 use Dewdrop\Admin\PageFactory\Crud as CrudFactory;
-use Dewdrop\Admin\Silex as SilexAdmin;
 use Dewdrop\Db\Table as DbTable;
 use Dewdrop\Db\Table\AdminModelInterface;
 use Dewdrop\Exception;
@@ -18,7 +16,7 @@ use Dewdrop\Fields\RowEditor;
 use Dewdrop\Pimple as DewdropPimple;
 use Pimple;
 
-abstract class CrudAbstract extends Silex implements CrudInterface
+abstract class CrudAbstract extends ComponentAbstract implements CrudInterface
 {
     protected $selectSort;
 
@@ -70,11 +68,6 @@ abstract class CrudAbstract extends Silex implements CrudInterface
         return $this->visibilityFilter;
     }
 
-    public function getListing()
-    {
-        return $this->listing;
-    }
-
     public function getRowEditor()
     {
         if (!$this->rowEditor) {
@@ -82,10 +75,5 @@ abstract class CrudAbstract extends Silex implements CrudInterface
         }
 
         return $this->rowEditor;
-    }
-
-    public function getFields()
-    {
-        return $this->fields;
     }
 }

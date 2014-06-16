@@ -982,8 +982,7 @@ class SelectTest extends BaseTestCase
 
         $select = $this->db->select()
             ->from('zfbugs_products', array('bug_id'=>"ABS($bugs_products.$bug_id)", new \Dewdrop\Db\Expr("COUNT(*) AS $thecount")))
-            ->group("ABS($bugs_products.$bug_id)")
-            ->order("ABS($bugs_products.$bug_id)");
+            ->group("ABS($bugs_products.$bug_id)");
         return $select;
     }
 
@@ -992,7 +991,7 @@ class SelectTest extends BaseTestCase
         $select = $this->selectGroupByAutoExpr();
 
         $this->assertEquals(
-            "SELECT ABS(`zfbugs_products`.`bug_id`) AS `bug_id`, COUNT(*) AS `thecount` FROM `zfbugs_products` GROUP BY ABS(`zfbugs_products`.`bug_id`) ORDER BY ABS(`zfbugs_products`.`bug_id`) ASC",
+            "SELECT ABS(`zfbugs_products`.`bug_id`) AS `bug_id`, COUNT(*) AS `thecount` FROM `zfbugs_products` GROUP BY ABS(`zfbugs_products`.`bug_id`)",
             (string) $select
         );
     }
@@ -1303,33 +1302,6 @@ class SelectTest extends BaseTestCase
 
         $this->assertEquals(
             'SELECT `zfproducts`.* FROM `zfproducts` ORDER BY 1',
-            $select->__toString()
-        );
-    }
-
-    /**
-     * Test automatic conversion of SQL functions to
-     * \Dewdrop\Db\Expr, e.g. order('LOWER(title)')
-     * should give the same result as
-     * order(new \Dewdrop\Db\Expr('LOWER(title)')).
-     */
-    protected function selectOrderByAutoExpr()
-    {
-        $products = $this->db->quoteIdentifier('zfproducts');
-        $product_id = $this->db->quoteIdentifier('product_id');
-
-        $select = $this->db->select()
-            ->from('zfproducts')
-            ->order("ABS($products.$product_id)");
-        return $select;
-    }
-
-    public function testSelectOrderByAutoExpr()
-    {
-        $select = $this->selectOrderByAutoExpr();
-
-        $this->assertEquals(
-            'SELECT `zfproducts`.* FROM `zfproducts` ORDER BY ABS(`zfproducts`.`product_id`) ASC',
             $select->__toString()
         );
     }

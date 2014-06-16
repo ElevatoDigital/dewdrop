@@ -10,7 +10,7 @@
 
 namespace Dewdrop\Admin\PageFactory;
 
-use Dewdrop\Admin\ComponentAbstract as Component;
+use Dewdrop\Admin\Component\ComponentAbstract;
 use ReflectionClass;
 
 class Files implements PageFactoryInterface
@@ -23,7 +23,7 @@ class Files implements PageFactoryInterface
      */
     private $inflector;
 
-    public function __construct(Component $component)
+    public function __construct(ComponentAbstract $component)
     {
         $this->component = $component;
         $this->inflector = $component->getInflector();

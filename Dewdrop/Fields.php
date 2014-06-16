@@ -393,12 +393,11 @@ class Fields implements ArrayAccess, IteratorAggregate, Countable
     protected function handleModelsForDbField(DbField $field, $modelName)
     {
         $fieldTable = $field->getTable();
-        $tableName  = $fieldTable->getTableName();
-        $tableHash  = spl_object_hash($fieldTable);
+        $groupName  = $field->getGroupName();
 
         if (null === $modelName &&
-            isset($this->modelInstances[$tableName]) &&
-            $this->modelInstances[$tableName] !== $fieldTable
+            isset($this->modelInstances[$groupName]) &&
+            $this->modelInstances[$groupName] !== $fieldTable
         ) {
             throw new Exception(
                 'When adding fields from two instances of the same model, you must specify '
@@ -407,7 +406,7 @@ class Fields implements ArrayAccess, IteratorAggregate, Countable
         }
 
         if (null === $modelName) {
-            $modelName = $tableName;
+            $modelName = $groupName;
         }
 
         if (isset($this->modelsByName[$modelName]) &&
@@ -419,12 +418,12 @@ class Fields implements ArrayAccess, IteratorAggregate, Countable
             );
         }
 
-        $this->modelInstances[$tableName] = $fieldTable;
+        $this->modelInstances[$groupName] = $fieldTable;
         $this->modelsByName[$modelName]   = $fieldTable;
 
         // Update the field's control name so that generated IDs, etc., use the new name
-        if ($modelName !== $tableName) {
-            $field->setControlName($modelName . ':' . $field->getName());
+        if ($modelName !== $groupName) {
+            $field->setGroupName($modelName);
         }
     }
 

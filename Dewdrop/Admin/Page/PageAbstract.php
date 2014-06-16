@@ -10,7 +10,7 @@
 
 namespace Dewdrop\Admin\Page;
 
-use Dewdrop\Admin\ComponentAbstract;
+use Dewdrop\Admin\Component\ComponentAbstract;
 use Dewdrop\Admin\ResponseHelper\Standard as ResponseHelper;
 use Dewdrop\Pimple;
 use Dewdrop\Request;

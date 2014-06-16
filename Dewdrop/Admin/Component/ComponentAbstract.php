@@ -8,16 +8,15 @@
  * @license   https://github.com/DeltaSystems/dewdrop/LICENSE
  */
 
-namespace Dewdrop\Admin;
+namespace Dewdrop\Admin\Component;
 
+use Dewdrop\Admin\Env\EnvInterface;
 use Dewdrop\Admin\Page\PageAbstract;
 use Dewdrop\Admin\PageFactory\Files as PageFilesFactory;
 use Dewdrop\Admin\PageFactory\PageFactoryInterface;
 use Dewdrop\Admin\Permissions;
 use Dewdrop\Admin\Response;
-use Dewdrop\Db\Adapter;
 use Dewdrop\Exception;
-use Dewdrop\Paths;
 use Dewdrop\Pimple as DewdropPimple;
 use Dewdrop\Request;
 use Pimple;
@@ -69,26 +68,9 @@ abstract class ComponentAbstract
      */
     private $menuPosition;
 
-    /**
-     * A request object that makes it easier to work with GET and POST
-     *
-     * @var \Dewdrop\Request
-     */
-    protected $request;
-
-    protected $pimple;
-
-    private $inflector;
-
-    private $name;
-
-    private $path;
-
     private $pageFactories = array();
 
     private $permissions;
-
-    protected $redirector;
 
     protected $shouldRenderLayout = true;
 
@@ -101,12 +83,8 @@ abstract class ComponentAbstract
      */
     public function __construct(Pimple $pimple = null)
     {
-        // Retrieve required resources from Pimple to ensure they're present
-        $this->pimple    = ($pimple ?: DewdropPimple::getInstance());
-        $this->db        = $this->initPimpleResource('db');
-        $this->paths     = $this->initPimpleResource('paths');
-        $this->request   = $this->initPimpleResource('dewdrop-request');
-        $this->inflector = $this->initPimpleResource('inflector');
+        $this->pimple = ($pimple ?: DewdropPimple::getInstance());
+        $this->env    = $pimple['admin'];
 
         // Component metadaata retrieved via reflection
         $reflectionClass = new ReflectionClass($this);
@@ -117,26 +95,16 @@ abstract class ComponentAbstract
         // Setup the default page factory, which looks for files in the component's folder
         $this->addPageFactory(new PageFilesFactory($this));
 
-        // Allow sub-classes to create basic resources
         $this->init();
-
-        // This should be refactored into an "environment driver" class
-        $this->redirector = function ($url) {
-            wp_safe_redirect($url);
-            exit;
-        };
 
         $this->checkRequiredProperties();
     }
 
-    public function initPimpleResource($resourceName)
-    {
-        if (isset($this->pimple[$resourceName])) {
-            return $this->pimple[$resourceName];
-        } else {
-            return DewdropPimple::getResource($resourceName);
-        }
-    }
+    /**
+     * Your component sub-class will use the init method to set basic component
+     * information like the title and the icon.
+     */
+    abstract public function init();
 
     public function getPageFactories()
     {
@@ -150,6 +118,11 @@ abstract class ComponentAbstract
         return $this;
     }
 
+    public function getPimple()
+    {
+        return $this->pimple;
+    }
+
     public function getPath()
     {
         return $this->path;
@@ -157,70 +130,28 @@ abstract class ComponentAbstract
 
     public function getInflector()
     {
-        return $this->inflector;
+        return $this->pimple['inflector'];
     }
 
     public function getPaths()
     {
-        return $this->paths;
-    }
-
-    public function setRequest(Request $request)
-    {
-        $this->request = $request;
-
-        return $this;
+        return $this->pimple['paths'];
     }
 
     public function getRequest()
     {
-        return $this->request;
+        return $this->pimple['dewdrop-request'];
     }
 
     /**
-     * Your component sub-class will use the init method to set basic component
-     * information like the title and the icon.
-     */
-    abstract public function init();
-
-    /**
-     * Add an "admin_menu" callback to let WP know that you want to register
-     * an admin component.
-     */
-    public function register()
-    {
-        add_action('admin_init', array($this, 'adminInit'));
-        add_action('admin_menu', array($this, 'registerMenuPage'));
-
-        // Also allow routing via WP's ajax facility to avoid rendering layout
-        add_action('wp_ajax_' . $this->getSlug(), array($this, 'route'));
-    }
-
-    /**
-     * Handle the admin_init action.  All page handling is done on admin_init
-     * so we have the opportunity to run code prior to WP rendering any output.
+     * Get the DB adapter associated with this component.  This is used
+     * frequently by page classes to get access to the DB connection.
      *
-     * @param string $page The name of the page to route to (e.g. "Index" or "Edit").
-     * @param Response $response Inject a response object, usually for tests.
-     *
-     * @return \Dewdrop\Admin\ComponentAbstract
+     * @return \Dewdrop\Db\Adapter
      */
-    public function adminInit($page = null, Response $response = null)
+    public function getDb()
     {
-        if ($this->isCurrentlyActive()) {
-            $page = $this->createPageObject($this->request->getQuery('route', 'Index'));
-
-            if (null === $response) {
-                $response = new Response();
-            }
-
-            $response->setPage($page);
-            $this->dispatchPage($page, $response);
-
-            $this->response = $response;
-        }
-
-        return $this;
+        return $this->pimple['db'];
     }
 
     public function getPermissions()
@@ -268,102 +199,16 @@ abstract class ComponentAbstract
     }
 
     /**
-     * Route requests to this component to the specified in the "route"
-     * parameter of the query string, if set.  This allows us to manage multiple
-     * pages in a component without having to hook into WP again for every page.
-     */
-    public function route()
-    {
-        if ($this->response) {
-            $this->response->render();
-        }
-    }
-
-    /**
-     * This is the callback we added to the "admin_menu" action in the
-     * register() method.  It essentially tells WP to call this component's
-     * route() method whenever the component is accessed.
-     */
-    public function registerMenuPage()
-    {
-        $slug = $this->getSlug();
-
-        $this->addObjectPage(
-            $this->title,
-            $this->title,
-            'add_users',
-            $slug,
-            array($this, 'route'),
-            $this->icon,
-            $this->menuPosition
-        );
-
-        if (count($this->submenuPages)) {
-            global $submenu_file;
-
-            foreach ($this->submenuPages as $page) {
-                $url = $slug;
-
-                if ('Index' !== $page['route']) {
-                    $url .= '/' . $page['route'];
-                }
-
-                // If the current route matches the page linked then mark it as selected
-                if ($url === $this->request->getQuery('page')) {
-                    $submenu_file = $url;
-                }
-
-                $this->addSubmenuPage(
-                    $slug,
-                    $page['title'],
-                    $page['title'],
-                    'add_users',
-                    $url,
-                    array($this, 'route')
-                );
-            }
-        }
-    }
-
-    /**
-     * Get a URL for a page in this component.  This method will automatically
-     * return submenu-friendly URLs when a submenu item matches the supplied
-     * page and params arguments.
+     * Request that the admin Env assemble a URL that will work to get to the
+     * specified page.
      *
      * @param string $page
      * @param array $params
-     * @return string
+     * @returns string
      */
     public function url($page, array $params = array())
     {
-        $base  = get_bloginfo('wpurl') . '/wp-admin/admin.php?page=' . $this->getSlug();
-        $query = $this->assembleQueryString($params, $separator = '&');
-
-        foreach ($this->submenuPages as $submenu) {
-            if ($submenu['route'] === $page) {
-                $submenuParams  = $subment['params'];
-                $matchesSubmenu = true;
-
-                foreach ($params as $name => $value) {
-                    if (!isset($submenuParams[$name]) || $submenuParams['value'] !== $value) {
-                        $matchesSubmenu = false;
-                        break;
-                    }
-                }
-
-                if ($matchesSubmenu) {
-                    if ('Index' === $submenu['route']) {
-                        $route = '';
-                    } else {
-                        $route = '/' . $submenu['route'];
-                    }
-
-                    return "{$base}{$route}{$query}";
-                }
-            }
-        }
-
-        return "{$base}&route={$page}{$query}";
+        return $this->env->url($this, $page, $params);
     }
 
     /**
@@ -386,6 +231,15 @@ abstract class ComponentAbstract
         return $this;
     }
 
+    public function addSubmenuDivider()
+    {
+        $this->submenuPages[] = array(
+            'isDivider' => true
+        );
+
+        return $this;
+    }
+
     /**
      * Get all sub-menu pages that have been added to this component.
      *
@@ -396,27 +250,9 @@ abstract class ComponentAbstract
         return $this->submenuPages;
     }
 
-    /**
-     * Get the DB adapter associated with this component.  This is used
-     * frequently by page classes to get access to the DB connection.
-     *
-     * @return \Dewdrop\Db\Adapter
-     */
-    public function getDb()
-    {
-        return $this->db;
-    }
-
     public function getName()
     {
         return $this->name;
-    }
-
-    public function setShouldRenderLayout($shouldRenderLayout)
-    {
-        $this->shouldRenderLayout = $shouldRenderLayout;
-
-        return $this;
     }
 
     public function getFullyQualifiedName()
@@ -424,9 +260,11 @@ abstract class ComponentAbstract
         return '/application/admin/' . $this->name;
     }
 
-    public function getPimple()
+    public function setShouldRenderLayout($shouldRenderLayout)
     {
-        return $this->pimple;
+        $this->shouldRenderLayout = $shouldRenderLayout;
+
+        return $this;
     }
 
     /**
@@ -499,16 +337,24 @@ abstract class ComponentAbstract
      * after calling render there is no output, the component will attempt
      * to render the page's default view script automatically.
      *
-     * @param PageAbstract $page
+     * @param mixed $page
      * @param Response $response
      * @return void
      */
-    protected function dispatchPage(PageAbstract $page, Response $response)
+    public function dispatchPage($page = null, Response $response = null)
     {
+        if (is_string($page)) {
+            $page = $this->createPageObject($page);
+        }
+
+        if (null === $response) {
+            $response = new Response($page, array($this->env, 'redirect'));
+        }
+
         $page->init();
 
         if ($page->shouldProcess()) {
-            $responseHelper = $page->createResponseHelper($this->redirector);
+            $responseHelper = $page->createResponseHelper(array($this->env, 'redirect'));
 
             $page->process($responseHelper);
 
@@ -532,37 +378,10 @@ abstract class ComponentAbstract
             $output = $page->renderView();
         }
 
-        $response->setOutput($output);
-
-        if ($this->request->isAjax() || !$this->shouldRenderLayout) {
-            $response->render();
-            exit;
-        }
-    }
-
-    /**
-     * A mock wrapper for WP's add_object_page() function.  Allows calls
-     * during testing without error.
-     *
-     * @return void
-     */
-    protected function addObjectPage()
-    {
-        if (function_exists('add_object_page')) {
-            call_user_func_array('add_object_page', func_get_args());
-        }
-    }
-
-    /**
-     * A mock wrapper for WP's add_submenu_page() function.  Allows calls
-     * during testing without error.
-     *
-     * @return void
-     */
-    protected function addSubmenuPage()
-    {
-        if (function_exists('add_submenu_page')) {
-            call_user_func_array('add_submenu_page', func_get_args());
+        if ($this->getRequest()->isAjax() || !$this->shouldRenderLayout) {
+            return $response->render();
+        } else {
+            return $this->env->renderLayout($output, $page->getView()->headScript());
         }
     }
 
@@ -581,47 +400,5 @@ abstract class ComponentAbstract
         $nameIndex = count($segments) - 2;
 
         return $segments[$nameIndex];
-    }
-
-    /**
-     * Determine which page (e.g. Index, Edit, etc.) is currently being
-     * displayed.  We take the route query parameter, subtract the slug
-     * and see what's left, defaulting to "Index".
-     *
-     * @return string
-     */
-    private function determineCurrentPage()
-    {
-        $slug  = $this->getSlug();
-        $page  = str_replace($slug, '', $this->request->getQuery('page'));
-        $route = $this->request->getQuery('route', 'Index');
-
-        if ($page) {
-            return ltrim($page, '/');
-        }
-
-        return $route;
-    }
-
-    /**
-     * Assemble the remainder of a URL query string.
-     *
-     * @param array $params
-     * @param string $separator
-     * @return string
-     */
-    protected function assembleQueryString(array $params, $separator)
-    {
-        $segments = array();
-
-        foreach ($params as $name => $value) {
-            $segments[] = sprintf(
-                "%s=%s",
-                rawurlencode($name),
-                rawurlencode($value)
-            );
-        }
-
-        return (count($segments) ? $separator . implode('&', $segments) : '');
     }
 }
