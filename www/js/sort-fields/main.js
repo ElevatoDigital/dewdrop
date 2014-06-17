@@ -1,13 +1,13 @@
 require.config({
-    baseUrl: '/js/stock/sort-fields/',
+    baseUrl: DEWDROP.bowerUrl('/dewdrop/www/js/sort-fields'),
     paths: {
-        text: '/js/require.text'
+        text: DEWDROP.bowerUrl('/requirejs-text/text'),
     }
 });
 
 require(
-    ['groups-collection', 'groups-view', 'add-group-popover-view'],
-    function (GroupsCollection, GroupsView, Popover) {
+    ['jquery', 'groups-collection', 'groups-view', 'add-group-popover-view'],
+    function ($, GroupsCollection, GroupsView, Popover) {
         var collection = new GroupsCollection(),
             popover    = new Popover({collection: collection}),
             groups     = new GroupsView({collection: collection});

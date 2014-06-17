@@ -1,6 +1,6 @@
 define(
-    ['list-view'],
-    function (List) {
+    ['jquery', 'list-view'],
+    function ($, List) {
         return Backbone.View.extend({
             el: '#groups-wrapper',
 

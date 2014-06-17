@@ -1,6 +1,6 @@
 define(
-    ['text!add-group-popover-template.html'],
-    function (popoverHtml) {
+    ['jquery', 'text!add-group-popover-template.html'],
+    function ($, popoverHtml) {
         'use strict';
 
         return Backbone.View.extend({

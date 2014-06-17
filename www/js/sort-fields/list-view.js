@@ -1,6 +1,6 @@
 define(
-    ['text!list-template.html', 'text!list-field-template.html'],
-    function (listHtml, fieldHtml) {
+    ['jquery', 'text!list-template.html', 'text!list-field-template.html'],
+    function ($, listHtml, fieldHtml) {
         'use strict';
 
         var listTemplate  = _.template(listHtml),
