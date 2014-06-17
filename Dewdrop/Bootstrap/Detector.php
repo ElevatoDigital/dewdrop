@@ -18,6 +18,9 @@ use Dewdrop\Paths;
 use Dewdrop\Request;
 use Dewdrop\View\View;
 use Pimple;
+use Silex\Application;
+use Silex\Provider\SessionServiceProvider;
+use WP_Session;
 
 /**
  * This class tracks down the bootstrap for your application and grabs
@@ -137,6 +140,22 @@ class Detector
             $pimple['view'] = function () {
                 return new View();
             };
+        }
+
+        if (!isset($pimple['session'])) {
+            /* @var $paths Paths */
+            $paths = $pimple['paths'];
+            if ($paths->isWp()) {
+                $pimple['session'] = $pimple->share(
+                    function () {
+                        return WP_Session::get_instance();
+                    }
+                );
+            } else if ($pimple instanceof Application) {
+                $pimple->register(new SessionServiceProvider());
+            } else {
+                throw new Exception('Silex application unavailable but not in WordPress');
+            }
         }
     }
 }
