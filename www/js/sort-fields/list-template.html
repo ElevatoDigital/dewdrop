@@ -1,0 +1,29 @@
+<li class="list-group-item list-group-item-title">
+    <span class="badge">
+        <%- fields.length %>
+        <%- (1 === fields.length ? 'Field' : 'Fields') %>
+    </span>
+    <h4>
+        <%- title %>
+    </h4>
+    <% if (caption) { %>
+    <div class="help-block"><%- caption %></div>
+    <% } %>
+    <% if (allowEditing) { %>
+    <div class="title-input form-inline">
+        <input type="text" class="title-input form-control" value="<%- title %>" />
+        <button type="button" class="btn btn-save-title btn-success btn-sm"><span class="glyphicon glyphicon-ok"></span></button>
+        <button type="button" class="btn btn-cancel btn-link btn-sm">Cancel</button>
+    </div>
+    <div class="title-buttons">
+        <a href="#" class="btn-remove pull-right btn btn-sm btn-default">
+            <span class="glyphicon glyphicon-remove"></span>
+            Delete Group
+        </a>
+        <a href="#" class="btn-edit pull-right btn btn-sm btn-success">
+            <span class="glyphicon glyphicon-pencil"></span>
+            Edit Title
+        </a>
+    </div>
+    <% } %>
+</li>

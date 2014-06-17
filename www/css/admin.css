@@ -1,0 +1,169 @@
+body {
+    padding-top: 70px;
+    padding-bottom: 20px;
+}
+
+.caret.caret-up {
+    border-top: 0;
+    border-bottom: 4px solid;
+    margin-left: -2px;
+    content: "";
+}
+
+.navbar-input-group {
+    font-size: 0px; /*removes whitespace between button and input*/
+}
+
+.navbar-input-group input {
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+}
+
+.navbar-input-group .btn {
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
+    border-left: 0px;
+}
+
+.modal .list-group {
+    margin-bottom: 0;
+}
+
+.modal .list-group-item {
+    padding: 0 25px;
+}
+
+.modal .list-group-item .checkbox {
+    margin: 0;
+    padding: 0;
+}
+
+.modal .list-group-item .checkbox label {
+    display: block;
+    margin: 0;
+    padding: 10px;
+}
+
+.navbar-admin-index .navbar-header .btn {
+    margin-left: 15px;
+}
+
+.navbar-right-btn-group {
+    max-width: 220px;
+}
+
+.collapsing .navbar-right-btn-group,
+.in .navbar-right-btn-group {
+    max-width: none;
+}
+
+.admin-filter-panel fieldset {
+    margin-top: 15px;
+}
+
+.admin-filter-panel .footer {
+    padding-top: 20px;
+}
+
+.navbar-admin-index .btn-group>.btn-group:last-child>.btn:first-child {
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+}
+
+#admin-index-collapse .btn-link-first {
+    margin-left: 12px;
+}
+
+.checkbox-list {
+    padding-left: 0;
+}
+
+.checkbox-list li {
+    list-style-type: none;
+    padding-left: 0;
+    margin-left: 0;
+}
+
+.checkbox-list li label {
+    font-weight: normal;
+}
+
+.row-actions {
+    visibility: hidden;
+    position: relative;
+    max-width: 100px;
+}
+
+.bootstrap-table>tbody>tr.keyboard-selected>td .row-actions,
+tr:hover .row-actions {
+    visibility: visible;
+}
+
+.bootstrap-table>tbody>tr.keyboard-selected>td {
+    background-color: #d9edf7;
+}
+
+#keyboard-shortcuts-modal .modal-body .btn {
+    font-family: monospace;
+    font-weight: bold;
+    margin: 5px 5px 5px 0;
+}
+
+#add-group-popover-content {
+    display: none;
+}
+
+.list-group-item-title {
+    overflow: hidden;
+    position: relative;
+}
+
+.list-group-item-title .badge {
+    position: relative;
+    top: -3px;
+}
+
+.list-group-item-title .title-buttons {
+    opacity: 0;
+    position: absolute;
+    right: 10px;
+    top: 48px;
+    transition: all 100ms ease-in;
+}
+
+.list-group-item-title:hover .title-buttons {
+    opacity: 1;
+    top: 32px;
+}
+
+.list-group-item-title .title-buttons .btn {
+    margin-left: 10px;
+}
+
+.title-input {
+    margin: 1px 0;
+}
+
+.tab-pane-edit {
+    padding-top: 10px;
+}
+
+@media (max-width: 767px) {
+    .row-actions {
+        visibility: visible;
+    }
+
+    .admin-filter-panel .visible-xs {
+        display: inline!important;
+    }
+
+    .admin-filter-panel .form-inline {
+        margin-bottom: 10px;
+        padding: 5px 0 5px 25px;
+    }
+
+    .admin-filter-panel .form-inline .form-control {
+        display: inline;
+        width: auto;
+    }
+}
