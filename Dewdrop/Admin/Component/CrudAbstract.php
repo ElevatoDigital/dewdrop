@@ -2,21 +2,22 @@
 
 namespace Dewdrop\Admin\Component;
 
-use Dewdrop\Admin\Component\CrudInterface;
 use Dewdrop\Admin\PageFactory\Crud as CrudFactory;
-use Dewdrop\Db\Table as DbTable;
-use Dewdrop\Exception;
 use Dewdrop\Fields;
 use Dewdrop\Fields\Filter\Groups as GroupsFilter;
 use Dewdrop\Fields\Filter\Visibility as VisibilityFilter;
+use Dewdrop\Fields\Helper\SelectPaginate;
 use Dewdrop\Fields\Helper\SelectSort;
-use Dewdrop\Fields\Listing;
 use Dewdrop\Fields\RowEditor;
-use Dewdrop\Pimple as DewdropPimple;
 use Pimple;
 
 abstract class CrudAbstract extends ComponentAbstract implements CrudInterface
 {
+    /**
+     * @var SelectPaginate
+     */
+    protected $selectPaginate;
+
     protected $selectSort;
 
     protected $fieldGroupsFilter;
@@ -32,6 +33,18 @@ abstract class CrudAbstract extends ComponentAbstract implements CrudInterface
         parent::__construct($pimple, $componentName);
 
         $this->addPageFactory(new CrudFactory($this));
+    }
+
+    /**
+     * @return SelectPaginate
+     */
+    public function getSelectPaginateHelper()
+    {
+        if (null === $this->selectPaginate) {
+            $this->selectPaginate = new SelectPaginate();
+        }
+
+        return $this->selectPaginate;
     }
 
     public function getSelectSortHelper()
@@ -74,5 +87,16 @@ abstract class CrudAbstract extends ComponentAbstract implements CrudInterface
         }
 
         return $this->rowEditor;
+    }
+
+    /**
+     * @param SelectPaginate $selectPaginate
+     * @return CrudAbstract
+     */
+    public function setSelectPaginateHelper(SelectPaginate $selectPaginate)
+    {
+        $this->selectPaginate = $selectPaginate;
+
+        return $this;
     }
 }

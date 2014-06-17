@@ -1,3 +1,11 @@
+<?php
+
+/* @var $view \Dewdrop\View\View */
+$view = $this;
+
+$request = $view->getRequest();
+
+?>
 <nav class="navbar navbar-default navbar-admin-index" role="navigation">
     <div class="navbar-header">
         <?php if ($this->permissions->can('create')) :?>
@@ -49,7 +57,7 @@
                         <li role="presentation" class="divider"></li>
                         <li role="presentation" class="dropdown-header"><span class="glyphicon glyphicon-wrench"></span> Dev Tools</li>
                         <li><a href="<?php echo $this->escapeHtmlAttr($this->adminUrl('debug-fields'));?>">View Fields</a></li>
-                        <li><a href="<?php echo $this->escapeHtmlAttr($this->adminUrl('debug-listing-sql', $this->getRequest()->getQuery()));?>">View Listing SQL</a></li>
+                        <li><a href="<?php echo $this->escapeHtmlAttr($this->adminUrl('debug-listing-sql', $request->getQuery()));?>">View Listing SQL</a></li>
                         <li><a href="<?php echo $this->escapeHtmlAttr($this->adminUrl('debug-pages'));?>">View Pages</a></li>
                         <li><a href="<?php echo $this->escapeHtmlAttr($this->adminUrl('debug-test-sorting'));?>">Test Sorting</a></li>
                         <?php endif;?>
@@ -143,9 +151,15 @@ $this->bootstrapRowActions()->assignCallback($rowActionArgs);
 
 echo $this->bootstrapTable(
     $fields,
-    $this->listing->fetchData($this->groupingFilter->apply($this->fields)),
+    $this->listing->fetchData($this->groupingFilter->apply($this->fields), $rowCount),
     $renderer,
     $this->listing->getSelectModifierByName('SelectSort')
+);
+
+echo $this->pagination(
+    $rowCount,
+    $this->listing->getSelectModifierByName('SelectPaginate')->getPageSize(),
+    (((int) $request->getQuery('page')) ?: 1)
 );
 
 echo $this->bootstrapColumnsModal(

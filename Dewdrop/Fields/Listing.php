@@ -10,8 +10,11 @@
 
 namespace Dewdrop\Fields;
 
+use Dewdrop\Db\Driver\Pdo\Pgsql;
+use Dewdrop\Db\Driver\Wpdb;
 use Dewdrop\Db\Field as DbField;
 use Dewdrop\Db\Select;
+use Dewdrop\Exception;
 use Dewdrop\Fields;
 use Dewdrop\Fields\Helper\SelectModifierInterface;
 
@@ -133,7 +136,7 @@ class Listing
      * Retrieve a select modifier using its name.
      *
      * @param string $name
-     * @return SelectModifier
+     * @return SelectModifierInterface|false
      */
     public function getSelectModifierByName($name)
     {
@@ -170,14 +173,37 @@ class Listing
      * Fetch the data for this listing, passing the supplied \Dewdrop\Fields
      * object to all modifiers before fetching the data from the DB.
      *
+     * @param Fields $fields
+     * @param int $rowCount
      * @return array
+     * @throws
      */
-    public function fetchData(Fields $fields)
+    public function fetchData(Fields $fields, &$rowCount = null)
     {
-        $data = $this->select->getAdapter()->fetchAll($this->getModifiedSelect($fields));
+        $adapter = $this->select->getAdapter();
+
+        $data = $adapter->fetchAll($this->getModifiedSelect($fields));
 
         if (!$data) {
             $data = array();
+        }
+
+        if ($this->getSelectModifierByName('selectpaginate')) {
+
+            $driver = $adapter->getDriver();
+
+            if ($driver instanceof Pgsql) {
+                if (0 < count($data)) {
+                    $rowCount = $data[0]['_dewdrop_count'];
+                } else {
+                    $rowCount = 0;
+                }
+            } else if ($driver instanceof Wpdb) {
+                $rowCount = $adapter->fetchOne('SELECT FOUND_ROWS()');
+            } else {
+                $driverClass = get_class($driver);
+                throw new Exception("Unsupported driver class '{$driverClass}'");
+            }
         }
 
         return $data;
