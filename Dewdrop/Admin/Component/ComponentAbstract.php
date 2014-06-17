@@ -84,7 +84,7 @@ abstract class ComponentAbstract
     public function __construct(Pimple $pimple = null)
     {
         $this->pimple = ($pimple ?: DewdropPimple::getInstance());
-        $this->env    = $pimple['admin'];
+        $this->env    = $this->getPimpleResource('admin');
 
         // Component metadaata retrieved via reflection
         $reflectionClass = new ReflectionClass($this);
@@ -130,17 +130,17 @@ abstract class ComponentAbstract
 
     public function getInflector()
     {
-        return $this->pimple['inflector'];
+        return $this->getPimpleResource('inflector');
     }
 
     public function getPaths()
     {
-        return $this->pimple['paths'];
+        return $this->getPimpleResource('paths');
     }
 
     public function getRequest()
     {
-        return $this->pimple['dewdrop-request'];
+        return $this->getPimpleResource('dewdrop-request');
     }
 
     /**
@@ -151,7 +151,7 @@ abstract class ComponentAbstract
      */
     public function getDb()
     {
-        return $this->pimple['db'];
+        return $this->getPimpleResource('db');
     }
 
     public function getPermissions()
@@ -180,22 +180,6 @@ abstract class ComponentAbstract
         }
 
         return $page;
-    }
-
-    /**
-     * Check to see if this component is currently being accessed.  We do this
-     * manually because we want to know whether the component is in use before
-     * WP would itself be able to tell us.  This allows us to dispatch pages on
-     * admin_init, which is early enough in the process that we can easily enqueue
-     * other resources.  Also, this gives us the chance to run code before WP has
-     * rendered any output.
-     *
-     * @return boolean
-     */
-    protected function isCurrentlyActive()
-    {
-        return preg_match('/^' . $this->getSlug() . '($|\/)/i', $this->request->getQuery('page')) ||
-            $this->getSlug() === $this->request->getPost('action');
     }
 
     /**
@@ -300,6 +284,11 @@ abstract class ComponentAbstract
         return $this;
     }
 
+    public function getIcon()
+    {
+        return $this->icon;
+    }
+
     /**
      * Set the position of the component's menu entry
      *
@@ -312,6 +301,11 @@ abstract class ComponentAbstract
         $this->menuPosition = $menuPosition;
 
         return $this;
+    }
+
+    public function getMenuPosition()
+    {
+        return $this->menuPosition;
     }
 
     /**
@@ -393,12 +387,17 @@ abstract class ComponentAbstract
      *
      * @return string
      */
-    protected function getSlug()
+    public function getSlug()
     {
         $fullClass = str_replace('\\', '/', get_class($this));
         $segments  = explode('/', $fullClass);
         $nameIndex = count($segments) - 2;
 
         return $segments[$nameIndex];
+    }
+
+    private function getPimpleResource($name)
+    {
+        return (isset($this->pimple[$name]) ? $this->pimple[$name] : DewdropPimple::getResource($name));
     }
 }

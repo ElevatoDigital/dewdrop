@@ -45,8 +45,6 @@ class Wp implements PimpleProviderInterface
     {
         $this->pimple = new Pimple();
 
-        $pimple['debug'] = false;
-
         $this
             ->defineConfig()
             ->defineDb()

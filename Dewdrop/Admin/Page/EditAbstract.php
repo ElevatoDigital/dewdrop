@@ -12,7 +12,7 @@ namespace Dewdrop\Admin\Page;
 
 use Dewdrop\Exception;
 use Dewdrop\Request;
-use Dewdrop\Admin\ComponentAbstract;
+use Dewdrop\Admin\Component\ComponentAbstract;
 use Dewdrop\Fields\Edit as EditFields;
 use Zend\InputFilter\InputFilter;
 

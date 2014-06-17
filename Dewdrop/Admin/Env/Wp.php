@@ -10,11 +10,15 @@
 
 namespace Dewdrop\Admin\Env;
 
-use Dewdrop\Admin\CmoponentAbstract;
+use Dewdrop\Admin\Component\ComponentAbstract;
+use Dewdrop\Admin\Response;
 use Dewdrop\View\View;
+use Zend\View\Helper\HeadScript;
 
 class Wp extends EnvAbstract
 {
+    private $output;
+
     public function renderLayout($content, HeadScript $headScript = null)
     {
         $view = new View();
@@ -67,14 +71,31 @@ class Wp extends EnvAbstract
         return "{$base}&route={$page}{$query}";
     }
 
+    public function redirect($url)
+    {
+        wp_safe_redirect($url);
+        exit;
+    }
+
     /**
      * Add an "admin_menu" callback to let WP know that you want to register
      * an admin component.
      */
     public function initComponent(ComponentAbstract $component)
     {
-        add_action('admin_init', array($this, 'adminInit'));
-        add_action('admin_menu', array($this, 'registerMenuPage'));
+        add_action(
+            'admin_init',
+            function () use ($component) {
+                return $this->adminInit($component);
+            }
+        );
+
+        add_action(
+            'admin_menu',
+            function () use ($component) {
+                return $this->registerMenuPage($component);
+            }
+        );
 
         // Also allow routing via WP's ajax facility to avoid rendering layout
         add_action('wp_ajax_' . $component->getSlug(), array($this, 'route'));
@@ -89,19 +110,17 @@ class Wp extends EnvAbstract
      *
      * @return \Dewdrop\Admin\ComponentAbstract
      */
-    public function adminInit($page = null, Response $response = null)
+    public function adminInit(ComponentAbstract $component, $page = null, Response $response = null)
     {
-        if ($this->isCurrentlyActive()) {
-            $page = $this->createPageObject($this->request->getQuery('route', 'Index'));
+        if ($this->componentIsCurrentlyActive($component)) {
+            $page = $component->createPageObject($component->getRequest()->getQuery('route', 'Index'));
 
             if (null === $response) {
                 $response = new Response();
             }
 
             $response->setPage($page);
-            $this->dispatchPage($page, $response);
-
-            $this->response = $response;
+            $this->output = $component->dispatchPage($page, $response);
         }
 
         return $this;
@@ -112,9 +131,9 @@ class Wp extends EnvAbstract
      * register() method.  It essentially tells WP to call this component's
      * route() method whenever the component is accessed.
      */
-    public function registerMenuPage()
+    public function registerMenuPage(ComponentAbstract $component)
     {
-        $slug = $this->getSlug();
+        $slug = $component->getSlug();
 
         $this->addObjectPage(
             $component->getTitle(),
@@ -122,14 +141,14 @@ class Wp extends EnvAbstract
             'add_users',
             $component->getSlug(),
             array($this, 'route'),
-            $this->getIcon(),
-            $this->getMenuPosition()
+            $component->getIcon(),
+            $component->getMenuPosition()
         );
 
-        if (count($this->getSubmenuPages())) {
+        if (count($component->getSubmenuPages())) {
             global $submenu_file;
 
-            foreach ($this->submenuPages as $page) {
+            foreach ($component->getSubmenuPages() as $page) {
                 $url = $slug;
 
                 if ('Index' !== $page['route']) {
@@ -137,7 +156,7 @@ class Wp extends EnvAbstract
                 }
 
                 // If the current route matches the page linked then mark it as selected
-                if ($url === $this->request->getQuery('page')) {
+                if ($url === $component->getRequest()->getQuery('page')) {
                     $submenu_file = $url;
                 }
 
@@ -186,8 +205,22 @@ class Wp extends EnvAbstract
      */
     public function route()
     {
-        if ($this->response) {
-            $this->response->render();
-        }
+        echo $this->output;
+    }
+
+    /**
+     * Check to see if this component is currently being accessed.  We do this
+     * manually because we want to know whether the component is in use before
+     * WP would itself be able to tell us.  This allows us to dispatch pages on
+     * admin_init, which is early enough in the process that we can easily enqueue
+     * other resources.  Also, this gives us the chance to run code before WP has
+     * rendered any output.
+     *
+     * @return boolean
+     */
+    protected function componentIsCurrentlyActive(ComponentAbstract $component)
+    {
+        return preg_match('/^' . $component->getSlug() . '($|\/)/i', $component->getRequest()->getQuery('page')) ||
+            $component->getSlug() === $component->getRequest()->getPost('action');
     }
 }

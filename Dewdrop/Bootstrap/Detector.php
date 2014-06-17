@@ -105,6 +105,10 @@ class Detector
      */
     public static function augmentPimpleWithDefaultResources(Pimple $pimple)
     {
+        if (!isset($pimple['debug'])) {
+            $pimple['debug'] = false;
+        }
+
         if (!isset($pimple['dewdrop-request'])) {
             $pimple['dewdrop-request'] = $pimple->share(
                 function () {
