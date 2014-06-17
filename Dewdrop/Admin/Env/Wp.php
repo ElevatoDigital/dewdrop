@@ -48,6 +48,26 @@ class Wp extends EnvAbstract
         $output .= $content;
         $output .= $view->wpWrap()->close();
 
+        wp_enqueue_script('jquery');
+        wp_enqueue_script('backbone');
+
+        $wpCoreScripts = array('jquery', 'backbone');
+
+        foreach ($this->coreClientSideDependencies['js'] as $name => $script) {
+            if (!in_array($name, $wpCoreScripts)) {
+                wp_enqueue_script($view->bowerUrl($script));
+            }
+        }
+
+        foreach ($this->coreClientSideDependencies['css'] as $name => $css) {
+            // We need to use a special, prefixed version of the Bootstrap CSS for WP
+            if ('bootstrap' !== $name) {
+                wp_enqueue_style($view->bowerUrl($css));
+            }
+        }
+
+        wp_enqueue_style($view->bowerUrl('/dewdrop/www/css/bootstrap-wp.css'));
+
         return $output;
     }
 

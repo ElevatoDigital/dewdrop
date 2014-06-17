@@ -27,6 +27,30 @@ abstract class EnvAbstract implements EnvInterface
     protected $components = array();
 
     /**
+     * The core client-side dependencies we expect to be loaded in the admin.
+     * These should all be sent through the bowerUrl() view helper so that their
+     * paths point to the bower_components folder for the current environment.
+     *
+     * @var array
+     */
+    protected $coreClientSideDependencies = array(
+        'js' => array(
+            'jquery'      => '/jquery/dist/jquery.min.js',
+            'bootstrap'   => '/bootstrap/dist/js/bootstrap.min.js',
+            'keymaster'   => '/keymaster/keymaster.js',
+            'velocity'    => '/velocity/jquery.velocity.min.js',
+            'velocity-ui' => '/velocity/velocity.ui.js',
+            'underscore'  => '/underscore/underscore.js',
+            'wp-backbone' => '/backbone/backbone.js',
+            'requirejs'   => '/requirejs/require.js'
+        ),
+        'css' => array(
+            'bootstrap'     => '/bootstrap/dist/css/bootstrap.min.css',
+            'dewdrop-admin' => '/dewdrop/www/css/admin.css'
+        )
+    );
+
+    /**
      * Look for and register all admin components in the given path.  If
      * no path is provided, the \Dewdrop\Paths->getAdmin() method will be
      * used to find the default admin path for the application.
