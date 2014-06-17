@@ -11,6 +11,7 @@
 namespace Dewdrop\Db\Driver;
 
 use Dewdrop\Db\Adapter;
+use Dewdrop\Db\Select;
 
 /**
  * A mock DB adpater driver for use during testing.  You can certainly
@@ -236,5 +237,33 @@ class Mock implements DriverInterface
     public function mapNativeTypeToGenericType($nativeType, $length)
     {
         return '';
+    }
+
+    /**
+     * Modify a \Dewdrop\Db\Select object so that the RDBMS can calculate the
+     * total number of rows that would have been returned if no LIMIT was
+     * present.
+     *
+     * @param Select $select
+     * @return void
+     */
+    public function prepareSelectForTotalRowCalculation(Select $select)
+    {
+
+    }
+
+    /**
+     * Fetch the number of rows that would have been fetched had no LIMIT
+     * clause been applied to a statement.  The result set is supplied here
+     * for RDBMS types (e.g. Postgres) where the total count is embedded in
+     * the result set.  However, some systems (e.g. MySQL) will not need
+     * to reference it.
+     *
+     * @param array $resultSet
+     * @return integer
+     */
+    public function fetchTotalRowCount(array $resultSet)
+    {
+        return 0;
     }
 }
