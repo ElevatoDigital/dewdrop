@@ -22,17 +22,18 @@ use Dewdrop\Db\Select\SelectException;
  */
 class Select
 {
-    const DISTINCT       = 'distinct';
-    const COLUMNS        = 'columns';
-    const FROM           = 'from';
-    const UNION          = 'union';
-    const WHERE          = 'where';
-    const GROUP          = 'group';
-    const HAVING         = 'having';
-    const ORDER          = 'order';
-    const LIMIT_COUNT    = 'limitcount';
-    const LIMIT_OFFSET   = 'limitoffset';
-    const FOR_UPDATE     = 'forupdate';
+    const DISTINCT            = 'distinct';
+    const PRE_COLUMNS_OPTIONS = 'precolumnsoptions';
+    const COLUMNS             = 'columns';
+    const FROM                = 'from';
+    const UNION               = 'union';
+    const WHERE               = 'where';
+    const GROUP               = 'group';
+    const HAVING              = 'having';
+    const ORDER               = 'order';
+    const LIMIT_COUNT         = 'limitcount';
+    const LIMIT_OFFSET        = 'limitoffset';
+    const FOR_UPDATE          = 'forupdate';
 
     const INNER_JOIN     = 'inner join';
     const LEFT_JOIN      = 'left join';
@@ -76,23 +77,24 @@ class Select
     /**
      * The initial values for the $parts array.
      * NOTE: It is important for the 'FOR_UPDATE' part to be last to ensure
-     * meximum compatibility with database adapters.
+     * maximum compatibility with database adapters.
      *
      * @var array
      */
-    protected static $partsInit = array(
-        self::DISTINCT     => false,
-        self::COLUMNS      => array(),
-        self::UNION        => array(),
-        self::FROM         => array(),
-        self::WHERE        => array(),
-        self::GROUP        => array(),
-        self::HAVING       => array(),
-        self::ORDER        => array(),
-        self::LIMIT_COUNT  => null,
-        self::LIMIT_OFFSET => null,
-        self::FOR_UPDATE   => false
-    );
+    protected static $partsInit = [
+        self::DISTINCT            => false,
+        self::PRE_COLUMNS_OPTIONS => [],
+        self::COLUMNS             => [],
+        self::UNION               => [],
+        self::FROM                => [],
+        self::WHERE               => [],
+        self::GROUP               => [],
+        self::HAVING              => [],
+        self::ORDER               => [],
+        self::LIMIT_COUNT         => null,
+        self::LIMIT_OFFSET        => null,
+        self::FOR_UPDATE          => false
+    ];
 
     /**
      * Specify legal join types.
@@ -176,6 +178,19 @@ class Select
     public function distinct($flag = true)
     {
         $this->parts[self::DISTINCT] = (bool) $flag;
+        return $this;
+    }
+
+    /**
+     * Adds an option verbatim to the SQL before the selected columns
+     *
+     * @param string $option
+     * @return Select
+     */
+    public function preColumnsOption($option)
+    {
+        $this->parts[static::PRE_COLUMNS_OPTIONS][] = $option;
+
         return $this;
     }
 
@@ -1034,6 +1049,21 @@ class Select
     {
         if ($this->parts[self::DISTINCT]) {
             $sql .= ' ' . self::SQL_DISTINCT;
+        }
+
+        return $sql;
+    }
+
+    /**
+     * Renders pre-columns options
+     *
+     * @param string $sql
+     * @return string
+     */
+    protected function renderPrecolumnsoptions($sql)
+    {
+        foreach ($this->parts[static::PRE_COLUMNS_OPTIONS] as $option) {
+            $sql .= " {$option}";
         }
 
         return $sql;

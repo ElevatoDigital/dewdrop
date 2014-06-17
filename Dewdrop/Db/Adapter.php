@@ -150,6 +150,14 @@ class Adapter
     }
 
     /**
+     * @return DriverInterface|WpdbDriver|mixed|null
+     */
+    public function getDriver()
+    {
+        return $this->driver;
+    }
+
+    /**
      * Returns table metadata information.
      *
      * @param string $table

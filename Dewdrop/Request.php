@@ -69,6 +69,25 @@ class Request
     }
 
     /**
+     * @return string
+     */
+    public function getUrl()
+    {
+        $url = preg_replace('/\?.+$/', '', $_SERVER['REQUEST_URI']);
+
+        if (0 < count($this->query)) {
+            $url .= '?';
+            $needsAmpersand = false;
+            foreach ($this->query as $name => $value) {
+                $url .= ($needsAmpersand ? '&' : '') . sprintf('%s=%s', rawurlencode($name), rawurlencode($value));
+                $needsAmpersand = true;
+            }
+        }
+
+        return $url;
+    }
+
+    /**
      * Just a simple utility method to check whether the request is an AJAX
      * call by looking for the HTTP_X_REQUESTED_WITH header, which should be
      * added by most (all?) major JS libraries.

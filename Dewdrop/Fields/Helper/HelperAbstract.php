@@ -97,7 +97,7 @@ abstract class HelperAbstract implements HelperInterface
      */
     public function matchesName($name)
     {
-        return $this->name = strtolower($name);
+        return $this->name === strtolower($name);
     }
 
     /**

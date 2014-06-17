@@ -320,4 +320,9 @@ class AdapterTest extends DbTestCase
     {
         $this->db->query('not even close to valid sql');
     }
+
+    public function testGetDriver()
+    {
+        $this->assertInstanceOf('\Dewdrop\Db\Driver\DriverInterface', $this->db->getDriver());
+    }
 }
