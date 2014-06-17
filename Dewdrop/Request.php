@@ -104,10 +104,19 @@ class Request
      */
     public function getPost($name = null, $default = null)
     {
-        if (null === $name) {
-            return $this->post;
+        // WordPress seriously emulates magic_quotes_gpc.  Have to remove its dumbass slashes.
+        if (function_exists('stripslashes_deep')) {
+            if (null === $name) {
+                return stripslashes_deep($this->post);
+            } else {
+                return (isset($this->post[$name]) ? stripslashes_deep($this->post[$name]) : $default);
+            }
         } else {
-            return (isset($this->post[$name]) ? $this->post[$name] : $default);
+            if (null === $name) {
+                return $this->post;
+            } else {
+                return (isset($this->post[$name]) ? $this->post[$name] : $default);
+            }
         }
     }
 

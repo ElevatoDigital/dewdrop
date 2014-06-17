@@ -11,7 +11,7 @@ class SortFields extends PageAbstract
 
     public function init()
     {
-        $this->component->getPermissions()->haltIfNotAllowed('notifications');
+        $this->component->getPermissions()->haltIfNotAllowed('sort-fields');
 
         $this->filter = new GroupsFilter(
             $this->component->getFullyQualifiedName(),

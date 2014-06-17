@@ -48,25 +48,13 @@ class Wp extends EnvAbstract
         $output .= $content;
         $output .= $view->wpWrap()->close();
 
-        wp_enqueue_script('jquery');
-        wp_enqueue_script('backbone');
-
-        $wpCoreScripts = array('jquery', 'backbone');
-
-        foreach ($this->coreClientSideDependencies['js'] as $name => $script) {
-            if (!in_array($name, $wpCoreScripts)) {
-                wp_enqueue_script($view->bowerUrl($script));
-            }
+        foreach ($headScript as $script) {
+            // We're prefixing the name here so we don't conflict with WP names
+            wp_enqueue_script(
+                'dewdrop-' . basename($script->attributes['src'], '.js'),
+                $script->attributes['src']
+            );
         }
-
-        foreach ($this->coreClientSideDependencies['css'] as $name => $css) {
-            // We need to use a special, prefixed version of the Bootstrap CSS for WP
-            if ('bootstrap' !== $name) {
-                wp_enqueue_style($view->bowerUrl($css));
-            }
-        }
-
-        wp_enqueue_style($view->bowerUrl('/dewdrop/www/css/bootstrap-wp.css'));
 
         return $output;
     }
@@ -173,6 +161,8 @@ class Wp extends EnvAbstract
         if ($this->componentIsCurrentlyActive($component)) {
             $page = $component->createPageObject($component->getRequest()->getQuery('route', 'Index'));
 
+            $this->enqueueClientSideDependencies($page->getView());
+
             if (null === $response) {
                 $response = new Response();
             }
@@ -189,6 +179,41 @@ class Wp extends EnvAbstract
         }
 
         return $this;
+    }
+
+    /**
+     * Enqueue the core Dewdrop client-side dependencies early in the process,
+     * before the page is dispatched, so that they come before the page-specific
+     * scripts.
+     *
+     * @param View $view
+     * @return void
+     */
+    protected function enqueueClientSideDependencies(View $view)
+    {
+        // Use jQuery and Backbone from WP core
+        wp_enqueue_script('jquery-core');
+        wp_enqueue_script('wp-backbone');
+
+        $wpCoreScripts = array('jquery', 'backbone');
+
+        // Enqueue non-WP core scripts
+        foreach ($this->coreClientSideDependencies['js'] as $name => $script) {
+            if (!in_array($name, $wpCoreScripts)) {
+                wp_enqueue_script($name, $view->bowerUrl($script));
+            }
+        }
+
+        wp_enqueue_style('bootstrap', $view->bowerUrl('/dewdrop/www/css/bootstrap-wp.css'));
+
+        foreach ($this->coreClientSideDependencies['css'] as $name => $css) {
+            // We need to use a special, prefixed version of the Bootstrap CSS for WP
+            if ('bootstrap' !== $name) {
+                wp_enqueue_style($name, $view->bowerUrl($css));
+            }
+        }
+
+        wp_enqueue_style('dewdrop-admin-wp', $view->bowerUrl('/dewdrop/www/css/admin-wp.css'));
     }
 
     /**

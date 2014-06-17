@@ -37,6 +37,6 @@ class BowerUrl extends AbstractHelper
             $wwwPath = '/' . trim(str_replace($_SERVER['DOCUMENT_ROOT'], '', $paths->getWww()), '/') . '/';
         }
 
-        return $wwwPath . ltrim($url, '/');
+        return $wwwPath . 'bower_components' . '/' . ltrim($url, '/');
     }
 }

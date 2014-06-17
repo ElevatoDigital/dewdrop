@@ -35,14 +35,15 @@ abstract class EnvAbstract implements EnvInterface
      */
     protected $coreClientSideDependencies = array(
         'js' => array(
-            'jquery'      => '/jquery/dist/jquery.min.js',
-            'bootstrap'   => '/bootstrap/dist/js/bootstrap.min.js',
-            'keymaster'   => '/keymaster/keymaster.js',
-            'velocity'    => '/velocity/jquery.velocity.min.js',
-            'velocity-ui' => '/velocity/velocity.ui.js',
-            'underscore'  => '/underscore/underscore.js',
-            'wp-backbone' => '/backbone/backbone.js',
-            'requirejs'   => '/requirejs/require.js'
+            'jquery'       => '/jquery/dist/jquery.min.js',
+            'bootstrap'    => '/bootstrap/dist/js/bootstrap.min.js',
+            'keymaster'    => '/keymaster/keymaster.js',
+            'velocity'     => '/velocity/jquery.velocity.min.js',
+            'velocity-ui'  => '/velocity/velocity.ui.js',
+            'underscore'   => '/underscore/underscore.js',
+            'backbone'     => '/backbone/backbone.js',
+            'requirejs'    => '/requirejs/require.js',
+            'dewdrop-core' => '/dewdrop/www/js/core.js'
         ),
         'css' => array(
             'bootstrap'     => '/bootstrap/dist/css/bootstrap.min.css',

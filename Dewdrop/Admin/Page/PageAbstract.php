@@ -141,23 +141,12 @@ abstract class PageAbstract
      * You can call renderView() directly from your render() method.  Or, if
      * your render method produces no output itself, the component will call
      * this method itself to automatically render your view script.
+     *
+     * @return string
      */
     public function renderView()
     {
-        $output = $this->view->render($this->inflectViewScriptName());
-
-        if ($this->component->getPaths()->isWp()) {
-            $wwwPath = $this->component->getPaths()->getPluginRoot() . '/www';
-
-            foreach ($this->view->headScript() as $script) {
-                wp_enqueue_script(
-                    basename($script->attributes->src, '.js'),
-                    plugins_url('/www/' . $script->attributes['src'], $wwwPath)
-                );
-            }
-        }
-
-        return $output;
+        return $this->view->render($this->inflectViewScriptName());
     }
 
     /**
