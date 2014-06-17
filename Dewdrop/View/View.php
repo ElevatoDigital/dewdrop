@@ -82,6 +82,7 @@ class View
         'inlinescript'          => '\Dewdrop\View\Helper\InlineScript',
         'inputcheckbox'         => '\Dewdrop\View\Helper\InputCheckbox',
         'inputtext'             => '\Dewdrop\View\Helper\InputText',
+        'pagination'            => '\Dewdrop\View\Helper\Pagination',
         'select'                => '\Dewdrop\View\Helper\Select',
         'table'                 => '\Dewdrop\View\Helper\Table',
         'tablecellrenderer'     => '\Dewdrop\View\Helper\TableCellRenderer',

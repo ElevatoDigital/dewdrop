@@ -25,5 +25,7 @@ class Index extends PageAbstract
         $this->view->groupingFilter   = $this->component->getFieldGroupsFilter();
         $this->view->fields           = $fields;
         $this->view->debug            = Pimple::getResource('debug');
+
+        $this->view->assign('page', $this);
     }
 }
