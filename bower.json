@@ -7,6 +7,13 @@
         "www/images",
         "www/fonts"
     ],
+    "ignore": [
+        "Dewdrop",
+        "bin",
+        "db",
+        "docs",
+        "tests"
+    ],
     "dependencies": {
         "jquery":         "1.*",
         "jquery-ui":      "1.*",

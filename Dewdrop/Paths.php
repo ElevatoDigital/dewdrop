@@ -126,6 +126,17 @@ class Paths
     }
 
     /**
+     * We expect a "www" folder inside the plugin/app root where client-side
+     * assets can be included.
+     *
+     * @return string
+     */
+    public function getWww()
+    {
+        return $this->getPluginRoot() . '/www';
+    }
+
+    /**
      * The folder housing your admin components
      *
      * @return string
