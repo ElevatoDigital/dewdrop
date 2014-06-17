@@ -1,12 +1,12 @@
 {
     "name": "dewdrop",
     "version": "0.10.0",
-    "main": {
+    "main": [
         "www/css",
         "www/js",
         "www/images",
         "www/fonts"
-    },
+    ],
     "dependencies": {
         "jquery":         "1.*",
         "jquery-ui":      "1.*",
