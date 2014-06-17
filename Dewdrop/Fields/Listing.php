@@ -17,6 +17,9 @@ use Dewdrop\Db\Select;
 use Dewdrop\Exception;
 use Dewdrop\Fields;
 use Dewdrop\Fields\Helper\SelectModifierInterface;
+use Dewdrop\Fields\Helper\SelectPaginate;
+use Dewdrop\Fields\Helper\SelectSort;
+use Dewdrop\Pimple;
 
 /**
  * The Listing class wraps a Select object and applies a number of SelectModifier
@@ -73,10 +76,16 @@ class Listing
      *
      * @param Select $select
      */
-    public function __construct(Select $select, DbField $primaryKey)
+    public function __construct(Select $select, DbField $primaryKey, Request $request = null)
     {
         $this->select     = $select;
         $this->primaryKey = $primaryKey;
+
+        $request = ($request ?: Pimple::getResource('dewdrop-request'));
+
+        $this
+            ->registerSelectModifier(new SelectSort($request))
+            ->registerSelectModifier(new SelectPaginate($request));
     }
 
     /**
