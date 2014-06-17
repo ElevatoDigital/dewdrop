@@ -17,6 +17,7 @@ use Dewdrop\Db\Select;
 use Dewdrop\Exception;
 use Dewdrop\Fields\FieldInterface;
 use Dewdrop\Fields;
+use Dewdrop\Request;
 
 /**
  */
@@ -34,14 +35,26 @@ class SelectPaginate extends HelperAbstract implements SelectModifierInterface
     /**
      * @var int
      */
-    protected $page = 1;
+    private $page;
 
     /**
      * Page size
      *
      * @var int
      */
-    protected $pageSize = 25;
+    private $pageSize = 50;
+
+    /**
+     * A Request object we can use to look up the current page.
+     *
+     * @param Request
+     */
+    private $request;
+
+    public function __construct(Request $request)
+    {
+        $this->request = $request;
+    }
 
     /**
      * @param FieldInterface $field
@@ -60,6 +73,19 @@ class SelectPaginate extends HelperAbstract implements SelectModifierInterface
     public function getPage()
     {
         return $this->page;
+    }
+
+    /**
+     * Sets page size
+     *
+     * @param int $pageSize
+     * @return SelectPaginate
+     */
+    public function setPageSize($pageSize)
+    {
+        $this->pageSize = (int) $pageSize;
+
+        return $this;
     }
 
     /**
@@ -90,41 +116,13 @@ class SelectPaginate extends HelperAbstract implements SelectModifierInterface
     {
         $driver = $select->getAdapter()->getDriver();
 
-        if ($driver instanceof Pgsql) {
-            $select->columns(['_dewdrop_count' => new Expr('COUNT(*) OVER()')]);
-        } else if ($driver instanceof Wpdb) {
-            $select->preColumnsOption('SQL_CALC_FOUND_ROWS');
-        } else {
-            $driverClass = get_class($driver);
-            throw new Exception("Unsupported driver class '{$driverClass}'");
-        }
+        $this->page = (int) $this->request->getQuery($paramPrefix . 'listing-page', 1);
 
-        return $select->limit($this->getPageSize(), $this->getPageSize() * ($this->page - 1));
-    }
+        $driver->prepareSelectForTotalRowCalculation($select);
 
-    /**
-     * Sets page
-     *
-     * @param int $page
-     * @return SelectPaginate
-     */
-    public function setPage($page)
-    {
-        $this->page = (int) $page;
-
-        return $this;
-    }
-
-    /**
-     * Sets page size
-     *
-     * @param int $pageSize
-     * @return SelectPaginate
-     */
-    public function setPageSize($pageSize)
-    {
-        $this->pageSize = (int) $pageSize;
-
-        return $this;
+        return $select->limit(
+            $this->getPageSize(),
+            $this->getPageSize() * ($this->page - 1)
+        );
     }
 }

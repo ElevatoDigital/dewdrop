@@ -96,7 +96,7 @@ class Pagination extends AbstractHelper
         $request = clone $this->view->getRequest();
 
         return $request
-            ->setQuery('page', $page)
+            ->setQuery('listing-page', $page)
             ->getUrl();
     }
 }

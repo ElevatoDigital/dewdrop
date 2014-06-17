@@ -41,7 +41,7 @@ abstract class CrudAbstract extends ComponentAbstract implements CrudInterface
     public function getSelectPaginateHelper()
     {
         if (null === $this->selectPaginate) {
-            $this->selectPaginate = new SelectPaginate();
+            $this->selectPaginate = new SelectPaginate($this->getRequest());
         }
 
         return $this->selectPaginate;

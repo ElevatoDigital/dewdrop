@@ -82,6 +82,14 @@ interface CrudInterface
     public function getVisibilityFilter();
 
     /**
+     * Get the \Dewdrop\Fields\Helper\SelectPaginate helper that will be
+     * responsible for paginating the Listing's Select object.
+     *
+     * @return \Dewdrop\Fields\Helper\SelectPaginate
+     */
+    public function getSelectPaginateHelper();
+
+    /**
      * Get the \Dewdrop\Fields\Helper\SelectSort helper that will be responsible
      * for sorting the Listing.
      *

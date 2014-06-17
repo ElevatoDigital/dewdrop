@@ -151,15 +151,17 @@ $this->bootstrapRowActions()->assignCallback($rowActionArgs);
 
 echo $this->bootstrapTable(
     $fields,
-    $this->listing->fetchData($this->groupingFilter->apply($this->fields), $rowCount),
+    $this->listing->fetchData($this->groupingFilter->apply($this->fields)),
     $renderer,
     $this->listing->getSelectModifierByName('SelectSort')
 );
 
+$paginationHelper = $this->listing->getSelectModifierByName('SelectPaginate');
+
 echo $this->pagination(
-    $rowCount,
-    $this->listing->getSelectModifierByName('SelectPaginate')->getPageSize(),
-    (((int) $request->getQuery('page')) ?: 1)
+    $this->listing->getTotalRowCount(),
+    $paginationHelper->getPageSize(),
+    $paginationHelper->getPage()
 );
 
 echo $this->bootstrapColumnsModal(

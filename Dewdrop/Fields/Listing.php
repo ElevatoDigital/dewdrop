@@ -59,6 +59,16 @@ class Listing
     private $primaryKey;
 
     /**
+     * The total number of rows that would have been fetched had no LIMIT
+     * clause been present on the Select object.  This is calculated when
+     * you call fetchData(), assuming you have a SelectPaginate helper
+     * registered.
+     *
+     * @var int
+     */
+    private $totalRowCount = 0;
+
+    /**
      * Supply the Select object that will be manipulated by this listing.
      *
      * @param Select $select
@@ -174,39 +184,37 @@ class Listing
      * object to all modifiers before fetching the data from the DB.
      *
      * @param Fields $fields
-     * @param int $rowCount
      * @return array
      * @throws
      */
-    public function fetchData(Fields $fields, &$rowCount = null)
+    public function fetchData(Fields $fields)
     {
         $adapter = $this->select->getAdapter();
+        $data    = $adapter->fetchAll($this->getModifiedSelect($fields));
 
-        $data = $adapter->fetchAll($this->getModifiedSelect($fields));
-
+        // Ensure we always return an array
         if (!$data) {
             $data = array();
         }
 
         if ($this->getSelectModifierByName('selectpaginate')) {
-
-            $driver = $adapter->getDriver();
-
-            if ($driver instanceof Pgsql) {
-                if (0 < count($data)) {
-                    $rowCount = $data[0]['_dewdrop_count'];
-                } else {
-                    $rowCount = 0;
-                }
-            } else if ($driver instanceof Wpdb) {
-                $rowCount = $adapter->fetchOne('SELECT FOUND_ROWS()');
-            } else {
-                $driverClass = get_class($driver);
-                throw new Exception("Unsupported driver class '{$driverClass}'");
-            }
+            $this->totalRowCount = $adapter->getDriver()->fetchTotalRowCount($data);
         }
 
         return $data;
+    }
+
+    /**
+     * Return the total row count that would have been retrieved during
+     * fetchData() if no LIMIT clause was applied to the Select.  Note that this
+     * will only work if you have a SelectPaginate select modifier registered
+     * with this listing.
+     *
+     * @return integer
+     */
+    public function getTotalRowCount()
+    {
+        return $this->totalRowCount;
     }
 
     /**

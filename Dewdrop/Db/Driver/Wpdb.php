@@ -11,6 +11,7 @@
 namespace Dewdrop\Db\Driver;
 
 use Dewdrop\Db\Adapter;
+use Dewdrop\Db\Select;
 use Dewdrop\Exception;
 use wpdb as RawWpdb;
 
@@ -462,5 +463,31 @@ class Wpdb implements DriverInterface
     {
         $this->query('COMMIT');
         return $this->query('SET AUTOCOMMIT=1');
+    }
+
+    /**
+     * Use the SQL_CALC_FOUND_ROWS facility in MySQL to calculate the total
+     * number of rows that would have been returned from a query if no LIMIT
+     * had been applied.
+     *
+     * @param Select $select
+     * @return void
+     */
+    public function prepareSelectForTotalRowCalculation(Select $select)
+    {
+        $select->preColumnsOption('SQL_CALC_FOUND_ROWS');
+    }
+
+    /**
+     * Use MySQL's FOUND_ROWS() facility to retrieve the total number of rows
+     * that would have been fetched on the previous statement if no LIMIT was
+     * applied.
+     *
+     * @param array $resultSet
+     * @return integer
+     */
+    public function fetchTotalRowCount(array $resultSet)
+    {
+        return $this->adapter->fetchOne('SELECT FOUND_ROWS()');
     }
 }

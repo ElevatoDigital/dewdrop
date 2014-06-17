@@ -12,6 +12,8 @@ namespace Dewdrop\Db\Driver\Pdo;
 
 use Dewdrop\Db\Adapter;
 use Dewdrop\Db\Driver\DriverInterface;
+use Dewdrop\Db\Expr;
+use Dewdrop\Db\Select;
 use Dewdrop\Exception;
 use PDO;
 use PDOException;
@@ -566,5 +568,37 @@ class Pgsql implements DriverInterface
     public function commit()
     {
         $this->query('COMMIT');
+    }
+
+    /**
+     * Use the OVER() window function to store a count of the total number
+     * of rows that would have been retrieved if no LIMIT clause was applied
+     * on the supplied Select object.  The total row count will be added
+     * to the result set as a _dewdrop_count column.
+     *
+     * @param Select $select
+     * @return void
+     */
+    public function prepareSelectForTotalRowCalculation(Select $select)
+    {
+        $select->columns(['_dewdrop_count' => new Expr('COUNT(*) OVER()')]);
+    }
+
+    /**
+     * Use the supplied resultset to determine the total number of rows
+     * that would have been fetch with no LIMIT clause present.  This will
+     * only really work if you called the prepareSelectForTotalRowCalculation()
+     * method on the Select that retrieved the resultset.
+     *
+     * @param array $resultSet
+     * @return integer
+     */
+    public function fetchTotalRowCount(array $resultSet)
+    {
+        if (0 < count($resultSet) && array_key_exists('_dewdrop_count', current($resultSet))) {
+            return current($resultSet)['_dewdrop_count'];
+        } else {
+            return 0;
+        }
     }
 }
