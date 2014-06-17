@@ -19,6 +19,8 @@ use Dewdrop\Pimple;
  */
 class BowerUrl extends AbstractHelper
 {
+    private static $wwwPath;
+
     /**
      * If no $wwwPath or $docRoot are provided, pull those from the environment.
      * Return the supplied URL with a prefix pointing to the bower_components
@@ -32,11 +34,18 @@ class BowerUrl extends AbstractHelper
     public function direct($url, $wwwPath = null, $docRoot = null)
     {
         if (null === $wwwPath) {
-            $paths   = Pimple::getResource('paths');
-            $docRoot = ($docRoot ?: $_SERVER['DOCUMENT_ROOT']);
-            $wwwPath = '/' . trim(str_replace($_SERVER['DOCUMENT_ROOT'], '', $paths->getWww()), '/') . '/';
+            if (self::$wwwPath) {
+                $wwwPath = self::$wwwPath;
+            } else {
+                $paths   = Pimple::getResource('paths');
+                $docRoot = ($docRoot ?: $_SERVER['DOCUMENT_ROOT']);
+                $wwwPath = trim(str_replace($_SERVER['DOCUMENT_ROOT'], '', $paths->getWww() . '/'), '/');
+                $wwwPath = ($wwwPath ? '/' . $wwwPath : '');
+
+                self::$wwwPath = $wwwPath;
+            }
         }
 
-        return $wwwPath . 'bower_components' . '/' . ltrim($url, '/');
+        return $wwwPath . '/bower_components/' . ltrim($url, '/');
     }
 }

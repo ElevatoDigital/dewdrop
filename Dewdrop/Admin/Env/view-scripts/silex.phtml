@@ -9,11 +9,11 @@
 
         <title><?php echo $this->escapeHtml($this->title);?></title>
 
-        <!-- Bootstrap core CSS -->
-        <link href="/css/bootstrap.min.css" rel="stylesheet">
-
-        <!-- Custom styles for this template -->
-        <link href="/css/admin.css" rel="stylesheet">
+        <?php
+        foreach ($this->dependencies['css'] as $css) {
+            printf('<link href="%s" rel="stylesheet" />', $this->bowerUrl($css));
+        }
+        ?>
 
         <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
         <!--[if lt IE 9]>
@@ -93,17 +93,11 @@
 
         <?php echo $this->content;?>
 
-        <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-        <script src="/js/jquery-1.11.1.min.js"></script>
-
-        <!-- Include all compiled plugins (below), or include individual files as needed -->
-        <script src="/js/bootstrap.min.js"></script>
-        <script src="/js/keymaster.js"></script>
-        <script src="/js/jquery.velocity.min.js"></script>
-        <script src="/js/velocity.ui.js"></script>
-        <script src="/js/underscore-min.js"></script>
-        <script src="/js/backbone-min.js"></script>
-        <script src="/js/require.js"></script>
+        <?php
+        foreach ($this->dependencies['js'] as $js) {
+            printf('<script src="%s"></script>', $this->bowerUrl($js));
+        }
+        ?>
 
         <script type="text/javascript">
             jQuery.fn.animate = jQuery.fn.velocity;

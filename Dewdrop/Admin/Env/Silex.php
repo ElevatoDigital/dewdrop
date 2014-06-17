@@ -99,7 +99,8 @@ class Silex extends EnvAbstract
             ->assign('title', $this->title)
             ->assign('components', $this->components)
             ->assign('content', $content)
-            ->assign('viewHeadScript', $headScript);
+            ->assign('viewHeadScript', $headScript)
+            ->assign('dependencies', $this->coreClientSideDependencies);
 
         return $view->render('silex.phtml');
     }
