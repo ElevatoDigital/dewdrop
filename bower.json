@@ -12,7 +12,7 @@
         "jquery-ui":      "1.*",
         "backbone":       "1.1.*",
         "keymaster":      "1.6.*",
-        "bootstrap":      "3.x",
+        "bootstrap":      "3.*",
         "velocity":       "0.1.*",
         "requirejs":      "2.*",
         "requirejs-text": "2.*"
