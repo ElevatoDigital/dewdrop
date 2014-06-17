@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * Dewdrop
+ *
+ * @link      https://github.com/DeltaSystems/dewdrop
+ * @copyright Delta Systems (http://deltasys.com)
+ * @license   https://github.com/DeltaSystems/dewdrop/LICENSE
+ */
+
 namespace Dewdrop\View\Helper;
 
 use Dewdrop\Exception;
@@ -11,24 +19,53 @@ use Dewdrop\Pimple;
 use Zend\InputFilter\Input;
 use Zend\InputFilter\InputFilter;
 
+/**
+ * Render an HTML form using Bootstrap classes and markup.  Note that this
+ * view helper can also render a \Dewdrop\Fields\GroupedFields object in a tab
+ * view.
+ */
 class BootstrapForm extends AbstractHelper
 {
+    /**
+     * If the user supplies no arguments, we return immediately, assuming that
+     * they want to call other methods on this helper directly.  Otherwise, we
+     * pass execution along to the directWithArgs() method so that the arguments
+     * can be validated.
+     *
+     * @return mixed
+     */
     public function direct()
     {
         $args = func_get_args();
 
         if (0 === $args) {
             return $this;
+        } else {
+            return call_user_func_array(array($this, 'directWithArgs'), $args);
         }
+    }
 
-        if (!$args[0] instanceof Fields) {
-            throw new Exception('BootstrapForm takes either no arguments or a Fields object');
-        }
+    /**
+     * If the direct method was called with arguments, it delegates to this
+     * method.  When a user supplies a \Dewdrop\Fields object, a
+     * \Zend\InputFilter\InputFilter object and an optional TableCell field
+     * helper as a renderer, the view helper can render the entire form in
+     * a single step.
+     *
+     * @param Fields $fields
+     * @param InputFilter $inputFiler
+     * @param Renderer $renderer
+     * @return string
+     */
+    public function directWithArgs(Fields $fields, InputFilter $inputFilter, Renderer $renderer = null)
+    {
+        $renderer = ($renderer ?: $this->view->editControlRenderer());
 
-        $fields      = $args[0];
-        $inputFilter = $args[1];
-        $renderer    = (isset($args[2]) && $args[2] instanceof Renderer ? $args[2] : $this->view->editControlRenderer());
-
+        /**
+         * Only render groups in a tab view if there is more than 1 group because
+         * when there is only 1 group, that means only the default "ungrouped"
+         * or "other" set is present.
+         */
         if ($fields instanceof GroupedFields && 1 < count($fields->getGroups())) {
             $renderMethod = 'renderGroupedFields';
         } else {
@@ -41,6 +78,13 @@ class BootstrapForm extends AbstractHelper
             . $this->close();
     }
 
+    /**
+     * Open the form table, optionally supplying a method and action attribute.
+     *
+     * @param string $action
+     * @param string $method
+     * @return string
+     */
     public function open($action = '', $method = 'POST')
     {
         return sprintf(
@@ -50,11 +94,24 @@ class BootstrapForm extends AbstractHelper
         );
     }
 
+    /**
+     * Close the form tag.
+     *
+     * @return string
+     */
     public function close()
     {
         return '</form>';
     }
 
+    /**
+     * Render a GroupedFields object using a Bootstrap tab view.
+     *
+     * @param GroupedFields $groupedFields
+     * @param InputFilter $inputFilter
+     * @param Renderer $renderer
+     * @return string
+     */
     public function renderGroupedFields(GroupedFields $groupedFields, InputFilter $inputFilter, Renderer $renderer)
     {
         $output = '<ul class="nav nav-tabs">';
@@ -92,6 +149,15 @@ class BootstrapForm extends AbstractHelper
         return $output;
     }
 
+    /**
+     * Render the supplied set of ungrouped fields, using the supplied InputFilter
+     * to get validation messages, etc.
+     *
+     * @param Fields $fields
+     * @param InputFilter $inputFilter
+     * @param Renderer $renderer
+     * @return string
+     */
     public function renderFields(Fields $fields, InputFilter $inputFilter, Renderer $renderer)
     {
         $output = '';
@@ -137,11 +203,29 @@ class BootstrapForm extends AbstractHelper
         return $output;
     }
 
+    /**
+     * This particular bit of the markup is separated out so that sub-classes could
+     * easily apply classes to it, primarily to take advantage of Bootstrap's
+     * responsive grids.  Note that the returned string should include a sprintf()
+     * string placeholder ("%s") so that validation-related classes can be added as
+     * well.
+     *
+     * @return string
+     */
     public function renderFormGroupOpenTag()
     {
         return '<div class="form-group%s">';
     }
 
+    /**
+     * Render the label for the supplied field, included a "required" flag when
+     * appropriate.
+     *
+     * @param Renderer $renderer
+     * @param FieldInterface $field
+     * @param Input $input
+     * @return string
+     */
     public function renderLabel(Renderer $renderer, FieldInterface $field, Input $input = null)
     {
         return sprintf(
@@ -152,11 +236,21 @@ class BootstrapForm extends AbstractHelper
         );
     }
 
+    /**
+     * Render a "required" flag using Boostrap's glyphicons.
+     *
+     * @return string
+     */
     public function renderRequiredFlag()
     {
         return ' <small><span title="Required" class="glyphicon glyphicon-asterisk text-danger"></span></small>';
     }
 
+    /**
+     * Render the supplied validation messages using Bootstraps' help-block class.
+     *
+     * @return string
+     */
     public function renderMessages($messages)
     {
         $output = '';
@@ -171,6 +265,12 @@ class BootstrapForm extends AbstractHelper
         return $output;
     }
 
+    /**
+     * Render a simple submit button at the footer of the form.
+     *
+     * @param string $title
+     * @return string
+     */
     public function renderSubmitButton($title = 'Save Changes')
     {
         return sprintf(
@@ -181,6 +281,15 @@ class BootstrapForm extends AbstractHelper
         );
     }
 
+    /**
+     * When a field's rendered control contains its own label and is not a list,
+     * we skip the rendering the label in this header.  This is meant to skip
+     * redundant labels on checkbox controls while still rendering labels for
+     * checkbox or radio button lists.
+     *
+     * @param string $output
+     * @return boolean
+     */
     protected function controlRequiresLabel($output)
     {
         return false === stripos($output, '<label') || false !== stripos($output, '<ul');

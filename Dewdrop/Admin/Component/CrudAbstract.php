@@ -5,7 +5,6 @@ namespace Dewdrop\Admin\Component;
 use Dewdrop\Admin\Component\CrudInterface;
 use Dewdrop\Admin\PageFactory\Crud as CrudFactory;
 use Dewdrop\Db\Table as DbTable;
-use Dewdrop\Db\Table\AdminModelInterface;
 use Dewdrop\Exception;
 use Dewdrop\Fields;
 use Dewdrop\Fields\Filter\Groups as GroupsFilter;

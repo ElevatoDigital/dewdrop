@@ -48,6 +48,14 @@ class Listing
     private $selectModifiers = array();
 
     /**
+     * A field that can be used to look up single items in this listing's
+     * Select object.
+     *
+     * @var DbField
+     */
+    private $primaryKey;
+
+    /**
      * Supply the Select object that will be manipulated by this listing.
      *
      * @param Select $select
@@ -58,6 +66,12 @@ class Listing
         $this->primaryKey = $primaryKey;
     }
 
+    /**
+     * Retrieve this listing's primary key field.  Sometimes useful when
+     * assembling URLs, etc.
+     *
+     * @return DbField
+     */
     public function getPrimaryKey()
     {
         return $this->primaryKey;
@@ -169,6 +183,14 @@ class Listing
         return $data;
     }
 
+    /**
+     * Fetch a single row from this listing by using the supplied ID value to
+     * match against the listing's primary key field.
+     *
+     * @param Fields $fields
+     * @param mixed $id
+     * @return array
+     */
     public function fetchRow(Fields $fields, $id)
     {
         $select = $this->getModifiedSelect($fields);

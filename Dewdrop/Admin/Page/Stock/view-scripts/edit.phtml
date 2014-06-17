@@ -1,5 +1,3 @@
-<?php echo $this->wrap()->open();?>
-
 <?php if ($this->invalidSubmission):?>
 <div class="alert alert-danger">
     Some errors were found in your submission.  Please double-check and try again.
@@ -17,4 +15,3 @@ echo $this->bootstrapForm(
     $this->rowEditor->getInputFilter()
 );
 ?>
-<?php echo $this->wrap()->close();?>

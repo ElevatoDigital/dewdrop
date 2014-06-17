@@ -28,5 +28,9 @@ class View extends PageAbstract
         $this->view->data           = $data;
         $this->view->groupingFilter = $this->component->getFieldGroupsFilter();
         $this->view->permissions    = $this->component->getPermissions();
+
+        if ($this->component->getRequest()->isAjax()) {
+            $this->component->setShouldRenderLayout(false);
+        }
     }
 }

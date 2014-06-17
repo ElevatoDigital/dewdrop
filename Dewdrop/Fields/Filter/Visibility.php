@@ -92,6 +92,15 @@ class Visibility implements FilterInterface
         return $this;
     }
 
+    /**
+     * Save the user's visible field selections back to the database.  We expect
+     * the selections array to just contain field IDs.  Only those that match
+     * IDs of fields in the supplied Fields object will be saved.
+     *
+     * @param Fields $fields
+     * @param array $selections
+     * @return void
+     */
     public function save(Fields $fields, array $selections)
     {
         $visibleFields = array();
@@ -130,6 +139,12 @@ class Visibility implements FilterInterface
         }
     }
 
+    /**
+     * Load the current selections from the database.  Will return an array
+     * of field IDs.
+     *
+     * @return array
+     */
     public function load()
     {
         $selections = $this->dbAdapter->fetchCol(
@@ -143,6 +158,15 @@ class Visibility implements FilterInterface
         return is_array($selections) ? $selections : array();
     }
 
+    /**
+     * Apply the field to the supplied set of fields.  If after filtering no
+     * fields are left, we'll return the full set of fields as a fallback.
+     * If no preferences are saved to the DB, we will use either pre-defined
+     * defaults (@see setDefaults()) or the first 4 fields.
+     *
+     * @param Fields $fields
+     * @return Fields
+     */
     public function apply(Fields $fields)
     {
         if (!$this->selections) {

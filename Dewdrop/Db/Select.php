@@ -639,6 +639,17 @@ class Select
         return $this->parts[$part];
     }
 
+    /**
+     * This method will quote the supplied table and column name pair, using
+     * whatever alias has been defined for the table on this Select object.
+     * This can be useful when you're modifying a Select and you are not sure
+     * what aliases have been added for the table you want to reference.
+     *
+     * @throws SelectException
+     * @param string $tableName
+     * @param string $columnName
+     * @return string
+     */
     public function quoteWithAlias($tableName, $columnName)
     {
         foreach ($this->getPart(self::FROM) as $queryName => $info) {

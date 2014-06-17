@@ -41,10 +41,14 @@ class BootstrapRowActions extends AbstractHelper
                     }
 
                     if ($view) {
-                        $out .= $this->renderView(vsprintf($view, $params), $rowIndex, $title);
+                        $out .= $this->renderView(vsprintf($view, $params), $rowIndex);
                     }
 
                     $out .= $this->close();
+
+                    if ($view) {
+                        $out .= $this->renderModal($rowIndex, $title);
+                    }
 
                     return $out;
                 }
@@ -69,12 +73,21 @@ class BootstrapRowActions extends AbstractHelper
         );
     }
 
-    public function renderView($url, $index, $modalTitle)
+    public function renderView($url, $index)
+    {
+        return sprintf(
+            '<a data-toggle="modal" data-target="#view-modal-%s" data-loading-text="..." data-keyboard-role="view" '
+            . 'class="btn btn-xs btn-default" href="%s">View</a>',
+            $this->view->escapeHtmlAttr($index),
+            $this->view->escapeHtmlAttr($url)
+        );
+    }
+
+    public function renderModal($index, $modalTitle)
     {
         return $this->partial(
             'bootstrap-row-actions-view.phtml',
             array(
-                'url'        => $url,
                 'index'      => $index,
                 'modalTitle' => $modalTitle
             )

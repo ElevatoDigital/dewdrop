@@ -251,6 +251,11 @@ abstract class ComponentAbstract
         return $this;
     }
 
+    public function shouldRenderLayout()
+    {
+        return $this->shouldRenderLayout;
+    }
+
     /**
      * Set the title of this component as it should be displayed in the WP
      * admin menu.
@@ -372,8 +377,8 @@ abstract class ComponentAbstract
             $output = $page->renderView();
         }
 
-        if ($this->getRequest()->isAjax() || !$this->shouldRenderLayout) {
-            return $response->render();
+        if (!$this->shouldRenderLayout) {
+            return $output;
         } else {
             return $this->env->renderLayout($output, $page->getView()->headScript());
         }

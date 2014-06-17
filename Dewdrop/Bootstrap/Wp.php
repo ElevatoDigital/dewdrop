@@ -97,7 +97,7 @@ class Wp implements PimpleProviderInterface
     /**
      * Define config resource for Pimple.  Nothing much to do for WP.
      *
-     * @return Config
+     * @return Wp
      */
     public function defineConfig()
     {
@@ -113,7 +113,7 @@ class Wp implements PimpleProviderInterface
     /**
      * Define the DB resource for Pimple.
      *
-     * @return DbAdapter
+     * @return Wp
      */
     public function defineDb()
     {
@@ -133,6 +133,12 @@ class Wp implements PimpleProviderInterface
         return $this;
     }
 
+    /**
+     * Provide a \Dewdrop\Admin\Env\Wp object so that Dewdrop admin components
+     * can work inside the WP admin shell.
+     *
+     * @return Wp
+     */
     public function defineAdmin()
     {
         $this->pimple['admin'] = $this->pimple->share(
@@ -140,5 +146,7 @@ class Wp implements PimpleProviderInterface
                 return new WpAdminEnv();
             }
         );
+
+        return $this;
     }
 }

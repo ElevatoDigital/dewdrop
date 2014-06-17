@@ -13,6 +13,10 @@ namespace Dewdrop\Admin\Env;
 use Dewdrop\Pimple;
 use DirectoryIterator;
 
+/**
+ * This class provides a couple methods that are common to all the admin
+ * environments Dewdrop works with.
+ */
 abstract class EnvAbstract implements EnvInterface
 {
     /**
@@ -28,7 +32,7 @@ abstract class EnvAbstract implements EnvInterface
      * used to find the default admin path for the application.
      *
      * @param string $path
-     * @return Silex
+     * @return EnvAbstract
      */
     public function registerComponentsInPath($path = null)
     {
@@ -64,7 +68,7 @@ abstract class EnvAbstract implements EnvInterface
      * could register them with this method.
      *
      * @param string $folder
-     * @return Silex
+     * @return EnvAbstract
      */
     public function registerComponent($folder)
     {
@@ -72,7 +76,7 @@ abstract class EnvAbstract implements EnvInterface
         $componentName = basename($folder);
         $className     = '\Admin\\' . Pimple::getResource('inflector')->camelize($componentName) . '\Component';
 
-        $component = new $className(Pimple::getInstance(), $this);
+        $component = new $className(Pimple::getInstance());
 
         $this->initComponent($component);
 

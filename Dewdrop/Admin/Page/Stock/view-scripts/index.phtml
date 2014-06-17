@@ -1,4 +1,3 @@
-<?php echo $this->wrap()->open();?>
 <nav class="navbar navbar-default navbar-admin-index" role="navigation">
     <div class="navbar-header">
         <?php if ($this->permissions->can('create')) :?>
@@ -157,4 +156,3 @@ echo $this->bootstrapColumnsModal(
 
 $this->headScript()->appendFile('/js/stock/listing-keyboard-shortcuts.js');
 ?>
-<?php echo $this->wrap()->close();?>
