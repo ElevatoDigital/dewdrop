@@ -12,7 +12,9 @@
         "bin",
         "db",
         "docs",
-        "tests"
+        "tests",
+        "composer.json",
+        "composer.lock"
     ],
     "dependencies": {
         "jquery":         "1.*",
