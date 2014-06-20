@@ -10,6 +10,8 @@
 
 namespace Dewdrop\Bootstrap;
 
+use Pimple;
+
 /**
  * Custom bootstrap classes just have to implement this interface.  Basically,
  * give Dewdrop a Pimple object.
