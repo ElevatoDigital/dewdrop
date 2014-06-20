@@ -10,5 +10,12 @@
         </div>
     </nav>
     <?php endif;?>
-    <?php echo $this->bootstrapDetailsView($this->fields->getVisibleFields($this->groupingFilter), $this->data);?>
+    <?php
+    echo $this->bootstrapDetailsView(
+        $this->fields->getVisibleFields($this->groupingFilter),
+        $this->data,
+        $this->tableCellRenderer(),
+        $this->id
+    );
+    ?>
 </div>

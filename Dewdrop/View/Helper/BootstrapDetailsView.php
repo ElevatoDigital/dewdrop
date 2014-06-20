@@ -33,9 +33,10 @@ class BootstrapDetailsView extends AbstractHelper
      * @param Fields $fields
      * @param array $data
      * @param Renderer $renderer
+     * @param integer $viewIndex
      * @return string
      */
-    public function direct(Fields $fields, array $data, Renderer $renderer = null)
+    public function direct(Fields $fields, array $data, Renderer $renderer = null, $viewIndex = null)
     {
         if (null === $renderer) {
             $renderer = $this->view->tableCellRenderer();
@@ -47,7 +48,7 @@ class BootstrapDetailsView extends AbstractHelper
          * or "other" set is present.
          */
         if ($fields instanceof GroupedFields && 1 < count($fields->getGroups())) {
-            return $this->renderGroups($fields, $data, $renderer);
+            return $this->renderGroups($fields, $data, $renderer, $viewIndex);
         } else {
             return $this->renderFields($fields, $data, $renderer);
         }
@@ -59,17 +60,21 @@ class BootstrapDetailsView extends AbstractHelper
      * @param GroupedFields $fields
      * @param array $data
      * @param Renderer $renderer
+     * @param integer $viewIndex
      * @return string
      */
-    protected function renderGroups(GroupedFields $fields, array $data, Renderer $renderer)
+    protected function renderGroups(GroupedFields $fields, array $data, Renderer $renderer, $viewIndex = null)
     {
+        static $globalGroupedViewCount = 0;
+
         $output = '<ul class="nav nav-tabs">';
 
         foreach ($fields->getGroups() as $index => $group) {
             if (count($group)) {
                 $output .= sprintf(
-                    '<li%s><a href="#group_%d" data-toggle="tab">%s</a></li>',
+                    '<li%s><a href="#details_%d_group_%d" data-toggle="tab">%s</a></li>',
                     (0 === $index ? ' class="active"' : ''),
+                    $this->view->escapeHtmlAttr(null !== $viewIndex ? $viewIndex : $globalGroupedViewCount),
                     $index,
                     $this->view->escapeHtml($group->getTitle())
                 );
@@ -82,8 +87,9 @@ class BootstrapDetailsView extends AbstractHelper
         foreach ($fields->getGroups() as $index => $group) {
             if (count($group)) {
                 $output .= sprintf(
-                    '<div class="tab-pane-edit tab-pane fade%s" id="group_%d">',
+                    '<div class="tab-pane-edit tab-pane fade%s" id="details_%d_group_%d">',
                     (0 === $index ? ' in active' : ''),
+                    $this->view->escapeHtmlAttr(null !== $viewIndex ? $viewIndex : $globalGroupedViewCount),
                     $index
                 );
 
@@ -94,6 +100,8 @@ class BootstrapDetailsView extends AbstractHelper
         }
 
         $output .= '</div>';
+
+        $globalGroupedViewCount += 1;
 
         return $output;
     }

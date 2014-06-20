@@ -18,14 +18,15 @@ class View extends PageAbstract
         $primaryKey = $this->component->getPrimaryModel()->getPrimaryKey();
         $params     = array();
 
-        foreach ($primaryKey as $id) {
-            $params[$id] = $this->request->getQuery($id);
+        foreach ($primaryKey as $field) {
+            $params[$field] = $this->request->getQuery($field);
         }
 
         $this->view->params         = $params;
         $this->view->fields         = $fields;
         $this->view->singularTitle  = $this->component->getPrimaryModel()->getSingularTitle();
         $this->view->data           = $data;
+        $this->view->id             = $id;
         $this->view->groupingFilter = $this->component->getFieldGroupsFilter();
         $this->view->permissions    = $this->component->getPermissions();
 
