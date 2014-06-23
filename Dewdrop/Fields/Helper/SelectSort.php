@@ -63,6 +63,8 @@ class SelectSort extends HelperAbstract implements SelectModifierInterface
 
     private $sortedDirection;
 
+    private $defaultField;
+
     private $defaultDirection = 'ASC';
 
     private $request;
@@ -99,6 +101,12 @@ class SelectSort extends HelperAbstract implements SelectModifierInterface
         return $this->prefix;
     }
 
+    public function setDefaultField(FieldInterface $defaultField)
+    {
+        $this->defaultField = $defaultField;
+
+        return $this;
+    }
 
     /**
      * Set the default direction that should be used when sorting.
@@ -160,7 +168,7 @@ class SelectSort extends HelperAbstract implements SelectModifierInterface
 
         // Sort by the first visible field that is also sortable, if no other sort was performed
         foreach ($fields->getVisibleFields() as $field) {
-            if ($field->isSortable()) {
+            if ($field->isSortable() && (null === $this->defaultField || $this->defaultField === $field)) {
                 $this->sortedField     = $field;
                 $this->sortedDirection = $this->defaultDirection;
 

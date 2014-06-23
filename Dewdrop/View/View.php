@@ -89,6 +89,7 @@ class View
         'select'                => '\Dewdrop\View\Helper\Select',
         'table'                 => '\Dewdrop\View\Helper\Table',
         'tablecellrenderer'     => '\Dewdrop\View\Helper\TableCellRenderer',
+        'tablesorthandle'       => '\Dewdrop\View\Helper\TableSortHandle',
         'textarea'              => '\Dewdrop\View\Helper\Textarea',
         'wpadminnotice'         => '\Dewdrop\View\Helper\WpAdminNotice',
         'wpcheckboxlist'        => '\Dewdrop\View\Helper\WpCheckboxList',

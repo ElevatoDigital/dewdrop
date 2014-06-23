@@ -58,6 +58,15 @@ class Wp extends EnvAbstract
             );
         }
 
+        foreach ($headLink as $link) {
+            if ('stylesheet' === $link->rel) {
+                wp_enqueue_style(
+                    'dewdrop-' . basename($link->href, '.css'),
+                    $link->href
+                );
+            }
+        }
+
         return $output;
     }
 
@@ -202,7 +211,7 @@ class Wp extends EnvAbstract
         // Enqueue non-WP core scripts
         foreach ($this->coreClientSideDependencies['js'] as $name => $script) {
             if (!in_array($name, $wpCoreScripts)) {
-                wp_enqueue_script($name, $view->bowerUrl($script));
+                wp_enqueue_script($name, $view->bowerUrl($script), array('jquery', 'wp-backbone'));
             }
         }
 

@@ -26,6 +26,7 @@ class Crud implements PageFactoryInterface
         'notification-edit'  => '\Dewdrop\Admin\Page\Stock\NotificationEdit',
         'notifications'      => '\Dewdrop\Admin\Page\Stock\Notifications',
         'sort-fields'        => '\Dewdrop\Admin\Page\Stock\SortFields',
+        'sort-listing'       => '\Dewdrop\Admin\Page\Stock\SortListing',
         'view'               => '\Dewdrop\Admin\Page\Stock\View'
     );
 

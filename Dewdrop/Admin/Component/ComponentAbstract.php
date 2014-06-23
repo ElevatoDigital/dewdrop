@@ -369,8 +369,13 @@ abstract class ComponentAbstract
         }
 
         ob_start();
-        $page->render();
-        $output = ob_get_clean();
+
+        $output = $page->render();
+
+        // Capture output generated during render rather than returned
+        if (!$output) {
+            $output = ob_get_clean();
+        }
 
         // Automatically render view if no output is generated
         if (!$output) {

@@ -2,6 +2,7 @@
 
 namespace Dewdrop\Admin\Page\Stock;
 
+use Dewdrop\Admin\Component\SortableListingInterface;
 use Dewdrop\Admin\Page\PageAbstract;
 use Dewdrop\Bootstrap;
 use Dewdrop\Fields\Filter\Visibility as VisibilityFilter;
@@ -25,6 +26,7 @@ class Index extends PageAbstract
         $this->view->groupingFilter   = $this->component->getFieldGroupsFilter();
         $this->view->fields           = $fields;
         $this->view->debug            = Pimple::getResource('debug');
+        $this->view->isSortable       = ($this->component instanceof SortableListingInterface);
 
         $this->view->assign('page', $this);
     }

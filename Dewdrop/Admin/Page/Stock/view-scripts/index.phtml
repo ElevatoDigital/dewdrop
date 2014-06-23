@@ -46,6 +46,24 @@ $selectFilter  = $this->listing->getSelectModifierByName('SelectFilter');
 $listingData   = $this->listing->fetchData($this->groupingFilter->apply($this->fields));
 $totalRowCount = $this->listing->getTotalRowCount();
 
+if ($this->isSortable) {
+    $sortField = $this->component->getSortField();
+
+    $this->tableSortHandle()->assignToField(
+        $sortField,
+        $renderer,
+        $this->listing->getPrimaryKey()->getName()
+    );
+
+    if (!$fields->has($sortField)) {
+        $fields->add($sortField);
+    }
+
+    $this->listing->getSelectModifierByName('SelectSort')->setDefaultField($sortField);
+
+    echo $this->tableSortHandle()->open($this->adminUrl('sort-listing'));
+}
+
 if (0 === $totalRowCount && $selectFilter->hasFilters()) {
     printf(
         '<div class="alert alert-warning">No %s found matching your filters.  Please try again.</div>',
@@ -58,6 +76,10 @@ if (0 === $totalRowCount && $selectFilter->hasFilters()) {
         $renderer,
         $this->listing->getSelectModifierByName('SelectSort')
     );
+}
+
+if ($this->isSortable) {
+    echo $this->tableSortHandle()->close();
 }
 
 $paginationHelper = $this->listing->getSelectModifierByName('SelectPaginate');

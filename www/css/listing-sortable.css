@@ -1,0 +1,12 @@
+table .handle {
+    font-size: 1.25em;
+    cursor: pointer;
+    cursor: -webkit-grab;
+    display: inline-block;
+    text-align: center;
+    width: 100%;
+}
+
+table .handle:active {
+    cursor: -webkit-grabbing;
+}
