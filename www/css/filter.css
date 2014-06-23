@@ -1,0 +1,27 @@
+.admin-filter-panel fieldset {
+    margin-top: 15px;
+}
+
+.admin-filter-panel .footer {
+    padding-top: 20px;
+}
+
+.filter-row {
+    padding-bottom: 10px;
+}
+
+@media (max-width: 767px) {
+    .admin-filter-panel .visible-xs {
+        display: inline!important;
+    }
+
+    .admin-filter-panel .form-inline {
+        margin-bottom: 10px;
+        padding: 5px 0 5px 25px;
+    }
+
+    .admin-filter-panel .form-inline .form-control {
+        display: inline;
+        width: auto;
+    }
+}

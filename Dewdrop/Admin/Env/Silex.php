@@ -13,6 +13,7 @@ namespace Dewdrop\Admin\Env;
 use Dewdrop\Admin\Component\ComponentAbstract;
 use Dewdrop\View\View;
 use Silex\Application;
+use Zend\View\Helper\HeadLink;
 use Zend\View\Helper\HeadScript;
 
 /**
@@ -88,9 +89,11 @@ class Silex extends EnvAbstract
      * appropriate area of the HTML.
      *
      * @param string $content
+     * @param HeadScript $headScript
+     * @param HeadLink $headLink
      * @return string
      */
-    public function renderLayout($content, HeadScript $headScript = null)
+    public function renderLayout($content, HeadScript $headScript = null, HeadLink $headLink = null)
     {
         $view = new View();
         $view->setScriptPath(__DIR__ . '/view-scripts');
@@ -100,6 +103,7 @@ class Silex extends EnvAbstract
             ->assign('components', $this->components)
             ->assign('content', $content)
             ->assign('viewHeadScript', $headScript)
+            ->assign('viewHeadLink', $headLink)
             ->assign('dependencies', $this->coreClientSideDependencies);
 
         return $view->render('silex.phtml');

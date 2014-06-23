@@ -400,7 +400,7 @@ class Field extends FieldAbstract
      */
     public function getQueryStringId()
     {
-        return str_replace(':', '+', $this->getControlName());
+        return str_replace(':', '-', $this->getControlName());
     }
 
     /**

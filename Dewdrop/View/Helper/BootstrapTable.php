@@ -57,7 +57,7 @@ class BootstrapTable extends Table
         $caret   = '';
 
         if (($sorter && $sorter->isSorted() && $sorter->getSortedField()->getQueryStringId() === $fieldId) ||
-            $fieldId === urlencode($request->getQuery('sort'))
+            $fieldId === $request->getQuery('sort')
         ) {
             if ($sorter) {
                 $activeDir = strtolower($sorter->getSortedDirection());
@@ -73,11 +73,24 @@ class BootstrapTable extends Table
         }
 
         return sprintf(
-            '<a href="?sort=%s&dir=%s">%s%s</a>',
-            $this->view->escapeHtmlAttr($fieldId),
-            $this->view->escapeHtmlAttr($direction),
+            '<a href="%s">%s%s</a>',
+            $this->view->escapeHtmlAttr($this->url($fieldId, $direction)),
             $this->view->escapeHtml($content),
             $caret
         );
+    }
+
+    /**
+     * @param int $page
+     * @return string
+     */
+    protected function url($id, $direction)
+    {
+        $request = clone $this->view->getRequest();
+
+        return $request
+            ->setQuery('sort', $id)
+            ->setQuery('dir', $direction)
+            ->getUrl();
     }
 }

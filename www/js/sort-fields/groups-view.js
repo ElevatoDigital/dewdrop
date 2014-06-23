@@ -33,6 +33,8 @@ define(
                 this.$el.sortable({
                     items: 'ul:not(.list-group:first)',
                 }).disableSelection();
+
+                return this;
             },
 
             updateSortIndexes: function () {

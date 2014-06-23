@@ -490,4 +490,26 @@ class Wpdb implements DriverInterface
     {
         return $this->adapter->fetchOne('SELECT FOUND_ROWS()');
     }
+
+    /**
+     * Return the operator that can be used for case-insensitive LIKE
+     * comparisons.
+     *
+     * @return string
+     */
+    public function getCaseInsensitiveLikeOperator()
+    {
+        return 'LIKE';
+    }
+
+    /**
+     * Use the functions available in the RDBMS to truncate the provided timestamp
+     * column to a date.
+     *
+     * @return string
+     */
+    public function truncateTimeStampToDate($timestamp)
+    {
+        return "DATE({$timestamp})";
+    }
 }

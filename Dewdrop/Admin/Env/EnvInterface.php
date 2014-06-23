@@ -11,6 +11,7 @@
 namespace Dewdrop\Admin\Env;
 
 use Dewdrop\Admin\Component\ComponentAbstract;
+use Zend\View\Helper\HeadLink;
 use Zend\View\Helper\HeadScript;
 
 /**
@@ -47,9 +48,10 @@ interface EnvInterface
      *
      * @param string $content
      * @param HeadScript $headScript
+     * @param HeadLink $headLink
      * @return string
      */
-    public function renderLayout($content, HeadScript $headScript = null);
+    public function renderLayout($content, HeadScript $headScript = null, HeadLink $headLink = null);
 
     /**
      * Return a URL that will work to route the user to the specified page in

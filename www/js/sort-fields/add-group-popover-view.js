@@ -59,7 +59,7 @@ define(
                 $('#add-group').popover('hide');
 
                 this.collection.add({
-                    title:          this.$el.find('.popover-content input').val()
+                    title: this.$el.find('.popover-content input').val()
                 });
             }
         });

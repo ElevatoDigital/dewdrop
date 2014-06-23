@@ -22,18 +22,19 @@ use Dewdrop\Db\Select\SelectException;
  */
 class Select
 {
-    const DISTINCT            = 'distinct';
-    const PRE_COLUMNS_OPTIONS = 'precolumnsoptions';
-    const COLUMNS             = 'columns';
-    const FROM                = 'from';
-    const UNION               = 'union';
-    const WHERE               = 'where';
-    const GROUP               = 'group';
-    const HAVING              = 'having';
-    const ORDER               = 'order';
-    const LIMIT_COUNT         = 'limitcount';
-    const LIMIT_OFFSET        = 'limitoffset';
-    const FOR_UPDATE          = 'forupdate';
+    const DISTINCT             = 'distinct';
+    const PRE_COLUMNS_OPTIONS  = 'precolumnsoptions';
+    const COLUMNS              = 'columns';
+    const FROM                 = 'from';
+    const UNION                = 'union';
+    const WHERE                = 'where';
+    const WHERE_CONDITION_SETS = 'wheresets';
+    const GROUP                = 'group';
+    const HAVING               = 'having';
+    const ORDER                = 'order';
+    const LIMIT_COUNT          = 'limitcount';
+    const LIMIT_OFFSET         = 'limitoffset';
+    const FOR_UPDATE           = 'forupdate';
 
     const INNER_JOIN     = 'inner join';
     const LEFT_JOIN      = 'left join';
@@ -82,18 +83,19 @@ class Select
      * @var array
      */
     protected static $partsInit = [
-        self::DISTINCT            => false,
-        self::PRE_COLUMNS_OPTIONS => [],
-        self::COLUMNS             => [],
-        self::UNION               => [],
-        self::FROM                => [],
-        self::WHERE               => [],
-        self::GROUP               => [],
-        self::HAVING              => [],
-        self::ORDER               => [],
-        self::LIMIT_COUNT         => null,
-        self::LIMIT_OFFSET        => null,
-        self::FOR_UPDATE          => false
+        self::DISTINCT             => false,
+        self::PRE_COLUMNS_OPTIONS  => [],
+        self::COLUMNS              => [],
+        self::UNION                => [],
+        self::FROM                 => [],
+        self::WHERE                => [],
+        self::WHERE_CONDITION_SETS => [],
+        self::GROUP                => [],
+        self::HAVING               => [],
+        self::ORDER                => [],
+        self::LIMIT_COUNT          => null,
+        self::LIMIT_OFFSET         => null,
+        self::FOR_UPDATE           => false
     ];
 
     /**
@@ -480,6 +482,35 @@ class Select
     public function orWhere($cond, $value = null, $type = null)
     {
         $this->parts[self::WHERE][] = $this->whereInternal($cond, $value, $type, false);
+
+        return $this;
+    }
+
+    public function registerConditionSet($name, $conjunction)
+    {
+        if (self::SQL_AND !== $conjunction && self::SQL_OR !== $conjunction) {
+            throw new SelectException('Condition sets must use AND or OR');
+        }
+
+        $this->parts[self::WHERE_CONDITION_SETS][$name] = array(
+            'conjunction' => $conjunction,
+            'conditions'  => array()
+        );
+
+        return $this;
+    }
+
+    public function whereConditionSet($setName, $condition, $value = null, $type = null, $number = null)
+    {
+        if (!isset($this->parts[self::WHERE_CONDITION_SETS][$setName])) {
+            throw new SelectException("Adding condition to unregistered set: {$setName}");
+        }
+
+        if (null !== $value) {
+            $condition = $this->adapter->quoteInto($condition, $value, $type, $number);
+        }
+
+        $this->parts[self::WHERE_CONDITION_SETS][$setName]['conditions'][] = $condition;
 
         return $this;
     }
@@ -1185,6 +1216,31 @@ class Select
     {
         if ($this->parts[self::FROM] && $this->parts[self::WHERE]) {
             $sql .= ' ' . self::SQL_WHERE . ' ' .  implode(' ', $this->parts[self::WHERE]);
+        }
+
+        return $sql;
+    }
+
+    protected function renderWheresets($sql)
+    {
+        if (count($this->parts[self::WHERE_CONDITION_SETS])) {
+            $setIndex = 0;
+
+            foreach ($this->parts[self::WHERE_CONDITION_SETS] as $set) {
+                if (!count($set['conditions'])) {
+                    continue;
+                }
+
+                if (0 < $setIndex || $this->parts[self::WHERE]) {
+                    $sql .= ' AND ';
+                } else {
+                    $sql .= ' WHERE ';
+                }
+
+                $sql .= '(' . implode(' ' . $set['conjunction'] . ' ', $set['conditions']) . ')';
+
+                $setIndex += 1;
+            }
         }
 
         return $sql;

@@ -65,6 +65,8 @@
 
         if (filterButton) {
             filterButton.click();
+
+            $('.filter-form .filter-field').focus();
         }
     };
     

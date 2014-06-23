@@ -217,4 +217,20 @@ interface DriverInterface
      * @return integer
      */
     public function fetchTotalRowCount(array $resultSet);
+
+    /**
+     * Return the operator that can be used for case-insensitive LIKE
+     * comparisons.
+     *
+     * @return string
+     */
+    public function getCaseInsensitiveLikeOperator();
+
+    /**
+     * Use the functions available in the RDBMS to truncate the provided timestamp
+     * column to a date.
+     *
+     * @return string
+     */
+    public function truncateTimeStampToDate($timestamp);
 }

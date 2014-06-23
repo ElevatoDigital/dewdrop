@@ -51,9 +51,23 @@ class SelectPaginate extends HelperAbstract implements SelectModifierInterface
      */
     private $request;
 
+    private $prefix;
+
     public function __construct(Request $request)
     {
         $this->request = $request;
+    }
+
+    public function setPrefix($prefix)
+    {
+        $this->prefix = $prefix;
+
+        return $this;
+    }
+
+    public function getPrefix()
+    {
+        return $this->prefix;
     }
 
     /**
@@ -100,23 +114,18 @@ class SelectPaginate extends HelperAbstract implements SelectModifierInterface
 
     /**
      * Using the supplied \Dewdrop\Fields and \Dewdrop\Db\Select, modify the
-     * Select and return it.  The $paramPrefix may be used in order for your
-     * helper to be able to reference prefixed request variables.  Prefixing
-     * may be used in cases where multiple instances of the same component
-     * are being rendered to the page and their GET or POST vars might
-     * conflict otherwise.
+     * Select and return it.
      *
      * @param Fields $fields
      * @param Select $select
-     * @param string $paramPrefix
      * @return Select
      * @throws Exception
      */
-    public function modifySelect(Fields $fields, Select $select, $paramPrefix = '')
+    public function modifySelect(Fields $fields, Select $select)
     {
         $driver = $select->getAdapter()->getDriver();
 
-        $this->page = (int) $this->request->getQuery($paramPrefix . 'listing-page', 1);
+        $this->page = (int) $this->request->getQuery($this->prefix . 'listing-page', 1);
 
         $driver->prepareSelectForTotalRowCalculation($select);
 

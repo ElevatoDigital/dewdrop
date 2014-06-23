@@ -74,13 +74,7 @@ abstract class AbstractHelper
      */
     public function partial($name, array $data)
     {
-        $view = new View($this->view->getEscaper());
-
-        $view
-            ->setScriptPath(__DIR__ . '/partials')
-            ->assign($data);
-
-        return $view->render($name);
+        return $this->view->partial($name, $data, __DIR__ . '/partials');
     }
 
     /**

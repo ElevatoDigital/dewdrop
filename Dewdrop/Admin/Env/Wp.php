@@ -13,6 +13,7 @@ namespace Dewdrop\Admin\Env;
 use Dewdrop\Admin\Component\ComponentAbstract;
 use Dewdrop\Admin\Response;
 use Dewdrop\View\View;
+use Zend\View\Helper\HeadLink;
 use Zend\View\Helper\HeadScript;
 
 /**
@@ -38,9 +39,10 @@ class Wp extends EnvAbstract
      *
      * @param string $content
      * @param HeadScript $headScript
+     * @param HeadLink $headLink
      * @return string
      */
-    public function renderLayout($content, HeadScript $headScript = null)
+    public function renderLayout($content, HeadScript $headScript = null, HeadLink $headLink = null)
     {
         $view = new View();
 

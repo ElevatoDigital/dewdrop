@@ -11,6 +11,7 @@
 namespace Dewdrop\View;
 
 use Dewdrop\Exception;
+use Dewdrop\Pimple;
 use Dewdrop\Request;
 use Dewdrop\View\Helper\PageDelegateInterface;
 use Zend\Escaper\Escaper;
@@ -58,11 +59,13 @@ class View
      * @var array
      */
     private $helperClasses = array(
+        'admincomponentnav'     => '\Dewdrop\View\Helper\AdminComponentNav',
         'adminnotice'           => '\Dewdrop\View\Helper\AdminNotice',
         'adminurl'              => '\Dewdrop\View\Helper\AdminUrl',
         'bootstraptable'        => '\Dewdrop\View\Helper\BootstrapTable',
         'bootstrapcolumnsmodal' => '\Dewdrop\View\Helper\BootstrapColumnsModal',
         'bootstrapdetailsview'  => '\Dewdrop\View\Helper\BootstrapDetailsView',
+        'bootstrapfilterform'   => '\Dewdrop\View\Helper\BootstrapFilterForm',
         'bootstrapform'         => '\Dewdrop\View\Helper\BootstrapForm',
         'bootstrapinputtext'    => '\Dewdrop\View\Helper\BootstrapInputText',
         'bootstraprowactions'   => '\Dewdrop\View\Helper\BootstrapRowActions',
@@ -111,7 +114,7 @@ class View
     public function __construct(Escaper $escaper = null, Request $request = null)
     {
         $this->escaper = ($escaper ?: new Escaper());
-        $this->request = ($request ?: new Request());
+        $this->request = ($request ?: Pimple::getResource('dewdrop-request'));
     }
 
     /**
@@ -263,7 +266,7 @@ class View
      * @param array $data
      * @return string
      */
-    public function partial($template, array $data)
+    public function partial($template, array $data, $scriptPath = null)
     {
         $partial = new View($this->escaper);
 
@@ -279,7 +282,7 @@ class View
         }
 
         $partial
-            ->setScriptPath($this->scriptPath)
+            ->setScriptPath($scriptPath ?: $this->scriptPath)
             ->assign($data);
 
         return $partial->render($template);

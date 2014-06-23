@@ -67,6 +67,8 @@ class SelectSort extends HelperAbstract implements SelectModifierInterface
 
     private $request;
 
+    private $prefix;
+
     public function __construct(Request $request)
     {
         $this->request = $request;
@@ -84,6 +86,19 @@ class SelectSort extends HelperAbstract implements SelectModifierInterface
 
         return $this;
     }
+
+    public function setPrefix($prefix)
+    {
+        $this->prefix = $prefix;
+
+        return $this;
+    }
+
+    public function getPrefix()
+    {
+        return $this->prefix;
+    }
+
 
     /**
      * Set the default direction that should be used when sorting.
@@ -110,21 +125,20 @@ class SelectSort extends HelperAbstract implements SelectModifierInterface
      *
      * @param Fields $fields
      * @param Select $select
-     * @param string $paramPrefix
      *
      * @return Select
      */
-    public function modifySelect(Fields $fields, Select $select, $paramPrefix = '')
+    public function modifySelect(Fields $fields, Select $select)
     {
         $this->sortedField     = null;
         $this->sortedDirection = null;
 
         foreach ($fields->getSortableFields() as $field) {
-            if ($field->getQueryStringId() === urlencode($this->request->getQuery($paramPrefix . 'sort'))) {
+            if ($field->getQueryStringId() === urlencode($this->request->getQuery($this->prefix . 'sort'))) {
                 if ('ASC' === $this->defaultDirection) {
-                    $direction = ('DESC' === strtoupper($this->request->getQuery($paramPrefix . 'dir')) ? 'DESC' : 'ASC');
+                    $direction = ('DESC' === strtoupper($this->request->getQuery($this->prefix . 'dir')) ? 'DESC' : 'ASC');
                 } else {
-                    $direction = ('ASC' === strtoupper($this->request->getQuery($paramPrefix . 'dir')) ? 'ASC' : 'DESC');
+                    $direction = ('ASC' === strtoupper($this->request->getQuery($this->prefix . 'dir')) ? 'ASC' : 'DESC');
                 }
 
                 $select = call_user_func(

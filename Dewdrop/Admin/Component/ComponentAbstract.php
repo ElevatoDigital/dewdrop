@@ -380,7 +380,11 @@ abstract class ComponentAbstract
         if (!$this->shouldRenderLayout) {
             return $output;
         } else {
-            return $this->env->renderLayout($output, $page->getView()->headScript());
+            return $this->env->renderLayout(
+                $output,
+                $page->getView()->headScript(),
+                $page->getView()->headLink()
+            );
         }
     }
 

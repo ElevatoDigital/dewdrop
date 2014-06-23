@@ -17,6 +17,7 @@ use Dewdrop\Db\Select;
 use Dewdrop\Exception;
 use Dewdrop\Fields;
 use Dewdrop\Fields\Helper\SelectModifierInterface;
+use Dewdrop\Fields\Helper\SelectFilter;
 use Dewdrop\Fields\Helper\SelectPaginate;
 use Dewdrop\Fields\Helper\SelectSort;
 use Dewdrop\Pimple;
@@ -84,6 +85,7 @@ class Listing
         $request = ($request ?: Pimple::getResource('dewdrop-request'));
 
         $this
+            ->registerSelectModifier(new SelectFilter($request))
             ->registerSelectModifier(new SelectSort($request))
             ->registerSelectModifier(new SelectPaginate($request));
     }
@@ -109,6 +111,10 @@ class Listing
      */
     public function setPrefix($prefix)
     {
+        foreach ($this->selectModifiers as $modifier) {
+            $modifier->setPrefix($prefix);
+        }
+
         $this->prefix = $prefix;
 
         return $this;
@@ -136,6 +142,8 @@ class Listing
     public function registerSelectModifier(SelectModifierInterface $selectModifier)
     {
         $this->selectModifiers[] = $selectModifier;
+
+        $selectModifier->setPrefix($this->prefix);
 
         return $this;
     }

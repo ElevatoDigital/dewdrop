@@ -266,4 +266,26 @@ class Mock implements DriverInterface
     {
         return 0;
     }
+
+    /**
+     * Return the operator that can be used for case-insensitive LIKE
+     * comparisons.
+     *
+     * @return string
+     */
+    public function getCaseInsensitiveLikeOperator()
+    {
+        return 'LIKE';
+    }
+
+    /**
+     * Use the functions available in the RDBMS to truncate the provided timestamp
+     * column to a date.
+     *
+     * @return string
+     */
+    public function truncateTimeStampToDate($timestamp)
+    {
+
+    }
 }

@@ -18,18 +18,8 @@ class Pagination extends AbstractHelper
      * @return string
      * @throws \Dewdrop\Exception
      */
-    public function direct()
+    public function direct($rowCount, $pageSize, $page, $title = 'Records')
     {
-        $args = func_get_args();
-
-        if (3 !== count($args)) {
-            throw new Exception('Pagination view helper requires row count, page size, and page number arguments');
-        }
-
-        $rowCount = (int) $args[0];
-        $pageSize = (int) $args[1];
-        $page     = (int) $args[2];
-
         $pageCount = ceil($rowCount / $pageSize);
 
         $out = '<div class="dewdrop-pagination text-center">';
@@ -82,7 +72,13 @@ class Pagination extends AbstractHelper
             $out .= '</ul>';
         }
 
-        $out .= "<div class=\"row-count\">{$rowCount} Records</div></div>";
+        $out .= sprintf(
+            '<div class="row-count">%d %s</div>',
+            (int) $rowCount,
+            $this->view->escapeHtml($title)
+        );
+
+        $out .= '</div>';
 
         return $out;
     }
