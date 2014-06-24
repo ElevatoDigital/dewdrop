@@ -224,7 +224,9 @@ class RowEditor
     {
         foreach ($this->fields->getEditableFields() as $field) {
             if (isset($data[$field->getId()])) {
-                $field->setValue($data[$field->getControlName()]);
+                $value = $field->getControlName();
+
+                $field->setValue($data[$value]);
             } elseif ($field instanceof DbField && $field->isType('boolean')) {
                 /**
                  * Checkboxes are omitted from POST completely when not checked, so this
