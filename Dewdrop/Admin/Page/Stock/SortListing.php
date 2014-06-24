@@ -33,11 +33,12 @@ class SortListing extends PageAbstract
         $primaryKey = $listing->getPrimaryKey();
         $model      = $primaryKey->getTable();
         $dbAdapter  = $model->getAdapter();
+        $sortField  = $this->component->getSortField();
 
         foreach ($this->request->getPost('sort_order') as $index => $id) {
             try {
                 $model->update(
-                    array('sort_index' => $index),
+                    array($sortField->getName() => $index),
                     $dbAdapter->quoteInto(
                         "{$primaryKey->getName()} = ?",
                         $id
