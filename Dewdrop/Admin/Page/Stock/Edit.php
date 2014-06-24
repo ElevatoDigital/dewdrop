@@ -44,9 +44,15 @@ class Edit extends PageAbstract
                     $responseHelper->setSuccessMessage("Successfully saved changes to {$title}");
                 }
 
-                $responseHelper
-                    ->run('save', array($this->rowEditor, 'save'))
-                    ->redirectToAdminPage('index');
+                $this->rowEditor->save();
+
+                if (!$this->request->isAjax()) {
+                    $responseHelper->redirectToAdminPage('index');
+                } else {
+                    header('Content-Type: application/json');
+                    echo json_encode(['result' => 'success']);
+                    exit;
+                }
             }
         }
     }

@@ -146,6 +146,11 @@ class Pgsql implements DriverInterface
                     $name = $i;
                 }
 
+                // Make PG play nice with PHP booleans when cast for prepared statements
+                if (is_bool($value)) {
+                    $value = (int) $value;
+                }
+
                 $bind[$name] = $value;
 
                 $i += 1;

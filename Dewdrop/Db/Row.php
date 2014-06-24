@@ -120,9 +120,7 @@ class Row implements ArrayAccess
             foreach ($this->columns as $column) {
                 $default = $this->table->getMetadata('columns', $column)['DEFAULT'];
 
-                if (null !== $default) {
-                    $this->data[$column] = $default;
-                }
+                $this->data[$column] = $default;
             }
         }
 
