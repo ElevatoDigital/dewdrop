@@ -588,6 +588,8 @@ abstract class Table
             $this->filterDataArrayForPhysicalColumns($data)
         );
 
+        $result = false;
+
         // Only perform primary update statement if a physical column is being updated
         if (count($updateData)) {
             $result = $this->db->update($this->tableName, $updateData, $where);

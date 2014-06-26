@@ -66,7 +66,7 @@ abstract class ComponentAbstract
      *
      * @var integer
      */
-    private $menuPosition;
+    private $menuPosition = null;
 
     private $pageFactories = array();
 

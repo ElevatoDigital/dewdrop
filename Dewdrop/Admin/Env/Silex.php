@@ -100,7 +100,7 @@ class Silex extends EnvAbstract
 
         $view
             ->assign('title', $this->title)
-            ->assign('components', $this->components)
+            ->assign('components', $this->getSortedComponentsForMenu())
             ->assign('content', $content)
             ->assign('viewHeadScript', $headScript)
             ->assign('viewHeadLink', $headLink)
@@ -120,5 +120,35 @@ class Silex extends EnvAbstract
     public function redirect($url)
     {
         return $this->application->redirect($url);
+    }
+
+    protected function getSortedComponentsForMenu()
+    {
+        $components = $this->components;
+
+        usort(
+            $components,
+            function ($a, $b) {
+                $aPos = $a->getMenuPosition();
+                $bPos = $b->getMenuPosition();
+
+                // Sort by title, if no menu positions are set
+                if (null === $aPos && null === $bPos) {
+                    return strcasecmp($a->getTitle(), $b->getTitle());
+                }
+
+                // Sort components with no position assigned to the end of the list
+                $aPos = (null === $aPos ? 100 : $aPos);
+                $bPos = (null === $bPos ? 100 : $bPos);
+
+                if ($aPos === $bPos) {
+                    return 0;
+                }
+
+                return ($aPos < $bPos) ? -1 : 1;
+            }
+        );
+
+        return $components;
     }
 }
