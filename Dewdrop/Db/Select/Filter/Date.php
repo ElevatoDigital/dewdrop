@@ -42,11 +42,20 @@ class Date
 
     private $inflector;
 
+    private $truncateTimestamps = true;
+
     public function __construct($tableName, $columnName, Inflector $inflector = null)
     {
-        $this->tableName  = $tableName;
-        $this->columnName = $columnName;
-        $this->inflector  = ($inflector ?: Pimple::getResource('inflector'));
+        $this->tableName   = $tableName;
+        $this->columnName  = $columnName;
+        $this->inflector   = ($inflector ?: Pimple::getResource('inflector'));
+    }
+
+    public function setTruncateTimestamps($truncateTimestamps)
+    {
+        $this->truncateTimestamps = $truncateTimestamps;
+
+        return $this;
     }
 
     public function apply(Select $select, $conditionSetName, array $queryVars)
@@ -63,10 +72,16 @@ class Date
         $endObj   = null;
         $endIso   = null;
 
+        if ($this->truncateTimestamps) {
+            $format = 'Y-m-d';
+        } else {
+            $format = 'Y-m-d G:i:s';
+        }
+
         if ($queryVars['start']) {
             try {
                 $startObj = new DateTime($queryVars['start']);
-                $startIso = $startObj->format('Y-m-d');
+                $startIso = $startObj->format($format);
             } catch (Exception $e) {
             }
         }
@@ -74,7 +89,7 @@ class Date
         if ($queryVars['end']) {
             try {
                 $endObj = new DateTime($queryVars['end']);
-                $endIso = $endObj->format('Y-m-d');
+                $endIso = $endObj->format($format);
             } catch (Exception $e) {
             }
         }
@@ -189,7 +204,7 @@ class Date
         $dbAdapter   = $select->getAdapter();
         $metadata    = $dbAdapter->getTableMetadata($this->tableName);
 
-        if ('timestamp' === $metadata['columns'][$this->columnName]['GENERIC_TYPE']) {
+        if ($this->truncateTimestamps && 'timestamp' === $metadata['columns'][$this->columnName]['GENERIC_TYPE']) {
             $quotedAlias = $dbAdapter->getDriver()->truncateTimestampToDate($quotedAlias);
         }
 

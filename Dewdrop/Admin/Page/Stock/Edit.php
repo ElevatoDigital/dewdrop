@@ -17,6 +17,10 @@ class Edit extends PageAbstract
         $this->rowEditor = $this->component->getRowEditor();
         $this->model     = $this->component->getPrimaryModel();
 
+        // Ensure primary key field is instantiated so that it is linked by row editor
+        $this->component->getFields()->add($this->component->getListing()->getPrimaryKey())
+            ->setEditable(false);
+
         $this->rowEditor->link();
 
         $this->isNew = $this->rowEditor->isNew();
@@ -50,7 +54,10 @@ class Edit extends PageAbstract
                     $responseHelper->redirectToAdminPage('index');
                 } else {
                     header('Content-Type: application/json');
-                    echo json_encode(['result' => 'success']);
+                    echo json_encode([
+                        'result' => 'success',
+                        'id'     => $this->component->getListing()->getPrimaryKey()->getValue()
+                    ]);
                     exit;
                 }
             }

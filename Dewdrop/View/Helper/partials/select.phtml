@@ -1,5 +1,8 @@
 <select class="<?php echo $this->escapeHtmlAttr(implode(' ', $this->classes));?>" name="<?php echo $this->escapeHtmlAttr($this->name);?>" id="<?php echo $this->escapeHtmlAttr($this->id);?>">
-    <option value=""></option>
+    <?php if ($this->showBlank): ?>
+    <option value=""><?php echo $this->escapeHtml($this->blankTitle);?></option>
+    <?php endif; ?>
+
     <?php
     foreach ($this->options as $value => $title) {
         printf(

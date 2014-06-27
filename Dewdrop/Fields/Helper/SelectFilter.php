@@ -70,8 +70,19 @@ class SelectFilter implements SelectModifierInterface
         return $this->selectModifier->modifySelect($fields, $select);
     }
 
+    public function addCustomFilter($filter, array $vars)
+    {
+        $this->selectModifier->addCustomFilter($filter, $vars);
+
+        return $this;
+    }
+
     public function hasFilters()
     {
+        if (0 < count($this->selectModifier->getCustomFilters())) {
+            return true;
+        }
+
         $queryKeys = array_keys($this->request->getQuery());
 
         foreach ($queryKeys as $key) {

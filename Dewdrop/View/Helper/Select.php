@@ -85,6 +85,10 @@ class Select extends AbstractHelper
     {
         extract($this->prepareOptionsArray($options));
 
+        if (!isset($showBlank)) {
+            $showBlank = true;
+        }
+
         if (null === $id) {
             $id = $name;
         }
@@ -98,11 +102,13 @@ class Select extends AbstractHelper
         return $this->partial(
             'select.phtml',
             array(
-                'name'    => $name,
-                'id'      => $id,
-                'value'   => $value,
-                'options' => $options,
-                'classes' => $classes
+                'name'       => $name,
+                'id'         => $id,
+                'value'      => $value,
+                'options'    => $options,
+                'classes'    => $classes,
+                'blankTitle' => $blankTitle,
+                'showBlank'  => $showBlank
             )
         );
     }
@@ -118,7 +124,7 @@ class Select extends AbstractHelper
     {
         $this
             ->checkRequired($options, array('name', 'value', 'options'))
-            ->ensurePresent($options, array('id', 'classes'))
+            ->ensurePresent($options, array('id', 'classes', 'blankTitle'))
             ->ensureArray($options, array('options', 'classes'));
 
         return $options;

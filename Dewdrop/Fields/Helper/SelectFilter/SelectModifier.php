@@ -26,6 +26,8 @@ class SelectModifier extends HelperAbstract implements SelectModifierInterface
 
     private $prefix;
 
+    private $customFilters = array();
+
     public function __construct(Request $request)
     {
         $this->request = $request;
@@ -81,6 +83,24 @@ class SelectModifier extends HelperAbstract implements SelectModifierInterface
         return $ids;
     }
 
+    /**
+     * @todo Add type hint for filter param once interface is worked out
+     */
+    public function addCustomFilter($filter, array $vars)
+    {
+        $this->customFilters[] = array(
+            'filter' => $filter,
+            'vars'   => $vars
+        );
+
+        return $this;
+    }
+
+    public function getCustomFilters()
+    {
+        return $this->customFilters;
+    }
+
     public function getFilterVars($index)
     {
         $vars = array();
@@ -134,6 +154,10 @@ class SelectModifier extends HelperAbstract implements SelectModifierInterface
                     );
                 }
             }
+        }
+
+        foreach ($this->customFilters as $filter) {
+            $select = $filter['filter']->apply($select, $conditionSetName, $filter['vars']);
         }
 
         return $select;
