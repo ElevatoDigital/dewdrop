@@ -16,9 +16,11 @@ use Dewdrop\Exception;
 use Dewdrop\Inflector;
 use Dewdrop\Paths;
 use Dewdrop\Request;
-use Dewdrop\Session;
 use Dewdrop\View\View;
 use Pimple;
+use Silex\Application;
+use Silex\Provider\SessionServiceProvider;
+use WP_Session;
 
 /**
  * This class tracks down the bootstrap for your application and grabs
@@ -141,11 +143,19 @@ class Detector
         }
 
         if (!isset($pimple['session'])) {
-            $pimple['session'] = $pimple->share(
-                function (Pimple $pimple) {
-                    return new Session($pimple);
-                }
-            );
+            /* @var $paths Paths */
+            $paths = $pimple['paths'];
+            if ($paths->isWp()) {
+                $pimple['session'] = $pimple->share(
+                    function () {
+                        return WP_Session::get_instance();
+                    }
+                );
+            } else if ($pimple instanceof Application) {
+                $pimple->register(new SessionServiceProvider());
+            } else {
+                throw new Exception('Silex application unavailable but not in WordPress');
+            }
         }
     }
 }

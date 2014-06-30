@@ -223,10 +223,8 @@ class RowEditor
     public function isValid(array $data)
     {
         foreach ($this->fields->getEditableFields() as $field) {
-            if (isset($data[$field->getId()])) {
-                $value = $field->getControlName();
-
-                $field->setValue($data[$value]);
+            if (array_key_exists($field->getId(), $data)) {
+                $field->setValue($data[$field->getId()]);
             } elseif ($field instanceof DbField && $field->isType('boolean')) {
                 /**
                  * Checkboxes are omitted from POST completely when not checked, so this
