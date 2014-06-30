@@ -99,6 +99,10 @@ class InputText extends AbstractHelper
             $id = $name;
         }
 
+        if (!$type) {
+            $type = 'text';
+        }
+
         return $this->partial(
             'input-text.phtml',
             array(
@@ -106,6 +110,7 @@ class InputText extends AbstractHelper
                 'id'          => $id,
                 'value'       => $value,
                 'classes'     => $classes,
+                'type'        => $type,
                 'autofocus'   => $autofocus,
                 'placeholder' => $placeholder
             )
@@ -125,7 +130,7 @@ class InputText extends AbstractHelper
     {
         $this
             ->checkRequired($options, array('name', 'value'))
-            ->ensurePresent($options, array('classes', 'id', 'autofocus', 'placeholder'))
+            ->ensurePresent($options, array('classes', 'id', 'autofocus', 'placeholder', 'type'))
             ->ensureArray($options, array('classes'));
 
         return $options;
