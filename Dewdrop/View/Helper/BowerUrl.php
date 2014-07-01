@@ -39,8 +39,13 @@ class BowerUrl extends AbstractHelper
             } else {
                 $paths   = Pimple::getResource('paths');
                 $docRoot = ($docRoot ?: $_SERVER['DOCUMENT_ROOT']);
-                $wwwPath = trim(str_replace($_SERVER['DOCUMENT_ROOT'], '', $paths->getWww() . '/'), '/');
-                $wwwPath = ($wwwPath ? '/' . $wwwPath : '');
+
+                if (false === strpos($paths->getWww(), $docRoot)) {
+                    $wwwPath = '';
+                } else {
+                    $wwwPath = trim(str_replace($_SERVER['DOCUMENT_ROOT'], '', $paths->getWww() . '/'), '/');
+                    $wwwPath = ($wwwPath ? '/' . $wwwPath : '');
+                }
 
                 self::$wwwPath = $wwwPath;
             }
