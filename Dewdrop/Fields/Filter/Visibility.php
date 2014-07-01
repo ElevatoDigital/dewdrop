@@ -74,10 +74,10 @@ class Visibility implements FilterInterface
      * selections have been made).  Your array can contain either
      * FieldInterface objects or string IDs for those fields.
      *
-     * @param array $defaultFields
+     * @param array|Fields $defaultFields
      * @return \Dewdrop\Fields\Filter\Visibility
      */
-    public function setDefaultFields(array $defaultFields)
+    public function setDefaultFields($defaultFields)
     {
         $this->defaultFields = array();
 
