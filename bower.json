@@ -21,6 +21,7 @@
         "jquery-ui":      "1.*",
         "backbone":       "1.1.*",
         "keymaster":      "1.6.*",
+        "moment":         "2.*",
         "bootstrap":      "3.*",
         "velocity":       "0.1.*",
         "requirejs":      "2.*",
