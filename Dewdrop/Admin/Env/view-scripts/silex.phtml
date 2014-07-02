@@ -27,7 +27,15 @@
           <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
         <![endif]-->
     </head>
-    <body>
+
+    <?php
+    $envClass = '';
+
+    if (defined('APPLICATION_ENV')) {
+        $envClass = 'env-' . APPLICATION_ENV;
+    }
+    ?>
+    <body class="<?php echo $envClass;?>">
     <div class="container-fluid">
         <nav class="navbar navbar-default navbar-inverse navbar-fixed-top" role="navigation">
             <div class="container-fluid">
