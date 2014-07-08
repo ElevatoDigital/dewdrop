@@ -18,6 +18,7 @@
         "phpunit/phpunit": "3.*",
         "phpunit/phpunit-mock-objects": "1.*",
         "pimple/pimple": "1.*",
+        "symfony/security": "~2.3",
         "zendframework/zend-console": "2.*",
         "zendframework/zend-dom": "2.*",
         "zendframework/zend-escaper": "2.*",
