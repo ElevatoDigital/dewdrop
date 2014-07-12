@@ -139,6 +139,11 @@ class Request
         }
     }
 
+    public function getPostBody()
+    {
+        return file_get_contents('php://input');
+    }
+
     /**
      * Get either a single query variable (by passing a string to the name $name
      * parameter) or the entire query array (by leaving $name empty).

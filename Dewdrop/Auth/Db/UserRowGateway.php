@@ -1,6 +1,6 @@
 <?php
 
-namespace Dewdrop\Db\Row;
+namespace Dewdrop\Auth\Db;
 
 use Dewdrop\Fields\UserInterface as DewdropFieldsUserInterface;
 use Dewdrop\Db\Row;
@@ -10,7 +10,7 @@ use Symfony\Component\Security\Core\User\UserInterface as SymfonySecurityUserInt
 /**
  * User database row class
  */
-class User extends Row implements DewdropFieldsUserInterface, SymfonySecurityUserInterface
+class UserRowGateway extends Row implements DewdropFieldsUserInterface, SymfonySecurityUserInterface
 {
     /**
      * Check to see if the user has the specified role.
@@ -31,7 +31,7 @@ class User extends Row implements DewdropFieldsUserInterface, SymfonySecurityUse
      */
     public function eraseCredentials()
     {
-        // @todo Implement eraseCredentials() method.
+        // No-op in Dewdrop core.  Implement at application-level if needed.
     }
 
     /**
@@ -44,7 +44,7 @@ class User extends Row implements DewdropFieldsUserInterface, SymfonySecurityUse
      */
     public function getPassword()
     {
-        // @todo Implement getPassword() method.
+        return $this->get('password_hash');
     }
 
     /**
@@ -77,7 +77,7 @@ class User extends Row implements DewdropFieldsUserInterface, SymfonySecurityUse
      */
     public function getSalt()
     {
-        // @todo Implement getSalt() method.
+        return $this->get('password_hash');
     }
 
     /**
@@ -87,6 +87,6 @@ class User extends Row implements DewdropFieldsUserInterface, SymfonySecurityUse
      */
     public function getUsername()
     {
-        // @todo Implement getUsername() method.
+        return $this->get('username');
     }
 }

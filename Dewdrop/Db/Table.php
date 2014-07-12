@@ -649,15 +649,21 @@ abstract class Table
     }
 
     /**
-     * Fetch a single row by running the provided SQL.
+     * Fetch a single row by running the provided SQL.  If no matching row is found,
+     * null will be returned.
      *
      * @param string|\Dewdrop\Db\Select $sql
-     * @return \Dewdrop\Db\Row
+     * @param array $bind
+     * @return null|Row
      */
-    public function fetchRow($sql)
+    public function fetchRow($sql, array $bind = array())
     {
         $className = $this->rowClass;
-        $data      = $this->db->fetchRow($sql, array(), Adapter::ARRAY_A);
+        $data      = $this->db->fetchRow($sql, $bind, Adapter::ARRAY_A);
+
+        if (null === $data) {
+            return null;
+        }
 
         return new $className($this, $data);
     }

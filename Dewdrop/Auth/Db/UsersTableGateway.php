@@ -1,27 +1,29 @@
 <?php
 
-namespace Dewdrop\Auth;
+namespace Dewdrop\Auth\Db;
 
-use Dewdrop\Db\Adapter as DbAdapter;
+use Dewdrop\Db\Table;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 
-class UserProvider implements UserProviderInterface
+/**
+ * Users database table class
+ */
+class UsersTableGateway extends Table implements UserProviderInterface
 {
     /**
-     * @var DbAdapter
-     */
-    protected $db;
-
-    /**
-     * @param DbAdapter $db
+     * This method should be used by sub-classes to set the table name,
+     * create field customization callbacks, etc.
+     *
      * @return void
      */
-    public function __construct(DbAdapter $db)
+    public function init()
     {
-        $this->db = $db;
+        $this
+            ->setTableName('users')
+            ->setRowClass('\Dewdrop\Auth\Db\UserRowGateway');
     }
 
     /**
@@ -41,8 +43,20 @@ class UserProvider implements UserProviderInterface
      */
     public function loadUserByUsername($username)
     {
-        // @todo Implement loadUserByUsername() method.
-        error_log(__METHOD__);
+        if (!$username) {
+            throw new UsernameNotFoundException('Please provide a username.');
+        } else {
+            $user = $this->fetchRow(
+                'SELECT * FROM users WHERE LOWER(username) = ?',
+                array(trim(strtolower($username)))
+            );
+
+            if (!$user) {
+                throw new UsernameNotFoundException('A user could not be found matching that username and password.');
+            }
+
+            return $user;
+        }
     }
 
     /**
@@ -60,8 +74,13 @@ class UserProvider implements UserProviderInterface
      */
     public function refreshUser(UserInterface $user)
     {
-        // @todo Implement refreshUser() method.
-        error_log(__METHOD__);
+        $className = get_class($user);
+
+        if (!$this->supportsClass($className)) {
+            throw new UnsupportedUserException("{$className} is not a supported user class.");
+        }
+
+        return $this->loadUserByUsername($this->user->get('username'));
     }
 
     /**
@@ -73,7 +92,6 @@ class UserProvider implements UserProviderInterface
      */
     public function supportsClass($class)
     {
-        // @todo Implement supportsClass() method.
-        error_log(__METHOD__);
+        return $class === '\Dewdrop\Auth\Db\UserRowGateway';
     }
 }
