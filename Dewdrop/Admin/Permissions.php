@@ -18,7 +18,7 @@ use Dewdrop\Pimple;
 
 class Permissions
 {
-    private $user;
+    private $component;
 
     private $registeredPermissions = array();
 
@@ -29,6 +29,14 @@ class Permissions
     public function __construct(ComponentAbstract $component)
     {
         $this->component = $component;
+
+        $this
+            ->register('access', 'Allow access to the ' . $this->component->getTitle() . ' component')
+            ->set('access', true);
+
+        $this
+            ->register('display-menu', 'Show the ' . $this->component->getTitle() . ' component in the menu')
+            ->set('display-menu', true);
 
         if ($this->component instanceof CrudInterface) {
             $this->registerAndSetDefaultsForCrudInterface();
@@ -51,6 +59,7 @@ class Permissions
             'sort-fields'    => "Sort and group {$singular} fields",
             'notifications'  => "Subscribe to be notified when {$plural} are added or updated",
             'view'           => "See an individual {$singular} in detail",
+            'view-listing'   => "See the full {$plural} listing"
         );
 
         foreach ($crudPermissions as $name => $description) {
@@ -86,6 +95,20 @@ class Permissions
 
         $can = $this->settings[$name];
 
+        if (is_array($can)) {
+            $allowedRoles = $can;
+
+            $user = (Pimple::getResource('user') ? Pimple::getResource('user') : '');
+            $can  = false;
+
+            foreach ($allowedRoles as $role) {
+                if ($user && in_array($role, $user->getRoles())) {
+                    $can = true;
+                    break;
+                }
+            }
+        }
+
         if (!$can && $throwExceptionOnFail) {
             throw new Exception("Permission denied: {$this->component->getFullyQualifiedName()}/{$name}.");
         }
@@ -96,6 +119,15 @@ class Permissions
     public function haltIfNotAllowed($name)
     {
         return $this->can($name, true);
+    }
+
+    public function setAll($setting)
+    {
+        foreach ($this->registeredPermissions as $name => $description) {
+            $this->set($name, $setting);
+        }
+
+        return $this;
     }
 
     public function set($name, $setting)

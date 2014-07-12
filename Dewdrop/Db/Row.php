@@ -76,14 +76,7 @@ class Row implements ArrayAccess
      *
      * @var array
      */
-    private $data;
-
-    /**
-     * The table this row is associated with.
-     *
-     * @var \Dewdrop\Db\Table
-     */
-    private $table;
+    protected $data;
 
     /**
      * The columns available to this row as defined by the associated table's
@@ -91,7 +84,14 @@ class Row implements ArrayAccess
      *
      * @var array
      */
-    private $columns;
+    protected $columns;
+
+    /**
+     * The table this row is associated with.
+     *
+     * @var \Dewdrop\Db\Table
+     */
+    private $table;
 
     /**
      * A map of many-to-many and EAV fieldsthat tracks whether their initial
@@ -138,6 +138,20 @@ class Row implements ArrayAccess
                 $this->virtualFieldsInitialized[] = $column;
             }
         }
+    }
+
+    /**
+     * Provide a new table instance for the row.  Mostly useful if you're
+     * implementing a __wakeup() method.
+     *
+     * @param Table $table
+     * @return Row
+     */
+    public function setTable(Table $table)
+    {
+        $this->table = $table;
+
+        return $this;
     }
 
     /**

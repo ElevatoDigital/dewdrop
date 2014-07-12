@@ -236,12 +236,12 @@ abstract class ComponentAbstract
 
     public function getName()
     {
-        return $this->name;
+        return $this->env->inflectComponentName($this->name);
     }
 
     public function getFullyQualifiedName()
     {
-        return '/application/admin/' . $this->name;
+        return '/application/admin/' . $this->getName();
     }
 
     public function setShouldRenderLayout($shouldRenderLayout)
@@ -342,6 +342,10 @@ abstract class ComponentAbstract
      */
     public function dispatchPage($page = null, Response $response = null)
     {
+        if (!$this->getPermissions()->can('access')) {
+            return $this->env->redirect('/admin/');
+        }
+
         if (is_string($page)) {
             $page = $this->createPageObject($page);
         }

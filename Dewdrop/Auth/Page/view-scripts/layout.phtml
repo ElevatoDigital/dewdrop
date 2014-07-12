@@ -46,7 +46,8 @@
         $this->headScript()
             ->appendFile($this->bowerUrl('/jquery/dist/jquery.min.js'))
             ->appendFile($this->bowerUrl('/bootstrap/dist/js/bootstrap.min.js'))
-            ->appendFile($this->bowerUrl('/velocity/jquery.velocity.min.js'));
+            ->appendFile($this->bowerUrl('/velocity/jquery.velocity.min.js'))
+            ->appendFile($this->bowerUrl('/velocity/velocity.ui.js'));
 
         echo $this->headScript();
         echo $this->view->headScript();

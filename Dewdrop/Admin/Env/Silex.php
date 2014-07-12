@@ -73,6 +73,17 @@ class Silex extends EnvAbstract
         return $this;
     }
 
+    /**
+     * Inflect a component name for use in URLs and routes.
+     *
+     * @param string $name
+     * @return string
+     */
+    public function inflectComponentName($name)
+    {
+        return $this->application['inflector']->hyphenize($name);
+    }
+
     public function initComponent(ComponentAbstract $component)
     {
         $this->application->match(
@@ -102,6 +113,7 @@ class Silex extends EnvAbstract
             ->assign('title', $this->title)
             ->assign('components', $this->getSortedComponentsForMenu())
             ->assign('content', $content)
+            ->assign('user', (isset($this->application['user']) ? $this->application['user'] : null))
             ->assign('viewHeadScript', $headScript)
             ->assign('viewHeadLink', $headLink)
             ->assign('dependencies', $this->coreClientSideDependencies);

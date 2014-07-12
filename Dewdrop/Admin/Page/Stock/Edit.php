@@ -27,6 +27,11 @@ class Edit extends PageAbstract
 
         $this->invalidSubmission = false;
 
+        $this->checkPermissions();
+    }
+
+    protected function checkPermissions()
+    {
         if ($this->isNew) {
             $this->component->getPermissions()->haltIfNotAllowed('create');
         } else {

@@ -45,6 +45,17 @@ class Pimple
     }
 
     /**
+     * Check to see if the specified resource is defined in Pimple.
+     *
+     * @param string $resourceName
+     * @return boolean
+     */
+    public static function hasResource($resourceName)
+    {
+        return isset(self::getInstance()[$resourceName]);
+    }
+
+    /**
      * Get a resource from the Pimple instance.  Just a shortcut.
      *
      * @param string $resourceName

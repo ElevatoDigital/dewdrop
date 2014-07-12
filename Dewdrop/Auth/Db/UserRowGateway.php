@@ -2,15 +2,17 @@
 
 namespace Dewdrop\Auth\Db;
 
-use Dewdrop\Fields\UserInterface as DewdropFieldsUserInterface;
+use Dewdrop\Auth\UserInterface as AuthUserInterface;
+use Dewdrop\Fields\UserInterface as FieldsUserInterface;
 use Dewdrop\Db\Row;
+use Dewdrop\Pimple;
 use Symfony\Component\Security\Core\Role\Role;
-use Symfony\Component\Security\Core\User\UserInterface as SymfonySecurityUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface as SfSecurityUserInterface;
 
 /**
  * User database row class
  */
-class UserRowGateway extends Row implements DewdropFieldsUserInterface, SymfonySecurityUserInterface
+class UserRowGateway extends Row implements AuthUserInterface, FieldsUserInterface, SfSecurityUserInterface
 {
     /**
      * Check to see if the user has the specified role.
@@ -65,7 +67,7 @@ class UserRowGateway extends Row implements DewdropFieldsUserInterface, SymfonyS
      */
     public function getRoles()
     {
-        // @todo Implement getRoles() method.
+        return array($this->get('role'));
     }
 
     /**
@@ -80,6 +82,11 @@ class UserRowGateway extends Row implements DewdropFieldsUserInterface, SymfonyS
         return $this->get('password_hash');
     }
 
+    public function getId()
+    {
+        return $this->get('user_id');
+    }
+
     /**
      * Returns the username used to authenticate the user.
      *
@@ -88,5 +95,42 @@ class UserRowGateway extends Row implements DewdropFieldsUserInterface, SymfonyS
     public function getUsername()
     {
         return $this->get('username');
+    }
+
+    public function getEmailAddress()
+    {
+        return $this->get('email_address');
+    }
+
+    public function getShortName()
+    {
+        return $this->get('first_name') . ' ' . substr($this->get('last_name'), 0, 1);
+    }
+
+    public function getFullName()
+    {
+        return $this->get('first_name') . ' ' . $this->get('last_name');
+    }
+
+    public function hashPassword($plaintextPassword)
+    {
+        $encoder = Pimple::getResource('security.encoder.digest');
+
+        $this->set(
+            'password_hash',
+            $encoder->encodePassword(trim($plaintextPassword), '')
+        );
+
+        return $this;
+    }
+
+    public function __sleep()
+    {
+        return array('columns', 'data');
+    }
+
+    public function __wakeup()
+    {
+        $this->setTable(new UsersTableGateway());
     }
 }

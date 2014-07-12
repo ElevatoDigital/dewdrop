@@ -2,7 +2,6 @@
 
 namespace Dewdrop;
 
-use Dewdrop\Auth\Db\UsersTableGateway;
 use Dewdrop\Db\Row\User as UserRow;
 use Dewdrop\View\View;
 use Silex\Application;
@@ -132,6 +131,18 @@ class Auth
             }
         );
 
+        $app['user'] = $app->share(
+            function () {
+                $token = $this->app['security']->getToken();
+
+                if (null !== $token) {
+                    return $token->getUser();
+                } else {
+                    return null;
+                }
+            }
+        );
+
         foreach ($this->routeClassMap as $route => $pageClassName) {
             $app->match(
                 $route,
@@ -156,13 +167,13 @@ class Auth
                     'pattern' => '^/admin/',
                     'form'    => [
                         'login_path' => '/auth/login',
-                        'check_path' => '/auth/login-check',
+                        'check_path' => '/admin/login-check',
                     ],
                     'logout'  => [
-                        'logout_path' => '/auth/logout',
+                        'logout_path' => '/admin/logout',
                     ],
                     'users' => $this->app->share(function () {
-                        return new UsersTableGateway($this->app['db']);
+                        return $this->app['users-gateway'];
                     }),
                 ],
             ],

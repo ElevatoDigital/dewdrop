@@ -13,6 +13,8 @@ class Index extends PageAbstract
 {
     public function render()
     {
+        $this->component->getPermissions()->haltIfNotAllowed('view-listing');
+
         $fields  = $this->component->getFields();
         $listing = $this->component->getListing();
         $filter  = $this->component->getVisibilityFilter();

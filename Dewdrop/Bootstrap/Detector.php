@@ -10,6 +10,7 @@
 
 namespace Dewdrop\Bootstrap;
 
+use Dewdrop\Auth\Db\UsersTableGateway;
 use Dewdrop\Config;
 use Dewdrop\Db\Adapter as DbAdapter;
 use Dewdrop\Exception;
@@ -156,6 +157,14 @@ class Detector
             } else {
                 throw new Exception('Silex application unavailable but not in WordPress');
             }
+        }
+
+        if (!isset($pimple['users-gateway'])) {
+            $pimple['users-gateway'] = $pimple->share(
+                function () use ($pimple) {
+                    return new UsersTableGateway($pimple['db']);
+                }
+            );
         }
     }
 }

@@ -41,6 +41,7 @@ class Run
         'WpInit',
         'Dbdeploy',
         'DbMetadata',
+        'AuthHashPassword',
         'Lint',
         'GenAdminComponent',
         'GenDbTable',

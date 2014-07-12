@@ -114,6 +114,13 @@ class Standard
         return $this;
     }
 
+    public function redirectToUrl($url)
+    {
+        $this->redirectUrl = $url;
+
+        return $this;
+    }
+
     /**
      * Perform any actions that have been setup by the page's process()
      * method.  In a testing environment, you'd likely skip this method to

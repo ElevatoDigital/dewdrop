@@ -53,6 +53,10 @@
                     <ul class="nav navbar-nav">
                         <?php
                         foreach ($this->components as $component) {
+                            if (!$component->getPermissions()->can('access') || !$component->getPermissions()->can('display-menu')) {
+                                continue;
+                            }
+
                             $submenuPages = $component->getSubmenuPages();
 
                             if (0 === count($submenuPages)) {
@@ -90,17 +94,19 @@
                         }
                         ?>
                     </ul>
+                    <?php if ($this->user):?>
                     <ul class="nav navbar-nav navbar-right">
                         <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-user"></span> Brad G <b class="caret"></b></a>
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-user"></span> <?php echo $this->escapeHtml($this->user->getShortName());?> <b class="caret"></b></a>
                             <ul class="dropdown-menu">
-                                <li><a href="/admin/account/edit">Account Info</a></li>
-                                <li><a href="/admin/auth/change-password">Change Password</a></li>
+                                <li><a href="/admin/users/edit?user_id=<?php echo $this->escapeHtmlAttr($this->user->getId());?>">Account Info</a></li>
+                                <li><a href="/admin/users/change-password?user_id=<?php echo $this->escapeHtmlAttr($this->user->getId());?>">Change Password</a></li>
                                 <li class="divider"></li>
-                                <li><a href="/admin/auth/logout">Logout</a></li>
+                                <li><a href="/admin/logout">Logout</a></li>
                             </ul>
                         </li>
                     </ul>
+                    <?php endif;?>
                 </div>
             </div>
         </nav>

@@ -10,6 +10,7 @@
 
 namespace Dewdrop\Admin\Env;
 
+use Dewdrop\Admin\Component\ComponentAbstract;
 use Dewdrop\Pimple;
 use DirectoryIterator;
 
@@ -53,6 +54,17 @@ abstract class EnvAbstract implements EnvInterface
     );
 
     /**
+     * Inflect a component name for use in URLs and routes.
+     *
+     * @param string $name
+     * @return string
+     */
+    public function inflectComponentName($name)
+    {
+        return $name;
+    }
+
+    /**
      * Look for and register all admin components in the given path.  If
      * no path is provided, the \Dewdrop\Paths->getAdmin() method will be
      * used to find the default admin path for the application.
@@ -80,7 +92,7 @@ abstract class EnvAbstract implements EnvInterface
         }
 
         foreach ($componentFolders as $folder) {
-            $this->registerComponent($folder);
+            $this->registerComponentFolder($folder);
         }
 
         return $this;
@@ -94,16 +106,28 @@ abstract class EnvAbstract implements EnvInterface
      * could register them with this method.
      *
      * @param string $folder
+     * @param string $classPrefix
      * @return EnvAbstract
      */
-    public function registerComponent($folder)
+    public function registerComponentFolder($folder, $classPrefix = '\Admin\\')
     {
         require_once $folder . '/Component.php';
         $componentName = basename($folder);
-        $className     = '\Admin\\' . Pimple::getResource('inflector')->camelize($componentName) . '\Component';
+        $className     = $classPrefix . Pimple::getResource('inflector')->camelize($componentName) . '\Component';
 
         $component = new $className(Pimple::getInstance());
 
+        return $this->registerComponent($component);
+    }
+
+    /**
+     * Register an already instantiated component.
+     *
+     * @param ComponentAbstract $component
+     * @return EnvAbstract
+     */
+    public function registerComponent(ComponentAbstract $component)
+    {
         $this->initComponent($component);
 
         $this->components[] = $component;

@@ -80,7 +80,7 @@ class UsersTableGateway extends Table implements UserProviderInterface
             throw new UnsupportedUserException("{$className} is not a supported user class.");
         }
 
-        return $this->loadUserByUsername($this->user->get('username'));
+        return $this->loadUserByUsername($user->get('username'));
     }
 
     /**
@@ -92,6 +92,21 @@ class UsersTableGateway extends Table implements UserProviderInterface
      */
     public function supportsClass($class)
     {
-        return $class === '\Dewdrop\Auth\Db\UserRowGateway';
+        return $class === 'Dewdrop\Auth\Db\UserRowGateway';
+    }
+
+    public function selectAdminListing()
+    {
+        $select = $this->select();
+
+        $select
+            ->from(array('u' => 'users'))
+            ->join(
+                array('r' => 'roles'),
+                'r.role = u.role',
+                array('role' => 'name')
+            );
+
+        return $select;
     }
 }

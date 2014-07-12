@@ -37,9 +37,18 @@ interface EnvInterface
      * \Dewdrop\Admin\Component\ComponentAbstract.
      *
      * @param string $folder
+     * @param string $classPrefix
      * @return EnvInterface
      */
-    public function registerComponent($folder);
+    public function registerComponentFolder($folder, $classPrefix);
+
+    /**
+     * Register an already instantiated component.
+     *
+     * @param ComponentAbstract $component
+     * @return EnvInterface
+     */
+    public function registerComponent(ComponentAbstract $component);
 
     /**
      * Render the layout for the response.  A layout should wrap the
