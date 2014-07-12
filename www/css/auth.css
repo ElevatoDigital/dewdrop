@@ -1,0 +1,20 @@
+html,
+body {
+    background: #fafafa;
+}
+
+.container-fluid {
+    padding-top: 15%;
+}
+
+.panel-heading {
+    text-align: center;
+}
+
+.remember-me {
+    padding-top: 8px;
+}
+
+.remember-me label {
+    font-weight: normal;
+}
