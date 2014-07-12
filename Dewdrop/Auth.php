@@ -5,6 +5,7 @@ namespace Dewdrop;
 use Dewdrop\Db\Row\User as UserRow;
 use Dewdrop\View\View;
 use Silex\Application;
+use Silex\Provider\RememberMeServiceProvider;
 use Silex\Provider\SecurityServiceProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Encoder\BCryptPasswordEncoder;
@@ -123,7 +124,10 @@ class Auth
     {
         $app = $this->app;
 
-        $app->register(new SecurityServiceProvider(), $this->getSecurityServiceProviderConfig());
+        $app->register(new SecurityServiceProvider());
+        $app->register(new RememberMeServiceProvider());
+
+        $app['security.firewalls'] = $this->getSecurityFirewallsConfig();
 
         $app['security.encoder.digest'] = $app->share(
             function ($app) {
@@ -159,23 +163,24 @@ class Auth
     /**
      * @return array
      */
-    protected function getSecurityServiceProviderConfig()
+    protected function getSecurityFirewallsConfig()
     {
         return [
-            'security.firewalls' => [
-                'admin' => [
-                    'pattern' => '^/admin/',
-                    'form'    => [
-                        'login_path' => '/auth/login',
-                        'check_path' => '/admin/login-check',
-                    ],
-                    'logout'  => [
-                        'logout_path' => '/admin/logout',
-                    ],
-                    'users' => $this->app->share(function () {
-                        return $this->app['users-gateway'];
-                    }),
+            'admin' => [
+                'pattern' => '^/admin/',
+                'form'    => [
+                    'login_path' => '/auth/login',
+                    'check_path' => '/admin/login-check',
                 ],
+                'logout'  => [
+                    'logout_path' => '/admin/logout',
+                ],
+                'remember_me' => [
+                    'key' => 'yj/5Hf#K#^{G.T*T>g0I+iXKFyy{%KM:DkRH~X6>dV"s|$1UhDEM(Uy5?-Pbp',
+                ],
+                'users' => $this->app->share(function () {
+                    return $this->app['users-gateway'];
+                }),
             ],
         ];
     }
