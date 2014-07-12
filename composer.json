@@ -10,6 +10,7 @@
         }
     },
     "require": {
+        "ircmaxell/password-compat": "1.0.*",
         "jdorn/sql-formatter": "1.2.*",
         "nielsradstake/php-codesniffer": "1.*",
         "php": ">=5.4.0",
