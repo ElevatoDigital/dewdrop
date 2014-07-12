@@ -1,7 +1,8 @@
 require.config({
     baseUrl: DEWDROP.bowerUrl('/dewdrop/www/js/sort-fields'),
     paths: {
-        text: DEWDROP.bowerUrl('/requirejs-text/text'),
+        text:        DEWDROP.bowerUrl('/requirejs-text/text'),
+        "jquery-ui": DEWDROP.bowerUrl('/jquery-ui/jquery-ui.min')
     }
 });
 

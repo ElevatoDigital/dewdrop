@@ -1,6 +1,6 @@
 define(
-    ['jquery', 'text!list-template.html', 'text!list-field-template.html'],
-    function ($, listHtml, fieldHtml) {
+    ['jquery', 'jquery-ui', 'text!list-template.html', 'text!list-field-template.html'],
+    function ($, ui, listHtml, fieldHtml) {
         'use strict';
 
         var listTemplate  = _.template(listHtml),
