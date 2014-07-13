@@ -116,6 +116,18 @@ class View
     {
         $this->escaper = ($escaper ?: new Escaper());
         $this->request = ($request ?: Pimple::getResource('dewdrop-request'));
+
+        $this->init();
+    }
+
+    /**
+     * This method can be used by sub-classes to setup additional helpers, etc.
+     *
+     * @return void
+     */
+    public function init()
+    {
+
     }
 
     /**
