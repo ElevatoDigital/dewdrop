@@ -581,9 +581,12 @@ abstract class Table
      *
      * @param array $data
      * @param string $where
+     * @return integer The number of rows affected.
      */
     public function update(array $data, $where)
     {
+        $result = 0;
+
         $updateData = $this->augmentUpdatedDataArrayWithDateFields(
             $this->filterDataArrayForPhysicalColumns($data)
         );
@@ -596,6 +599,8 @@ abstract class Table
         $this
             ->saveManyToManyRelationships($data)
             ->saveEav($data);
+
+        return $result;
     }
 
     /**
