@@ -17,6 +17,8 @@ class ComponentAbstractTest extends BaseTestCase
 
     private $request;
 
+    private $isWp;
+
     public function setUp()
     {
         $testPimple = new \Pimple();
@@ -27,6 +29,7 @@ class ComponentAbstractTest extends BaseTestCase
 
         $this->request = $this->component->getRequest();
         $this->paths   = $this->component->getPaths();
+        $this->isWp    = $this->paths->isWp();
     }
 
     /**
@@ -46,7 +49,7 @@ class ComponentAbstractTest extends BaseTestCase
     public function testGeneratesUrlForSpecifiedPageWithNoSubmenusOrParams()
     {
         $this->assertContains(
-            '&route=MyCrazyPageName',
+            ($this->isWp ? '&route=MyCrazyPageName' : '/admin/animals/my-crazy-page-name'),
             $this->component->url('MyCrazyPageName')
         );
     }
@@ -54,7 +57,7 @@ class ComponentAbstractTest extends BaseTestCase
     public function testUrlMethodWillAppendSuppliedQueryParams()
     {
         $this->assertContains(
-            '&param1=1&param2=2',
+            ($this->isWp ? '&param1=1&param2=2' : '?param1=1&param2=2'),
             $this->component->url('Page', array('param1' => 1, 'param2' => 2))
         );
     }
@@ -64,7 +67,7 @@ class ComponentAbstractTest extends BaseTestCase
         $this->component->addToSubmenu('Test', 'Test');
 
         $this->assertContains(
-            'page=Animals/Test',
+            ($this->isWp ? 'page=Animals/Test' : '/admin/animals/test'),
             $this->component->url('Test')
         );
 
@@ -79,7 +82,7 @@ class ComponentAbstractTest extends BaseTestCase
         $this->component->addToSubmenu('View All', 'Index');
 
         $this->assertContains(
-            'page=Animals',
+            ($this->isWp ? 'page=Animals' : '/admin/animals/index'),
             $this->component->url('Index')
         );
 
@@ -94,7 +97,7 @@ class ComponentAbstractTest extends BaseTestCase
         $this->component->addToSubmenu('Test', 'Test');
 
         $this->assertContains(
-            'route=Test&id=3',
+            ($this->isWp ? 'route=Test&id=3' : '/admin/animals/test?id=3'),
             $this->component->url('Test', array('id' => 3))
         );
 
