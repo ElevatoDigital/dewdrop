@@ -22,10 +22,6 @@ class EditAbstractTest extends DbTestCase
     {
         parent::setUp();
 
-        if (!Pimple::getResource('paths')->isWp()) {
-            $this->markTestSkipped('Admin components currently only work in WP.');
-        }
-
         require_once __DIR__ . '/../test-models/Animals.php';
 
         $testPimple = new \Pimple();

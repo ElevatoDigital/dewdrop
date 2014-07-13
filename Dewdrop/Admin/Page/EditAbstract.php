@@ -228,7 +228,7 @@ abstract class EditAbstract extends PageAbstract
     public function fieldHasError($name)
     {
         if (!$this->fields->has($name)) {
-            throw new Exception("Checking for errors on unknown field \"{$field}\"");
+            throw new Exception("Checking for errors on unknown field \"{$name}\"");
         }
 
         return in_array($name, $this->fieldsWithErrors);
