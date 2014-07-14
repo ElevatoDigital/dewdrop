@@ -48,20 +48,6 @@ class Groups implements FilterInterface
     private $dbAdapter;
 
     /**
-     * The table where the sort fields are stored in the DB.
-     *
-     * @var string
-     */
-    private $fieldTableName = 'dewdrop_sorted_fields';
-
-    /**
-     * The table where the groups are stored in the DB.
-     *
-     * @var string
-     */
-    private $groupTableName = 'dewdrop_field_groups';
-
-    /**
      * A variable where we can store the data loaded from the DB so that we
      * do not have to query for it multiple times on a single request.
      *
@@ -80,34 +66,6 @@ class Groups implements FilterInterface
     {
         $this->componentName = $componentName;
         $this->dbAdapter     = $dbAdapter;
-    }
-
-    /**
-     * Manually override the name of the database table where the sorted fields
-     * are stored.  Typically only needed during testing.
-     *
-     * @param string $fieldTableName
-     * @return Groups
-     */
-    public function setFieldTableName($fieldTableName)
-    {
-        $this->fieldTableName = $fieldTableName;
-
-        return $this;
-    }
-
-    /**
-     * Manually override the name of the database table where the field groups
-     * are stored.  Typically only needed during testing.
-     *
-     * @param string $groupTableName
-     * @return Groups
-     */
-    public function setGroupTableName($groupTableName)
-    {
-        $this->groupTableName = $groupTableName;
-
-        return $this;
     }
 
     /**
@@ -234,10 +192,12 @@ class Groups implements FilterInterface
      *
      * <code>
      * array(
-     *     'title' => 'My Group Title',
-     *     'fields' => array(
-     *         array('id' => 'products:name'),
-     *         array('id' => 'products:price')
+     *     array(
+     *         'title' => 'My Group Title',
+     *         'fields' => array(
+     *             array('id' => 'products:name'),
+     *             array('id' => 'products:price')
+     *         )
      *     )
      * )
      * </code>
@@ -345,7 +305,7 @@ class Groups implements FilterInterface
      *
      * @return void
      */
-    protected function deleteCurrentSettings()
+    public function deleteCurrentSettings()
     {
         $this->dbAdapter->delete(
             'dewdrop_field_groups',

@@ -19,6 +19,7 @@ use Dewdrop\Exception;
 use Dewdrop\Fields\Field as CustomField;
 use Dewdrop\Fields\FieldInterface;
 use Dewdrop\Fields\FieldsIterator;
+use Dewdrop\Fields\UserInterface;
 
 /**
  * The Fields API is at the core of many of Dewdrop's abstractions.  It has two
@@ -161,7 +162,7 @@ class Fields implements ArrayAccess, IteratorAggregate, Countable
             throw new Exception('\Dewdrop\Fields only excepts field objects');
         }
 
-        if (is_string($offset) && !is_number($offset)) {
+        if (is_string($offset) && !is_numeric($offset)) {
             $value->setId($offset);
 
             if ($this->has($offset)) {
@@ -234,6 +235,16 @@ class Fields implements ArrayAccess, IteratorAggregate, Countable
         $this->user = $user;
 
         return $this;
+    }
+
+    /**
+     * Get the user object associated with these fields.
+     *
+     * @return UserInterface
+     */
+    public function getUser()
+    {
+        return $this->user;
     }
 
     /**
@@ -330,11 +341,12 @@ class Fields implements ArrayAccess, IteratorAggregate, Countable
     /**
      * Get all the fields currently in this collection.
      *
+     * @param mixed $filters
      * @return Fields
      */
-    public function getAll()
+    public function getAll($filters = null)
     {
-        return new Fields($this->fields);
+        return $this->applyFilters($this, $filters);
     }
 
     /**
