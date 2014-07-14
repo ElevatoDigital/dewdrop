@@ -38,7 +38,7 @@ class BootstrapForm extends AbstractHelper
     {
         $args = func_get_args();
 
-        if (0 === $args) {
+        if (0 === count($args)) {
             return $this;
         } else {
             return call_user_func_array(array($this, 'directWithArgs'), $args);
@@ -178,7 +178,7 @@ class BootstrapForm extends AbstractHelper
             $controlOutput = $renderer->getControlRenderer()->render($field, $fieldPosition);
 
             if ($this->controlRequiresLabel($controlOutput)) {
-                $output .= $this->renderLabel($renderer, $field, $input);
+                $output .= $this->renderLabel($field, $input, $renderer);
             }
 
             $output .= $controlOutput;
@@ -221,12 +221,12 @@ class BootstrapForm extends AbstractHelper
      * Render the label for the supplied field, included a "required" flag when
      * appropriate.
      *
-     * @param Renderer $renderer
      * @param FieldInterface $field
      * @param Input $input
+     * @param Renderer $renderer
      * @return string
      */
-    public function renderLabel(Renderer $renderer, FieldInterface $field, Input $input = null)
+    public function renderLabel(FieldInterface $field, Input $input = null, Renderer $renderer)
     {
         return sprintf(
             '<label class="control-label" for="%s">%s%s</label>',
