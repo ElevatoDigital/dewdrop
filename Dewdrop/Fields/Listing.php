@@ -10,17 +10,15 @@
 
 namespace Dewdrop\Fields;
 
-use Dewdrop\Db\Driver\Pdo\Pgsql;
-use Dewdrop\Db\Driver\Wpdb;
 use Dewdrop\Db\Field as DbField;
 use Dewdrop\Db\Select;
-use Dewdrop\Exception;
 use Dewdrop\Fields;
 use Dewdrop\Fields\Helper\SelectModifierInterface;
 use Dewdrop\Fields\Helper\SelectFilter;
 use Dewdrop\Fields\Helper\SelectPaginate;
 use Dewdrop\Fields\Helper\SelectSort;
 use Dewdrop\Pimple;
+use Dewdrop\Request;
 
 /**
  * The Listing class wraps a Select object and applies a number of SelectModifier
@@ -76,6 +74,8 @@ class Listing
      * Supply the Select object that will be manipulated by this listing.
      *
      * @param Select $select
+     * @param DbField $primaryKey
+     * @param Request $request
      */
     public function __construct(Select $select, DbField $primaryKey, Request $request = null)
     {

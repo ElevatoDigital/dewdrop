@@ -10,8 +10,6 @@
 
 namespace Dewdrop\Fields;
 
-use Dewdrop\Db\Field as DbField;
-use Dewdrop\Exception;
 use Dewdrop\Fields as FieldsSet;
 
 /**
@@ -34,6 +32,13 @@ class Field extends FieldAbstract
      * @var string
      */
     private $label;
+
+    /**
+     * The field value
+     *
+     * @var mixed
+     */
+    private $value;
 
     /**
      * Change the field's ID.
@@ -84,7 +89,7 @@ class Field extends FieldAbstract
 
     /**
      * Set the label to be used for this field.  On custom fields, no inflection
-     * or auto-detection is done for the labe, so you'll need to call setLabel()
+     * or auto-detection is done for the label, so you'll need to call setLabel()
      * on essentially every custom field you write.
      *
      * @param string $label
@@ -105,5 +110,28 @@ class Field extends FieldAbstract
     public function getLabel()
     {
         return $this->label;
+    }
+
+    /**
+     * Get the value for this field.
+     *
+     * @return mixed
+     */
+    public function getValue()
+    {
+        return $this->value;
+    }
+
+    /**
+     * Set the value for this field.
+     *
+     * @param mixed $value
+     * @return Field
+     */
+    public function setValue($value)
+    {
+        $this->value = $value;
+
+        return $this;
     }
 }

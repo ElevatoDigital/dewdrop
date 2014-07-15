@@ -2,8 +2,7 @@
 
 namespace Dewdrop;
 
-use Dewdrop\Db\Row\User as UserRow;
-use Dewdrop\View\View;
+use Dewdrop\Auth\Db\UserRowGateway;
 use Silex\Application;
 use Silex\Provider\RememberMeServiceProvider;
 use Silex\Provider\SecurityServiceProvider;
@@ -95,7 +94,7 @@ class Auth
     }
 
     /**
-     * @return UserRow|null
+     * @return UserRowGateway|null
      */
     public function getUser()
     {
@@ -114,7 +113,7 @@ class Auth
      */
     public function hasUser()
     {
-        return null === $this->getUser();
+        return null !== $this->getUser();
     }
 
     /**
@@ -130,7 +129,7 @@ class Auth
         $app['security.firewalls'] = $this->getSecurityFirewallsConfig();
 
         $app['security.encoder.digest'] = $app->share(
-            function ($app) {
+            function () {
                 return new BCryptPasswordEncoder(6);
             }
         );

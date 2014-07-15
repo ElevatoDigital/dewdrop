@@ -14,7 +14,6 @@ use Dewdrop\Admin\Component\ComponentAbstract;
 use Dewdrop\Admin\ResponseHelper\Standard as ResponseHelper;
 use Dewdrop\Pimple;
 use Dewdrop\Request;
-use Dewdrop\View\View;
 
 /**
  * This is the base page controller class for admin component's in Dewdrop.
@@ -45,7 +44,7 @@ abstract class PageAbstract
     /**
      * The component the page is part of
      *
-     * @var \Dewdrop\Admin\ComponentAbstract
+     * @var ComponentAbstract
      */
     protected $component;
 

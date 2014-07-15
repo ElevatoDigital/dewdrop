@@ -10,15 +10,12 @@
 
 namespace Dewdrop\Admin\Component;
 
-use Dewdrop\Admin\Env\EnvInterface;
-use Dewdrop\Admin\Page\PageAbstract;
 use Dewdrop\Admin\PageFactory\Files as PageFilesFactory;
 use Dewdrop\Admin\PageFactory\PageFactoryInterface;
 use Dewdrop\Admin\Permissions;
 use Dewdrop\Admin\Response;
 use Dewdrop\Exception;
 use Dewdrop\Pimple as DewdropPimple;
-use Dewdrop\Request;
 use Pimple;
 use ReflectionClass;
 
@@ -201,7 +198,7 @@ abstract class ComponentAbstract
      * @param string $title
      * @param string $page
      * @param array $params
-     * @return \Dewdrop\Admin\ComponentAbstract
+     * @return ComponentAbstract
      */
     public function addToSubmenu($title, $page, $params = array())
     {
@@ -261,7 +258,7 @@ abstract class ComponentAbstract
      * admin menu.
      *
      * @param string $title
-     * @return \Dewdrop\Admin\ComponentAbstract
+     * @return ComponentAbstract
      */
     public function setTitle($title)
     {
@@ -280,7 +277,7 @@ abstract class ComponentAbstract
      * entry.
      *
      * @param string $icon
-     * @return \Dewdrop\Admin\ComponentAbstract
+     * @return ComponentAbstract
      */
     public function setIcon($icon)
     {
@@ -299,7 +296,7 @@ abstract class ComponentAbstract
      *
      * @see $menuPosition
      * @param integer $menuPosition
-     * @return \Dewdrop\Admin\ComponentAbstract
+     * @return ComponentAbstract
      */
     public function setMenuPosition($menuPosition)
     {
@@ -317,12 +314,12 @@ abstract class ComponentAbstract
      * Make sure the title property was set in the component's init()
      * method.
      *
-     * @throws \Dewdrop\Exception
+     * @throws Exception
      */
     protected function checkRequiredProperties()
     {
         if (!$this->title) {
-            throw new \Dewdrop\Exception('Component title is required');
+            throw new Exception('Component title is required');
         }
     }
 

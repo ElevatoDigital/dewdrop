@@ -11,11 +11,9 @@
 namespace Dewdrop;
 
 use ArrayAccess;
-use ArrayIterator;
 use Countable;
 use IteratorAggregate;
 use Dewdrop\Db\Field as DbField;
-use Dewdrop\Exception;
 use Dewdrop\Fields\Field as CustomField;
 use Dewdrop\Fields\FieldInterface;
 use Dewdrop\Fields\FieldsIterator;

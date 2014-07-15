@@ -5,8 +5,6 @@ namespace Dewdrop\Admin\Page\Stock;
 use Dewdrop\Admin\Component\SortableListingInterface;
 use Dewdrop\Admin\Page\PageAbstract;
 use Dewdrop\Bootstrap;
-use Dewdrop\Fields\Filter\Visibility as VisibilityFilter;
-use Dewdrop\Fields\Listing\Export\Csv as CsvExport;
 use Dewdrop\Pimple;
 
 class Index extends PageAbstract

@@ -74,7 +74,7 @@ interface CrudInterface
     public function getFieldGroupsFilter();
 
     /**
-     * Get a \Dewdrop\Fields\Filter\Visilibility object that allows the user
+     * Get a \Dewdrop\Fields\Filter\Visibility object that allows the user
      * to select which fields should be visible on listings.
      *
      * @return \Dewdrop\Fields\Filter\Visibility

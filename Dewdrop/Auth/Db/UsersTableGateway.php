@@ -84,6 +84,14 @@ class UsersTableGateway extends Table implements UserProviderInterface
     }
 
     /**
+     * @return \Dewdrop\Db\Select
+     */
+    public function selectAdminListing()
+    {
+        return $this->select()->from(['u' => 'users']);
+    }
+
+    /**
      * Whether this provider supports the given user class
      *
      * @param string $class
@@ -93,20 +101,5 @@ class UsersTableGateway extends Table implements UserProviderInterface
     public function supportsClass($class)
     {
         return $class === 'Dewdrop\Auth\Db\UserRowGateway';
-    }
-
-    public function selectAdminListing()
-    {
-        $select = $this->select();
-
-        $select
-            ->from(array('u' => 'users'))
-            ->join(
-                array('r' => 'roles'),
-                'r.role = u.role',
-                array('role' => 'name')
-            );
-
-        return $select;
     }
 }

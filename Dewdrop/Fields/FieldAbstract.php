@@ -12,7 +12,6 @@ namespace Dewdrop\Fields;
 
 use Dewdrop\Fields as FieldsSet;
 use Dewdrop\Fields\Exception;
-use Dewdrop\Fields\UserInterface;
 
 /**
  * This class serves as a base for both custom and DB fields in Dewdrop.
