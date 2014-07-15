@@ -4,6 +4,7 @@ namespace Dewdrop\Admin\Component\Stock\Users;
 
 use Dewdrop\Admin\Component\ComponentAbstract;
 use Dewdrop\Admin\Component\CrudInterface;
+use Dewdrop\Admin\PageFactory\Crud as CrudFactory;
 use Dewdrop\Fields;
 use Dewdrop\Fields\Filter\Groups as GroupsFilter;
 use Dewdrop\Fields\Filter\Visibility as VisibilityFilter;
@@ -48,6 +49,8 @@ class Component extends ComponentAbstract implements CrudInterface
     public function init()
     {
         $this->setTitle('Users');
+
+        $this->addPageFactory(new CrudFactory($this));
 
         $this->getPermissions()
             ->register('change-password', 'Allow users to change their own password')
