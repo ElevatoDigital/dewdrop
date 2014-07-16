@@ -16,6 +16,7 @@ namespace Dewdrop\Cli;
 use Dewdrop\Bootstrap\Detector as BootstrapDetector;
 use Dewdrop\Paths;
 use Dewdrop\Db\Adapter;
+use Dewdrop\Pimple as DewdropPimple;
 use Pimple;
 
 /**
@@ -41,7 +42,6 @@ class Run
         'WpInit',
         'Dbdeploy',
         'DbMetadata',
-        'AuthHashPassword',
         'Lint',
         'GenAdminComponent',
         'GenDbTable',
@@ -117,7 +117,7 @@ class Run
      */
     public function __construct(array $args = null, $command = null, $renderer = null)
     {
-        $this->pimple   = BootstrapDetector::findPimple();
+        $this->pimple   = DewdropPimple::getInstance();
         $this->args     = ($args ?: array_slice($_SERVER['argv'], 2));
         $this->renderer = ($renderer ?: new Renderer\Markdown());
         $this->paths    = (isset($this->pimple['paths']) ? $this->pimple['paths'] : new Paths());

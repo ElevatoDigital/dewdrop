@@ -9,5 +9,16 @@ require_once 'vendor/autoload.php';
 
 \Dewdrop\Bootstrap\Wp::handleWpLoadGlobals();
 
+$paths = new \Dewdrop\Paths();
+
+if ($paths->isWp()) {
+    $folder     = basename($paths->getPluginRoot());
+    $pluginFile = $paths->getPluginRoot() . '/' . $folder . '.php';
+
+    if (file_exists($pluginFile)) {
+        require_once $pluginFile;
+    }
+}
+
 $cli = new \Dewdrop\Cli\Run();
 $cli->run();
