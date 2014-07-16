@@ -138,6 +138,19 @@ class Row implements ArrayAccess
                 $this->virtualFieldsInitialized[] = $column;
             }
         }
+
+        $this->init();
+    }
+
+    /**
+     * This method can be used by sub-classes to store initial values (for comparison
+     * during saving, for example).
+     *
+     * @return void
+     */
+    public function init()
+    {
+
     }
 
     /**
