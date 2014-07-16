@@ -17,6 +17,7 @@ use Dewdrop\Db\Field as DbField;
 use Dewdrop\Fields\Field as CustomField;
 use Dewdrop\Fields\FieldInterface;
 use Dewdrop\Fields\FieldsIterator;
+use Dewdrop\Fields\Filter\FilterInterface;
 use Dewdrop\Fields\UserInterface;
 
 /**
@@ -152,6 +153,7 @@ class Fields implements ArrayAccess, IteratorAggregate, Countable
      *
      * @param string $offset
      * @param mixed $value
+     * @throws Exception
      * @return void
      */
     public function offsetSet($offset, $value)
@@ -253,6 +255,7 @@ class Fields implements ArrayAccess, IteratorAggregate, Countable
      */
     public function has($id)
     {
+        /* @var $field FieldInterface */
         foreach ($this->fields as $field) {
             if ($field->getId() === $id) {
                 return true;
@@ -270,6 +273,7 @@ class Fields implements ArrayAccess, IteratorAggregate, Countable
      */
     public function get($id)
     {
+        /* @var $field FieldInterface */
         foreach ($this->fields as $field) {
             if ($field->getId() === $id) {
                 return $field;
@@ -291,6 +295,8 @@ class Fields implements ArrayAccess, IteratorAggregate, Countable
      * execution to that context.
      *
      * @param mixed $field
+     * @param string $modelName
+     * @throws Exception
      * @return FieldInterface
      */
     public function add($field, $modelName = null)
@@ -324,6 +330,7 @@ class Fields implements ArrayAccess, IteratorAggregate, Countable
      */
     public function remove($id)
     {
+        /* @var $field FieldInterface */
         foreach ($this->fields as $index => $field) {
             if ($field->getId() === $id) {
                 unset($this->fields[$index]);
@@ -477,6 +484,7 @@ class Fields implements ArrayAccess, IteratorAggregate, Countable
             $filters = array($filters);
         }
 
+        /* @var $filter FilterInterface */
         foreach ($filters as $filter) {
             $fields = $filter->apply($fields);
         }

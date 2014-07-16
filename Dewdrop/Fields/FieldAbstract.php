@@ -10,6 +10,7 @@
 
 namespace Dewdrop\Fields;
 
+use Dewdrop\Fields;
 use Dewdrop\Fields as FieldsSet;
 use Dewdrop\Fields\Exception;
 
@@ -138,6 +139,7 @@ abstract class FieldAbstract implements FieldInterface
      * option names and their values.
      *
      * @param array $options
+     * @throws Exception
      * @return FieldAbstract
      */
     public function setOptions(array $options)
@@ -192,27 +194,22 @@ abstract class FieldAbstract implements FieldInterface
     }
 
     /**
-     * When a non-existent method is called on this field, we attempt to call
-     * the method instead on the associated FieldsSet.  This enables control of
-     * execution to return to the FieldsSet, providing a very fluid method
-     * chaining style when adding and customizing many fields on a
-     * \Dewdrop\Fields object.
+     * When calling add() on this field, it will delegate the call back up to
+     * the associated \Dewdrop\Fields object.  This allows for a very fluid
+     * method chaining style when defining a large set of fields.
      *
-     * @param string $method
-     * @param array $args
+     * @param mixed $field
+     * @param string $modelName
+     * @throws Exception
      * @return mixed
      */
-    public function __call($method, array $args)
+    public function add($field, $modelName = null)
     {
         if (!$this->fieldsSet) {
-            throw new Exception("{$method} not found on field and not Fields object assigned");
+            throw new Exception('Cannot add field because no \Dewdrop\Fields object is available');
         }
 
-        if (!method_exists($this->fieldsSet, $method)) {
-            throw new Exception("{$method} not found on \Dewdrop\\Fields");
-        }
-
-        return call_user_func_array(array($this->fieldsSet, $method), $args);
+        return $this->fieldsSet->add($field, $modelName);
     }
 
     /**
@@ -265,7 +262,7 @@ abstract class FieldAbstract implements FieldInterface
      * @param mixed $role
      * @return FieldAbstract
      */
-    public function allowVisbilityForRole($role)
+    public function allowVisibilityForRole($role)
     {
         return $this->allowPermissionForRole('visible', $role);
     }
@@ -560,7 +557,7 @@ abstract class FieldAbstract implements FieldInterface
     private function forbidPermissionForRole($permissionProperty, $role)
     {
         if (in_array($role, $this->$permissionProperty)) {
-            $this->$permissionProperty = array_diff($this->$permisionsProperty, array($role));
+            $this->$permissionProperty = array_diff($this->$permissionProperty, array($role));
 
             // Once custom permissions are set, we need to remove the "all" setting
             if (self::AUTHORIZATION_ALLOW_ALL !== $role) {
@@ -602,6 +599,7 @@ abstract class FieldAbstract implements FieldInterface
      *
      * @param string $permissionProperty
      * @param mixed $value
+     * @throws Exception
      * @return FieldAbstract
      */
     private function setPermission($permissionProperty, $value)

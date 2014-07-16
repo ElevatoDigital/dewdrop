@@ -10,6 +10,11 @@ use stdClass;
 
 class FieldsTest extends PHPUnit_Framework_TestCase
 {
+    /**
+     * @var Fields;
+     */
+    private $fields;
+
     public function setUp()
     {
         $this->fields = new Fields();

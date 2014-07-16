@@ -10,6 +10,8 @@
 
 namespace Dewdrop\Fields;
 
+use Dewdrop\Fields as FieldsSet;
+
 /**
  * All fields implement this interface.  It covers 3 core field responsibilities:
  *
@@ -83,6 +85,31 @@ interface FieldInterface
      * @return string
      */
     public function getQueryStringId();
+
+    /**
+     * Set the FieldsSet that contains this FieldAbstract object.  Note that once
+     * this is set, it cannot be changed without first calling resetFieldsSet().
+     * This is done to ensure that when chaining calls between this field and its
+     * containing set, the same set is always used.  This avoids inconsistent or
+     * unpredictable cases where the field is added to one set but later customized
+     * on a derivitive set.
+     *
+     * @param FieldsSet $fieldsSet
+     * @return FieldAbstract
+     */
+    public function setFieldsSet(FieldsSet $fieldsSet);
+
+    /**
+     * When calling add() on this field, it will delegate the call back up to
+     * the associated \Dewdrop\Fields object.  This allows for a very fluid
+     * method chaining style when defining a large set of fields.
+     *
+     * @param mixed $field
+     * @param string $modelName
+     * @throws Exception
+     * @return mixed
+     */
+    public function add($field, $modelName = null);
 
     /**
      * Assing a custom callback for use with the named field helper.
@@ -163,7 +190,7 @@ interface FieldInterface
      * @param mixed $role
      * @return FieldInterface
      */
-    public function allowVisbilityForRole($role);
+    public function allowVisibilityForRole($role);
 
     /**
      * Forbid visibility for a specific role.
