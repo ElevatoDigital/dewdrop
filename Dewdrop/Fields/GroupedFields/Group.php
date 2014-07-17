@@ -62,7 +62,10 @@ class Group extends Fields
      */
     public function remove($id)
     {
-        $this->groupedFields->remove($id);
+        // This check ensures we don't enter an infinite loop because the set will try to remove from the group as well
+        if ($this->groupedFields->has($id)) {
+            $this->groupedFields->remove($id);
+        }
 
         return parent::remove($id);
     }
