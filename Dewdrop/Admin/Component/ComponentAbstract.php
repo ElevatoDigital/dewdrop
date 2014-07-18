@@ -155,6 +155,10 @@ abstract class ComponentAbstract
     {
         if (!$this->permissions) {
             $this->permissions = new Permissions($this);
+
+            if ($this->hasPimpleResource('user')) {
+                $this->permissions->setUser($this->getPimpleResource('user'));
+            }
         }
 
         return $this->permissions;
@@ -411,8 +415,17 @@ abstract class ComponentAbstract
         return $segments[$nameIndex];
     }
 
+    private function hasPimpleResource($name)
+    {
+        return isset($this->pimple[$name]) || DewdropPimple::hasResource($name);
+    }
+
     private function getPimpleResource($name)
     {
-        return (isset($this->pimple[$name]) ? $this->pimple[$name] : DewdropPimple::getResource($name));
+        if (isset($this->pimple[$name])) {
+            return $this->pimple[$name];
+        } else {
+            return DewdropPimple::getResource($name);
+        }
     }
 }
