@@ -24,6 +24,14 @@ interface SelectModifierInterface
     public function getPrefix();
 
     /**
+     * Check to see if the SelectModifier matches the supplied name.
+     *
+     * @param string $name
+     * @return boolean
+     */
+    public function matchesName($name);
+
+    /**
      * Using the supplied \Dewdrop\Fields and \Dewdrop\Db\Select, modify the
      * Select and return it.
      *

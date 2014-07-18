@@ -64,21 +64,21 @@ class TableCell
     /**
      * The helper used to render &lt;td&gt; content.
      *
-     * @var \Dewdrop\Feilds\Helper\TableCell\Content
+     * @var \Dewdrop\Fields\Helper\TableCell\Content
      */
     private $contentRenderer;
 
     /**
      * The helper used to render &lt;th&gt; content.
      *
-     * @var \Dewdrop\Feilds\Helper\TableCell\Header
+     * @var \Dewdrop\Fields\Helper\TableCell\Header
      */
     private $headerRenderer;
 
     /**
      * The helper used to build a CSS class string for a &lt;td&gt;.
      *
-     * @var \Dewdrop\Feilds\Helper\TableCell\Header
+     * @var \Dewdrop\Fields\Helper\TableCell\Header
      */
     private $tdClassNamesRenderer;
 

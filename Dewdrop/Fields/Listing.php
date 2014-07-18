@@ -13,6 +13,7 @@ namespace Dewdrop\Fields;
 use Dewdrop\Db\Field as DbField;
 use Dewdrop\Db\Select;
 use Dewdrop\Fields;
+use Dewdrop\Fields\Exception;
 use Dewdrop\Fields\Helper\SelectModifierInterface;
 use Dewdrop\Fields\Helper\SelectFilter;
 use Dewdrop\Fields\Helper\SelectPaginate;
@@ -71,6 +72,13 @@ class Listing
     private $totalRowCount = 0;
 
     /**
+     * The Request object used by this listing and its select modifiers.
+     *
+     * @var Request
+     */
+    private $request;
+
+    /**
      * Supply the Select object that will be manipulated by this listing.
      *
      * @param Select $select
@@ -82,12 +90,12 @@ class Listing
         $this->select     = $select;
         $this->primaryKey = $primaryKey;
 
-        $request = ($request ?: Pimple::getResource('dewdrop-request'));
+        $this->request = ($request ?: Pimple::getResource('dewdrop-request'));
 
         $this
-            ->registerSelectModifier(new SelectFilter($request))
-            ->registerSelectModifier(new SelectSort($request))
-            ->registerSelectModifier(new SelectPaginate($request));
+            ->registerSelectModifier(new SelectFilter($this->request))
+            ->registerSelectModifier(new SelectSort($this->request))
+            ->registerSelectModifier(new SelectPaginate($this->request));
     }
 
     /**
@@ -111,6 +119,7 @@ class Listing
      */
     public function setPrefix($prefix)
     {
+        /* @var $modifier SelectModifierInterface */
         foreach ($this->selectModifiers as $modifier) {
             $modifier->setPrefix($prefix);
         }
@@ -129,6 +138,16 @@ class Listing
     public function getPrefix()
     {
         return $this->prefix;
+    }
+
+    /**
+     * Return the request being used by this listing.
+     *
+     * @return Request
+     */
+    public function getRequest()
+    {
+        return $this->request;
     }
 
     /**
@@ -167,6 +186,7 @@ class Listing
      */
     public function getSelectModifierByName($name)
     {
+        /* @var $modifier SelectModifierInterface */
         foreach ($this->selectModifiers as $modifier) {
             if ($modifier->matchesName($name)) {
                 return $modifier;
@@ -187,10 +207,16 @@ class Listing
      */
     public function getModifiedSelect(Fields $fields)
     {
+        /** @var $select Select */
         $select = clone($this->select);
 
+        /* @var $modifier SelectModifierInterface */
         foreach ($this->selectModifiers as $modifier) {
             $select = $modifier->modifySelect($fields, $select, $this->prefix);
+
+            if (!$select instanceof Select) {
+                throw new Exception('Modifier did not return a Select object.');
+            }
         }
 
         return $select;
@@ -240,7 +266,7 @@ class Listing
      *
      * @param Fields $fields
      * @param mixed $id
-     * @return array
+     * @return \Dewdrop\Db\Row
      */
     public function fetchRow(Fields $fields, $id)
     {
