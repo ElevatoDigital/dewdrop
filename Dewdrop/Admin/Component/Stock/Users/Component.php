@@ -11,6 +11,7 @@ use Dewdrop\Fields\Filter\Visibility as VisibilityFilter;
 use Dewdrop\Fields\Listing;
 use Dewdrop\Fields\RowEditor;
 use Dewdrop\Pimple;
+use Dewdrop\View\View;
 use Model\Users;
 use Zend\InputFilter\Input;
 use Zend\Validator\Callback;
@@ -181,7 +182,7 @@ class Component extends ComponentAbstract implements CrudInterface
         $fields->add($passwordFieldName)
             ->assignHelperCallback(
                 'EditControl.Control',
-                function ($helper, $view) use ($request) {
+                function ($helper, View $view) use ($request) {
                     return $view->inputText(
                         [
                             'name'      => 'password',
@@ -209,7 +210,7 @@ class Component extends ComponentAbstract implements CrudInterface
         $this->fields->add('confirm_password')
             ->assignHelperCallback(
                 'EditControl.Control',
-                function ($helper, $view) use ($request) {
+                function ($helper, View $view) use ($request) {
                     return $view->inputText(
                         [
                             'name'  => 'confirm_password',
