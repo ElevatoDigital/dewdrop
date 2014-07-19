@@ -11,9 +11,10 @@
 namespace Dewdrop\Fields\RowEditor\Link;
 
 use Dewdrop\Db\Field as DbField;
+use Dewdrop\Db\Row;
 use Dewdrop\Db\Table;
 use Dewdrop\Fields\Exception;
-use Dewdrop\Fields\FieldInterface;
+use Dewdrop\Fields\RowEditor;
 
 /**
  * Provide a row that can be associated with all the fields from a model
@@ -42,6 +43,14 @@ use Dewdrop\Fields\FieldInterface;
 class Field implements LinkInterface
 {
     /**
+     * The RowEditor this link is associated with.  Used to get the field's row,
+     * if needed.
+     *
+     * @var RowEditor
+     */
+    private $rowEditor;
+
+    /**
      * The field that will be used to get the look-up value.
      *
      * @var DbField
@@ -54,9 +63,10 @@ class Field implements LinkInterface
      *
      * @param DbField $field
      */
-    public function __construct(DbField $field)
+    public function __construct(RowEditor $rowEditor, DbField $field)
     {
-        $this->field = $field;
+        $this->rowEditor = $rowEditor;
+        $this->field     = $field;
     }
 
     /**
@@ -75,18 +85,15 @@ class Field implements LinkInterface
     public function link(Table $table)
     {
         if (!$this->field->hasRow()) {
-            throw new Exception(
-                "Cannot link from {$this->field->getId()} field because it has no row.  Be sure to "
-                . "link rows in an order that ensures rows are linked after their dependencies."
-            );
+            $this->field->setRow($this->rowEditor->getRow($this->field->getGroupName()));
         }
 
         $value = $this->field->getValue();
 
         if ($value) {
-            $row = $table->getModel($modelName)->find($value);
+            $row = $table->find($value);
         } else {
-            $row = $table->getModel($modelName)->createRow();
+            $row = $table->createRow();
         }
 
         return $row;

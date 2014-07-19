@@ -38,13 +38,6 @@ class RowEditor
     private $rowsByName = array();
 
     /**
-     * Validation errors captured during a call to isValid().
-     *
-     * @var array
-     */
-    private $errors = array();
-
-    /**
      * In most cases, you can link all your rows simply by pointing RowEditor
      * to a variable it can use to find() the row by primary key.
      *
@@ -115,6 +108,7 @@ class RowEditor
      * this class's linkByQueryString() and linkByField() methods), or you can
      * provide your own custom linker by calling setLinkCallback().
      *
+     * @throws \Dewdrop\Exception
      * @return RowEditor
      */
     public function linkRowsToFields()
@@ -122,6 +116,11 @@ class RowEditor
         if ($this->linkCallback) {
             call_user_func($this->linkCallback, $this, $this->request);
         } else {
+            if (!count($this->links)) {
+                throw new Exception('Cannot link rows without Link objects or link callback defined.');
+            }
+
+            /* @var $link LinkInterface */
             foreach ($this->links as $modelName => $link) {
                 $this->setRow(
                     $modelName,
@@ -191,19 +190,25 @@ class RowEditor
      */
     public function linkByField($modelName, DbField $field)
     {
-        return $this->addLink($modelName, new FieldLink($field));
+        return $this->addLink($modelName, new FieldLink($this, $field));
     }
 
     /**
      * Check to see if we're currently editing new rows or existing rows.
      * If any of the rows are not new, this will return false.
      *
+     * @throws \Dewdrop\Exception
      * @return boolean
      */
     public function isNew()
     {
+        if (!count($this->rowsByName)) {
+            throw new Exception('You cannot call isNew() prior to calling link(), which creates the row objects.');
+        }
+
         $isNew = true;
 
+        /* @var $row Row */
         foreach ($this->rowsByName as $row) {
             if (!$row->isNew()) {
                 $isNew = false;
@@ -222,6 +227,7 @@ class RowEditor
      */
     public function isValid(array $data)
     {
+        /* @var $field DbField */
         foreach ($this->fields->getEditableFields() as $field) {
             if (array_key_exists($field->getId(), $data)) {
                 $field->setValue($data[$field->getId()]);
@@ -325,6 +331,8 @@ class RowEditor
         }
 
         // Now save any rows that weren't saved in the first loop
+
+        /* @var $row Row */
         foreach ($this->rowsByName as $modelName => $row) {
             if (!in_array($modelName, $savedRows)) {
                 $row->save();
@@ -368,17 +376,28 @@ class RowEditor
      * Get a row by its model name.
      *
      * @param string $modelName
+     * @throws \Dewdrop\Exception
      * @return Row
      */
     public function getRow($modelName)
     {
+        if (!isset($this->rowsByName[$modelName])) {
+            $models = $this->fields->getModelsByName();
+
+            if (!isset($models[$modelName])) {
+                throw new Exception("Attempting to retrieve row for unknown model: {$modelName}");
+            } else {
+                throw new Exception('Attempting to retrieve row prior to linking');
+            }
+        }
+
         return $this->rowsByName[$modelName];
     }
 
     /**
      * Get a model from the fields object by its model name.
      *
-     * @throws Dewdrop\Fields\Exception
+     * @throws Exception
      * @param string $modelName
      * @return \Dewdrop\Db\Table
      */

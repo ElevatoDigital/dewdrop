@@ -238,6 +238,16 @@ class Field extends FieldAbstract
     }
 
     /**
+     * Check to see if this field has an associated row.
+     *
+     * @return boolean
+     */
+    public function hasRow()
+    {
+        return null !== $this->row;
+    }
+
+    /**
      * Set the value of this field on the associated row, if available.
      *
      * @param mixed $value

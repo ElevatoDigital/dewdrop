@@ -1,0 +1,1 @@
+ALTER TABLE dewdrop_test_animals ADD favorite_fruit_id INTEGER REFERENCES dewdrop_test_fruits;
