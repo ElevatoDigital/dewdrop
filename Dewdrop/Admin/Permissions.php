@@ -63,13 +63,6 @@ class Permissions
     private $lockedSettings = array();
 
     /**
-     * The user we'll be testing these permissions against, if any.
-     *
-     * @var UserInterface
-     */
-    private $user;
-
-    /**
      * Provide the component that these permissions should be applied to.
      *
      * @param mixed $component
@@ -150,21 +143,8 @@ class Permissions
     }
 
     /**
-     * Set the user that will be used when checking permissions.
-     *
-     * @param UserInterface $user
-     * @return $this
-     */
-    public function setUser(UserInterface $user)
-    {
-        $this->user = $user;
-
-        return $this;
-    }
-
-    /**
      * Check to see if the given permission is granted to the current user (or
-     * anonymous users, if setUser() hasn't been called.  You can optionally
+     * anonymous users, if no user resource is available in Pimple.  You can optionally
      * choose to just throw an exception to halt execution when the user doesn't
      * have the requested permission.  This can be convenient when the user
      * can only reach the point where this permission is checked by circumventing
@@ -186,10 +166,15 @@ class Permissions
         if (is_array($can)) {
             $allowedRoles = $can;
 
-            $can = false;
+            $can  = false;
+            $user = null;
+
+            if ($this->component->hasPimpleResource('user')) {
+                $user = $this->component->getPimpleResource('user');
+            }
 
             foreach ($allowedRoles as $role) {
-                if ($this->user && in_array($role, $this->user->getRoles())) {
+                if ($user && in_array($role, $user->getRoles())) {
                     $can = true;
                     break;
                 }

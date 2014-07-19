@@ -103,6 +103,20 @@ abstract class ComponentAbstract
      */
     abstract public function init();
 
+    public function hasPimpleResource($name)
+    {
+        return isset($this->pimple[$name]) || DewdropPimple::hasResource($name);
+    }
+
+    public function getPimpleResource($name)
+    {
+        if (isset($this->pimple[$name])) {
+            return $this->pimple[$name];
+        } else {
+            return DewdropPimple::getResource($name);
+        }
+    }
+
     public function getPageFactories()
     {
         return $this->pageFactories;
@@ -155,10 +169,6 @@ abstract class ComponentAbstract
     {
         if (!$this->permissions) {
             $this->permissions = new Permissions($this);
-
-            if ($this->hasPimpleResource('user')) {
-                $this->permissions->setUser($this->getPimpleResource('user'));
-            }
         }
 
         return $this->permissions;
@@ -413,19 +423,5 @@ abstract class ComponentAbstract
         $nameIndex = count($segments) - 2;
 
         return $segments[$nameIndex];
-    }
-
-    private function hasPimpleResource($name)
-    {
-        return isset($this->pimple[$name]) || DewdropPimple::hasResource($name);
-    }
-
-    private function getPimpleResource($name)
-    {
-        if (isset($this->pimple[$name])) {
-            return $this->pimple[$name];
-        } else {
-            return DewdropPimple::getResource($name);
-        }
     }
 }

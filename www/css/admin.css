@@ -50,6 +50,9 @@ body {
 
 .navbar-right-btn-group {
     max-width: 220px;
+    top: 0;
+    position: absolute;
+    right: 15px;
 }
 
 .collapsing .navbar-right-btn-group,
@@ -143,5 +146,12 @@ tr:hover .row-actions {
 @media (max-width: 767px) {
     .row-actions {
         visibility: visible;
+    }
+
+    .navbar-right-btn-group {
+        max-width: 220px;
+        top: 0;
+        position: relative;
+        right: 0;
     }
 }
