@@ -178,7 +178,7 @@ class BootstrapForm extends AbstractHelper
             $controlOutput = $renderer->getControlRenderer()->render($field, $fieldPosition);
 
             if ($this->controlRequiresLabel($controlOutput)) {
-                $output .= $this->renderLabel($field, $input, $renderer);
+                $output .= $this->renderLabel($field, $renderer, $input);
             }
 
             $output .= $controlOutput;
@@ -222,11 +222,11 @@ class BootstrapForm extends AbstractHelper
      * appropriate.
      *
      * @param FieldInterface $field
-     * @param Input $input
      * @param Renderer $renderer
+     * @param Input $input
      * @return string
      */
-    public function renderLabel(FieldInterface $field, Input $input = null, Renderer $renderer)
+    public function renderLabel(FieldInterface $field, Renderer $renderer, Input $input = null)
     {
         return sprintf(
             '<label class="control-label" for="%s">%s%s</label>',

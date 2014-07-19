@@ -14,6 +14,11 @@ use Dewdrop\Fields\FieldInterface;
 use Dewdrop\Fields\Helper\HelperAbstract;
 use Dewdrop\View\View;
 
+/**
+ * Render the label needed for a given field's edit control.  You don't need to worry
+ * about rendering the actual &lt;label&gt; HTML tag, just the text that will serve
+ * as its contents.
+ */
 class Label extends HelperAbstract
 {
     /**
@@ -25,13 +30,28 @@ class Label extends HelperAbstract
      */
     protected $name = 'editcontrol.label';
 
+    /**
+     * The View the label will be rendered into.
+     *
+     * @var View
+     */
     private $view;
 
+    /**
+     * Provide the View this label will be rendered into.
+     *
+     * @param View $view
+     */
     public function __construct(View $view)
     {
         $this->view = $view;
     }
 
+    /**
+     * Get the View this label will be rendered into.
+     *
+     * @return View
+     */
     public function getView()
     {
         return $this->view;

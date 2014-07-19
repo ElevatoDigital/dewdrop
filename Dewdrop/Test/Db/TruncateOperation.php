@@ -35,7 +35,8 @@ class TruncateOperation extends \PHPUnit_Extensions_Database_Operation_Truncate
         foreach ($dataSet->getReverseIterator() as $table) {
             /* @var $table PHPUnit_Extensions_Database_DataSet_ITable */
             $query = "
-                {$connection->getTruncateCommand()} {$connection->quoteSchemaObject($table->getTableMetaData()->getTableName())}
+                {$connection->getTruncateCommand()}
+                {$connection->quoteSchemaObject($table->getTableMetaData()->getTableName())}
             ";
 
             if (defined('WPINC')) {
@@ -47,7 +48,13 @@ class TruncateOperation extends \PHPUnit_Extensions_Database_Operation_Truncate
             try {
                 $connection->getConnection()->query($query);
             } catch (PDOException $e) {
-                throw new PHPUnit_Extensions_Database_Operation_Exception('TRUNCATE', $query, array(), $table, $e->getMessage());
+                throw new PHPUnit_Extensions_Database_Operation_Exception(
+                    'TRUNCATE',
+                    $query,
+                    array(),
+                    $table,
+                    $e->getMessage()
+                );
             }
         }
 

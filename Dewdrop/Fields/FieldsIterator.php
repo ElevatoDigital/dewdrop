@@ -1,13 +1,35 @@
 <?php
 
+/**
+ * Dewdrop
+ *
+ * @link      https://github.com/DeltaSystems/dewdrop
+ * @copyright Delta Systems (http://deltasys.com)
+ * @license   https://github.com/DeltaSystems/dewdrop/LICENSE
+ */
+
 namespace Dewdrop\Fields;
 
 use Iterator;
 
+/**
+ * An Iterator implement that is used to loop over a \Dewdrop\Fields
+ * object.
+ */
 class FieldsIterator implements Iterator
 {
+    /**
+     * The array of fields supplied by the source \Dewdrop\Fields object.
+     *
+     * @var array
+     */
     protected $fields;
 
+    /**
+     * Supply the array of fields that will be iterated over.
+     *
+     * @param array $fields
+     */
     public function __construct(array $fields)
     {
         $this->fields = $fields;
@@ -64,5 +86,4 @@ class FieldsIterator implements Iterator
 
         return (null !== $key && false !== $key);
     }
-
 }

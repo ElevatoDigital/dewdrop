@@ -16,7 +16,6 @@ use Dewdrop\Db\Select;
 use Dewdrop\Fields;
 use Dewdrop\Fields\Exception;
 use Dewdrop\Fields\FieldInterface;
-use Dewdrop\Fields\Helper\SelectModifierInterface;
 use Dewdrop\Request;
 
 /**
@@ -112,6 +111,7 @@ class SelectSort extends HelperAbstract implements SelectModifierInterface
      * Set the default direction that should be used when sorting.
      *
      * @param string $defaultDirection
+     * @throws \Dewdrop\Fields\Exception
      * @return SelectSort
      */
     public function setDefaultDirection($defaultDirection)
@@ -133,7 +133,7 @@ class SelectSort extends HelperAbstract implements SelectModifierInterface
      *
      * @param Fields $fields
      * @param Select $select
-     *
+     * @throws \Dewdrop\Fields\Exception
      * @return Select
      */
     public function modifySelect(Fields $fields, Select $select)
@@ -141,18 +141,19 @@ class SelectSort extends HelperAbstract implements SelectModifierInterface
         $this->sortedField     = null;
         $this->sortedDirection = null;
 
+        /* @var $field FieldInterface */
         foreach ($fields->getSortableFields() as $field) {
             if ($field->getQueryStringId() === urlencode($this->request->getQuery($this->prefix . 'sort'))) {
                 if ('ASC' === $this->defaultDirection) {
-                    $direction = ('DESC' === strtoupper($this->request->getQuery($this->prefix . 'dir')) ? 'DESC' : 'ASC');
+                    $dir = ('DESC' === strtoupper($this->request->getQuery($this->prefix . 'dir')) ? 'DESC' : 'ASC');
                 } else {
-                    $direction = ('ASC' === strtoupper($this->request->getQuery($this->prefix . 'dir')) ? 'ASC' : 'DESC');
+                    $dir = ('ASC' === strtoupper($this->request->getQuery($this->prefix . 'dir')) ? 'ASC' : 'DESC');
                 }
 
                 $select = call_user_func(
                     $this->getFieldAssignment($field),
                     $select,
-                    $direction
+                    $dir
                 );
 
                 if (!$select instanceof Select) {
@@ -160,7 +161,7 @@ class SelectSort extends HelperAbstract implements SelectModifierInterface
                 }
 
                 $this->sortedField     = $field;
-                $this->sortedDirection = $direction;
+                $this->sortedDirection = $dir;
 
                 return $select;
             }
@@ -235,7 +236,7 @@ class SelectSort extends HelperAbstract implements SelectModifierInterface
         return $select->order("{$field->getName()} $direction");
     }
 
-    public function sortDbReference(DbField $field, $select, $direction)
+    public function sortDbReference(DbField $field, Select $select, $direction)
     {
         return $select->order(
             new Expr(

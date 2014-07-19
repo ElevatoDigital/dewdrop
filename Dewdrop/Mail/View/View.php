@@ -59,4 +59,3 @@ class View extends BaseView
             ->registerHelper('button', '\Dewdrop\Mail\View\Helper\Button');
     }
 }
-

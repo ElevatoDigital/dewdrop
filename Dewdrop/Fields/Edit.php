@@ -17,9 +17,6 @@ use Dewdrop\Exception;
 use Zend\InputFilter\InputFilter;
 
 /**
- * @deprecated
- * @see \Dewdrop\Fields\RowEditor
- *
  * Use the \Dewdrop\Db\Field API to manage the editing of values.
  *
  * Adding fields to this object simplifies a couple aspects of the common
@@ -52,6 +49,9 @@ use Zend\InputFilter\InputFilter;
  *         fields whose control names _do_ appear in the supplied values hash.
  *     </li>
  * </ol>
+ *
+ * @deprecated
+ * @see \Dewdrop\Fields\RowEditor
  */
 class Edit implements Countable, Iterator
 {

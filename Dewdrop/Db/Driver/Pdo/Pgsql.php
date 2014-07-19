@@ -427,7 +427,7 @@ class Pgsql implements DriverInterface
         $desc = array();
         foreach ($result as $key => $row) {
             $defaultValue = $row[$default_value];
-            if ($row[$type] == 'varchar' || $row[$type] == 'bpchar' ) {
+            if ($row[$type] == 'varchar' || $row[$type] == 'bpchar') {
                 if (preg_match('/character(?: varying)?(?:\((\d+)\))?/', $row[$complete_type], $matches)) {
                     if (isset($matches[1])) {
                         $row[$length] = $matches[1];

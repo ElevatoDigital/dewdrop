@@ -13,13 +13,15 @@ class BootstrapRowActions extends AbstractHelper
 
         extract($options);
 
-        $edit = urldecode($edit);
-        $view = urldecode($view);
-
         $renderer->getContentRenderer()
             ->assignCallbackByColumnPosition(
                 0,
-                function ($helper, $rowData, $rowIndex, $columnIndex) use ($renderer, $edit, $view, $field, $title, $urlFields) {
+                function ($helper, $rowData, $rowIndex, $columnIndex) use ($options) {
+                    extract($options);
+
+                    $edit = urldecode($edit);
+                    $view = urldecode($view);
+
                     $out = call_user_func(
                         $renderer->getContentRenderer()->getFieldAssignment($field),
                         $rowData,

@@ -194,7 +194,7 @@ class SelectModifier extends HelperAbstract implements SelectModifierInterface
         $filter    = new $className($field->getTable()->getTableName(), $field->getName());
 
         return function ($helper, $select, $conditionSetName, $queryVars) use ($filter) {
-            return $filter->apply($select, $conditionSetName,  $queryVars);
+            return $filter->apply($select, $conditionSetName, $queryVars);
         };
     }
 }

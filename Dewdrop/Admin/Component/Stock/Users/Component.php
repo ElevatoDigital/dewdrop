@@ -172,8 +172,7 @@ class Component extends ComponentAbstract implements CrudInterface
      */
     protected function addPasswordFields(Fields $fields)
     {
-        static
-            $passwordFieldName = 'password',
+        static $passwordFieldName = 'password',
             $confirmFieldName  = 'confirm_password',
             $minimumLength     = 6;
 

@@ -24,6 +24,7 @@ interface HelperInterface
      * Check to see if the supplied input matches this helper's name
      * (case-insensitive).
      *
+     * @param string $name
      * @return boolean
      */
     public function matchesName($name);

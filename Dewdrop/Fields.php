@@ -100,8 +100,20 @@ class Fields implements ArrayAccess, IteratorAggregate, Countable
      */
     private $fields = array();
 
+    /**
+     * The model instances associated with added DB fields.
+     *
+     * @var array
+     */
     private $modelInstances = array();
 
+    /**
+     * The models associated with added DB fields by name (typically the table
+     * name, but could be different if a custom name is provided when calling
+     * add()).
+     *
+     * @var array
+     */
     private $modelsByName = array();
 
     /**
@@ -126,6 +138,12 @@ class Fields implements ArrayAccess, IteratorAggregate, Countable
         }
     }
 
+    /**
+     * Iterate over this Fields set using a FieldsIterator.  You typically don't
+     * call this directly, you just do a foreach over the Fields object.
+     *
+     * @return FieldsIterator
+     */
     public function getIterator()
     {
         return new FieldsIterator($this->fields);
@@ -402,11 +420,28 @@ class Fields implements ArrayAccess, IteratorAggregate, Countable
         return $this->getFieldsPassingMethodCheck('isFilterable', $filters);
     }
 
+    /**
+     * Get all the model instances associated with added DB fields, indexed by
+     * name.
+     *
+     * @return array
+     */
     public function getModelsByName()
     {
         return $this->modelsByName;
     }
 
+    /**
+     * Handle the model (\Dewdrop\Db\Table) objects for the supplied newly added
+     * DB field.  We allow custom model names for situations where you need to
+     * add fields from two different instances of the same model (e.g. you have
+     * an two Addresses model instances on your fields set because you have both
+     * a billing and a shipping address).
+     *
+     * @param DbField $field
+     * @param string $modelName
+     * @throws Exception
+     */
     protected function handleModelsForDbField(DbField $field, $modelName)
     {
         $fieldTable = $field->getTable();

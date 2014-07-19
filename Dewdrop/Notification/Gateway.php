@@ -86,7 +86,9 @@ class Gateway extends Table
                     function ($helper, $view) {
                         return $view->inputText(
                             'recipients',
-                            $this->renderRecipients($view->getRequest()->getQuery('dewdrop_notification_subscription_id')),
+                            $this->renderRecipients(
+                                $view->getRequest()->getQuery('dewdrop_notification_subscription_id')
+                            ),
                             'form-control'
                         );
                     }

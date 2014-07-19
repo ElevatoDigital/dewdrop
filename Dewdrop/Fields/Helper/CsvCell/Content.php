@@ -224,6 +224,8 @@ class Content extends HelperAbstract
     }
 
     /**
+     * Render cell content for a boolean database field.
+     *
      * @param DbField $field
      * @param array $rowData
      * @return string

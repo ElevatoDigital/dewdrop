@@ -152,7 +152,7 @@ class Detector
                         return WP_Session::get_instance();
                     }
                 );
-            } else if ($pimple instanceof Application) {
+            } elseif ($pimple instanceof Application) {
                 $pimple->register(new SessionServiceProvider());
             } else {
                 throw new Exception('Silex application unavailable but not in WordPress');
