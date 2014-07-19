@@ -11,7 +11,7 @@ use stdClass;
 class FieldsTest extends PHPUnit_Framework_TestCase
 {
     /**
-     * @var Fields;
+     * @var Fields
      */
     private $fields;
 
@@ -78,11 +78,13 @@ class FieldsTest extends PHPUnit_Framework_TestCase
     {
         $first = $this->fields->getIterator()->current();
 
+        /* @var $field Field */
         foreach ($this->fields as $field) {
             $this->assertEquals($first->getId(), $field->getId());
 
-            foreach ($this->fields as $field) {
-                $this->assertEquals($first->getId(), $field->getId());
+            /* @var $fieldInner Field */
+            foreach ($this->fields as $fieldInner) {
+                $this->assertEquals($first->getId(), $fieldInner->getId());
                 break;
             }
 
@@ -99,6 +101,8 @@ class FieldsTest extends PHPUnit_Framework_TestCase
     {
         $field = new Field();
         $field->setId('array');
+
+        /* @var $this->fields Fields */
         $this->fields[] = $field;
         $this->assertTrue($this->fields->has('array'));
     }
@@ -171,6 +175,7 @@ class FieldsTest extends PHPUnit_Framework_TestCase
 
         $count = 0;
 
+        /* @var $field Field */
         foreach ($this->fields as $field) {
             if ('visible' === $field->getId()) {
                 $count += 1;
@@ -196,7 +201,7 @@ class FieldsTest extends PHPUnit_Framework_TestCase
     public function testCanSupplyASingleFilterToGetAll()
     {
         $filter = new CallbackFilter(
-            function ($field) {
+            function (Field $field) {
                 return 'visible' === $field->getId();
             }
         );
@@ -207,7 +212,7 @@ class FieldsTest extends PHPUnit_Framework_TestCase
     public function testCanSupplyMultipleFiltersToGetAll()
     {
         $firstFilter = new CallbackFilter(
-            function ($field) {
+            function (Field $field) {
                 return 'visible' !== $field->getId();
             }
         );
@@ -215,7 +220,7 @@ class FieldsTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(3, count($this->fields->getAll($firstFilter)));
 
         $secondFilter = new CallbackFilter(
-            function ($field) {
+            function (Field $field) {
                 return 'filterable' !== $field->getId();
             }
         );
@@ -225,6 +230,7 @@ class FieldsTest extends PHPUnit_Framework_TestCase
 
     public function testCanFilterWhenGettingVisibleFields()
     {
+        /* @var $field Field */
         foreach ($this->fields as $field) {
             $field->setVisible(true);
         }
@@ -232,7 +238,7 @@ class FieldsTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(4, count($this->fields->getVisibleFields()));
 
         $filter = new CallbackFilter(
-            function ($field) {
+            function (Field $field) {
                 return 'visible' === $field->getId();
             }
         );
@@ -242,6 +248,7 @@ class FieldsTest extends PHPUnit_Framework_TestCase
 
     public function testCanFilterWhenGettingSortableFields()
     {
+        /* @var $field Field */
         foreach ($this->fields as $field) {
             $field->setSortable(true);
         }
@@ -249,7 +256,7 @@ class FieldsTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(4, count($this->fields->getSortableFields()));
 
         $filter = new CallbackFilter(
-            function ($field) {
+            function (Field $field) {
                 return 'visible' === $field->getId();
             }
         );
@@ -259,6 +266,7 @@ class FieldsTest extends PHPUnit_Framework_TestCase
 
     public function testCanFilterWhenGettingEditableFields()
     {
+        /* @var $field Field */
         foreach ($this->fields as $field) {
             $field->setEditable(true);
         }
@@ -266,7 +274,7 @@ class FieldsTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(4, count($this->fields->getEditableFields()));
 
         $filter = new CallbackFilter(
-            function ($field) {
+            function (Field $field) {
                 return 'visible' === $field->getId();
             }
         );
@@ -283,7 +291,7 @@ class FieldsTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(4, count($this->fields->getFilterableFields()));
 
         $filter = new CallbackFilter(
-            function ($field) {
+            function (Field $field) {
                 return 'visible' === $field->getId();
             }
         );
@@ -370,5 +378,15 @@ class FieldsTest extends PHPUnit_Framework_TestCase
         $this->fields->setUser($user);
 
         $this->assertInstanceOf('Dewdrop\Fields\UserInterface', $this->fields->getUser());
+    }
+
+    public function testCanReferenceFieldIdsWhileIterating()
+    {
+        /* @var $field Field */
+        foreach ($this->fields as $id => $field) {
+            $this->assertEquals('visible', $id);
+            $this->assertEquals('visible', $field->getId());
+            break;
+        }
     }
 }
