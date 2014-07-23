@@ -20,7 +20,7 @@ use Dewdrop\Fields\Helper\HelperAbstract;
  * a custom callback for this helper, use the following callback
  * parameters:
  *
- * <code>
+ * <pre>
  * $csvCell->getContentRenderer()->assign(
  *     'my_model:my_field',
  *     function ($helper, array $rowData, $rowIndex, $columnIndex) {
@@ -32,7 +32,7 @@ use Dewdrop\Fields\Helper\HelperAbstract;
  *         return 'something';
  *     }
  * );
- * </code>
+ * </pre>
  */
 class Content extends HelperAbstract
 {

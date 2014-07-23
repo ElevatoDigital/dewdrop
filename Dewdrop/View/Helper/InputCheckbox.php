@@ -19,9 +19,9 @@ use Dewdrop\Exception;
  *
  * Example usage:
  *
- * <code>
+ * <pre>
  * echo $this->wpInputCheckbox($this->fields->get('animals:is_mammals'));
- * </code>
+ * </pre>
  */
 class InputCheckbox extends AbstractHelper
 {

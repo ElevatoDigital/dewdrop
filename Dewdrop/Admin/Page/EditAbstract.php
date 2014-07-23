@@ -50,7 +50,7 @@ use Zend\InputFilter\InputFilter;
  *
  * The following is a simple example of applying the described tasks:
  *
- * <code>
+ * <pre>
  *
  * namespace Admin\MyComponent;
  *
@@ -74,7 +74,7 @@ use Zend\InputFilter\InputFilter;
  *     // ... your render method
  * }
  *
- * </code>
+ * </pre>
  */
 abstract class EditAbstract extends PageAbstract
 {

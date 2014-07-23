@@ -29,12 +29,12 @@ use Dewdrop\Fields\RowEditor;
  * row's shipping_address_id and billing_address_id fields.  To pull
  * this off, you'd set up your RowEditor like this:
  *
- * <code>
+ * <pre>
  * $this->rowEditor
  *     ->linkByQueryString('orders', 'order_id')
  *     ->linkByField('shipping_address', $orderModel->field('shipping_address_id'))
  *     ->linkByField('billing_address', $orderModel->field('billing_address_id'));
- * </code>
+ * </pre>
  *
  * Note that because this linker requires the look-up field have its own row
  * association, it requires a \Dewdrop\Db\Field, not just a
@@ -104,9 +104,9 @@ class Field implements LinkInterface
      * the RowEditor) up to the linked field in this object.  For example, say
      * you'd configured a link like this in your RowEditor:
      *
-     * <code>
+     * <pre>
      * $rowEditor->linkByField('addresses', $this->orderModel->field('address_id'));
-     * </code>
+     * </pre>
      *
      * Then, when this method was called, you'd get a row from the addresses
      * table that had already been saved by the row editor.  And, using that row,

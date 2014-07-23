@@ -35,14 +35,14 @@ use Dewdrop\Fields\UserInterface;
  * Adding fields is possible in a few different ways.  You can add a DB field
  * directly from a \Dewdrop\Db\Table model:
  *
- * <code>
+ * <pre>
  * $fields->add($model->field('my_field'));
- * </code>
+ * </pre>
  *
  * You can add a custom field by passing an ID string to the add() method and
  * then customizing the field:
  *
- * <code>
+ * <pre>
  * $fields->add('my_custom_field_id')
  *     ->setLabel('Just a Custom Field')
  *     ->setVisible(true)
@@ -52,11 +52,11 @@ use Dewdrop\Fields\UserInterface;
  *             return 'Hello, world';
  *         }
  *     );
- * </code>
+ * </pre>
  *
  * Or, you can instantiate and add the field object directly:
  *
- * <code>
+ * <pre>
  * $field = new \Dewdrop\Fields\Field();
  *
  * $field
@@ -71,7 +71,7 @@ use Dewdrop\Fields\UserInterface;
  *     );
  *
  * $fields->add($field);
- * </code>
+ * </pre>
  *
  * Once added, you can get your fields back in a number of different ways:
  *
@@ -163,9 +163,9 @@ class Fields implements ArrayAccess, IteratorAggregate, Countable
      * Allow addition/replacement of Field objects on this collection via array
      * syntax:
      *
-     * <code>
+     * <pre>
      * $fields['id'] = $field;
-     * </code>
+     * </pre>
      *
      * This is part of the ArrayAccess interface built into PHP.
      *
@@ -194,9 +194,9 @@ class Fields implements ArrayAccess, IteratorAggregate, Countable
     /**
      * Get a field by its ID using ArrayAccess syntax.
      *
-     * <code>
+     * <pre>
      * echo $fields['id']->getLabel();
-     * </code>
+     * </pre>
      *
      * This method is part of the ArrayAccess interface built into PHP.
      *
@@ -212,9 +212,9 @@ class Fields implements ArrayAccess, IteratorAggregate, Countable
      * Test to see if the specified field ID exists in this Fields collection
      * using isset():
      *
-     * <code>
+     * <pre>
      * isset($fields['id']);
-     * </code>
+     * </pre>
      *
      * This method is part of the ArrayAccess interface built into PHP.
      *
@@ -229,9 +229,9 @@ class Fields implements ArrayAccess, IteratorAggregate, Countable
     /**
      * Allow removal of a field via ArrayAccess syntax:
      *
-     * <code>
+     * <pre>
      * unset($fields['id']);
-     * </code>
+     * </pre>
      *
      * @param string $offset
      * @return void

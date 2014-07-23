@@ -110,9 +110,9 @@ class Field extends FieldAbstract
      *
      * By default, this property with have the value of:
      *
-     * <code>
+     * <pre>
      * table_name:column_name
-     * </code>
+     * </pre>
      *
      * @var string
      */

@@ -1,10 +1,19 @@
 <?php
 
+/**
+ * Dewdrop
+ *
+ * @link      https://github.com/DeltaSystems/dewdrop
+ * @copyright Delta Systems (http://deltasys.com)
+ * @license   https://github.com/DeltaSystems/dewdrop/LICENSE
+ */
+
 namespace Dewdrop\Auth\Db;
 
 use Dewdrop\Db\Table;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
+use Symfony\Component\Security\Core\Role\Role;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 
@@ -46,14 +55,24 @@ class UsersTableGateway extends Table implements UserProviderInterface
         if (!$username) {
             throw new UsernameNotFoundException('Please provide a username.');
         } else {
-            $user = $this->fetchRow(
-                'SELECT * FROM users WHERE LOWER(username) = ?',
-                array(trim(strtolower($username)))
+            $rowData = $this->getAdapter()->fetchRow(
+                'SELECT
+                  u.*,
+                  sl.name AS role
+                FROM users u
+                JOIN security_levels sl USING (security_level_id)
+                WHERE LOWER(u.username) = ?',
+                [trim(strtolower($username))]
             );
 
-            if (!$user) {
+            if (null === $rowData) {
                 throw new UsernameNotFoundException('A user could not be found matching that username and password.');
             }
+
+            /* @var $user \Dewdrop\Auth\Db\UserRowGateway */
+            $user = $this->createRow($rowData);
+
+            $user->setRole(new Role($rowData['role']));
 
             return $user;
         }
@@ -84,6 +103,8 @@ class UsersTableGateway extends Table implements UserProviderInterface
     }
 
     /**
+     * Returns a select object for the admin listing
+     *
      * @return \Dewdrop\Db\Select
      */
     public function selectAdminListing()

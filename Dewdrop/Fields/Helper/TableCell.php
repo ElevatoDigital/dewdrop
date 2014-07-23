@@ -31,7 +31,7 @@ use Zend\Escaper\Escaper;
  *
  * Customizing the rendering of your cell's content in a view script:
  *
- * <code>
+ * <pre>
  * $renderer = $this->tableCellRenderer();
  *
  * $renderer->getContentRenderer()->assign(
@@ -40,12 +40,12 @@ use Zend\Escaper\Escaper;
  *         return $helper->getEscaper()->escapeHtml($rowData['my_field']);
  *     }
  * );
- * </code>
+ * </pre>
  *
  * Customizing the rendering of a header in your model (typically in the init()
  * method of a \Dewdrop\Db\Table sub-class):
  *
- * <code>
+ * <pre>
  * $this->customizeField(
  *     'my_field',
  *     function ($field) {
@@ -57,7 +57,7 @@ use Zend\Escaper\Escaper;
  *         );
  *     }
  * );
- * </code>
+ * </pre>
  */
 class TableCell
 {

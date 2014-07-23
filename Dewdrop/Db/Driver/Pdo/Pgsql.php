@@ -263,14 +263,14 @@ class Pgsql implements DriverInterface
      *
      * The array has the following format:
      *
-     * <code>
+     * <pre>
      * array(
      *     'column_name' => array(
      *         'table'  => 'foreign_table',
      *         'column' => 'foreign_column'
      *     )
      * )
-     * </code>
+     * </pre>
      *
      * @param string $tableName
      * @return array
@@ -314,13 +314,13 @@ class Pgsql implements DriverInterface
      *
      * The array has the following format:
      *
-     * <code>
+     * <pre>
      * array(
      *     'key_name' => array(
      *         sequence_in_index => 'column_name'
      *     )
      * )
-     * </code>
+     * </pre>
      *
      * @param string $tableName
      * @return array

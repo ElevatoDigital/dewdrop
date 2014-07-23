@@ -28,14 +28,14 @@ use Dewdrop\Request;
  * When defining a custom callback for this helper, use the following
  * callback parameters:
  *
- * <code>
+ * <pre>
  * $myField->assignHelperCallback(
  *     'SelectSort',
  *     function ($helper, Select $select, $direction) {
  *         return $select->order("a.my_field {$direction}");
  *     }
  * );
- * </code>
+ * </pre>
  *
  * Note that $direction is guaranteed by the helper to be "ASC" or "DESC", so
  * you don't need to check that yourself.  Your callback does have to return

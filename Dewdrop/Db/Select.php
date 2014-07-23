@@ -257,13 +257,13 @@ class Select
      * The first parameter has to be an array of \Dewdrop\Db\Select or
      * sql query strings.
      *
-     * <code>
+     * <pre>
      * $sql1 = $db->select();
      * $sql2 = "SELECT ...";
      * $select = $db->select()
      *      ->union(array($sql1, $sql2))
      *      ->order("id");
-     * </code>
+     * </pre>
      *
      * @param  array $select Array of select clauses for the union.
      * @param  string $type
@@ -435,7 +435,7 @@ class Select
      * and replaced into the condition wherever a question-mark
      * appears. Array values are quoted and comma-separated.
      *
-     * <code>
+     * <pre>
      * // simplest but non-secure
      * $select->where("id = $id");
      *
@@ -444,16 +444,16 @@ class Select
      *
      * // alternatively, with named binding
      * $select->where('id = :id');
-     * </code>
+     * </pre>
      *
      * Note that it is more correct to use named bindings in your
      * queries for values other than strings. When you use named
      * bindings, don't forget to pass the values when actually
      * making a query:
      *
-     *e<code>
+     * <pre>
      * $db->fetchAll($select, array('id' => 5));
-     * </code>
+     * </pre>
      *
      * @param string   $cond  The WHERE condition.
      * @param mixed    $value OPTIONAL The value to quote into the condition.
@@ -871,12 +871,12 @@ class Select
      * then completes the ON condition by using the same field for the FROM
      * table and the JOIN table.
      *
-     * <code>
+     * <pre>
      * $select = $db->select()->from('table1')
      *                        ->joinUsing('table2', 'column1');
      *
      * // SELECT * FROM table1 JOIN table2 ON table1.column1 = table2.column2
-     * </code>
+     * </pre>
      *
      * These joins are called by the developer simply by adding 'Using' to the
      * method name. E.g.

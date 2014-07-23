@@ -25,7 +25,7 @@ use Dewdrop\View\View as BaseView;
  *
  * A typical view script would look like this:
  *
- * <code>
+ * <pre>
  * echo $this->document()->open('My message title');
  * echo $this->content()->open();
  *
@@ -39,7 +39,7 @@ use Dewdrop\View\View as BaseView;
  * // Unsubscribe or other footer content here
  *
  * echo $this->document()->close();
- * </code>
+ * </pre>
  */
 class View extends BaseView
 {

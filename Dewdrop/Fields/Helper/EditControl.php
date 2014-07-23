@@ -23,14 +23,14 @@ use Dewdrop\View\View;
  * You can customize the rendering of a control for a field by writing a custom
  * callback like this:
  *
- * <code>
+ * <pre>
  * $helper->getControlRenderer()->assign(
  *     $field,
  *     function ($helper, $view, $fieldPosition) use ($field) {
  *         return $view->inputText($field);
  *     }
  * );
- * </code>
+ * </pre>
  */
 class EditControl
 {

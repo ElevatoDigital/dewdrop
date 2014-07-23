@@ -194,11 +194,11 @@ abstract class PageAbstract
      * class name to all lower case with the words separated by hyphens.
      * For example, the following class name:
      *
-     * <code>Admin\MyComponent\Index</code>
+     * <pre>Admin\MyComponent\Index</pre>
      *
      * Would become:
      *
-     * <code>index.phtml</code>
+     * <pre>index.phtml</pre>
      *
      * @return string
      */
