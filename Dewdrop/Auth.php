@@ -56,6 +56,12 @@ use Symfony\Component\Security\Core\Encoder\BCryptPasswordEncoder;
  * Of course additional tables and columns are permissible, but those above are required. You can extend the user table
  * and user row classes, \Dewdrop\Auth\Db\UsersTableGateway and \Dewdrop\Auth\Db\UserRowGateway if necessary.
  *
+ * You can easily generate a password hash for development and testing purposes using a Dewdrop CLI command:
+ *
+ * <pre>
+ * $ ./vendor/bin/dewdrop auth-hash-password --plaintext <password>
+ * </pre>
+ *
  * Next, the component needs to be initialized early in the application lifecycle. Notice how in the following example
  * the Dewdrop user management component is also registered with the admin component:
  *
