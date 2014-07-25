@@ -19,25 +19,25 @@ use Dewdrop\Exception;
  *
  * You can set values on the row using the set() method like this:
  *
- * <code>
+ * <pre>
  * $row->set('column_name', $value);
- * </code>
+ * </pre>
  *
  * Or, you can set multiple values at once like this:
  *
- * <code>
+ * <pre>
  * $row->set(
  *     array(
  *         'column_name'   => $value,
  *         'second_column' => $anotherValue
  *     )
  * );
- * </code>
+ * </pre>
  *
  * Setting and retrieving values can also be done via direct object or array-style
  * use of the object:
  *
- * <code>
+ * <pre>
  * // Access a column's value with object syntax
  * echo $row->column_name;
  *
@@ -49,7 +49,7 @@ use Dewdrop\Exception;
  *
  * // Set a column's value with array syntax
  * $row['column_name'] = 'Value';
- * </code>
+ * </pre>
  *
  * Once the columns have been assigned the desired values, you can call save(),
  * which will either update or insert the row depending upon whether it already
@@ -61,9 +61,9 @@ use Dewdrop\Exception;
  * Additionally, you can retrieve field objects representing columns in this
  * row by calling its field() method:
  *
- * <code>
+ * <pre>
  * $row->field('column_name');
- * </code>
+ * </pre>
  *
  * The field object allows you to easily integrate with other Dewdrop
  * APIs, leveraging the database metadata to add validators, retrieve lists
@@ -194,9 +194,9 @@ class Row implements ArrayAccess
      * Allow setting of data properties on this row via direct object property
      * syntax:
      *
-     * <code>
+     * <pre>
      * $row->property_id = $value;
-     * </code>
+     * </pre>
      *
      * @param string $key
      * @param mixed $value
@@ -210,9 +210,9 @@ class Row implements ArrayAccess
     /**
      * Allow setting of data properties on this row via direct array syntax:
      *
-     * <code>
+     * <pre>
      * $row['property_id'] = $value;
-     * </code>
+     * </pre>
      *
      * This is part of the ArrayAccess interface built into PHP.
      *
@@ -234,7 +234,8 @@ class Row implements ArrayAccess
      *
      * @param string|array $column
      * @param mixed $value
-     * @return \Dewdrop\Db\Row
+     * @return Row
+     * @throws Exception
      */
     public function set($column, $value = null)
     {
@@ -262,9 +263,9 @@ class Row implements ArrayAccess
     /**
      * Allow retrieval of data values via direct object property access:
      *
-     * <code>
+     * <pre>
      * echo $row->property_id;
-     * </code>
+     * </pre>
      *
      * @param string $key
      * @return mixed
@@ -277,9 +278,9 @@ class Row implements ArrayAccess
     /**
      * Allow retrieval of data values via direct array access:
      *
-     * <code>
+     * <pre>
      * echo $row['property_id'];
-     * </code>
+     * </pre>
      *
      * This method is part of the ArrayAccess interface built into PHP.
      *
@@ -296,6 +297,7 @@ class Row implements ArrayAccess
      *
      * @param string $name
      * @return mixed
+     * @throws Exception
      */
     public function get($name)
     {
@@ -328,9 +330,9 @@ class Row implements ArrayAccess
     /**
      * Test to see if a given column exists on this row using object syntax:
      *
-     * <code>
+     * <pre>
      * isset($row->column_name);
-     * </code>
+     * </pre>
      *
      * @param string $key
      * @return boolean
@@ -343,9 +345,9 @@ class Row implements ArrayAccess
     /**
      * Test to see if a given column exists on this row using array syntax:
      *
-     * <code>
+     * <pre>
      * isset($row['column_name']);
-     * </code>
+     * </pre>
      *
      * This method is part of the ArrayAccess interface built into PHP.
      *

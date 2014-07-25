@@ -26,14 +26,14 @@ use Dewdrop\Fields\FieldInterface;
  * per-instance basis.  Here's an example of defining a custom callback
  * globally for a field:
  *
- * <code>
+ * <pre>
  * $field->assignHelperCallback(
  *     'NameOfHelperToCustomize',
  *     function ($helper) {
  *         // Any custom logic you'd like to perform for this field.
  *     }
  * );
- * </code>
+ * </pre>
  *
  * In the above example, "NameOfHelperToCustomize" is the name of the helper
  * as defined in the helper's $name class property.  This string is case
@@ -42,26 +42,26 @@ use Dewdrop\Fields\FieldInterface;
  * To defined a custom callback on a per-instance basis for a helper, you
  * can do the following:
  *
- * <code>
+ * <pre>
  * $helper->assign(
  *     'my_model:field_id',
  *     function ($helper) {
  *         // Any custom logic you'd like to perform for this field.
  *     }
  * );
- * </code>
+ * </pre>
  *
  * If you'd like to decorate an existing callback with additional logic,
  * that's possible using the getFieldAssignment() method:
  *
- * <code>
+ * <pre>
  * $field->assignHelperCallback(
  *     'NameOfHelperToCustomize',
  *     function ($helper) {
  *         return '<strong>' . call_user_func($helper->getFieldAssignment($field), $helper) . '</strong>';
  *     }
  * );
- * </code>
+ * </pre>
  *
  * When a per-instance callback is assigned, that overrides any global or
  * fallback callbacks.  So, you can have an application-wide default (e.g.

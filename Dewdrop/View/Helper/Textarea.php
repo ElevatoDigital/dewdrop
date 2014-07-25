@@ -19,9 +19,9 @@ use \Dewdrop\Exception;
  *
  * Example usage:
  *
- * <code>
+ * <pre>
  * echo $this->textarea($this->fields->get('animals:long_description'));
- * </code>
+ * </pre>
  */
 class Textarea extends AbstractHelper
 {

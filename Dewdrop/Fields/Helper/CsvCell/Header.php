@@ -19,7 +19,7 @@ use Dewdrop\Fields\Helper\HelperAbstract;
  * a custom callback for this helper, using the following callback
  * parameters:
  *
- * <code>
+ * <pre>
  * $csvCell->getHeaderRenderer()->assign(
  *     'my_model:my_field',
  *     function ($helper, $field) {
@@ -29,7 +29,7 @@ use Dewdrop\Fields\Helper\HelperAbstract;
  *         return 'something';
  *     }
  * );
- * </code>
+ * </pre>
  *
  * NOTE: You do not have to supply a callback for this helper for any fields.
  * By default, this helper will just use the field's label for the header

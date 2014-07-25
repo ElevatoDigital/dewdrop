@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * Dewdrop
+ *
+ * @link      https://github.com/DeltaSystems/dewdrop
+ * @copyright Delta Systems (http://deltasys.com)
+ * @license   https://github.com/DeltaSystems/dewdrop/LICENSE
+ */
+
 namespace Dewdrop\Auth\Page;
 
 use Dewdrop\Auth;
@@ -7,16 +15,39 @@ use Dewdrop\View\View;
 use Silex\Application;
 use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * Abstract page class
+ */
 abstract class PageAbstract
 {
-    protected $auth;
-
+    /**
+     * @var Application
+     */
     protected $app;
 
+    /**
+     * @var Auth
+     */
+    protected $auth;
+
+    /**
+     * @var Request
+     */
     protected $request;
 
+    /**
+     * @var View
+     */
     protected $view;
 
+    /**
+     * Constructor
+     *
+     * @param Auth $auth
+     * @param Application $app
+     * @param Request $request
+     * @param View $view
+     */
     public function __construct(Auth $auth, Application $app, Request $request, View $view = null)
     {
         $this->auth    = $auth;
@@ -30,11 +61,21 @@ abstract class PageAbstract
         $this->init();
     }
 
+    /**
+     * Initializations
+     *
+     * @return void
+     */
     public function init()
     {
-
     }
 
+    /**
+     * Renders the given content within the layout
+     *
+     * @param string $content
+     * @return string
+     */
     public function renderLayout($content)
     {
         $layout = new View();
@@ -52,5 +93,10 @@ abstract class PageAbstract
         return $layout->render($this->auth->getLayoutScript());
     }
 
+    /**
+     * Provides a string response to the request
+     *
+     * @return string
+     */
     abstract public function respond();
 }

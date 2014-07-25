@@ -74,7 +74,7 @@ class Groups implements FilterInterface
      * sorting preferences for a component.  The resulting array will be in the
      * following format:
      *
-     * <code>
+     * <pre>
      * array(
      *     'title'    => 'Group Title',
      *     'caption' => 'Group caption explaining what it is.  Usually only on unsorted group.',
@@ -89,7 +89,7 @@ class Groups implements FilterInterface
      *         )
      *     )
      * )
-     * </code>
+     * </pre>
      *
      * @see \Dewdrop\Admin\Page\Stock\SortFields
      * @return array
@@ -150,7 +150,7 @@ class Groups implements FilterInterface
      * Load the current preferences for this component from the database.  The
      * information will be returned in this format:
      *
-     * <code>
+     * <pre>
      * array(
      *     array(
      *         'field_id'    => 'products:name',
@@ -158,7 +158,7 @@ class Groups implements FilterInterface
      *         'group_id'    => 2
      *     )
      * )
-     * </code>
+     * </pre>
      *
      * The fields and groups will be sorted when returned from this method, so
      * can iterate over it without having to first sort it.
@@ -190,7 +190,7 @@ class Groups implements FilterInterface
      * Save the supplied configuration to the database.  We expect the info
      * to be provided in this format:
      *
-     * <code>
+     * <pre>
      * array(
      *     array(
      *         'title' => 'My Group Title',
@@ -200,7 +200,7 @@ class Groups implements FilterInterface
      *         )
      *     )
      * )
-     * </code>
+     * </pre>
      *
      * @param array $groupConfig
      * @return Groups

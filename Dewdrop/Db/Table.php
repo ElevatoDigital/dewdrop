@@ -472,9 +472,9 @@ abstract class Table
      *
      * For example, to get metadata only for the "name" column, you would call:
      *
-     * <code>
+     * <pre>
      * $this->getMetadata('columns', 'name');
-     * </code>
+     * </pre>
      *
      * @param string $section
      * @param string $index

@@ -19,7 +19,7 @@ use Zend\Escaper\Escaper;
  * be added to the &lt;td&gt; of your table cell.  When defining a custom
  * callback for this helper, using the following callback parameters:
  *
- * <code>
+ * <pre>
  * $tableCell->getContentRenderer()->assign(
  *     'my_model:my_field',
  *     function ($helper, array $rowData, $rowIndex, $columnIndex) {
@@ -31,7 +31,7 @@ use Zend\Escaper\Escaper;
  *         return '<strong>' . $helper->getEscaper()->escapeHtml($row['my_field']) . '</strong>;
  *     }
  * );
- * </code>
+ * </pre>
  */
 class TdClassNames extends HelperAbstract
 {

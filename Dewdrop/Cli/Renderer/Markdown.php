@@ -40,10 +40,10 @@ class Markdown implements RendererInterface
      * Display the primary title for the output using the "=" Markdown
      * syntax:
      *
-     * <code>
+     * <pre>
      * Title
      * =====
-     * </code>
+     * </pre>
      *
      * @param string $title
      * @returns RendererInterface
@@ -63,10 +63,10 @@ class Markdown implements RendererInterface
      * Display a subhead, or 2nd-level header using the "hyphen" Markdown
      * syntax:
      *
-     * <code>
+     * <pre>
      * Subhead
      * -------
-     * </code>
+     * </pre>
      *
      * @param string $subhead
      * @returns RendererInterface

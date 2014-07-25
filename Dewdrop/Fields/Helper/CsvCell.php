@@ -26,7 +26,7 @@ use Dewdrop\Fields\Helper\CsvCell\Header;
  *
  * Customizing the rendering of your cell's content in a view script:
  *
- * <code>
+ * <pre>
  * $renderer = $this->csvCellRenderer();
  *
  * $renderer->getContentRenderer()->assign(
@@ -35,12 +35,12 @@ use Dewdrop\Fields\Helper\CsvCell\Header;
  *         return $helper->getEscaper()->escapeHtml($rowData['my_field']);
  *     }
  * );
- * </code>
+ * </pre>
  *
  * Customizing the rendering of a header in your model (typically in the init()
  * method of a \Dewdrop\Db\Table sub-class):
  *
- * <code>
+ * <pre>
  * $this->customizeField(
  *     'my_field',
  *     function ($field) {
@@ -52,7 +52,7 @@ use Dewdrop\Fields\Helper\CsvCell\Header;
  *         );
  *     }
  * );
- * </code>
+ * </pre>
  */
 class CsvCell
 {

@@ -551,12 +551,12 @@ class Adapter
      * The placeholder is a question-mark; all placeholders will be replaced
      * with the quoted value.   For example:
      *
-     * <code>
+     * <pre>
      * $text = "WHERE date < ?";
      * $date = "2005-01-02";
      * $safe = $sql->quoteInto($text, $date);
      * // $safe = "WHERE date < '2005-01-02'"
-     * </code>
+     * </pre>
      *
      * @param string  $text  The text with a placeholder.
      * @param mixed   $value The value to quote.
@@ -717,14 +717,14 @@ class Adapter
      *
      * The array has the following format:
      *
-     * <code>
+     * <pre>
      * array(
      *     'column_name' => array(
      *         'table'  => 'foreign_table',
      *         'column' => 'foreign_column'
      *     )
      * )
-     * </code>
+     * </pre>
      *
      * @param string $tableName
      * @return array
@@ -739,13 +739,13 @@ class Adapter
      *
      * The array has the following format:
      *
-     * <code>
+     * <pre>
      * array(
      *     'key_name' => array(
      *         sequence_in_index => 'column_name'
      *     )
      * )
-     * </code>
+     * </pre>
      *
      * @param string $tableName
      * @return array

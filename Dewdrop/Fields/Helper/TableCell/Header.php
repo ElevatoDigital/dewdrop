@@ -20,7 +20,7 @@ use Zend\Escaper\Escaper;
  * a custom callback for this helper, using the following callback
  * parameters:
  *
- * <code>
+ * <pre>
  * $tableCell->getHeaderRenderer()->assign(
  *     'my_model:my_field',
  *     function ($helper, $field) {
@@ -30,7 +30,7 @@ use Zend\Escaper\Escaper;
  *         return $helper->getEscaper()->escapeHtml($field->getLabel());
  *     }
  * );
- * </code>
+ * </pre>
  *
  * NOTE: You do not have to supply a callback for this helper for any fields.
  * By default, this helper will just use the field's label for the header
