@@ -21,21 +21,29 @@ use Symfony\Component\HttpFoundation\Request;
 abstract class PageAbstract
 {
     /**
+     * Silex application
+     *
      * @var Application
      */
     protected $app;
 
     /**
+     * Auth component
+     *
      * @var Auth
      */
     protected $auth;
 
     /**
+     * Request object
+     *
      * @var Request
      */
     protected $request;
 
     /**
+     * View object
+     *
      * @var View
      */
     protected $view;

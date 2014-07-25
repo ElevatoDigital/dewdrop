@@ -23,6 +23,8 @@ use Symfony\Component\Security\Core\User\UserInterface as SfSecurityUserInterfac
 class UserRowGateway extends Row implements AuthUserInterface, FieldsUserInterface, SfSecurityUserInterface
 {
     /**
+     * Role
+     *
      * @var Role
      */
     protected $role;
