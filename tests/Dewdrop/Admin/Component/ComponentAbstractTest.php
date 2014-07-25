@@ -2,22 +2,23 @@
 
 namespace Dewdrop\Admin\Component;
 
-use Dewdrop\Admin\Response;
 use Dewdrop\Db\Adapter;
-use Dewdrop\Paths;
 use Dewdrop\Pimple;
 use Dewdrop\Request;
 use Dewdrop\Test\BaseTestCase;
 
 class ComponentAbstractTest extends BaseTestCase
 {
-    private $db;
-
     private $paths;
 
     private $request;
 
     private $isWp;
+
+    /**
+     * @var \Dewdrop\Admin\Component\ComponentAbstract
+     */
+    private $component;
 
     public function setUp()
     {
@@ -38,7 +39,7 @@ class ComponentAbstractTest extends BaseTestCase
     public function testComponentWithEmptyInitThrowsException()
     {
         require_once __DIR__ . '/../test-components/insufficient-init-method/Component.php';
-        $component = new \DewdropTest\Admin\InsufficientInitMethod\Component(Pimple::getInstance());
+        new \DewdropTest\Admin\InsufficientInitMethod\Component(Pimple::getInstance());
     }
 
     public function testGetDbReturnsAdapter()
@@ -105,5 +106,12 @@ class ComponentAbstractTest extends BaseTestCase
             'page=Animals/Test',
             $this->component->url('Test', array('id' => 3))
         );
+    }
+
+    public function testCanConfigureTheComponentToNotRenderTheAdminLayout()
+    {
+        $this->assertTrue($this->component->shouldRenderLayout());
+        $this->component->setShouldRenderLayout(false);
+        $this->assertFalse($this->component->shouldRenderLayout());
     }
 }

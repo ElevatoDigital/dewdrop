@@ -178,6 +178,7 @@ abstract class ComponentAbstract
     {
         $page = null;
 
+        /* @var $factory PageFactoryInterface */
         foreach ($this->getPageFactories() as $factory) {
             $page = $factory->createPage($name);
 
@@ -349,7 +350,7 @@ abstract class ComponentAbstract
      *
      * @param mixed $page
      * @param Response $response
-     * @return void
+     * @return mixed
      */
     public function dispatchPage($page = null, Response $response = null)
     {

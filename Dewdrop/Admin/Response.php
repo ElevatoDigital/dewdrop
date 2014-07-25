@@ -102,7 +102,7 @@ class Response
      * Set whether the page's process method was called.
      *
      * @param boolean $wasProcessed
-     * @return \Dewdrop\Admin\Response\ResponseInterface
+     * @return $this
      */
     public function setWasProcessed($wasProcessed)
     {
