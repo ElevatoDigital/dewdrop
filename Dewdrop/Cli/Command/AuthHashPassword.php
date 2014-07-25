@@ -12,10 +12,23 @@ namespace Dewdrop\Cli\Command;
 
 use Dewdrop\Exception;
 
+/**
+ * Generates a password hash for authentication
+ */
 class AuthHashPassword extends CommandAbstract
 {
+    /**
+     * Plain text password
+     *
+     * @var string
+     */
     private $plaintext;
 
+    /**
+     * Initializations
+     *
+     * @return void
+     */
     public function init()
     {
         $this
@@ -29,6 +42,12 @@ class AuthHashPassword extends CommandAbstract
         );
     }
 
+    /**
+     * Set plain text password
+     *
+     * @param string $plaintext
+     * @return AuthHashPassword
+     */
     public function setPlaintext($plaintext)
     {
         $this->plaintext = $plaintext;
@@ -36,6 +55,12 @@ class AuthHashPassword extends CommandAbstract
         return $this;
     }
 
+    /**
+     * Generate and echo password hash
+     *
+     * @return void
+     * @throws Exception
+     */
     public function execute()
     {
         $pimple = $this->runner->getPimple();
