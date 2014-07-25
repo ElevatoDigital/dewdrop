@@ -96,6 +96,8 @@ abstract class PageAbstract
     /**
      * Create any resources that need to be accessible both for processing
      * and rendering.
+     *
+     * @return void
      */
     public function init()
     {
@@ -130,6 +132,8 @@ abstract class PageAbstract
 
     /**
      * Assign variables to your page's view and render the output.
+     *
+     * @return void
      */
     public function render()
     {

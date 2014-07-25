@@ -1,10 +1,17 @@
 <?php
 
+/**
+ * Dewdrop
+ *
+ * @link      https://github.com/DeltaSystems/dewdrop
+ * @copyright Delta Systems (http://deltasys.com)
+ * @license   https://github.com/DeltaSystems/dewdrop/LICENSE
+ */
+
 namespace Dewdrop\Admin\Component\Stock\Users;
 
 use Dewdrop\Admin\Component\ComponentAbstract;
 use Dewdrop\Admin\Component\CrudInterface;
-use Dewdrop\Admin\PageFactory\Crud as CrudFactory;
 use Dewdrop\Fields;
 use Dewdrop\Fields\Filter\Groups as GroupsFilter;
 use Dewdrop\Fields\Filter\Visibility as VisibilityFilter;
@@ -12,46 +19,90 @@ use Dewdrop\Fields\Listing;
 use Dewdrop\Fields\RowEditor;
 use Dewdrop\Pimple;
 use Dewdrop\View\View;
-use Model\Users;
 use Zend\InputFilter\Input;
 use Zend\Validator\Callback;
 use Zend\Validator\StringLength;
 
+/**
+ * Admin user management component.
+ *
+ * This component provides user management facilities within the Dewdrop admin environment for Silex.
+ *
+ * Following is an example of how to register the component within your application's index.php facade script:
+ *
+ * <pre>
+ * $zend = realpath(__DIR__ . '/../zend');
+ *
+ * if (file_exists($zend)) {
+ *     define('PROJECT_ROOT', $zend);
+ * } else {
+ *     define('PROJECT_ROOT', realpath(__DIR__ . '/../'));
+ * }
+ *
+ * require_once PROJECT_ROOT . '/vendor/autoload.php';
+ *
+ * $silex = \Dewdrop\Pimple::getInstance();
+ *
+ * $silex['auth']->init();
+ *
+ * $silex['admin']->registerComponentsInPath();
+ *
+ * $silex['admin']->registerComponent(new \Dewdrop\Admin\Component\Stock\Users\Component());
+ *
+ * $silex->run();
+ * </pre>
+ *
+ * If you wish to extend this class, you can write your own \Admin\Users\Component class in /admin/users/Component.php,
+ * and because the Dewdrop admin environment already scans the /admin directory for components, you do not need to
+ * register your custom component in your application's index.php facade script as shown in the above example.
+ */
 class Component extends ComponentAbstract implements CrudInterface
 {
     /**
+     * Field groups filter
+     *
      * @var GroupsFilter
      */
     protected $fieldGroupsFilter;
 
     /**
+     * Fields collection
+     *
      * @var Fields
      */
     protected $fields;
 
     /**
+     * Fields listing
+     *
      * @var Listing
      */
     protected $listing;
 
     /**
+     * Row editor
+     *
      * @var RowEditor
      */
     protected $rowEditor;
 
     /**
+     * Fields visibility filter
+     *
      * @var VisibilityFilter
      */
     protected $visibilityFilter;
 
     /**
+     * Initializations
+     *
      * @return void
      */
     public function init()
     {
         $this->setTitle('Users');
 
-        $this->addPageFactory(new CrudFactory($this));
+        $this->addPageFactory(new PageFactory($this));
 
         $this->getPermissions()
             ->register('change-password', 'Allow users to change their own password')
@@ -59,6 +110,11 @@ class Component extends ComponentAbstract implements CrudInterface
     }
 
     /**
+     * Get the primary model that is used by this component.  This model will
+     * be used to provide page and button titles.  By default, its primary key
+     * will also be used to filter the listing when needed (e.g. when viewing
+     * a single item rather than the full listing).
+     *
      * @return \Dewdrop\Auth\Db\UsersTableGateway
      */
     public function getPrimaryModel()
@@ -67,6 +123,9 @@ class Component extends ComponentAbstract implements CrudInterface
     }
 
     /**
+     * Get the \Dewdrop\Fields\RowEditor object that will assist with the
+     * editing of items in this component.
+     *
      * @return RowEditor
      */
     public function getRowEditor()
@@ -86,6 +145,10 @@ class Component extends ComponentAbstract implements CrudInterface
     }
 
     /**
+     * Get a \Dewdrop\Fields\Listing object that allows the component to
+     * retrieve records for viewing.  The Listing handles applying user sorts
+     * and filters.
+     *
      * @return Listing
      */
     public function getListing()
@@ -101,6 +164,10 @@ class Component extends ComponentAbstract implements CrudInterface
     }
 
     /**
+     * Get the \Dewdrop\Fields object that defines what fields are available to
+     * this component, what capabilities that each have, and how they should
+     * interact with various \Dewdrop\Fields\Helper objects.
+     *
      * @return Fields
      */
     public function getFields()
@@ -125,7 +192,8 @@ class Component extends ComponentAbstract implements CrudInterface
                                 $escaper->escapeHtml($rowData['email_address'])
                             );
                         }
-                    );
+                    )
+                ->add($model->field('security_level_id'));
         }
 
         return $this->fields;
@@ -158,16 +226,29 @@ class Component extends ComponentAbstract implements CrudInterface
     public function getVisibilityFilter()
     {
         if (!$this->visibilityFilter) {
-            $this->visibilityFilter = new VisibilityFilter(
-                $this->getFullyQualifiedName(),
-                $this->getDb()
-            );
+            $this->visibilityFilter = new VisibilityFilter($this->getFullyQualifiedName(), $this->getDb());
+            $this->visibilityFilter->setDefaultFields($this->getFields()->getVisibleFields());
         }
 
         return $this->visibilityFilter;
     }
 
     /**
+     * Set visibility filter
+     *
+     * @param VisibilityFilter $visibilityFilter
+     * @return Component
+     */
+    public function setVisibilityFilter(VisibilityFilter $visibilityFilter)
+    {
+        $this->visibilityFilter = $visibilityFilter;
+
+        return $this;
+    }
+
+    /**
+     * Add password and confirmation fields to the given fields collection
+     *
      * @param Fields $fields
      * @return Component
      */
@@ -182,13 +263,12 @@ class Component extends ComponentAbstract implements CrudInterface
         $fields->add($passwordFieldName)
             ->assignHelperCallback(
                 'EditControl.Control',
-                function ($helper, View $view) use ($request) {
+                function ($helper, View $view) use ($passwordFieldName, $request) {
                     return $view->inputText(
                         [
-                            'name'      => 'password',
-                            'type'      => 'password',
-                            'value'     => $request->getPost('password'),
-                            'autofocus' => 'autofocus',
+                            'name'  => $passwordFieldName,
+                            'type'  => 'password',
+                            'value' => $request->getPost($passwordFieldName),
                         ]
                     );
                 }
@@ -200,7 +280,7 @@ class Component extends ComponentAbstract implements CrudInterface
                     $input
                         ->setRequired(true)
                         ->getValidatorChain()
-                        ->addValidator(new StringLength(['min' => $minimumLength]));
+                        ->attach(new StringLength(['min' => $minimumLength]));
                     return $input;
                 }
             )
@@ -210,12 +290,12 @@ class Component extends ComponentAbstract implements CrudInterface
         $this->fields->add('confirm_password')
             ->assignHelperCallback(
                 'EditControl.Control',
-                function ($helper, View $view) use ($request) {
+                function ($helper, View $view) use ($confirmFieldName, $request) {
                     return $view->inputText(
                         [
-                            'name'  => 'confirm_password',
+                            'name'  => $confirmFieldName,
                             'type'  => 'password',
-                            'value' => $request->getPost('confirm_password'),
+                            'value' => $request->getPost($confirmFieldName),
                         ]
                     );
                 }
@@ -233,7 +313,7 @@ class Component extends ComponentAbstract implements CrudInterface
                     $input
                         ->setRequired(true)
                         ->getValidatorChain()
-                        ->addValidator($passwordsMatchValidator);
+                        ->attach($passwordsMatchValidator);
                     return $input;
                 }
             )

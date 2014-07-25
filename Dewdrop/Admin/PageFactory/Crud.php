@@ -13,9 +13,20 @@ namespace Dewdrop\Admin\PageFactory;
 use Dewdrop\Admin\Component\CrudInterface;
 use ReflectionClass;
 
+/**
+ * Page factory for CRUD-capable components
+ */
 class Crud implements PageFactoryInterface
 {
-    private $pageClassMap = array(
+    /**
+     * @var \Dewdrop\Admin\Component\CrudInterface
+     */
+    protected $component;
+
+    /**
+     * @var array
+     */
+    protected $pageClassMap = [
         'adjust-visibility'  => '\Dewdrop\Admin\Page\Stock\AdjustVisibility',
         'debug-fields'       => '\Dewdrop\Admin\Page\Stock\DebugFields',
         'debug-listing-sql'  => '\Dewdrop\Admin\Page\Stock\DebugListingSql',
@@ -28,15 +39,24 @@ class Crud implements PageFactoryInterface
         'sort-fields'        => '\Dewdrop\Admin\Page\Stock\SortFields',
         'sort-listing'       => '\Dewdrop\Admin\Page\Stock\SortListing',
         'view'               => '\Dewdrop\Admin\Page\Stock\View'
-    );
+    ];
 
-    private $component;
-
+    /**
+     * Constructor
+     *
+     * @param CrudInterface $component
+     */
     public function __construct(CrudInterface $component)
     {
         $this->component = $component;
     }
 
+    /**
+     * Returns a page instance for the given name or false on failure
+     *
+     * @param string $name
+     * @return \Dewdrop\Admin\Page\PageAbstract|false
+     */
     public function createPage($name)
     {
         // Remain compatible with WP style naming
@@ -56,6 +76,11 @@ class Crud implements PageFactoryInterface
         return false;
     }
 
+    /**
+     * Return an array having page names as keys and class names as values
+     *
+     * @return array
+     */
     public function listAvailablePages()
     {
         return $this->pageClassMap;

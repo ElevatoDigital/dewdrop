@@ -6,11 +6,30 @@ use Dewdrop\Admin\Page\PageAbstract;
 
 class Edit extends PageAbstract
 {
-    private $rowEditor;
+    /**
+     * @var \Dewdrop\Admin\Component\Stock\Users\Component
+     */
+    protected $component;
 
-    private $isNew;
+    /**
+     * @var \Dewdrop\Fields\RowEditor
+     */
+    protected $rowEditor;
 
-    private $model;
+    /**
+     * @var bool
+     */
+    protected $invalidSubmission;
+
+    /**
+     * @var bool
+     */
+    protected $isNew;
+
+    /**
+     * @var \Dewdrop\Auth\Db\UsersTableGateway
+     */
+    protected $model;
 
     public function init()
     {

@@ -305,18 +305,18 @@ class Auth
     {
         return [
             'admin' => [
-                'pattern' => '^/admin/',
-                'form'    => [
+                'pattern'     => '^/admin/',
+                'form'        => [
                     'login_path' => '/auth/login',
                     'check_path' => '/admin/login-check',
                 ],
-                'logout'  => [
+                'logout'      => [
                     'logout_path' => '/admin/logout',
                 ],
                 'remember_me' => [
                     'key' => 'yj/5Hf#K#^{G.T*T>g0I+iXKFyy{%KM:DkRH~X6>dV"s|$1UhDEM(Uy5?-Pbp',
                 ],
-                'users' => $this->app->share(function () {
+                'users'       => $this->app->share(function () {
                     return $this->app['users-gateway'];
                 }),
             ],

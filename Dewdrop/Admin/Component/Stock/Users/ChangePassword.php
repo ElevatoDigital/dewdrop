@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * Dewdrop
+ *
+ * @link      https://github.com/DeltaSystems/dewdrop
+ * @copyright Delta Systems (http://deltasys.com)
+ * @license   https://github.com/DeltaSystems/dewdrop/LICENSE
+ */
+
 namespace Dewdrop\Admin\Component\Stock\Users;
 
 use Dewdrop\Admin\Page\PageAbstract;
@@ -10,14 +18,38 @@ use Zend\InputFilter\InputFilter;
 use Zend\Validator\Callback;
 use Zend\Validator\StringLength;
 
+/**
+ * Change password page
+ */
 class ChangePassword extends PageAbstract
 {
+    /**
+     * Users table data gateway
+     *
+     * @var \Dewdrop\Auth\Db\UsersTableGateway
+     */
     protected $model;
 
+    /**
+     * Fields collection
+     *
+     * @var Fields
+     */
     protected $fields;
 
+    /**
+     * Input filter
+     *
+     * @var InputFilter
+     */
     protected $inputFilter;
 
+    /**
+     * Create any resources that need to be accessible both for processing
+     * and rendering.
+     *
+     * @return void
+     */
     public function init()
     {
         $this->model  = Pimple::getResource('users-gateway');
@@ -40,7 +72,7 @@ class ChangePassword extends PageAbstract
         $password
             ->setRequired(true)
             ->getValidatorChain()
-                ->addValidator(new StringLength(array('min' => 6)));
+                ->attach(new StringLength(array('min' => 6)));
 
         $confirm = new Input('confirm_password');
         $this->inputFilter->add($confirm);
@@ -56,9 +88,20 @@ class ChangePassword extends PageAbstract
         $confirm
             ->setRequired(true)
             ->getValidatorChain()
-                ->addValidator($validator);
+                ->attach($validator);
     }
 
+    /**
+     * Perform any processing or data manipulation needed before render.
+     *
+     * A response helper object will be passed to this method to allow you to
+     * easily add success messages or redirects.  This helper should be used
+     * to handle these kinds of actions so that you can easily test your
+     * page's code.
+     *
+     * @param \Dewdrop\Admin\ResponseHelper\Standard $responseHelper
+     * @return \Dewdrop\Admin\ResponseHelper\Standard|null
+     */
     public function process($responseHelper)
     {
         $isCurrentUser = ($this->row->get('user_id') === Pimple::getResource('user')->get('user_id'));
@@ -84,6 +127,11 @@ class ChangePassword extends PageAbstract
         }
     }
 
+    /**
+     * Assign variables to your page's view and render the output.
+     *
+     * @return void
+     */
     public function render()
     {
         $this->view->inputFilter = $this->inputFilter;

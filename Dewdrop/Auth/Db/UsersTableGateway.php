@@ -58,7 +58,7 @@ class UsersTableGateway extends Table implements UserProviderInterface
             $rowData = $this->getAdapter()->fetchRow(
                 'SELECT
                   u.*,
-                  sl.name AS role
+                  sl.name AS security_level
                 FROM users u
                 JOIN security_levels sl USING (security_level_id)
                 WHERE LOWER(u.username) = ?',
@@ -72,7 +72,7 @@ class UsersTableGateway extends Table implements UserProviderInterface
             /* @var $user \Dewdrop\Auth\Db\UserRowGateway */
             $user = $this->createRow($rowData);
 
-            $user->setRole(new Role($rowData['role']));
+            $user->setRole(new Role($rowData['security_level']));
 
             return $user;
         }
@@ -109,7 +109,13 @@ class UsersTableGateway extends Table implements UserProviderInterface
      */
     public function selectAdminListing()
     {
-        return $this->select()->from(['u' => 'users']);
+        return $this->select()
+            ->from(['u' => 'users'])
+            ->join(
+                ['sl' => 'security_levels'],
+                'u.security_level_id = sl.security_level_id',
+                ['security_level' => 'name']
+            );
     }
 
     /**
