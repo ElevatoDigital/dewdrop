@@ -14,8 +14,9 @@ use Dewdrop\Db\Field as DbField;
 use Dewdrop\Db\Select;
 use Dewdrop\Fields;
 use Dewdrop\Fields\Exception;
-use Dewdrop\Fields\Helper\SelectModifierInterface;
+use Dewdrop\Fields\Helper\SelectCallback;
 use Dewdrop\Fields\Helper\SelectFilter;
+use Dewdrop\Fields\Helper\SelectModifierInterface;
 use Dewdrop\Fields\Helper\SelectPaginate;
 use Dewdrop\Fields\Helper\SelectSort;
 use Dewdrop\Pimple;
@@ -148,6 +149,27 @@ class Listing
     public function getRequest()
     {
         return $this->request;
+    }
+
+    /**
+     * Allow users to create a custom modifier that just uses a callback
+     * to modify the select object.
+     *
+     * @param $name
+     * @param callable $callback
+     * @return $this
+     */
+    public function registerCustomModifier($name, callable $callback)
+    {
+        $modifier = new SelectCallback();
+
+        $modifier
+            ->setName($name)
+            ->setCallback($callback);
+
+        $this->registerSelectModifier($modifier);
+
+        return $this;
     }
 
     /**
