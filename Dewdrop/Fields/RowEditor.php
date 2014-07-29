@@ -227,10 +227,17 @@ class RowEditor
      */
     public function isValid(array $data)
     {
+        $inputFilter = $this->getInputFilter();
+
         /* @var $field DbField */
         foreach ($this->fields->getEditableFields() as $field) {
             if (array_key_exists($field->getId(), $data)) {
-                $field->setValue($data[$field->getId()]);
+                $id = $field->getId();
+
+                /* @var $filter \Zend\Filter\FilterChain */
+                $filter = $inputFilter->get($id)->getFilterChain();
+
+                $field->setValue($filter->filter($data[$id]));
             } elseif ($field instanceof DbField && $field->isType('boolean')) {
                 /**
                  * Checkboxes are omitted from POST completely when not checked, so this
@@ -241,9 +248,9 @@ class RowEditor
             }
         }
 
-        $this->getInputFilter()->setData($data);
+        $inputFilter->setData($data);
 
-        return $this->getInputFilter()->isValid();
+        return $inputFilter->isValid();
     }
 
     /**
