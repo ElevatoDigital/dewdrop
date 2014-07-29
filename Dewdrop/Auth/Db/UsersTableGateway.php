@@ -42,13 +42,9 @@ class UsersTableGateway extends Table implements UserProviderInterface
      * found.
      *
      * @param string $username The username
-     *
-     * @return UserInterface
-     *
+     * @return \Dewdrop\Auth\Db\UserRowGateway
      * @see UsernameNotFoundException
-     *
      * @throws UsernameNotFoundException if the user is not found
-     *
      */
     public function loadUserByUsername($username)
     {
@@ -76,6 +72,35 @@ class UsersTableGateway extends Table implements UserProviderInterface
 
             return $user;
         }
+    }
+
+    /**
+     * Returns the user for the given email address or null on failure
+     *
+     * @param string $emailAddress
+     * @return \Dewdrop\Auth\Db\UserRowGateway|null
+     */
+    public function loadUserByEmailAddress($emailAddress)
+    {
+        $user = null;
+
+        $rowData = $this->getAdapter()->fetchRow(
+            'SELECT
+              u.*,
+              sl.name AS security_level
+            FROM users u
+            JOIN security_levels sl USING (security_level_id)
+            WHERE LOWER(u.email_address) = ?',
+            [trim(strtolower($emailAddress))]
+        );
+
+        if (null !== $rowData) {
+            /* @var $user \Dewdrop\Auth\Db\UserRowGateway */
+            $user = $this->createRow($rowData);
+            $user->setRole(new Role($rowData['security_level']));
+        }
+
+        return $user;
     }
 
     /**

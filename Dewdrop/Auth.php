@@ -10,10 +10,14 @@
 
 namespace Dewdrop;
 
+use Dewdrop\Auth\Db\UserPasswordChangeTokensTableGateway;
 use Dewdrop\Auth\Db\UserRowGateway;
+use Dewdrop\Mail\View\View as MailView;
 use Silex\Application;
 use Silex\Provider\RememberMeServiceProvider;
 use Silex\Provider\SecurityServiceProvider;
+use Silex\Provider\SwiftmailerServiceProvider;
+use Swift_Message;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Encoder\BCryptPasswordEncoder;
 
@@ -48,8 +52,16 @@ use Symfony\Component\Security\Core\Encoder\BCryptPasswordEncoder;
  *     username VARCHAR(64) NOT NULL UNIQUE,
  *     first_name VARCHAR(128) NOT NULL,
  *     last_name VARCHAR(128) NOT NULL,
- *     email_address VARCHAR(512) NOT NULL,
+ *     email_address VARCHAR(512) NOT NULL UNIQUE,
  *     password_hash VARCHAR(60) NOT NULL
+ * );
+ *
+ * CREATE TABLE user_password_change_tokens (
+ *     user_password_change_token_id SERIAL PRIMARY KEY,
+ *     user_id INTEGER NOT NULL REFERENCES users,
+ *     token VARCHAR(60) NOT NULL UNIQUE,
+ *     date_created TIMESTAMP NOT NULL DEFAULT NOW()
+ *     used BOOLEAN NOT NULL DEFAULT FALSE
  * );
  * </pre>
  *
@@ -103,7 +115,8 @@ class Auth
      */
     protected $routeClassMap = array(
         '/auth/login'           => '\Dewdrop\Auth\Page\Login',
-        '/auth/forgot-password' => '\Dewdrop\Auth\Page\ForgotPassword'
+        '/auth/forgot-password' => '\Dewdrop\Auth\Page\ForgotPassword',
+        '/auth/reset-password'  => '\Dewdrop\Auth\Page\ResetPassword',
     );
 
     /**
@@ -151,6 +164,53 @@ class Auth
     public function assignRouteClass($route, $className)
     {
         $this->routeClassMap[$route] = $className;
+
+        return $this;
+    }
+
+    /**
+     * Generate a password change token and send the given user an email with a link to reset password
+     *
+     * @param UserRowGateway $user
+     * @return Auth
+     */
+    public function forgotPassword(UserRowGateway $user)
+    {
+        $token = password_hash(openssl_random_pseudo_bytes(64), PASSWORD_BCRYPT);
+
+        $tokenTableDataGateway = new UserPasswordChangeTokensTableGateway();
+
+        $tokenTableDataGateway->insert([
+            'user_id' => $user->getId(),
+            'token'   => $token,
+        ]);
+
+        if ('80' !== $_SERVER['SERVER_PORT']) {
+            $port = ":{$_SERVER['SERVER_PORT']}";
+        } else {
+            $port = '';
+        }
+
+        $resetPasswordUrl = "http://{$_SERVER['SERVER_NAME']}{$port}/auth/reset-password?token=" .
+            rawurlencode($token);
+
+        $mailView = new MailView();
+        $mailView
+            ->assign('resetPasswordUrl', $resetPasswordUrl)
+            ->setScriptPath(__DIR__ . '/Auth/view-scripts');
+
+        $bodyHtml = $mailView->render('forgot-password-email-html.phtml');
+        $bodyText = $mailView->render('forgot-password-email-text.phtml');
+
+        $message = Swift_Message::newInstance();
+        $message
+            ->setSubject('Reset Password')
+            ->setFrom("noreply@{$_SERVER['SERVER_NAME']}")
+            ->setTo($user->getEmailAddress());
+        $message->setBody($bodyHtml, 'text/html');
+        $message->addPart($bodyText, 'text/plain');
+
+        $this->app['mailer']->send($message);
 
         return $this;
     }
@@ -263,6 +323,8 @@ class Auth
         $app->register(new SecurityServiceProvider());
         $app->register(new RememberMeServiceProvider());
 
+        $app->register(new SwiftmailerServiceProvider());
+
         $app['security.firewalls'] = $this->getSecurityFirewallsConfig();
 
         $app['security.encoder.digest'] = $app->share(
@@ -304,7 +366,11 @@ class Auth
     protected function getSecurityFirewallsConfig()
     {
         return [
-            'admin' => [
+            '^/auth/reset-password' => [
+                'pattern'   => '^/auth/reset-password',
+                'anonymous' => true,
+            ],
+            '^/admin/'           => [
                 'pattern'     => '^/admin/',
                 'form'        => [
                     'login_path' => '/auth/login',
