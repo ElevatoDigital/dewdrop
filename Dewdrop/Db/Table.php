@@ -617,7 +617,7 @@ abstract class Table
     /**
      * Find a single row based upon primary key value.
      *
-     * @return \Dewdrop\Db\Row
+     * @return \Dewdrop\Db\Row|null
      */
     public function find()
     {
