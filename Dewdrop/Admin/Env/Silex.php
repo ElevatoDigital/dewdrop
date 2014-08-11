@@ -39,6 +39,20 @@ class Silex extends EnvAbstract
     private $application;
 
     /**
+     * The path to the layout view script.
+     *
+     * @var string
+     */
+    private $layoutPath;
+
+    /**
+     * The file name of the view script used when rendering the layout.
+     *
+     * @var string
+     */
+    private $layoutName = 'silex.phtml';
+
+    /**
      * Provide a \Silex\Application object that can be used to retrieve
      * resources, register routes, etc.
      *
@@ -47,6 +61,7 @@ class Silex extends EnvAbstract
     public function __construct(Application $application)
     {
         $this->application = $application;
+        $this->layoutPath  = __DIR__ . '/view-scripts';
     }
 
     /**
@@ -96,6 +111,32 @@ class Silex extends EnvAbstract
     }
 
     /**
+     * Set the path where the layout view script can be found.
+     *
+     * @param $layoutPath
+     * @return $this
+     */
+    public function setLayoutPath($layoutPath)
+    {
+        $this->layoutPath = $layoutPath;
+
+        return $this;
+    }
+
+    /**
+     * Set the file name of the layout view script.
+     *
+     * @param $layoutName string
+     * @return $this
+     */
+    public function setLayoutName($layoutName)
+    {
+        $this->layoutName = $layoutName;
+
+        return $this;
+    }
+
+    /**
      * Render the admin shell's layout, placing the supplied content in the
      * appropriate area of the HTML.
      *
@@ -107,7 +148,7 @@ class Silex extends EnvAbstract
     public function renderLayout($content, HeadScript $headScript = null, HeadLink $headLink = null)
     {
         $view = new View();
-        $view->setScriptPath(__DIR__ . '/view-scripts');
+        $view->setScriptPath($this->layoutPath);
 
         $view
             ->assign('title', $this->title)
@@ -118,7 +159,7 @@ class Silex extends EnvAbstract
             ->assign('viewHeadLink', $headLink)
             ->assign('dependencies', $this->coreClientSideDependencies);
 
-        return $view->render('silex.phtml');
+        return $view->render($this->layoutName);
     }
 
     public function url(ComponentAbstract $component, $page, array $params = array())

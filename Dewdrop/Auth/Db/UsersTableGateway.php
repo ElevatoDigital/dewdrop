@@ -52,11 +52,8 @@ class UsersTableGateway extends Table implements UserProviderInterface
             throw new UsernameNotFoundException('Please provide a username.');
         } else {
             $rowData = $this->getAdapter()->fetchRow(
-                'SELECT
-                  u.*,
-                  sl.name AS security_level
+                'SELECT u.*
                 FROM users u
-                JOIN security_levels sl USING (security_level_id)
                 WHERE LOWER(u.username) = ?',
                 [trim(strtolower($username))]
             );
@@ -68,7 +65,7 @@ class UsersTableGateway extends Table implements UserProviderInterface
             /* @var $user \Dewdrop\Auth\Db\UserRowGateway */
             $user = $this->createRow($rowData);
 
-            $user->setRole(new Role($rowData['security_level']));
+            $user->setRole(new Role($rowData['security_level_id']));
 
             return $user;
         }
@@ -85,11 +82,8 @@ class UsersTableGateway extends Table implements UserProviderInterface
         $user = null;
 
         $rowData = $this->getAdapter()->fetchRow(
-            'SELECT
-              u.*,
-              sl.name AS security_level
+            'SELECT u.*
             FROM users u
-            JOIN security_levels sl USING (security_level_id)
             WHERE LOWER(u.email_address) = ?',
             [trim(strtolower($emailAddress))]
         );
@@ -97,7 +91,7 @@ class UsersTableGateway extends Table implements UserProviderInterface
         if (null !== $rowData) {
             /* @var $user \Dewdrop\Auth\Db\UserRowGateway */
             $user = $this->createRow($rowData);
-            $user->setRole(new Role($rowData['security_level']));
+            $user->setRole(new Role($rowData['security_level_id']));
         }
 
         return $user;

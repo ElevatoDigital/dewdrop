@@ -41,7 +41,7 @@ class UserRowGateway extends Row implements AuthUserInterface, FieldsUserInterfa
             $role = new Role($role);
         }
 
-        return $this->role->getRole() === $role->getRole();
+        return $this->role->getRole() == $role->getRole();
     }
 
     /**

@@ -13,8 +13,8 @@ namespace Dewdrop\Admin;
 use Dewdrop\Admin\Component\ComponentAbstract;
 use Dewdrop\Admin\Component\CrudInterface;
 use Dewdrop\Exception;
-use Dewdrop\Fields\UserInterface;
 use Dewdrop\Pimple;
+use Symfony\Component\Security\Core\Role\Role as SfRole;
 
 /**
  * This class allows you to adjust the permissions for an admin component.  It
@@ -174,7 +174,7 @@ class Permissions
             }
 
             foreach ($allowedRoles as $role) {
-                if ($user && in_array($role, $user->getRoles())) {
+                if ($user && in_array($role, $this->getUserRoleValues($user))) {
                     $can = true;
                     break;
                 }
@@ -253,5 +253,20 @@ class Permissions
         $this->set($name, $setting);
 
         return $this;
+    }
+
+    protected function getUserRoleValues($user)
+    {
+        $roles = [];
+
+        foreach ($user->getRoles() as $role) {
+            if ($role instanceof SfRole) {
+                $role = $role->getRole();
+            }
+
+            $roles[] = $role;
+        }
+
+        return $roles;
     }
 }
