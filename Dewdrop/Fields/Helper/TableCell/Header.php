@@ -12,7 +12,7 @@ namespace Dewdrop\Fields\Helper\TableCell;
 
 use Dewdrop\Fields\FieldInterface;
 use Dewdrop\Fields\Helper\HelperAbstract;
-use Zend\Escaper\Escaper;
+use Dewdrop\View\View;
 
 /**
  * The header helper allows you to render the content of the header for
@@ -27,7 +27,7 @@ use Zend\Escaper\Escaper;
  *         // Param $helper is a reference to this instance of the Header helper
  *         // Param $field is your Field object, so you can get the label, etc.
  *
- *         return $helper->getEscaper()->escapeHtml($field->getLabel());
+ *         return $helper->getView()->escapeHtml($field->getLabel());
  *     }
  * );
  * </pre>
@@ -49,32 +49,45 @@ class Header extends HelperAbstract
     protected $name = 'tablecell.header';
 
     /**
-     * A \Zend\Escaper\Escaper object used to escape content from your callbacks
-     * to prevent XSS attacks.  You are responsible for escaping unsafe content.
+     * A view object used for rendering and escaping.
      *
-     * @var \Zend\Escaper\Escaper
+     * @var View
      */
-    private $escaper;
+    private $view;
 
     /**
-     * Provide a \Zend\Escaper\Escaper that can be used by callbacks to escape
-     * their output to prevent XSS attacks.
+     * Provide a Dewdrop view for rendering.
      *
-     * @param Escaper $escaper
+     * @param View $view
      */
-    public function __construct(Escaper $escaper)
+    public function __construct(View $view)
     {
-        $this->escaper = $escaper;
+        $this->view = $view;
     }
 
     /**
-     * Get the \Zend\Escaper\Escaper instance in your callbacks.
+     * Get the Dewdrop view object that can be used to render the cell's content
+     * and escape it to prevent XSS.
      *
-     * @return \Zend\Escaper\Escaper
+     * @return View
+     */
+    public function getView()
+    {
+        return $this->view;
+    }
+
+    /**
+     * The TableCell helpers originally used an Escaper rather than a Dewdrop
+     * view object.  This was limiting and also error-prone because Escaper
+     * fails to handle nulls well.  The view API has all of Escaper's public
+     * methods, though, so returning it here, should not break any code.
+     *
+     * @return \Dewdrop\View\View
+     * @deprecated
      */
     public function getEscaper()
     {
-        return $this->escaper;
+        return $this->view;
     }
 
     /**
@@ -101,7 +114,7 @@ class Header extends HelperAbstract
     public function detectCallableForField(FieldInterface $field)
     {
         return function () use ($field) {
-            return $this->escaper->escapeHtml($field->getLabel());
+            return $this->view->escapeHtml($field->getLabel());
         };
     }
 }

@@ -13,7 +13,7 @@ namespace Dewdrop\Fields\Helper;
 use Dewdrop\Fields\Helper\TableCell\Content;
 use Dewdrop\Fields\Helper\TableCell\Header;
 use Dewdrop\Fields\Helper\TableCell\TdClassNames;
-use Zend\Escaper\Escaper;
+use Dewdrop\View\View;
 
 /**
  * The TableCell helper actually composes 3 simpler helpers that are useful when
@@ -83,18 +83,19 @@ class TableCell
     private $tdClassNamesRenderer;
 
     /**
-     * Provide a \Zend\Escaper\Escaper that can be used by callbacks to escape
-     * their output to prevent XSS attacks.
+     * Provide a \Dewdrop\View\View hat can be used by callbacks to escape
+     * their output to prevent XSS attacks or call helpers to render their
+     * output.
      *
-     * @param Escaper $escaper
+     * @param View $view
      */
-    public function __construct(Escaper $escaper)
+    public function __construct(View $view)
     {
-        $escaper = ($escaper ?: new Escaper());
+        $view = ($view ?: new View());
 
-        $this->contentRenderer      = new Content($escaper);
-        $this->headerRenderer       = new Header($escaper);
-        $this->tdClassNamesRenderer = new TdClassNames($escaper);
+        $this->contentRenderer      = new Content($view);
+        $this->headerRenderer       = new Header($view);
+        $this->tdClassNamesRenderer = new TdClassNames($view);
     }
 
     /**

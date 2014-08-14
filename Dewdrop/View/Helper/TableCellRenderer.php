@@ -25,6 +25,6 @@ class TableCellRenderer extends AbstractHelper
      */
     public function direct()
     {
-        return new TableCell($this->view->getEscaper());
+        return new TableCell($this->view);
     }
 }
