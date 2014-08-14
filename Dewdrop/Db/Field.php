@@ -248,6 +248,16 @@ class Field extends FieldAbstract
     }
 
     /**
+     * Get the row associated with this field.
+     *
+     * @return Row
+     */
+    public function getRow()
+    {
+        return $this->row;
+    }
+
+    /**
      * Set the value of this field on the associated row, if available.
      *
      * @param mixed $value

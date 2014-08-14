@@ -31,6 +31,7 @@ class Crud implements PageFactoryInterface
         'debug-fields'       => '\Dewdrop\Admin\Page\Stock\DebugFields',
         'debug-listing-sql'  => '\Dewdrop\Admin\Page\Stock\DebugListingSql',
         'debug-test-sorting' => '\Dewdrop\Admin\Page\Stock\DebugTestSorting',
+        'delete'             => '\Dewdrop\Admin\Page\Stock\Delete',
         'edit'               => '\Dewdrop\Admin\Page\Stock\Edit',
         'export'             => '\Dewdrop\Admin\Page\Stock\Export',
         'index'              => '\Dewdrop\Admin\Page\Stock\Index',

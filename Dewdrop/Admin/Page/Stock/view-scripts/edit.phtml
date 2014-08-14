@@ -9,6 +9,25 @@
     <li class="active"><?php echo ($this->isNew ? 'Add' : 'Edit');?> <?php echo $this->escapeHtml($this->model->getSingularTitle());?></li>
 </ol>
 
+<?php if ($this->rowEditor->hasDeleteField()):?>
+
+<?php
+$params = [];
+
+foreach ($this->model->getPrimaryKey() as $field) {
+    $params[$field] = $this->request->getQuery($field);
+}
+?>
+
+<div class="navbar navbar-default" role="navigation">
+    <div class="navbar-right">
+        <a class="navbar-btn btn btn-danger btn-delete" data-message="Are you sure you want to delete this <?php echo $this->escapeHtmlAttr(strtolower($this->model->getSingularTitle()));?>?" data-href="<?php echo $this->escapeHtmlAttr($this->adminUrl('delete', $params));?>" data-redirect="<?php echo $this->escapeHtmlAttr($this->adminUrl('index'));?>">Delete This <?php echo $this->escapeHtml($this->model->getSingularTitle());?></a>
+    </div>
+</div>
+<?php $this->headScript()->appendFile($this->bowerUrl('/dewdrop/www/js/delete-button.js'));?>
+
+<?php endif;?>
+
 <?php
 echo $this->bootstrapForm(
     $this->fields->getEditableFields($this->groupingFilter),

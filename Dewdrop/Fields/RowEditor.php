@@ -78,6 +78,13 @@ class RowEditor
     private $inputFilterHelper;
 
     /**
+     * A boolean field that can be used to flag a row as deleted.
+     *
+     * @var DbField
+     */
+    private $deleteField;
+
+    /**
      * Supply the fields and HTTP request that will be used during editing.
      *
      * @param Fields $fields
@@ -274,6 +281,39 @@ class RowEditor
     }
 
     /**
+     * Set the field that can be used to delete this item.
+     *
+     * @param DbField $deleteField
+     * @return $this
+     */
+    public function setDeleteField(DbField $deleteField)
+    {
+        $this->deleteField = $deleteField;
+
+        return $this;
+    }
+
+    /**
+     * Check to see if a delete field is assigned to this editor.
+     *
+     * @return boolean
+     */
+    public function hasDeleteField()
+    {
+        return null !== $this->deleteField;
+    }
+
+    public function delete()
+    {
+        if ($this->hasDeleteField()) {
+            $this->deleteField
+                ->setValue(1)
+                ->getRow()
+                    ->save();
+        }
+    }
+
+    /**
      * Set a custom save callback.  This can be useful if you need to do
      * anything beyond calling the save methods on your rows.  Your callback
      * will receive this object as its only argument.  You can call getRow()
@@ -372,6 +412,10 @@ class RowEditor
             if ($field instanceof DbField && $field->getTable() === $model) {
                 $field->setRow($row);
             }
+        }
+
+        if ($this->deleteField) {
+            $this->deleteField->setRow($row);
         }
 
         $this->rowsByName[$modelName] = $row;

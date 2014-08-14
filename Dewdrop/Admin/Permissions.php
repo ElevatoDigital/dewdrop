@@ -104,6 +104,7 @@ class Permissions
         $crudPermissions = array(
             'adjust-columns' => 'Adjust the columns that are visible on the main listing',
             'create'         => "Create new {$plural}",
+            'delete'         => "Delete {$plural}",
             'custom-views'   => 'Create and edit custom views',
             'debug'          => 'Use debugging tools',
             'edit'           => "Edit existing {$plural}",

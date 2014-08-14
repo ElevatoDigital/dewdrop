@@ -95,6 +95,7 @@ class Edit extends PageAbstract
         $this->view->fields            = $this->component->getFields();
         $this->view->model             = $this->model;
         $this->view->rowEditor         = $this->rowEditor;
+        $this->view->request           = $this->request;
         $this->view->groupingFilter    = $this->component->getFieldGroupsFilter();
         $this->view->invalidSubmission = $this->invalidSubmission;
     }
