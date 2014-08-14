@@ -2,7 +2,7 @@
 
 namespace Dewdrop\Fields\Helper;
 
-use Zend\Escaper\Escaper;
+use Dewdrop\View\View;
 
 class TableCellTest extends \PHPUnit_Framework_TestCase
 {
@@ -13,9 +13,9 @@ class TableCellTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $escaper = new Escaper();
+        $view = new View();
 
-        $this->helper = new TableCell($escaper);
+        $this->helper = new TableCell($view);
     }
 
     public function testCanRetrieveContentRenderer()
@@ -42,27 +42,27 @@ class TableCellTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testContentRendererGetsEscaper()
+    public function testContentRendererGetsView()
     {
         $this->assertInstanceOf(
-            'Zend\Escaper\Escaper',
-            $this->helper->getContentRenderer()->getEscaper()
+            'Dewdrop\View\View',
+            $this->helper->getContentRenderer()->getView()
         );
     }
 
-    public function testHeaderRendererGetsEscaper()
+    public function testHeaderRendererGetsView()
     {
         $this->assertInstanceOf(
-            'Zend\Escaper\Escaper',
-            $this->helper->getHeaderRenderer()->getEscaper()
+            'Dewdrop\View\View',
+            $this->helper->getHeaderRenderer()->getView()
         );
     }
 
-    public function testTdClassNamesRendererGetsEscaper()
+    public function testTdClassNamesRendererGetsView()
     {
         $this->assertInstanceOf(
-            'Zend\Escaper\Escaper',
-            $this->helper->getTdClassNamesRenderer()->getEscaper()
+            'Dewdrop\View\View',
+            $this->helper->getTdClassNamesRenderer()->getView()
         );
     }
 }
