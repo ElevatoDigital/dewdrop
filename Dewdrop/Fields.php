@@ -128,13 +128,20 @@ class Fields implements ArrayAccess, IteratorAggregate, Countable
      * set for this collection.
      *
      * @param array $fields
+     * @param UserInterface $fields
      */
-    public function __construct(array $fields = null)
+    public function __construct(array $fields = null, UserInterface $user = null)
     {
         if (is_array($fields)) {
             foreach ($fields as $field) {
                 $this->add($field);
             }
+        }
+
+        if (null !== $user) {
+            $this->user = $user;
+        } elseif (Pimple::hasResource('user')) {
+            $this->user = Pimple::getResource('user');
         }
     }
 
@@ -490,7 +497,7 @@ class Fields implements ArrayAccess, IteratorAggregate, Countable
      */
     protected function getFieldsPassingMethodCheck($fieldMethodName, $filters)
     {
-        $fields = new Fields();
+        $fields = new Fields([], $this->user);
 
         foreach ($this->fields as $field) {
             if ($field->$fieldMethodName($this->user)) {

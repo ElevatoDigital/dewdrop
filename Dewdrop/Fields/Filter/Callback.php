@@ -45,7 +45,7 @@ class Callback implements FilterInterface
      */
     public function apply(Fields $fields)
     {
-        $filteredFields = new Fields();
+        $filteredFields = new Fields([], $fields->getUser());
 
         foreach ($fields as $field) {
             if (true === call_user_func($this->callback, $field)) {

@@ -185,7 +185,7 @@ class Visibility implements FilterInterface
             }
         }
 
-        $output = new Fields();
+        $output = new Fields([], $fields->getUser());
 
         foreach ($fields as $field) {
             if (in_array($field->getId(), $this->selections) ||

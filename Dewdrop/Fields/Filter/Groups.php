@@ -344,7 +344,7 @@ class Groups implements FilterInterface
             $this->loadedDbData = $this->load();
         }
 
-        $groupedFields = new GroupedFields();
+        $groupedFields = new GroupedFields([], $currentFields->getUser());
 
         foreach ($this->loadedDbData as $fieldConfig) {
             // Ungrouped fields come after grouped fields
