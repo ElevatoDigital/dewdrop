@@ -2,7 +2,7 @@
     <div class="text-muted">
         <small>
             Find <?php echo $this->escapeHtml(strtolower($this->title ?: 'records'));?> matching
-            <select name="<?php echo $this->escapeHtmlAttr($this->paramPrefix);?>ftr-logic">
+            <select data-chosen-exclude name="<?php echo $this->escapeHtmlAttr($this->paramPrefix);?>ftr-logic">
                 <?php
                 $operators = array('all', 'any');
 
