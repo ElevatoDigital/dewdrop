@@ -9,7 +9,7 @@
     <li class="active"><?php echo ($this->isNew ? 'Add' : 'Edit');?> <?php echo $this->escapeHtml($this->model->getSingularTitle());?></li>
 </ol>
 
-<?php if ($this->rowEditor->hasDeleteField()):?>
+<?php if (!$this->rowEditor->isNew() && $this->rowEditor->hasDeleteField()):?>
 
 <?php
 $params = [];
@@ -20,7 +20,7 @@ foreach ($this->model->getPrimaryKey() as $field) {
 ?>
 
 <div class="navbar navbar-default" role="navigation">
-    <div class="navbar-right">
+    <div class="navbar-right navbar-right-btn-group">
         <a class="navbar-btn btn btn-danger btn-delete" data-message="Are you sure you want to delete this <?php echo $this->escapeHtmlAttr(strtolower($this->model->getSingularTitle()));?>?" data-href="<?php echo $this->escapeHtmlAttr($this->adminUrl('delete', $params));?>" data-redirect="<?php echo $this->escapeHtmlAttr($this->adminUrl('index'));?>">Delete This <?php echo $this->escapeHtml($this->model->getSingularTitle());?></a>
     </div>
 </div>
