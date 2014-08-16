@@ -135,6 +135,27 @@ class OptionPairs
     }
 
     /**
+     * An alias for getStmt().
+     *
+     * @return Select
+     */
+    public function getSelect()
+    {
+        return $this->getStmt();
+    }
+
+    /**
+     * An alias for setStmt().
+     *
+     * @param Select $select
+     * @return OptionPairs
+     */
+    public function setSelect(Select $select)
+    {
+        return $this->setStmt($select);
+    }
+
+    /**
      * Get the \Dewdrop\Db\Select that will be used for retrieving options.  If
      * one isn't already available, it will be generated using the other
      * properties on this object.  You can call this method to get a good
