@@ -465,6 +465,26 @@ class Row implements ArrayAccess
     }
 
     /**
+     * Returns the row data.
+     *
+     * @return array
+     */
+    public function getData()
+    {
+        return $this->data;
+    }
+
+    /**
+     * Returns an array representation of the row data.
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        return $this->getData();
+    }
+
+    /**
      * Refresh the row, pulling in the latest data from the DB.
      *
      * @return \Dewdrop\Db\Row
