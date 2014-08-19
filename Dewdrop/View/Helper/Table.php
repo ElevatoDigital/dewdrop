@@ -91,7 +91,19 @@ class Table extends AbstractHelper
         $out = '<tbody>';
 
         foreach ($data as $row) {
-            $out .= '<tr>';
+            $classes = $renderer->getRowClasses($row);
+
+            if (!is_array($classes) || !count($classes)) {
+                $out .= '<tr>';
+            } else {
+                $out .= sprintf(
+                    '<tr class="%s">',
+                    implode(
+                        ' ',
+                        array_map([$this->view, 'escapeHtmlAttr'], $classes)
+                    )
+                );
+            }
 
             $columnIndex = 0;
 

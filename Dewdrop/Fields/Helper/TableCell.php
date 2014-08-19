@@ -83,6 +83,13 @@ class TableCell
     private $tdClassNamesRenderer;
 
     /**
+     * A callback used to get an array of CSS class name for a table row.
+     *
+     * @var callable
+     */
+    private $rowClassCallback;
+
+    /**
      * Provide a \Dewdrop\View\View hat can be used by callbacks to escape
      * their output to prevent XSS attacks or call helpers to render their
      * output.
@@ -129,5 +136,34 @@ class TableCell
     public function getTdClassNamesRenderer()
     {
         return $this->tdClassNamesRenderer;
+    }
+
+    /**
+     * Provide a callback that can be used to generate an array of CSS class
+     * names that should be applied to a table row.
+     *
+     * @param callable $callback
+     * @return $this
+     */
+    public function setRowClassCallback(callable $callback)
+    {
+        $this->rowClassCallback = $callback;
+
+        return $this;
+    }
+
+    /**
+     * Get an array of CSS class names that should be applied to the given row.
+     *
+     * @param array $rowData
+     * @return array
+     */
+    public function getRowClasses(array $rowData)
+    {
+        if (!$this->rowClassCallback) {
+            return [];
+        } else {
+            return call_user_func($this->rowClassCallback, $rowData);
+        }
     }
 }
