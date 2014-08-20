@@ -539,20 +539,21 @@ class Field extends FieldAbstract
 
         if ($this->isType('string')) {
             if ($metadata['LENGTH'] && 0 < (int) $metadata['LENGTH']) {
-                $validators->addValidator(new Validator\StringLength(0, $metadata['LENGTH']));
+                $validators->attach(new Validator\StringLength(0, $metadata['LENGTH']));
             }
 
             $filters->attach(new Filter\StringTrim());
             $filters->attach(new Filter\Null(Filter\Null::TYPE_STRING));
         } elseif ($this->isType('date')) {
-            $validators->addValidator(new Validator\Date());
+            $validators->attach(new Validator\Date());
         } elseif ($this->isType('boolean')) {
             $filters->attach(new Filter\Int());
         } elseif ($this->isType('integer')) {
-            $filters->attach(new Filter\Digits());
-            $validators->addValidator(new \Zend\I18n\Validator\Int());
+            $filters->attach(new Filter\Int());
+            $validators->attach(new \Zend\I18n\Validator\Int());
         } elseif ($this->isType('float')) {
-            $validators->addValidator(new \Zend\I18n\Validator\Float());
+            $filters->attach(new Filter\Digits());
+            $validators->attach(new \Zend\I18n\Validator\Float());
         }
     }
 
