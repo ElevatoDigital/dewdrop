@@ -94,7 +94,7 @@ class EditHelperDetector
             return 'select';
         } elseif ($field->isType('clob')) {
             return 'textarea';
-        } elseif ($field->isType('text', 'numeric')) {
+        } elseif ($field->isType('text', 'integer', 'float')) {
             return 'inputText';
         }
 
