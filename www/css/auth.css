@@ -11,6 +11,10 @@ body {
     text-align: center;
 }
 
+.panel-heading img {
+    max-width: 100%;
+}
+
 .remember-me {
     padding-top: 8px;
 }
