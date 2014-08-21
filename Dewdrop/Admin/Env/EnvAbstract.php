@@ -39,7 +39,7 @@ abstract class EnvAbstract implements EnvInterface
             'jquery'       => '/jquery/dist/jquery.min.js',
             'bootstrap'    => '/bootstrap/dist/js/bootstrap.min.js',
             'keymaster'    => '/keymaster/keymaster.js',
-            'moment'       => '/moment/min/moment-with-langs.min.js',
+            'moment'       => '/moment/min/moment-with-locales.min.js',
             'velocity'     => '/velocity/jquery.velocity.min.js',
             'velocity-ui'  => '/velocity/velocity.ui.js',
             'underscore'   => '/underscore/underscore.js',
