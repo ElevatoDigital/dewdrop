@@ -63,8 +63,10 @@ abstract class PageAbstract
         $this->request = $request;
         $this->view    = ($view ?: new View());
 
-        $this->view->setScriptPath(__DIR__ . '/view-scripts');
-        $this->view->assign('title', $this->auth->getTitle());
+        $this->view
+            ->setScriptPath(__DIR__ . '/view-scripts')
+            ->assign('title', $this->auth->getTitle())
+            ->assign('headerHtml', $this->auth->getHeaderHtml());
 
         $this->init();
     }

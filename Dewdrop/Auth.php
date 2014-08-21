@@ -120,11 +120,20 @@ class Auth
     );
 
     /**
-     * Title
+     * Title.  This will be escaped and used in the title tag.
      *
      * @var string
      */
     protected $title = 'Welcome';
+
+    /**
+     * Optionally specify some HTML to use in the header of the panel
+     * on each page (e.g. a logo image).  If not specified, then the
+     * title text will be used.
+     *
+     * @var string
+     */
+    protected $headerHtml;
 
     /**
      * Layout script path
@@ -225,7 +234,7 @@ class Auth
     {
         $this->title = $title;
 
-        return $title;
+        return $this;
     }
 
     /**
@@ -236,6 +245,29 @@ class Auth
     public function getTitle()
     {
         return $this->title;
+    }
+
+    /**
+     * HTML to use on the header of the panel on each page.
+     *
+     * @param $headerHtml
+     * @return $this
+     */
+    public function setHeaderHtml($headerHtml)
+    {
+        $this->headerHtml = $headerHtml;
+
+        return $this;
+    }
+
+    /**
+     * Get the HTML that should be used in the header of the panel on each page.
+     *
+     * @return string
+     */
+    public function getHeaderHtml()
+    {
+        return $this->headerHtml;
     }
 
     /**
