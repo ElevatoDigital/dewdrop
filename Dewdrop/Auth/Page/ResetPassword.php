@@ -13,6 +13,7 @@ namespace Dewdrop\Auth\Page;
 use Dewdrop\Auth\Db\UserPasswordChangeTokensTableGateway;
 use Dewdrop\Auth\Db\UsersTableGateway;
 use Dewdrop\Exception;
+use Dewdrop\Pimple;
 
 /**
  * Reset password page
@@ -27,20 +28,39 @@ class ResetPassword extends PageAbstract
      */
     public function respond()
     {
-        if ($this->request->isMethod('POST')) {
+        $request = Pimple::getResource('dewdrop-request');
 
-            $rows = $this->getUserAndTokenRows($this->request->request->get('token'));
+        if ($request->isPost()) {
+            if (6 > strlen($request->getPost('password'))) {
+                $this->view->assign('error', 'Password must be at least 6 characters long.');
+            } elseif ($request->getPost('password') !== $request->getPost('confirm')) {
+                $this->view->assign('error', 'Passwords do not match.');
+            } else {
+                $userAndToken = $this->getUserAndTokenRows($this->request->query->get('token'));
 
-            // @todo Process form submission
+                $userAndToken['token']
+                    ->set('used', 1)
+                    ->save();
 
-//            $rows['token']
-//                ->set('used', true)
-//                ->save();
+                $userAndToken['user']
+                    ->hashPassword($request->getPost('password'))
+                    ->save();
 
-//            return $this->app->redirect('/target');
+                return $this->app->redirect('/auth/login');
+            }
         }
 
-        $this->getUserAndTokenRows($this->request->query->get('token'));
+        try {
+            $userAndToken = $this->getUserAndTokenRows($this->request->query->get('token'));
+
+            $this->view->assign('user', $userAndToken['user']);
+        } catch (Exception $e) {
+            $this->view->assign('invalidToken', true);
+        }
+
+        $this->view
+            ->assign('password', $request->getPost('password'))
+            ->assign('confirm', $request->getPost('confirm'));
 
         return $this->renderLayout($this->view->render('reset-password.phtml'));
     }
@@ -55,7 +75,6 @@ class ResetPassword extends PageAbstract
     protected function getUserAndTokenRows($token)
     {
         do {
-
             if (null === $token) {
                 break;
             }
@@ -75,14 +94,12 @@ class ResetPassword extends PageAbstract
             }
 
             $usersTable = new UsersTableGateway();
-
-            $userRow = $usersTable->find($tokenRow->get('user_id'));
+            $userRow    = $usersTable->find($tokenRow->get('user_id'));
 
             return [
                 'token' => $tokenRow,
                 'user'  => $userRow,
             ];
-
         } while (false);
 
         throw new Exception('Invalid token');
