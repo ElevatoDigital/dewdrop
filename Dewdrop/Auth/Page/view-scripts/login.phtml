@@ -17,6 +17,10 @@ if ($this->error) {
             <div class="alert alert-danger"><?php echo $this->escapeHtml($this->error); ?></div>
             <?php endif;?>
 
+            <?php if ($this->token):?>
+                <div class="alert alert-success">Password successfully reset.</div>
+            <?php endif;?>
+
             <div class="form-group">
                 <label for="username">Username</label>
                 <input id="username" type="text" name="_username" class="form-control" autofocus

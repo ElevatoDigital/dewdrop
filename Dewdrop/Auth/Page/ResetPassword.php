@@ -46,7 +46,7 @@ class ResetPassword extends PageAbstract
                     ->hashPassword($request->getPost('password'))
                     ->save();
 
-                return $this->app->redirect('/auth/login');
+                return $this->app->redirect('/auth/login?token=' . $userAndToken['token']->get('token'));
             }
         }
 
