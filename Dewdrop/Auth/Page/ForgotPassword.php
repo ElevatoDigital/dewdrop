@@ -23,7 +23,6 @@ class ForgotPassword extends PageAbstract
     public function respond()
     {
         if ($this->request->isMethod('POST')) {
-
             /* @var $usersTable \Dewdrop\Auth\Db\UsersTableGateway */
             $usersTable = $this->app['users-gateway'];
 

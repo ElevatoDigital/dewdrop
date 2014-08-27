@@ -206,6 +206,7 @@ class Auth
         $mailView = new MailView();
         $mailView
             ->assign('resetPasswordUrl', $resetPasswordUrl)
+            ->assign('title', $this->title)
             ->setScriptPath(__DIR__ . '/Auth/view-scripts');
 
         $bodyHtml = $mailView->render('forgot-password-email-html.phtml');
