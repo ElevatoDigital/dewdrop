@@ -93,6 +93,8 @@ class EditHelperDetector
             return 'wpSelect';
         } elseif ($field->isType('clob', 'string', 'numeric')) {
             return 'wpInputText';
+        } elseif ($field->isType('date')) {
+            return 'wpDatePicker';
         }
 
         throw new Exception(
