@@ -50,13 +50,6 @@ class EditHelperDetectorTest extends BaseTestCase
         $this->assertEquals('textarea', $this->detector->detect($field));
     }
 
-    public function testNumericFieldWillUseWpInputTextByDefault()
-    {
-        $field = $this->getTestField('numeric');
-
-        $this->assertEquals('inputText', $this->detector->detect($field));
-    }
-
     public function testBooleanFieldWillUseCheckboxByDefault()
     {
         $field = $this->getTestField('boolean');
