@@ -148,7 +148,7 @@ class Inflector
         foreach ($irregulars as $singular => $plural) {
             if (preg_match('/(' . $plural . ')$/i', $word, $arr)) {
                 return preg_replace(
-                    '/('.$_plural.')$/i',
+                    '/('.$plural.')$/i',
                     substr($arr[0], 0, 1) . substr($singular, 1),
                     $word
                 );
