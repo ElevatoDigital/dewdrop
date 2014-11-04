@@ -251,6 +251,10 @@ class Row implements ArrayAccess
             throw new Exception("Setting value on invalid  column \"{$column}\"");
         }
 
+        if ($this->table->hasEav() && $this->table->getEav()->hasAttribute($column)) {
+            $this->virtualFieldsInitialized[] = $column;
+        }
+
         if (is_bool($value)) {
             $value = (int) $value;
         }
@@ -307,6 +311,7 @@ class Row implements ArrayAccess
 
         if ($this->table->hasManyToManyRelationship($name)
             && !in_array($name, $this->virtualFieldsInitialized)
+            && !isset($this->data[$name])
         ) {
             $relationship = $this->table->getManyToManyRelationship($name);
 
@@ -405,12 +410,12 @@ class Row implements ArrayAccess
 
             $this->table->update($updateData, $this->assembleUpdateWhereClause());
         } else {
-            $this->table->insert($this->data);
+            $id = $this->table->insert($this->data);
 
             // Set value of auto-incrementing primary key, if available
             foreach ($this->table->getMetadata('columns') as $column => $metadata) {
                 if ($metadata['IDENTITY'] && $metadata['PRIMARY']) {
-                    $this->set($column, $this->getTable()->getAdapter()->lastInsertId());
+                    $this->set($column, $id);
                 }
             }
         }
