@@ -17,8 +17,7 @@ use Dewdrop\Fields\Edit as EditFields;
 use Zend\InputFilter\InputFilter;
 
 /**
- * @deprecated
- * @see \Dewdrop\Fields\RowEditor
+ * DEPRECATED!  Look at \Dewdrop\Fields\RowEditor instead.
  *
  * An abstract page controller to make the standard edit page workflow easier
  * to implement.  When extending this class, the normal page controller workflow
@@ -75,6 +74,9 @@ use Zend\InputFilter\InputFilter;
  * }
  *
  * </pre>
+ *
+ * @deprecated
+ * @see \Dewdrop\Fields\RowEditor
  */
 abstract class EditAbstract extends PageAbstract
 {

@@ -291,13 +291,16 @@ class Mock implements DriverInterface
 
     /**
      * Quote the supplied input using the appropriate method for your database
-     * platform/driver.
+     * platform/driver.  We're using addslashes() in the Mock driver because it
+     * allows us to test that quoteInternal() is being called during tests without
+     * using MySQL or Postgres functions directly.  addslashes() in production
+     * would be inappropriate.
      *
      * @param string $input
      * @return string
      */
     public function quoteInternal($input)
     {
-        return $input;
+        return "'" . addslashes($input) . "'";
     }
 }
