@@ -6,14 +6,10 @@
  * @link      https://github.com/DeltaSystems/dewdrop
  * @copyright Delta Systems (http://deltasys.com)
  * @license   https://github.com/DeltaSystems/dewdrop/LICENSE
- *
- * @category   Dewdrop
- * @package    Cli
  */
 
 namespace Dewdrop\Cli;
 
-use Dewdrop\Bootstrap\Detector as BootstrapDetector;
 use Dewdrop\Paths;
 use Dewdrop\Db\Adapter;
 use Dewdrop\Pimple as DewdropPimple;

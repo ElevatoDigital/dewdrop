@@ -170,6 +170,16 @@ class Date
         return $this;
     }
 
+    /**
+     * Apply the filter to the supplied Select object.
+     *
+     * @param Select $select
+     * @param string $conditionSetName
+     * @param array $queryVars
+     * @return Select
+     * @throws InvalidOperator
+     * @throws MissingQueryVar
+     */
     public function apply(Select $select, $conditionSetName, array $queryVars)
     {
         $this->validate($queryVars);
@@ -195,6 +205,7 @@ class Date
                 $startObj = new DateTime($queryVars['start']);
                 $startIso = $startObj->format($format);
             } catch (Exception $e) {
+                // If we get input we can't parse, we just throw it out
             }
         }
 
@@ -203,6 +214,7 @@ class Date
                 $endObj = new DateTime($queryVars['end']);
                 $endIso = $endObj->format($format);
             } catch (Exception $e) {
+                // If we get input we can't parse, we just throw it out
             }
         }
 
@@ -218,16 +230,47 @@ class Date
         return $this->$methodName($select, $conditionSetName, $startIso, $endIso);
     }
 
+    /**
+     * Filter the Select to find records on or between the start and end dates.
+     *
+     * @param Select $select
+     * @param string $conditionSetName
+     * @param string $start
+     * @param string $end
+     * @return Select
+     */
     public function filterOnOrBetween(Select $select, $conditionSetName, $start, $end)
     {
         return $this->filterBetweenInternal(true, $select, $conditionSetName, $start, $end);
     }
 
+    /**
+     * Filter the Select to find records between the start and end dates.
+     *
+     * @param Select $select
+     * @param string $conditionSetName
+     * @param string $start
+     * @param string $end
+     * @return Select
+     */
     public function filterBetween(Select $select, $conditionSetName, $start, $end)
     {
         return $this->filterBetweenInternal(false, $select, $conditionSetName, $start, $end);
     }
 
+    /**
+     * This method does the heavy-lifting for the two "between" operators (both
+     * inclusive and exclusive).  This method will attempt to handle situations
+     * where we don't actually have a start or end date by delegating to other
+     * methods.
+     *
+     * @param bool $inclusive
+     * @param Select $select
+     * @param string $conditionSetName
+     * @param string $start
+     * @param string $end
+     * @return Select
+     */
     private function filterBetweenInternal($inclusive, Select $select, $conditionSetName, $start, $end)
     {
         if (!$start && !$end) {
@@ -282,6 +325,19 @@ class Date
         return $this->filterSingleInputInternal(false, $select, $conditionSetName, 'equal', $start);
     }
 
+    /**
+     * This method does the heavy lifting for all the single-input operators
+     * this filter supports.
+     *
+     * @param bool $inclusive
+     * @param Select $select
+     * @param string $conditionSetName
+     * @param string $type
+     * @param string $value
+     * @return $this
+     * @throws Exception
+     * @throws SelectException
+     */
     private function filterSingleInputInternal($inclusive, Select $select, $conditionSetName, $type, $value)
     {
         if ('after' !== $type && 'before' !== $type && 'equal' !== $type) {
@@ -326,6 +382,15 @@ class Date
         return $quotedAlias;
     }
 
+    /**
+     * Ensure the expected input vars were supplied before we attempt to apply
+     * a filter.  We need the "comp" variable, which gives us the operator,
+     * along with a start and end date.
+     *
+     * @param array $vars
+     * @throws InvalidOperator
+     * @throws MissingQueryVar
+     */
     private function validate(array $vars)
     {
         if (!isset($vars['comp'])) {

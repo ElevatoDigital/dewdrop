@@ -19,8 +19,20 @@ use Dewdrop\Fields;
  */
 interface SelectModifierInterface
 {
+    /**
+     * Set a prefix that should be used when pulling information from the
+     * request.
+     *
+     * @param string $prefix
+     * @return mixed
+     */
     public function setPrefix($prefix);
 
+    /**
+     * Get the prefix used for request parameters.
+     *
+     * @return string
+     */
     public function getPrefix();
 
     /**

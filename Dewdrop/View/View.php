@@ -111,6 +111,7 @@ class View
      * in sanitizing output in various contexts.
      *
      * @param Escaper $escaper
+     * @param Request $request
      */
     public function __construct(Escaper $escaper = null, Request $request = null)
     {
@@ -277,6 +278,7 @@ class View
      *
      * @param string $template
      * @param array $data
+     * @param string $scriptPath
      * @return string
      */
     public function partial($template, array $data, $scriptPath = null)

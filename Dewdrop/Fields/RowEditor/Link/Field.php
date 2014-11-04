@@ -61,6 +61,7 @@ class Field implements LinkInterface
      * Provide a field that can be used when looking up the primary key value
      * for the generated row object.
      *
+     * @param RowEditor $rowEditor
      * @param DbField $field
      */
     public function __construct(RowEditor $rowEditor, DbField $field)
@@ -113,6 +114,7 @@ class Field implements LinkInterface
      * this method would set the value of the orderModel's address_id field
      * to the primary key of the addresses row.
      *
+     * @param Row $row
      * @return \Dewdrop\Fields\RowEditor\Link\Field
      */
     public function populateValueFromSavedRow(Row $row)

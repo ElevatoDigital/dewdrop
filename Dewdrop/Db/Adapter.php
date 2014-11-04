@@ -150,7 +150,9 @@ class Adapter
     }
 
     /**
-     * @return DriverInterface|WpdbDriver|mixed|null
+     * Get the driver being used to perform work for this DB adapter.
+     *
+     * @return DriverInterface
      */
     public function getDriver()
     {

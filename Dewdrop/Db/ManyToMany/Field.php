@@ -66,7 +66,7 @@ class Field extends BaseField
      * Set the ManyToMany relationship that is used by this field to manage
      * values and options for this field.
      *
-     * @param Relationship
+     * @param Relationship $manyToManyRelationship
      * @return \Dewdrop\Db\ManyToMany\Field
      */
     public function setManyToManyRelationship(Relationship $manyToManyRelationship)

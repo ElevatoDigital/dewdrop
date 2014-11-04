@@ -92,6 +92,7 @@ class Groups implements FilterInterface
      * </pre>
      *
      * @see \Dewdrop\Admin\Page\Stock\SortFields
+     * @param Fields $fields
      * @return array
      */
     public function getConfigForFields(Fields $fields)

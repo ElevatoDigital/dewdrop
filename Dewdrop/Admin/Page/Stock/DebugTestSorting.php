@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * Dewdrop
+ *
+ * @link      https://github.com/DeltaSystems/dewdrop
+ * @copyright Delta Systems (http://deltasys.com)
+ * @license   https://github.com/DeltaSystems/dewdrop/LICENSE
+ */
+
 namespace Dewdrop\Admin\Page\Stock;
 
 use Dewdrop\Admin\Page\PageAbstract;
@@ -7,8 +15,17 @@ use Dewdrop\Fields;
 use Dewdrop\Fields\Test\ListingSort as ListingSortTest;
 use ReflectionClass;
 
+/**
+ * This page will test every possible sort in a CRUD component's fields and
+ * listing to ensure each field can be sorted in both ASC and DESC order
+ * without causing an error.
+ */
 class DebugTestSorting extends PageAbstract
 {
+    /**
+     * Perform the actual tests using a ListingSortTest object and pass the
+     * results to our view for rendering.
+     */
     public function render()
     {
         $this->component->getPermissions()->haltIfNotAllowed('debug');

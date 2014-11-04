@@ -545,17 +545,37 @@ abstract class Table
         return $this->db->select();
     }
 
+    /**
+     * Generate a listing Select object.  A listing attempts to include
+     * values for foreign keys, many-to-many relationships for contexts
+     * such as admin CRUD components where you intend to display all the
+     * information related to a certain set of entities.
+     *
+     * @return Select
+     */
     public function selectListing()
     {
         $listing = new TableListing($this);
         return $listing->select();
     }
 
+    /**
+     * By default, returns the same value as selectListing().  However,
+     * this is here as a placeholder for any admin-area specific listing
+     * changes you need to make for this model.
+     *
+     * @return Select
+     */
     public function selectAdminListing()
     {
         return $this->selectListing();
     }
 
+    /**
+     * Get all the field providers added to this table.
+     *
+     * @return array
+     */
     public function getFieldProviders()
     {
         return $this->fieldProviders;
@@ -727,6 +747,13 @@ abstract class Table
         return implode(' AND ', $where);
     }
 
+    /**
+     * If this table has date_created or datetime_created columns, supply a
+     * value for them automatically during insert().
+     *
+     * @param array $data
+     * @return array
+     */
     private function augmentInsertedDataArrayWithDateFields(array $data)
     {
         if ($this->getMetadata('columns', 'date_created')) {
@@ -738,6 +765,13 @@ abstract class Table
         return $this->augmentUpdatedDataArrayWithDateFields($data);
     }
 
+    /**
+     * If this table has date_updated or datetime_updated columns, supply a
+     * value for them automatically during update().
+     *
+     * @param array $data
+     * @return array
+     */
     private function augmentUpdatedDataArrayWithDateFields(array $data)
     {
         if ($this->getMetadata('columns', 'date_updated')) {

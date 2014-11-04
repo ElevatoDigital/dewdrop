@@ -19,6 +19,12 @@ use Dewdrop\Pimple;
  */
 class BowerUrl extends AbstractHelper
 {
+    /**
+     * This static property is just used as a cache for the www path, so we don't
+     * have to rebuild it repeatedly for reach Bower file we're including.
+     *
+     * @var string
+     */
     private static $wwwPath;
 
     /**

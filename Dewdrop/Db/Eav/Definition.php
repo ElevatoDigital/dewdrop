@@ -220,6 +220,16 @@ class Definition
         return array_key_exists($name, $this->attributes);
     }
 
+    /**
+     * Set the index of the column in the attributes table that will be used to
+     * determine if an attribute is required or not.  Useful if you require
+     * an attribute in some contexts but not others (e.g. you have a column
+     * called "is_required_public" and another called "is_required_admin" and
+     * need to consult a different column depending upon who is logged in).
+     *
+     * @param string $requiredIndex
+     * @return $this
+     */
     public function setRequiredIndex($requiredIndex)
     {
         $this->requiredIndex = $requiredIndex;
@@ -418,6 +428,17 @@ class Definition
         return $this->attributes;
     }
 
+    /**
+     * Determine a generic data type appropriate for the supplied EAV type.
+     * The EAV backend value tables are named after the data types in the DB,
+     * so they don't directly match generic types from our PHP API.  This
+     * method maps the two domains together so that we can check an EAV
+     * field's generic type in our application code.
+     *
+     * @param string $eavType
+     * @return string
+     * @throws Exception
+     */
     private function detectGenericType($eavType)
     {
         switch ($eavType) {

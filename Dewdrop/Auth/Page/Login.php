@@ -13,7 +13,7 @@ namespace Dewdrop\Auth\Page;
 use Dewdrop\Auth\Db\UserPasswordChangeTokensTableGateway;
 
 /**
- * Login page
+ * Generic login page used by Dewdrop's built-in auth module.
  */
 class Login extends PageAbstract
 {
@@ -41,6 +41,12 @@ class Login extends PageAbstract
         return $this->renderLayout($this->view->render('login.phtml'));
     }
 
+    /**
+     * Look in the DB for a password change token matching the current request.
+     *
+     * @param string $token
+     * @return \Dewdrop\Db\Row|null
+     */
     private function findToken($token)
     {
         $tokenTable = new UserPasswordChangeTokensTableGateway();

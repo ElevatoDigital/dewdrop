@@ -230,6 +230,7 @@ interface DriverInterface
      * Use the functions available in the RDBMS to truncate the provided timestamp
      * column to a date.
      *
+     * @param string $timestamp
      * @return string
      */
     public function truncateTimeStampToDate($timestamp);
