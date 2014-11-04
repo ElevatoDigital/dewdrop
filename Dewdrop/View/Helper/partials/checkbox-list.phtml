@@ -1,4 +1,4 @@
-<ul class="checkbox-list">
+<ul class="<?php echo $this->escapeHtmlAttr(implode(' ', $this->classes));?>">
     <?php
     foreach ($this->options as $value => $title) {
         echo '<li>';
