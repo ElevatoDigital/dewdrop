@@ -413,10 +413,11 @@ class Row implements ArrayAccess
             $id = $this->table->insert($this->data);
 
             // Set value of auto-incrementing primary key, if available
-            foreach ($this->table->getMetadata('columns') as $column => $metadata) {
-                if ($metadata['IDENTITY'] && $metadata['PRIMARY']) {
-                    $this->set($column, $id);
-                }
+            if ($id) {
+                $this->set(
+                    current($this->table->getPrimaryKey()),
+                    $id
+                );
             }
         }
 

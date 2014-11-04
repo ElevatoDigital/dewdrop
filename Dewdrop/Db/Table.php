@@ -514,7 +514,7 @@ abstract class Table
 
         foreach ($this->getMetadata('columns') as $column => $metadata) {
             if ($metadata['PRIMARY']) {
-                $position  = $metadata['PRIMARY_POSITION'];
+                $position = $metadata['PRIMARY_POSITION'];
 
                 $columns[$position] = $column;
             }
@@ -567,8 +567,12 @@ abstract class Table
      * Data should be supplied as key value pairs, with the keys representing
      * the column names.
      *
+     * We return the ID of the inserted row because if we do not return it from
+     * insert(), it will be impossible to retrieve it, if we have many-to-many
+     * or EAV fields that also inserted rows before this method returns.
+     *
      * @param array $data
-     * @return integer Last insert ID.
+     * @return integer|null Last insert ID, if the table has auto-incrementing key.
      */
     public function insert(array $data)
     {
@@ -579,7 +583,14 @@ abstract class Table
             )
         );
 
-        $result = $this->getAdapter()->lastInsertId();
+        $result = null;
+
+        foreach ($this->getMetadata('columns') as $column => $metadata) {
+            if ($metadata['IDENTITY'] && $metadata['PRIMARY']) {
+                $result = $this->getAdapter()->lastInsertId();
+                break;
+            }
+        }
 
         $this
             ->saveManyToManyRelationships($data, $result)

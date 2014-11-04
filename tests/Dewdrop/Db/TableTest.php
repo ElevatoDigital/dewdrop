@@ -159,9 +159,9 @@ class TableTest extends DbTestCase
         $this->assertInstanceOf('\Dewdrop\Db\Adapter', $this->table->getAdapter());
     }
 
-    public function testInsertAddsToTableSuccessfullyAndReturnsCountOfRowsAffected()
+    public function testInsertReturnsLastInsertId()
     {
-        $affected = $this->table->insert(
+        $id = $this->table->insert(
             array(
                 'name'                   => 'Peach',
                 'is_delicious'           => 1,
@@ -169,9 +169,7 @@ class TableTest extends DbTestCase
             )
         );
 
-        $this->assertEquals(1, $affected);
-        $this->assertEquals(6, $this->db->lastInsertId());
-        $this->assertEquals(6, $this->db->fetchOne('SELECT COUNT(*) FROM dewdrop_test_fruits'));
+        $this->assertEquals(6, $id);
     }
 
     public function testUpdateSuccessfullySavesExistingRowAndReturnsRowsAffected()
