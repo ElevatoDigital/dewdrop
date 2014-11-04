@@ -32,7 +32,9 @@ class FilterType extends HelperAbstract
         }
 
         if ($field->isType('reference')) {
-            return $this->handleDbReference($field);
+            return $this->handleDbReference($field, 'reference');
+        } elseif ($field->isType('manytomany')) {
+            return $this->handleDbReference($field, 'manytomany');
         }
 
         if ($field->isType('boolean')) {
@@ -55,13 +57,15 @@ class FilterType extends HelperAbstract
                 );
             };
         }
+
+        return false;
     }
 
-    protected function handleDbReference(DbField $field)
+    protected function handleDbReference(DbField $field, $type)
     {
-        return function () use ($field) {
+        return function () use ($field, $type) {
             return array(
-                'type'    => 'reference',
+                'type'    => $type,
                 'options' => array(
                     'options' => $field->getOptionPairs()->fetch()
                 )

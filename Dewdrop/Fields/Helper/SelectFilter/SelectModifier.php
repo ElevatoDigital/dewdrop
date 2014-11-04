@@ -3,7 +3,9 @@
 namespace Dewdrop\Fields\Helper\SelectFilter;
 
 use Dewdrop\Db\Field as DbField;
+use Dewdrop\Db\Eav\Field as EavField;
 use Dewdrop\Db\Select;
+use Dewdrop\Db\Select\Filter\ManyToMany as ManyToManyFilter;
 use Dewdrop\Fields;
 use Dewdrop\Fields\Exception;
 use Dewdrop\Fields\FieldInterface;
@@ -171,27 +173,35 @@ class SelectModifier extends HelperAbstract implements SelectModifierInterface
             return false;
         }
 
-        if ($field->isType('reference')) {
-            //$type = 'Reference';
-        } elseif ($field->isType('boolean')) {
-            //$type = 'Boolean';
-        } elseif ($field->isType('date', 'timestamp')) {
-            $type = 'Date';
-        } elseif ($field->isType('integer', 'float')) {
-            //$type = 'Numeric';
-        } elseif ($field->isType('clob', 'text')) {
-            $type = 'Text';
+        if ($field->isType('manytomany')) {
+            /* @var $field \Dewdrop\Db\ManyToMany\Field */
+            $filter = new ManyToManyFilter($field->getManyToManyRelationship());
         } else {
-            return false;
-        }
+            if ($field->isType('reference')) {
+                $type = 'Reference';
+            } elseif ($field->isType('boolean')) {
+                $type = 'Boolean';
+            } elseif ($field->isType('date', 'timestamp')) {
+                $type = 'Date';
+            } elseif ($field->isType('integer', 'float')) {
+                //$type = 'Numeric';
+            } elseif ($field->isType('clob', 'text')) {
+                $type = 'Text';
+            } else {
+                return false;
+            }
 
-        // @todo Remove this little fallback after initial development
-        if (null === $type) {
-            $type = 'Text';
-        }
+            if ($field instanceof EavField) {
+                $tableName = $field->getName();
+                $fieldName = 'value';
+            } else {
+                $tableName = $field->getTable()->getTableName();
+                $fieldName = $field->getName();
+            }
 
-        $className = '\Dewdrop\Db\Select\Filter\\' . $type;
-        $filter    = new $className($field->getTable()->getTableName(), $field->getName());
+            $className = '\Dewdrop\Db\Select\Filter\\' . $type;
+            $filter    = new $className($tableName, $fieldName);
+        }
 
         return function ($helper, $select, $conditionSetName, $queryVars) use ($filter) {
             return $filter->apply($select, $conditionSetName, $queryVars);
