@@ -51,7 +51,7 @@ abstract class AbstractHelper
      * This method is used by \Dewdrop\View\View::__call() to allow direct
      * execution of a helper.
      *
-     * @return \Dewdrop\View\Helper\AbstractHelper
+     * @return mixed
      */
     public function direct()
     {

@@ -31,6 +31,8 @@ class BootstrapFilterForm extends AbstractHelper
      *    when working with a typical admin component.
      *
      * 3) A set of fields, a SelectFilter and a title.
+     *
+     * @return string
      */
     public function direct()
     {
@@ -91,6 +93,13 @@ class BootstrapFilterForm extends AbstractHelper
         );
     }
 
+    /**
+     * Render the filter form, wrapped in the panel used by typical admin CRUD
+     * components, rather than as a standalone form.
+     *
+     * @param CrudInterface $component
+     * @return string
+     */
     public function adminPanel(CrudInterface $component)
     {
         return $this->partial(

@@ -54,7 +54,7 @@ class BootstrapForm extends AbstractHelper
      * a single step.
      *
      * @param Fields $fields
-     * @param InputFilter $inputFiler
+     * @param InputFilter $inputFilter
      * @param Renderer $renderer
      * @return string
      */
@@ -258,9 +258,10 @@ class BootstrapForm extends AbstractHelper
     /**
      * Render the supplied validation messages using Bootstraps' help-block class.
      *
+     * @param array $messages
      * @return string
      */
-    public function renderMessages($messages)
+    public function renderMessages(array $messages)
     {
         $output = '';
 

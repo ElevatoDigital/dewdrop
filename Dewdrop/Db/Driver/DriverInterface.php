@@ -233,4 +233,13 @@ interface DriverInterface
      * @return string
      */
     public function truncateTimeStampToDate($timestamp);
+
+    /**
+     * Quote the supplied input using the appropriate method for your database
+     * platform/driver.
+     *
+     * @param string $input
+     * @return string
+     */
+    public function quoteInternal($input);
 }

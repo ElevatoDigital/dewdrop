@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * Dewdrop
+ *
+ * @link      https://github.com/DeltaSystems/dewdrop
+ * @copyright Delta Systems (http://deltasys.com)
+ * @license   https://github.com/DeltaSystems/dewdrop/LICENSE
+ */
+
 namespace Dewdrop\Db\Select\Filter;
 
 use DateTime;
@@ -7,43 +15,140 @@ use Dewdrop\Db\Select;
 use Dewdrop\Db\Select\Filter\Exception\InvalidOperator;
 use Dewdrop\Db\Select\Filter\Exception\MissingQueryVar;
 use Dewdrop\Db\Select\SelectException;
+use Dewdrop\Inflector;
 use Dewdrop\Pimple;
 use Exception;
 
+/**
+ * A filter implementation for date (and related datatypes such as timestamps)
+ * fields.  This is the most complex filter.  It provides many different operators
+ * to help select common date ranges (e.g. "This Month").
+ *
+ * Internally, this filter divides a lot of its code between operators that require
+ * a single input (e.g. OP_IS) and those that require two inputs to check a range
+ * of dates (e.g. OP_BETWEEN).
+ */
 class Date
 {
+    /**
+     * Operator constant for dates in a range (inclusive).
+     *
+     * @const
+     */
     const OP_ON_OR_BETWEEN = 'on-or-between';
 
+    /**
+     * Operator constant for dates in a range (exclusive).
+     *
+     * @const
+     */
     const OP_BETWEEN = 'between';
 
+    /**
+     * Operator constant for dates before value (inclusive).
+     *
+     * @const
+     */
     const OP_ON_OR_BEFORE = 'on-or-before';
 
+    /**
+     * Operator constant for dates before value (exclusive).
+     *
+     * @const
+     */
     const OP_BEFORE = 'before';
 
+    /**
+     * Operator constant for dates after value (inclusive).
+     *
+     * @const
+     */
     const OP_ON_OR_AFTER = 'on-or-after';
 
+    /**
+     * Operator constant for dates after value (exclusive).
+     *
+     * @const
+     */
     const OP_AFTER = 'after';
 
+    /**
+     * Operator constant for exact date match.
+     *
+     * @const
+     */
     const OP_IS = 'is';
 
+    /**
+     * Operator constant for today.
+     *
+     * @const
+     */
     const OP_TODAY = 'today';
 
+    /**
+     * Operator constant for yesterday.
+     *
+     * @const
+     */
     const OP_YESTERDAY = 'yesterday';
 
+    /**
+     * Operator constant for this week.
+     *
+     * @const
+     */
     const OP_THIS_WEEK = 'this-week';
 
+    /**
+     * Operator constant for this month.
+     *
+     * @const
+     */
     const OP_THIS_MONTH = 'this-month';
 
+    /**
+     * Operator constant for this year.
+     *
+     * @const
+     */
     const OP_THIS_YEAR = 'this-year';
 
+    /**
+     * The name of the table in which the filtered column is present.
+     *
+     * @var string
+     */
     private $tableName;
 
+    /**
+     * The name of the DB column you need to filter.
+     *
+     * @var string
+     */
     private $columnName;
 
+    /**
+     * Inflector object used when converting from operator to filter method name.
+     *
+     * @var Inflector
+     */
     private $inflector;
 
+    /**
+     * Whether to cut off time values on timestamps when filtering input.
+     *
+     * @var bool
+     */
     private $truncateTimestamps = true;
 
+    /**
+     * Provide the table and column names that will be filtered by this object.
+     *
+     * @param string $tableName
+     * @param string $columnName
+     * @param Inflector $inflector
+     */
     public function __construct($tableName, $columnName, Inflector $inflector = null)
     {
         $this->tableName   = $tableName;
@@ -51,6 +156,13 @@ class Date
         $this->inflector   = ($inflector ?: Pimple::getResource('inflector'));
     }
 
+    /**
+     * Set whether time values should be truncated from timestamps when filtering
+     * input.
+     *
+     * @param bool $truncateTimestamps
+     * @return $this
+     */
     public function setTruncateTimestamps($truncateTimestamps)
     {
         $this->truncateTimestamps = $truncateTimestamps;
@@ -189,6 +301,9 @@ class Date
             case 'equal':
                 $operator = '=';
                 break;
+            default:
+                throw new Exception("filterSingleInputInternal expects before, after or equal operators only.");
+                break;
         }
 
         return $select->whereConditionSet(
@@ -230,6 +345,12 @@ class Date
         }
     }
 
+    /**
+     * Check to see if the supplied operator is valid.
+     *
+     * @param string $operator
+     * @return bool
+     */
     private function isValidOperator($operator)
     {
         switch ($operator) {

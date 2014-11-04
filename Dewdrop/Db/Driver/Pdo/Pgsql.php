@@ -234,6 +234,12 @@ class Pgsql implements DriverInterface
         return '"';
     }
 
+    /**
+     * Quote the supplied input using PDO's quote() method.
+     *
+     * @param $input
+     * @return string
+     */
     public function quoteInternal($input)
     {
         return $this->pdo->quote($input);

@@ -503,4 +503,16 @@ class Wpdb implements DriverInterface
     {
         return "DATE({$timestamp})";
     }
+
+    /**
+     * Quote the supplied input using mysql_real_escape_string() because WordPress
+     * is really gross.
+     *
+     * @param string $input
+     * @return string
+     */
+    public function quoteInternal($input)
+    {
+        return mysql_real_escape_string($input);
+    }
 }
