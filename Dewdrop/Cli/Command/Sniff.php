@@ -97,7 +97,7 @@ class Sniff extends CommandAbstract
 
         $cmd = sprintf(
             '%s --standard=%s --extensions=php '
-            . '--ignore=*/vendor/* --ignore=*/tests/* --ignore=*/www/* --ignore=*/.git/* '
+            . '--ignore=*/vendor/* --ignore=*/metadata/* --ignore=*/tests/* --ignore=*/www/* --ignore=*/.git/* '
             . '%s %s',
             $this->phpcs,
             escapeshellarg($this->standard),
