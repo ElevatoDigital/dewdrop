@@ -1,5 +1,5 @@
 define(
-    ['type/base-view', 'text!type/reference-template.html'],
+    ['type/base-view', 'text!type/manytomany-template.html'],
     function (BaseView, templateHtml) {
         'use strict';
 
