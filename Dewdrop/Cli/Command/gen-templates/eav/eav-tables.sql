@@ -60,3 +60,12 @@ CREATE TABLE {{tableName}}_eav_values_int (
     {{primaryKeyForeignKeys}}
     PRIMARY KEY ({{primaryKeyColumnList}}, attribute_id)
 ) ENGINE=InnoDB CHARSET=utf8;
+
+CREATE TABLE {{tableName}}_eav_values_boolean (
+    {{primaryKeyColumns}}
+    attribute_id INTEGER NOT NULL,
+    value BOOLEAN,{{multiColumnPrimaryKeyIndexes}}
+    INDEX (attribute_id),
+    {{primaryKeyForeignKeys}}
+    PRIMARY KEY ({{primaryKeyColumnList}}, attribute_id)
+) ENGINE=InnoDB CHARSET=utf8;
