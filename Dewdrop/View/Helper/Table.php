@@ -10,7 +10,6 @@
 
 namespace Dewdrop\View\Helper;
 
-use Dewdrop\Exception;
 use Dewdrop\Fields;
 use Dewdrop\Fields\Helper\SelectSort;
 use Dewdrop\Fields\Helper\TableCell as TableCellHelper;
@@ -26,23 +25,28 @@ class Table extends AbstractHelper
         // No argument passed, assume they want to call other methods
         if (0 === count($args)) {
             return $this;
-        }
-
-        if (!isset($args[0]) || !$args[0] instanceof Fields ||
-            !isset($args[1]) || !is_array($args[1])
-        ) {
-            throw new Exception('Table helper takes either no arguments or an array of fields and an array of data');
         } else {
-            $fields   = $args[0]->getVisibleFields();
-            $data     = $args[1];
-            $renderer = (isset($args[2]) ? $args[2] : $this->view->tableCellRenderer());
-            $sorter   = (isset($args[3]) && $args[3] instanceof SelectSort ? $args[3] : null);
-
-            return $this->open()
-                . $this->renderHead($fields, $renderer, $sorter)
-                . $this->renderBody($fields, $data, $renderer)
-                . $this->close();
+            return call_user_func_array([$this, 'directWithArgs'], $args);
         }
+    }
+
+    public function directWithArgs(
+        Fields $fields,
+        array $data,
+        TableCellHelper $renderer = null,
+        SelectSort $sorter = null
+    )
+    {
+        $fields = $fields->getVisibleFields();
+
+        if (null === $renderer) {
+            $renderer = $this->view->tableCellRenderer();
+        }
+
+        return $this->open()
+            . $this->renderHead($fields, $renderer, $sorter)
+            . $this->renderBody($fields, $data, $renderer)
+            . $this->close();
     }
 
     public function open()
