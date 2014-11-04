@@ -11,6 +11,7 @@
 namespace Dewdrop\Db\FieldProvider;
 
 use Dewdrop\Db\Field;
+use Dewdrop\Db\Select;
 use Dewdrop\Db\Table;
 
 /**
@@ -72,5 +73,16 @@ class Metadata implements ProviderInterface
     public function getAllNames()
     {
         return array_keys($this->table->getMetadata('columns'));
+    }
+
+    /**
+     * This is a no-op for the metadata provider.
+     *
+     * @param Select $select
+     * @return Select
+     */
+    public function augmentSelect(Select $select)
+    {
+        return $select;
     }
 }

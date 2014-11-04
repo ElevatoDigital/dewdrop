@@ -10,6 +10,8 @@
 
 namespace Dewdrop\Db\FieldProvider;
 
+use Dewdrop\Db\Select;
+
 /**
  * The field provider interface allows a table object to easily manage
  * fields coming from several different sources (i.e. physical DB columns,
@@ -42,4 +44,12 @@ interface ProviderInterface
      * @return array
      */
     public function getAllNames();
+
+    /**
+     * Augment the provided Select object with values from this field provider.
+     *
+     * @param Select $select
+     * @return Select
+     */
+    public function augmentSelect(Select $select);
 }

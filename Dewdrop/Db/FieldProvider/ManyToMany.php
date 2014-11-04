@@ -11,6 +11,8 @@
 namespace Dewdrop\Db\FieldProvider;
 
 use Dewdrop\Db\ManyToMany\Field;
+use Dewdrop\Db\ManyToMany\Relationship;
+use Dewdrop\Db\Select;
 use Dewdrop\Db\Table;
 
 /**
@@ -75,5 +77,15 @@ class ManyToMany implements ProviderInterface
     public function getAllNames()
     {
         return array_keys($this->table->getManyToManyRelationships());
+    }
+
+    public function augmentSelect(Select $select)
+    {
+        /* @var $relationship Relationship */
+        foreach ($this->table->getManyToManyRelationships() as $name => $relationship) {
+            $relationship->augmentSelect($select, $name);
+        }
+
+        return $select;
     }
 }
