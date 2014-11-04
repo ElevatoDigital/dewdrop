@@ -128,7 +128,7 @@ class Fields implements ArrayAccess, IteratorAggregate, Countable
      * set for this collection.
      *
      * @param array $fields
-     * @param UserInterface $fields
+     * @param UserInterface $user
      */
     public function __construct(array $fields = null, UserInterface $user = null)
     {
@@ -140,7 +140,7 @@ class Fields implements ArrayAccess, IteratorAggregate, Countable
 
         if (null !== $user) {
             $this->user = $user;
-        } elseif (Pimple::hasResource('user')) {
+        } elseif (Pimple::hasResource('user') && Pimple::getResource('user') instanceof UserInterface) {
             $this->user = Pimple::getResource('user');
         }
     }
