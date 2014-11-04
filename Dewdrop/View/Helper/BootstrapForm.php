@@ -14,6 +14,7 @@ use Dewdrop\Exception;
 use Dewdrop\Fields;
 use Dewdrop\Fields\FieldInterface;
 use Dewdrop\Fields\GroupedFields;
+use Dewdrop\Fields\GroupedFields\Group;
 use Dewdrop\Fields\Helper\EditControl as Renderer;
 use Dewdrop\Pimple;
 use Zend\InputFilter\Input;
@@ -130,6 +131,8 @@ class BootstrapForm extends AbstractHelper
         $output .= '</ul>';
         $output .= '<div class="tab-content">';
 
+        $fieldPosition = 0;
+
         foreach ($groupedFields->getGroups() as $index => $group) {
             if (count($group)) {
                 $output .= sprintf(
@@ -138,9 +141,11 @@ class BootstrapForm extends AbstractHelper
                     $index
                 );
 
-                $output .= $this->renderFields($group, $inputFilter, $renderer);
+                $output .= $this->renderFields($group, $inputFilter, $renderer, $fieldPosition);
 
                 $output .= '</div>';
+
+                $fieldPosition += count($group);
             }
         }
 
@@ -156,14 +161,12 @@ class BootstrapForm extends AbstractHelper
      * @param Fields $fields
      * @param InputFilter $inputFilter
      * @param Renderer $renderer
+     * @param integer $fieldPosition
      * @return string
      */
-    public function renderFields(Fields $fields, InputFilter $inputFilter, Renderer $renderer)
+    public function renderFields(Fields $fields, InputFilter $inputFilter, Renderer $renderer, $fieldPosition = 0)
     {
         $output = '';
-
-        // Track where in the form each field is rendered.  Mainly for autofocus.
-        $fieldPosition = 0;
 
         foreach ($fields->getEditableFields() as $field) {
             $output  .= '<div class="">';
@@ -228,6 +231,12 @@ class BootstrapForm extends AbstractHelper
      */
     public function renderLabel(FieldInterface $field, Renderer $renderer, Input $input = null)
     {
+        $content = $renderer->getLabelRenderer()->render($field);
+
+        if (!$content) {
+            return '';
+        }
+
         return sprintf(
             '<label class="control-label" for="%s">%s%s</label>',
             $this->view->escapeHtmlAttr($field->getHtmlId()),
