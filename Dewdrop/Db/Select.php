@@ -699,7 +699,7 @@ class Select
     public function quoteWithAlias($tableName, $columnName)
     {
         foreach ($this->getPart(self::FROM) as $queryName => $info) {
-            if ($tableName === $info['tableName']) {
+            if ($tableName === $info['tableName'] || $queryName === $tableName) {
                 return $this->getAdapter()->quoteIdentifier("{$queryName}.{$columnName}");
             }
         }
