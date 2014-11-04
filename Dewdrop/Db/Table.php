@@ -11,10 +11,8 @@
 namespace Dewdrop\Db;
 
 use Dewdrop\Db\Eav\Definition as EavDefinition;
-use Dewdrop\Db\ManyToMany\Field as ManyToManyField;
 use Dewdrop\Db\ManyToMany\Relationship as ManyToManyRelationship;
-use Dewdrop\Db\Row;
-use Dewdrop\Db\Field;
+use Dewdrop\Db\Select\TableListing;
 use Dewdrop\Exception;
 use Dewdrop\Pimple;
 
@@ -547,6 +545,22 @@ abstract class Table
         return $this->db->select();
     }
 
+    public function selectListing()
+    {
+        $listing = new TableListing($this);
+        return $listing->select();
+    }
+
+    public function selectAdminListing()
+    {
+        return $this->selectListing();
+    }
+
+    public function getFieldProviders()
+    {
+        return $this->fieldProviders;
+    }
+
     /**
      * Insert a new row.
      *
@@ -554,20 +568,22 @@ abstract class Table
      * the column names.
      *
      * @param array $data
-     * @return integer Number of affected rows.
+     * @return integer Last insert ID.
      */
     public function insert(array $data)
     {
-        $result = $this->db->insert(
+        $this->db->insert(
             $this->tableName,
             $this->augmentInsertedDataArrayWithDateFields(
                 $this->filterDataArrayForPhysicalColumns($data)
             )
         );
 
+        $result = $this->getAdapter()->lastInsertId();
+
         $this
-            ->saveManyToManyRelationships($data)
-            ->saveEav($data);
+            ->saveManyToManyRelationships($data, $result)
+            ->saveEav($data, $result);
 
         return $result;
     }
@@ -765,9 +781,10 @@ abstract class Table
      * insert() or update().
      *
      * @param array $data
+     * @param integer $pkeyValue
      * @return \Dewdrop\Db\Table
      */
-    private function saveManyToManyRelationships(array $data)
+    private function saveManyToManyRelationships(array $data, $pkeyValue = null)
     {
         foreach ($data as $name => $values) {
             if ($this->hasManyToManyRelationship($name)) {
@@ -778,7 +795,7 @@ abstract class Table
                 if (isset($data[$anchorName]) && $data[$anchorName]) {
                     $anchorValue = $data[$anchorName];
                 } else {
-                    $anchorValue = $this->getAdapter()->lastInsertId();
+                    $anchorValue = $pkeyValue;
                 }
 
                 // Can only save xref values if we have anchor value
@@ -797,9 +814,10 @@ abstract class Table
      * via the $data array itself or the lastInsertId().
      *
      * @param array $data
+     * @param integer $pkeyValue
      * @return \Dewdrop\Db\Table
      */
-    private function saveEav(array $data)
+    private function saveEav(array $data, $pkeyValue = null)
     {
         if ($this->hasEav()) {
             $pkey = array();
@@ -809,7 +827,7 @@ abstract class Table
                 if (isset($data[$pkeyColumn]) && $data[$pkeyColumn]) {
                     $pkey[] = $data[$pkeyColumn];
                 } else {
-                    $pkey[] = $this->getAdapter()->lastInsertId();
+                    $pkey[] = $pkeyValue;
                 }
             }
 
