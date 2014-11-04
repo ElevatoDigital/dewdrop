@@ -122,6 +122,10 @@ class Permissions
                 ->set($name, true);
         }
 
+        // @ todo Re-enabled these pages once they're complete
+        $this->set('custom-views', false);
+        $this->set('notifications', false);
+
         $this->set('debug', $this->debug);
 
         return $this;
