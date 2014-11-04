@@ -234,6 +234,11 @@ class Pgsql implements DriverInterface
         return '"';
     }
 
+    public function quoteInternal($input)
+    {
+        return $this->pdo->quote($input);
+    }
+
     /**
      * Returns a list of the tables in the database.
      *
