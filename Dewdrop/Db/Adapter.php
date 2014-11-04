@@ -542,7 +542,7 @@ class Adapter
         if (is_int($value) || is_float($value)) {
             return $value;
         }
-        return "'" . mysql_real_escape_string($value) . "'";
+        return $this->driver->quoteInternal($value);
     }
 
     /**
