@@ -10,7 +10,6 @@ class TableSortHandle extends AbstractHelper
     public function assignToField(FieldInterface $field, TableCell $cellRenderer, $primaryKeyName)
     {
         $this->view->headScript()
-            ->appendFile($this->view->bowerUrl('/jquery-ui/ui/minified/jquery-ui.min.js'))
             ->appendFile($this->view->bowerUrl('/dewdrop/www/js/listing-sortable.js'));
 
         $this->view->headLink()
