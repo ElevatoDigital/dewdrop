@@ -11,8 +11,8 @@
 namespace Dewdrop\Cli\Command;
 
 /**
- * Generate API documentation for all Drewdrop libraries with
- * phpdoc (a.k.a. phpDocumentor2).
+ * Generate API documentation for all Dewdrop libraries with
+ * phpdoc (a.k.a. phpDocumentor 2).
  */
 class DewdropDoc extends CommandAbstract
 {
