@@ -55,6 +55,7 @@ class SortListing extends PageAbstract
     {
         header('Content-Type: application/json');
         $this->component->setShouldRenderLayout(false);
-        return (null === $this->error ? json_encode(['result' => 'success']) : $this->error);
+        echo (null === $this->error ? json_encode(['result' => 'success']) : $this->error);
+        exit;
     }
 }
