@@ -73,4 +73,14 @@ class Field extends BaseField
     {
         return $this->attribute['display_helper'];
     }
+
+    /**
+     * Get the attribute definition for this field from the EAV definition.
+     *
+     * @return array
+     */
+    public function getAttribute()
+    {
+        return $this->attribute;
+    }
 }
