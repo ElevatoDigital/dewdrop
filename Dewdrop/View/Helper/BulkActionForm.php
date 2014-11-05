@@ -54,7 +54,8 @@ class BulkActionForm extends AbstractHelper
             [
                 'bulkActions'  => $bulkActions,
                 'visibleCount' => $visibleCount,
-                'totalCount'   => $totalCount
+                'totalCount'   => $totalCount,
+                'pluralTitle'  => $pluralTitle
             ]
         );
     }
