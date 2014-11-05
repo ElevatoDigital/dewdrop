@@ -35,8 +35,7 @@ class Table extends AbstractHelper
         array $data,
         TableCellHelper $renderer = null,
         SelectSort $sorter = null
-    )
-    {
+    ) {
         $fields = $fields->getVisibleFields();
 
         if (null === $renderer) {

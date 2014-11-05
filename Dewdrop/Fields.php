@@ -326,6 +326,27 @@ class Fields implements ArrayAccess, IteratorAggregate, Countable
      */
     public function add($field, $modelName = null)
     {
+        $this->fields[] = $this->prepareFieldForAdding($field, $modelName);
+
+        return $field;
+    }
+
+    public function prepend($field, $modelName = null)
+    {
+        $field = $this->prepareFieldForAdding($field, $modelName);
+
+        array_unshift($this->fields, $field);
+
+        return $field;
+    }
+
+    public function append($field, $modelName = null)
+    {
+        return $this->add($field, $modelName);
+    }
+
+    private function prepareFieldForAdding($field, $modelName = null)
+    {
         if (is_string($field)) {
             $id    = $field;
             $field = new CustomField();
@@ -341,8 +362,6 @@ class Fields implements ArrayAccess, IteratorAggregate, Countable
         }
 
         $field->setFieldsSet($this);
-
-        $this->fields[] = $field;
 
         return $field;
     }

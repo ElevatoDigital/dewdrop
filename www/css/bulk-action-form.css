@@ -1,0 +1,28 @@
+body {
+    padding-bottom: 75px;
+}
+
+.bulk-action-check-all {
+    position: relative;
+    top: -27px;
+    left: 8px;
+}
+
+.bulk-action-panel {
+    border-bottom: none;
+    bottom: 0;
+    display: none;
+    left: 0;
+    margin-bottom: 0;
+    position: fixed;
+    width: 100%;
+}
+
+.bulk-action-panel.in {
+    display: block;
+}
+
+.bulk-action-check-all-alert {
+    display: none;
+    padding-bottom: 10px;
+}

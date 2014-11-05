@@ -67,9 +67,9 @@ class Edit extends PageAbstract
                 $title = strtolower($this->model->getSingularTitle());
 
                 if ($this->isNew) {
-                    $responseHelper->setSuccessMessage("Successfully saved new {$title}");
+                    $responseHelper->setSuccessMessage("Successfully saved new {$title}.");
                 } else {
-                    $responseHelper->setSuccessMessage("Successfully saved changes to {$title}");
+                    $responseHelper->setSuccessMessage("Successfully saved changes to {$title}.");
                 }
 
                 $this->rowEditor->save();

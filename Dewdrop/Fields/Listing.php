@@ -219,6 +219,43 @@ class Listing
     }
 
     /**
+     * Check to see if this listing has a select modifier with the given name.
+     *
+     * @param string $name
+     * @return bool
+     */
+    public function hasSelectModifier($name)
+    {
+        /* @var $modifier SelectModifierInterface */
+        foreach ($this->selectModifiers as $modifier) {
+            if ($modifier->matchesName($name)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Remove the select modifier that matches the supplied name.
+     *
+     * @param string $name
+     * @return $this
+     */
+    public function removeSelectModifierByName($name)
+    {
+        /* @var $modifier SelectModifierInterface */
+        foreach ($this->selectModifiers as $index => $modifier) {
+            if ($modifier->matchesName($name)) {
+                unset($this->selectModifiers[$index]);
+                break;
+            }
+        }
+
+        return $this;
+    }
+
+    /**
      * Get the Select object after all modifiers have been applied to it.  This
      * can be useful if you'd like to see the Select (or its resulting SQL code)
      * will all modifications applied, in case you need to debug or troubleshoot

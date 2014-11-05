@@ -11,6 +11,8 @@
 namespace Dewdrop\Admin\ResponseHelper;
 
 use Dewdrop\Admin\Page\PageAbstract;
+use Dewdrop\Pimple;
+use Dewdrop\Session;
 
 /**
  * The response helper object gets injected into a page's process() method
@@ -71,16 +73,26 @@ class Standard
     private $redirector;
 
     /**
+     * A Dewdrop\Session object that can be used to store success messages
+     * across redirects.
+     *
+     * @var Session
+     */
+    private $session;
+
+    /**
      * Create a new ResponseHelper, generally kicked off by a page class in
      * its createResponseHelper() method.
      *
      * @param PageAbstract $page
      * @param callable $redirector
+     * @param Session $session
      */
-    public function __construct(PageAbstract $page, callable $redirector)
+    public function __construct(PageAbstract $page, callable $redirector, Session $session = null)
     {
         $this->page       = $page;
         $this->redirector = $redirector;
+        $this->session    = ($session ?: Pimple::getResource('session'));
     }
 
     /**
@@ -126,7 +138,7 @@ class Standard
      * method.  In a testing environment, you'd likely skip this method to
      * avoid "exit" following redirects, etc.
      *
-     * @return void
+     * @return bool
      */
     public function execute()
     {
@@ -150,7 +162,7 @@ class Standard
      * execute() method, but sometimes in testing, you may want to selectively
      * execute portions of the response payload.
      *
-     * @return \Dewdrop\Admin\ResopnseHelper\Standard
+     * @return \Dewdrop\Admin\ResponseHelper\Standard
      */
     public function executeCallbacks()
     {
@@ -164,16 +176,12 @@ class Standard
     /**
      * Set the success message, if one has been assigned.
      *
-     * @return \Dewdrop\Admin\ResopnseHelper\Standard
+     * @return \Dewdrop\Admin\ResponseHelper\Standard
      */
     public function executeSuccessMessage()
     {
         if ($this->successMessage) {
-            // No sessions in WP, so we're using a cookie for this for now
-            setcookie(
-                'dewdrop_admin_success_notice',
-                $this->successMessage
-            );
+            $this->session->set('successMessage', $this->successMessage);
         }
 
         return $this;
@@ -182,7 +190,7 @@ class Standard
     /**
      * Execute the assigned redirect.
      *
-     * @return \Dewdrop\Admin\ResopnseHelper\Standard
+     * @return \Dewdrop\Admin\ResponseHelper\Standard
      */
     public function executeRedirect()
     {

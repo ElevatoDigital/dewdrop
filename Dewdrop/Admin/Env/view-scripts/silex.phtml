@@ -111,6 +111,10 @@
             </div>
         </nav>
 
+        <?php if ($this->successMessage) : ?>
+        <div class="alert alert-success"><?php echo $this->escapeHtml($this->successMessage);?></div>
+        <?php endif;?>
+
         <?php echo $this->content;?>
 
         <?php

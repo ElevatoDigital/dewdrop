@@ -12,6 +12,7 @@ namespace Dewdrop\Admin\Env;
 
 use Dewdrop\Admin\Component\ComponentAbstract;
 use Dewdrop\Pimple;
+use Dewdrop\Session;
 use DirectoryIterator;
 
 /**
@@ -26,6 +27,13 @@ abstract class EnvAbstract implements EnvInterface
      * @var array
      */
     protected $components = array();
+
+    /**
+     * A Dewdrop Session object useful for get flash messenger messages, etc.
+     *
+     * @var Session
+     */
+    protected $session;
 
     /**
      * The core client-side dependencies we expect to be loaded in the admin.
@@ -62,6 +70,20 @@ abstract class EnvAbstract implements EnvInterface
     public function inflectComponentName($name)
     {
         return $name;
+    }
+
+    /**
+     * Inject a Session object.  If you don't provide one, we'll locate it with
+     * Pimple, but it's useful to inject during testing.
+     *
+     * @param Session $session
+     * @return $this
+     */
+    public function setSession(Session $session)
+    {
+        $this->session = $session;
+
+        return $this;
     }
 
     /**

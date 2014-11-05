@@ -150,6 +150,13 @@ class Silex extends EnvAbstract
         $view = new View();
         $view->setScriptPath($this->layoutPath);
 
+        $session = ($this->session ?: $this->application['session']);
+
+        if ($session->get('successMessage')) {
+            $view->assign('successMessage', $session->get('successMessage'));
+            $session->remove('successMessage');
+        }
+
         $view
             ->assign('title', $this->title)
             ->assign('components', $this->getSortedComponentsForMenu())

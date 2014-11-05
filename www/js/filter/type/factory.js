@@ -20,7 +20,7 @@ define(
         };
 
         return function (type, options, model, index) {
-            if ('undefined' === typeof options) {
+            if (!options) {
                 options = {};
             }
 

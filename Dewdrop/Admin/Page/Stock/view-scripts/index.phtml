@@ -64,6 +64,12 @@ if ($this->isSortable) {
     echo $this->tableSortHandle()->open($this->adminUrl('sort-listing'));
 }
 
+if ($this->bulkActions) {
+    $this->bulkActions->addCheckboxField($fields);
+
+    echo $this->bulkActionForm()->open();
+}
+
 if (0 === $totalRowCount && $selectFilter->hasFilters()) {
     printf(
         '<div class="alert alert-warning">No %s found matching your filters.  Please try again.</div>',
@@ -90,6 +96,15 @@ echo $this->pagination(
     $paginationHelper->getPage(),
     (1 === $totalRowCount ? $this->singularTitle : $this->pluralTitle)
 );
+
+if ($this->bulkActions) {
+    echo $this->bulkActionForm()->close(
+        $this->bulkActions,
+        $totalRowCount,
+        $paginationHelper->getPageSize(),
+        $this->pluralTitle
+    );
+}
 
 echo $this->bootstrapColumnsModal(
     $this->fields->getVisibleFields($this->groupingFilter),

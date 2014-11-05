@@ -13,48 +13,43 @@ class BootstrapRowActions extends AbstractHelper
 
         extract($options);
 
-        $renderer->getContentRenderer()
-            ->assignCallbackByColumnPosition(
-                0,
-                function ($helper, $rowData, $rowIndex, $columnIndex) use ($options) {
-                    extract($options);
+        $originalCallback = $renderer->getContentRenderer()->getFieldAssignment($field);
 
-                    $edit = urldecode($edit);
-                    $view = urldecode($view);
+        $renderer->getContentRenderer()->assign(
+            $field->getId(),
+            function ($helper, $rowData, $rowIndex, $columnIndex) use ($originalCallback, $options) {
+                extract($options);
 
-                    $out = call_user_func(
-                        $renderer->getContentRenderer()->getFieldAssignment($field),
-                        $rowData,
-                        $rowIndex,
-                        $columnIndex
-                    );
+                $edit = urldecode($edit);
+                $view = urldecode($view);
+                $out  = call_user_func($originalCallback, $rowData, $rowIndex, $columnIndex);
 
-                    $params = array_map(
-                        function ($fieldName) use ($rowData) {
-                            return $rowData[$fieldName];
-                        },
-                        $urlFields
-                    );
+                $params = array_map(
+                    function ($fieldName) use ($rowData) {
+                        return $rowData[$fieldName];
+                    },
+                    $urlFields
+                );
 
-                    $out .= $this->open();
+                $out .= $this->open();
 
-                    if ($edit) {
-                        $out .= $this->renderEdit(vsprintf($edit, $params));
-                    }
-
-                    if ($view) {
-                        $out .= $this->renderView(vsprintf($view, $params), $rowIndex);
-                    }
-
-                    $out .= $this->close();
-
-                    if ($view) {
-                        $out .= $this->renderModal($rowIndex, $title);
-                    }
-
-                    return $out;
+                if ($edit) {
+                    $out .= $this->renderEdit(vsprintf($edit, $params));
                 }
-            );
+
+                if ($view) {
+                    $out .= $this->renderView(vsprintf($view, $params), $rowIndex);
+                }
+
+                $out .= $this->close();
+
+                if ($view) {
+                    $out .= $this->renderModal($rowIndex, $title);
+                }
+
+                return $out;
+            }
+        );
     }
 
     public function open()
