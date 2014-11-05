@@ -20,6 +20,58 @@ use Zend\Escaper\Escaper;
  * A simple view implementation that allows for simple assignment of data,
  * escaping for common contexts (e.g. HTML, HTML attribute, JS, etc.),
  * and calling of helper objects for reusable view logic.
+ *
+ * Including method annotations here (http://www.phpdoc.org/docs/latest/references/phpdoc/tags/method.html)
+ * to assist static analysis in PHPStorm and Scrutinizer CI given the use
+ * of the __call() magic method in this class for view helpers.  Won't cover
+ * us on custom helpers necessarily, but it will help catch most bugs/typos.
+ *
+ * @method string adminComponentNav()
+ * @method string adminNotice()
+ * @method string adminUrl()
+ * @method string bootstrapColumnsModal()
+ * @method string bootstrapDetailsView()
+ * @method mixed bootstrapFilterForm()
+ * @method mixed bootstrapForm()
+ * @method string bootstrapInputText()
+ * @method \Dewdrop\View\Helper\BootstrapRowActions bootstrapRowActions()
+ * @method string bootstrapSelect()
+ * @method mixed bootstrapTable()
+ * @method string bootstrapTextarea()
+ * @method string bowerUrl()
+ * @method \Dewdrop\View\Helper\BulkActionForm bulkActionForm()
+ * @method string checkboxList()
+ * @method \Dewdrop\Fields\Helper\CsvCell csvCellRenderer()
+ * @method string csvExport()
+ * @method \Dewdrop\View\Helper\DetectEditHelper detectEditHelper()
+ * @method \Dewdrop\View\Helper\EditForm editForm()
+ * @method \Dewdrop\Fields\Helper\EditControl editControlRenderer()
+ * @method \Zend\View\Helper\HeadLink headLink()
+ * @method \Zend\View\Helper\HeadMeta headMeta()
+ * @method \Zend\View\Helper\HeadScript headScript()
+ * @method \Zend\View\Helper\HeadStyle headStyle()
+ * @method void inlineScript()
+ * @method string inputCheckbox()
+ * @method string inputText()
+ * @method string pagination()
+ * @method string select()
+ * @method mixed table()
+ * @method \Dewdrop\Fields\Helper\TableCell tableCellRenderer()
+ * @method \Dewdrop\View\Helper\TableSortHandle tableSortHandle()
+ * @method string textarea()
+ * @method string wpAdminNotice()
+ * @method string wpCheckboxList()
+ * @method string wpColorPicker()
+ * @method \Dewdrop\View\Helper\WpEditForm wpEditForm()
+ * @method string wpEditor()
+ * @method \Dewdrop\View\Helper\WpEditRow wpEditRow()
+ * @method string wpImagePicker()
+ * @method string wpInputCheckbox()
+ * @method string wpInputText()
+ * @method string wpSelect()
+ * @method mixed wpTable()
+ * @method \Dewdrop\View\Helper\WpWrap wpWrap()
+ * @method \Dewdrop\View\Helper\Wrap wrap()
  */
 class View
 {
@@ -293,7 +345,10 @@ class View
 
         foreach ($this->helpers as $name => $helper) {
             if ($helper instanceof PageDelegateInterface) {
-                $partial->helper($name)->setPage($helper->getPage());
+                /* @var $partialHelper PageDelegateInterface */
+                $partialHelper = $partial->helper($name);
+
+                $partialHelper->setPage($helper->getPage());
             }
         }
 
