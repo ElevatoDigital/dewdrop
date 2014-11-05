@@ -38,7 +38,7 @@ use Zend\Escaper\Escaper;
  * @method string bootstrapSelect()
  * @method mixed bootstrapTable()
  * @method string bootstrapTextarea()
- * @method string bowerUrl()
+ * @method string bowerUrl(string $url, string $wwwPath = null, string $docRoot = null)
  * @method \Dewdrop\View\Helper\BulkActionForm bulkActionForm()
  * @method string checkboxList()
  * @method \Dewdrop\Fields\Helper\CsvCell csvCellRenderer()
