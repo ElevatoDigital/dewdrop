@@ -326,7 +326,9 @@ class Fields implements ArrayAccess, IteratorAggregate, Countable
      */
     public function add($field, $modelName = null)
     {
-        $this->fields[] = $this->prepareFieldForAdding($field, $modelName);
+        $field = $this->prepareFieldForAdding($field, $modelName);
+
+        $this->fields[] = $field;
 
         return $field;
     }
