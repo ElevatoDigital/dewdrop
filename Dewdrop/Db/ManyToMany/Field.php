@@ -11,7 +11,6 @@
 namespace Dewdrop\Db\ManyToMany;
 
 use Dewdrop\Db\Field as BaseField;
-use Dewdrop\Fields\OptionPairs;
 use Zend\InputFilter\Input;
 
 /**
@@ -99,24 +98,6 @@ class Field extends BaseField
     protected function getOptionPairsReference()
     {
         return $this->manyToManyRelationship->getOptionPairsReference();
-    }
-
-    /**
-     * In the case of a ManyToMany field, we don't add any validators based on
-     * the data type and other metadata tied to a physical database column.
-     * The only input filter interaction we do is setting the allowEmpty property
-     * depending upon whether this field is marked as required.
-     *
-     * @param Input $inputFilter
-     * @return void
-     */
-    protected function addFiltersAndValidatorsUsingMetadata(Input $inputFilter)
-    {
-        if ($this->isRequired()) {
-            $inputFilter->setAllowEmpty(false);
-        } else {
-            $inputFilter->setAllowEmpty(true);
-        }
     }
 
     /**

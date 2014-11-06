@@ -13,6 +13,7 @@ namespace Dewdrop\Bootstrap;
 use Dewdrop\Auth\Db\UsersTableGateway;
 use Dewdrop\Config;
 use Dewdrop\Db\Adapter as DbAdapter;
+use Dewdrop\Db\Field\InputFilterBuilder;
 use Dewdrop\Exception;
 use Dewdrop\Inflector;
 use Dewdrop\Paths;
@@ -141,6 +142,14 @@ class Detector
             $pimple['view'] = function () {
                 return new View();
             };
+        }
+
+        if (!isset($pimple['db.field.input-filter-builder'])) {
+            $pimple['db.field.input-filter-builder'] = $pimple->share(
+                function () {
+                    return new InputFilterBuilder();
+                }
+            );
         }
 
         if (!isset($pimple['session'])) {

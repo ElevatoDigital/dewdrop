@@ -10,12 +10,11 @@
 
 namespace Dewdrop\Db;
 
+use Dewdrop\Db\Field\InputFilterBuilder;
 use Dewdrop\Fields\FieldAbstract;
 use Dewdrop\Fields\OptionPairs;
-use Dewdrop\Filter\NullableDbBoolean as NullableDbBooleanFilter;
-use Zend\Filter;
+use Dewdrop\Pimple;
 use Zend\InputFilter\Input;
-use Zend\Validator;
 
 /**
  * Field objects provide a way to leverage database metadata throughout
@@ -120,12 +119,19 @@ class Field extends FieldAbstract
     private $controlName;
 
     /**
-     * The \Zend\InputFilter\Filter instance used to validate and filter this
+     * The \Zend\InputFilter\Input instance used to validate and filter this
      * field.
      *
-     * @var \Zend\InputFilter\Filter
+     * @var \Zend\InputFilter\Input
      */
     private $inputFilter;
+
+    /**
+     * Object used to populate this field's input filter based upon its type.
+     *
+     * @var InputFilterBuilder
+     */
+    private $inputFilterBuilder;
 
     /**
      * The ID for this field.  Used when interacting with the \Dewdrop\Fields
@@ -213,7 +219,7 @@ class Field extends FieldAbstract
      * field is required.  When the metadata says the column is not NULLABLE,
      * then it is marked as being required.
      *
-     * @return boolaen
+     * @return boolean
      */
     public function isRequired()
     {
@@ -344,6 +350,16 @@ class Field extends FieldAbstract
     }
 
     /**
+     * Get the metadata from the DB adapter for this field.
+     *
+     * @return array
+     */
+    public function getMetadata()
+    {
+        return $this->metadata;
+    }
+
+    /**
      * Manually override the default control name for this field.
      *
      * This can be useful and necessary if you are using multiple instances of
@@ -429,17 +445,29 @@ class Field extends FieldAbstract
      * object allows us to easily filter and validate values assigned to the
      * field.
      *
-     * @return \Zend\InputFilter\Filter
+     * @return \Zend\InputFilter\Input
      */
     public function getInputFilter()
     {
         if (null === $this->inputFilter) {
             $this->inputFilter = new Input($this->getControlName());
 
-            $this->addFiltersAndValidatorsUsingMetadata($this->inputFilter);
+            $this->getInputFilterBuilder()->attachFiltersAndValidatorsForField($this, $this->inputFilter);
         }
 
         return $this->inputFilter;
+    }
+
+    public function setInputFilterBuilder(InputFilterBuilder $inputFilterBuilder)
+    {
+        $this->inputFilterBuilder = $inputFilterBuilder;
+
+        return $this;
+    }
+
+    public function getInputFilterBuilder()
+    {
+        return $this->inputFilterBuilder ?: Pimple::getResource('db.field.input-filter-builder');
     }
 
     /**
@@ -520,57 +548,6 @@ class Field extends FieldAbstract
                 )
             )
         );
-    }
-
-    /**
-     * Create some basic filters and validators using the DB metadata.
-     *
-     * The following filters and validators are added:
-     *
-     * <ul>
-     *     <li>For required fields, a NotEmpty validator is added.</li>
-     *     <li>For text-based fields, a length validator and trim filter are added.</li>
-     *     <li>For integers, an integer validator is added.</li>
-     *     <li>For all floating point types, a float validator is added.</li>
-     * </ul>
-     *
-     * @param Input $inputFilter
-     * @return void
-     */
-    protected function addFiltersAndValidatorsUsingMetadata(Input $inputFilter)
-    {
-        $validators = $inputFilter->getValidatorChain();
-        $filters    = $inputFilter->getFilterChain();
-        $metadata   = $this->metadata;
-
-        if ($this->isRequired() && !$this->isType('boolean')) {
-            $inputFilter->setAllowEmpty(false);
-        } else {
-            $inputFilter->setAllowEmpty(true);
-        }
-
-        if ($this->isType('string')) {
-            if ($metadata['LENGTH'] && 0 < (int) $metadata['LENGTH']) {
-                $validators->attach(new Validator\StringLength(0, $metadata['LENGTH']));
-            }
-
-            $filters->attach(new Filter\StringTrim());
-            $filters->attach(new Filter\Null(Filter\Null::TYPE_STRING));
-        } elseif ($this->isType('date')) {
-            $validators->attach(new Validator\Date());
-        } elseif ($this->isType('boolean')) {
-            if ($metadata['NULLABLE']) {
-                $filters->attach(new NullableDbBooleanFilter());
-            } else {
-                $filters->attach(new Filter\Int());
-            }
-        } elseif ($this->isType('integer')) {
-            $filters->attach(new Filter\Int());
-            $validators->attach(new \Zend\I18n\Validator\Int());
-        } elseif ($this->isType('float')) {
-            $filters->attach(new Filter\Digits());
-            $validators->attach(new \Zend\I18n\Validator\Float());
-        }
     }
 
     /**
