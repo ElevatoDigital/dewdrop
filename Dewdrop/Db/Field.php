@@ -398,7 +398,7 @@ class Field extends FieldAbstract
 
     /**
      * Get the group name for this field, typically the table name, unless an
-     * alterative has been set.
+     * alternative has been set.
      *
      * @return string
      */

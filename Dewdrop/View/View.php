@@ -16,6 +16,12 @@ use Dewdrop\Request;
 use Dewdrop\View\Helper\PageDelegateInterface;
 use Zend\Escaper\Escaper;
 
+// Solely for static analysis assistance
+use Dewdrop\Fields\Helper\TableCell;
+use Dewdrop\Fields\Listing\BulkActions;
+use Dewdrop\View\Helper;
+use Dewdrop\View\Helper\BulkActionCheckboxField;
+
 /**
  * A simple view implementation that allows for simple assignment of data,
  * escaping for common contexts (e.g. HTML, HTML attribute, JS, etc.),
@@ -34,18 +40,18 @@ use Zend\Escaper\Escaper;
  * @method mixed bootstrapFilterForm()
  * @method mixed bootstrapForm()
  * @method string bootstrapInputText()
- * @method \Dewdrop\View\Helper\BootstrapRowActions bootstrapRowActions()
+ * @method Helper\BootstrapRowActions bootstrapRowActions()
  * @method string bootstrapSelect()
  * @method mixed bootstrapTable()
  * @method string bootstrapTextarea()
  * @method string bowerUrl(string $url, string $wwwPath = null, string $docRoot = null)
- * @method \Dewdrop\View\Helper\BulkActionForm bulkActionForm()
- * @method \Dewdrop\View\Helper\BulkActionCheckboxField bulkActionCheckboxField(\Dewdrop\Fields\Listing\BulkActions $bulkActions, \Dewdrop\Fields\Helper\TableCell $tableCellRenderer)
+ * @method Helper\BulkActionForm bulkActionForm()
+ * @method BulkActionCheckboxField bulkActionCheckboxField(BulkActions $bulkActions, TableCell $tableCellRenderer)
  * @method string checkboxList()
  * @method \Dewdrop\Fields\Helper\CsvCell csvCellRenderer()
  * @method string csvExport()
- * @method \Dewdrop\View\Helper\DetectEditHelper detectEditHelper()
- * @method \Dewdrop\View\Helper\EditForm editForm()
+ * @method Helper\DetectEditHelper detectEditHelper()
+ * @method Helper\EditForm editForm()
  * @method \Dewdrop\Fields\Helper\EditControl editControlRenderer()
  * @method \Zend\View\Helper\HeadLink headLink()
  * @method \Zend\View\Helper\HeadMeta headMeta()
@@ -58,21 +64,21 @@ use Zend\Escaper\Escaper;
  * @method string select()
  * @method mixed table()
  * @method \Dewdrop\Fields\Helper\TableCell tableCellRenderer()
- * @method \Dewdrop\View\Helper\TableSortHandle tableSortHandle()
+ * @method Helper\TableSortHandle tableSortHandle()
  * @method string textarea()
  * @method string wpAdminNotice()
  * @method string wpCheckboxList()
  * @method string wpColorPicker()
- * @method \Dewdrop\View\Helper\WpEditForm wpEditForm()
+ * @method Helper\WpEditForm wpEditForm()
  * @method string wpEditor()
- * @method \Dewdrop\View\Helper\WpEditRow wpEditRow()
+ * @method Helper\WpEditRow wpEditRow()
  * @method string wpImagePicker()
  * @method string wpInputCheckbox()
  * @method string wpInputText()
  * @method string wpSelect()
  * @method mixed wpTable()
- * @method \Dewdrop\View\Helper\WpWrap wpWrap()
- * @method \Dewdrop\View\Helper\Wrap wrap()
+ * @method Helper\WpWrap wpWrap()
+ * @method Helper\Wrap wrap()
  */
 class View
 {

@@ -27,4 +27,4 @@ class UserPasswordChangeTokensTableGateway extends Table
     {
         $this->setTableName('user_password_change_tokens');
     }
-} 
+}
