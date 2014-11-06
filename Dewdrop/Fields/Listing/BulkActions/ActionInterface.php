@@ -30,16 +30,12 @@ interface ActionInterface
     public function shouldProcess();
 
     /**
-     * Process the provided array of selected IDs.  The IDs will be integer
-     * values.  In typical situations, the integers will represent primary key
-     * values from your Listing, but it is user input, so don't assume that
-     * each value actually exists in the DB.  In short, you have these
-     * guarantees only:
-     *
-     * 1) Each value is a positive integer.
-     *
-     * 2) There will be at least one value (i.e. you can slide $selected into
-     *    an IN (?) without worrying about it being empty).
+     * Process the provided array of selected IDs.  The IDs will always be legit
+     * values from the Listing's primary key field.  This means that the ID was
+     * presented to the user and they were allowed to select it.  Your process
+     * method will also only be called when there is at least 1 selected value,
+     * so you don't have to worry about empty array if you're using an IN
+     * operator.
      *
      * @param array $selected
      * @return mixed

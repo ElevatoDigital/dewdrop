@@ -336,8 +336,7 @@ class Listing
             $this->primaryKey->getName()
         );
 
-        $select
-            ->where("{$quotedPrimaryKey} = ?", $id);
+        $select->where("{$quotedPrimaryKey} = ?", $id);
 
         return $this->select->getAdapter()->fetchRow($select);
     }

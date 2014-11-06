@@ -20,6 +20,8 @@ echo $this->partial(
 ?>
 
 <?php
+/* @var $fields \Dewdrop\Fields */
+
 $renderer = $this->tableCellRenderer();
 $fields   = $this->fields->getVisibleFields(array($this->groupingFilter, $this->visibilityFilter));
 $pkey     = $this->listing->getPrimaryKey()->getName();
@@ -65,7 +67,7 @@ if ($this->isSortable) {
 }
 
 if ($this->bulkActions) {
-    $this->bulkActions->addCheckboxField($fields);
+    $fields->prepend($this->bulkActionCheckboxField($this->bulkActions, $renderer));
 
     echo $this->bulkActionForm()->open();
 }

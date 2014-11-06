@@ -43,6 +43,20 @@ use Dewdrop\Fields\Listing\BulkActions\Result;
 class BulkActions
 {
     /**
+     * Constant to make params of fetchIdsFromListing() clearer when called.
+     *
+     * @const
+     */
+    const ENABLE_LISTING_PAGINATION = true;
+
+    /**
+     * Constant to make params of fetchIdsFromListing() clearer when called.
+     *
+     * @const
+     */
+    const DISABLE_LISTING_PAGINATION = false;
+
+    /**
      * The ID used for the inputs rendered by this BulkActions object (e.g.
      * the checkboxes the user will use to select items).
      *
@@ -134,6 +148,26 @@ class BulkActions
     }
 
     /**
+     * Get the primary key field from the Listing.
+     *
+     * @return \Dewdrop\Db\Field
+     */
+    public function getPrimaryKey()
+    {
+        return $this->listing->getPrimaryKey();
+    }
+
+    /**
+     * Get an array of selected items.  Populated during process().
+     *
+     * @return array
+     */
+    public function getSelected()
+    {
+        return $this->selected;
+    }
+
+    /**
      * Add an action.  Any implementor of ActionInterface is accepted.
      *
      * @param ActionInterface $action
@@ -222,34 +256,28 @@ class BulkActions
      * "check_pages" input for these bulk actions, we retrieve a full data set
      * from the Listing and return all the IDs.  Otherwise, we return an array
      * of the explicitly selected items.  In each case, we ensure that the items
-     * are actual positive integer values, but we do not verify that they are
-     * legitimate record IDs.  This means the values in the returned array are
-     * safe from SQL-I and suitable for use with the SQL IN/NOT IN operators,
-     * but that you should not assume they are always actual row IDs.
+     * legitimate records IDs from the Listing by comparing against the results
+     * of Listing->fetchData().  This means you can be sure the IDs supplied to
+     * your action's process() method are actual records in the DB that the user
+     * was allowed to see/select.
      *
      * @return array
      */
     private function getSelectedItemsFromRequest()
     {
         $input = $this->getRequest()->getPost($this->id);
-        $clean = [];
 
         if (!is_array($input)) {
-            return $clean;
+            return [];
         } elseif ($this->getRequest()->getPost($this->id . '_check_pages')) {
-            $this->listing->removeSelectModifierByName('SelectPaginate');
-
-            foreach ($this->listing->fetchData($this->fields) as $row) {
-                $clean[] = (int) $row[$this->listing->getPrimaryKey()->getName()];
-            }
-
-            return $clean;
+            return $this->fetchIdsFromListing(self::DISABLE_LISTING_PAGINATION);
         } else {
-            foreach ($input as $selected) {
-                $selected = (int) $selected;
+            $valid = $this->fetchIdsFromListing(self::ENABLE_LISTING_PAGINATION);
+            $clean = [];
 
-                if (0 < $selected) {
-                    $clean[] = $selected;
+            foreach ($valid as $validValue) {
+                if (in_array($validValue, $input)) {
+                    $clean[] = $validValue;
                 }
             }
 
@@ -257,47 +285,24 @@ class BulkActions
         }
     }
 
-    /**
-     * Add a custom field to the supplied Fields object to render a selection
-     * checkbox for these bulk actions.  The field is prepended to the Fields
-     * object, so it doesn't matter if you call this before or after other fields
-     * were added.
-     *
-     * @param Fields $fields
-     * @return $this
-     */
-    public function addCheckboxField(Fields $fields)
+    private function fetchIdsFromListing($usePagination)
     {
-        $pkeyName = $this->listing->getPrimaryKey()->getName();
+        $out = [];
 
-        $fields->prepend($this->id)
-            ->setVisible(true)
-            ->assignHelperCallback(
-                'TableCell.Header',
-                function () {
-                    return '';
-                }
-            )
-            ->assignHelperCallback(
-                'TableCell.Content',
-                function ($helper, array $rowData) use ($pkeyName) {
-                    /* @var $helper \Dewdrop\Fields\Helper\TableCell\Content */
+        if (!$usePagination) {
+            $pagination = $this->listing->getSelectModifierByName('SelectPaginate');
 
-                    if (!isset($rowData[$pkeyName])) {
-                        throw new Exception("{$pkeyName} not available in row data for bulk action checkbox render.");
-                    }
+            $this->listing->removeSelectModifierByName('SelectPaginate');
+        }
 
-                    $pkeyValue = $rowData[$pkeyName];
+        foreach ($this->listing->fetchData($this->fields) as $row) {
+            $out[] = $row[$this->listing->getPrimaryKey()->getName()];
+        }
 
-                    return sprintf(
-                        '<input class="bulk-checkbox" type="checkbox" name="%s[]" value="%s" %s />',
-                        $helper->getView()->escapeHtmlAttr($this->id),
-                        $helper->getView()->escapeHtmlAttr($pkeyValue),
-                        (in_array($pkeyValue, $this->selected) ? 'checked="checked"' : '')
-                    );
-                }
-            );
+        if (!$usePagination && isset($pagination)) {
+            $this->listing->registerSelectModifier($pagination);
+        }
 
-        return $this;
+        return $out;
     }
 }
