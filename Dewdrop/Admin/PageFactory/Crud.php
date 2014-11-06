@@ -30,6 +30,7 @@ class Crud implements PageFactoryInterface
         'adjust-visibility'  => '\Dewdrop\Admin\Page\Stock\AdjustVisibility',
         'debug-fields'       => '\Dewdrop\Admin\Page\Stock\DebugFields',
         'debug-listing-sql'  => '\Dewdrop\Admin\Page\Stock\DebugListingSql',
+        'debug-pages'        => '\Dewdrop\Admin\Page\Stock\DebugPages',
         'debug-test-sorting' => '\Dewdrop\Admin\Page\Stock\DebugTestSorting',
         'delete'             => '\Dewdrop\Admin\Page\Stock\Delete',
         'edit'               => '\Dewdrop\Admin\Page\Stock\Edit',
@@ -78,12 +79,18 @@ class Crud implements PageFactoryInterface
     }
 
     /**
-     * Return an array having page names as keys and class names as values
-     *
      * @return array
      */
     public function listAvailablePages()
     {
-        return $this->pageClassMap;
+        $pages = [];
+
+        foreach ($this->pageClassMap as $urlName => $className) {
+            $reflectedClass = new ReflectionClass($className);
+
+            $pages[] = new Page($urlName, $reflectedClass->getFileName(), $className);
+        }
+
+        return $pages;
     }
 }

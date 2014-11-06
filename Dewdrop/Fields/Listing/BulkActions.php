@@ -13,7 +13,6 @@ namespace Dewdrop\Fields\Listing;
 use Dewdrop\Fields;
 use Dewdrop\Fields\Listing;
 use Dewdrop\Fields\Listing\BulkActions\ActionInterface;
-use Dewdrop\Fields\Listing\BulkActions\Exception;
 use Dewdrop\Fields\Listing\BulkActions\Button;
 use Dewdrop\Fields\Listing\BulkActions\Result;
 
@@ -285,6 +284,14 @@ class BulkActions
         }
     }
 
+    /**
+     * Using the Listing's fetchData() method, grab an array of IDs.  Depending upon
+     * the selection mode the user has chosen, we may or may not paginate the result
+     * set.
+     *
+     * @param bool $usePagination
+     * @return array
+     */
     private function fetchIdsFromListing($usePagination)
     {
         $out = [];

@@ -24,8 +24,6 @@ interface PageFactoryInterface
     public function createPage($name);
 
     /**
-     * Return an array having page names as keys and class names as values
-     *
      * @return array
      */
     public function listAvailablePages();

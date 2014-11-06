@@ -1,45 +1,101 @@
 <?php
 
+/**
+ * Dewdrop
+ *
+ * @link      https://github.com/DeltaSystems/dewdrop
+ * @copyright Delta Systems (http://deltasys.com)
+ * @license   https://github.com/DeltaSystems/dewdrop/LICENSE
+ */
+
 namespace Dewdrop\Db\Select;
 
 use Dewdrop\Db\Adapter as DbAdapter;
+use Dewdrop\Db\Expr;
 use Dewdrop\Db\FieldProvider\ProviderInterface;
 use Dewdrop\Db\Select;
 use Dewdrop\Db\Table;
 
+/**
+ * This class can assist in creating a Select object to provide the data for
+ * Listing.  It traverses foreign keys, looks at many-to-many relationships and
+ * EAV fields, etc. and folds them into the Select to ensure that they conform
+ * to naming conventions Dewdrop uses when rendering Listings.
+ *
+ * There are a couple known limitations with this tool right now:
+ *
+ * @todo Allow retrieval of more fields from referenced tables.
+ *
+ * If, for example, you wanted to show all the fields in an address rather than just
+ * a single value to represent that foreign key value.
+ *
+ * @todo The ability to handle situations were the same table is referenced twice.
+ *
+ * If, for example, you had both a shipping_address_id and a billing_address_id, the
+ * table alias code would have an issue with that right now.
+ */
 class TableListing
 {
     /**
+     * The table for which we're generating the listing.
+     *
      * @var Table
      */
     private $table;
 
     /**
+     * The DB adapter associated with the table.
+     *
      * @var DbAdapter
      */
     private $db;
 
     /**
+     * The Select object that was generated for the listing.  If you've
+     * manipulated the options or need to regenerate the listing for some
+     * other reason, call reset() and then select().
+     *
      * @var Select
      */
     private $select;
 
     /**
+     * Table aliases used so far while building the Select.
+     *
      * @var array
      */
     private $aliases = [];
 
     /**
+     * Any custom reference table title columns.  We'll attempt use "name",
+     * "title" or whatever the first column in the referenced table happens
+     * to be, but you can override that behavior with setReferenceTitleColumn().
+     *
      * @param array
      */
     private $referenceTitleColumns = [];
 
+    /**
+     * Provide the table for which we're generated a listing Select.
+     *
+     * @param Table $table
+     */
     public function __construct(Table $table)
     {
         $this->table = $table;
         $this->db    = $this->table->getAdapter();
     }
 
+    /**
+     * Override the reference title column for a foreign key.  The first
+     * parameter should be the name of the foreign key column in the primary
+     * table.  The second parameter is a column name from the referenced table
+     * or an Expr object.
+     *
+     * @param string $foreignKeyColumn
+     * @param string $titleColumn
+     * @return $this
+     */
     public function setReferenceTitleColumn($foreignKeyColumn, $titleColumn)
     {
         $this->referenceTitleColumns[$foreignKeyColumn] = $titleColumn;
@@ -47,12 +103,26 @@ class TableListing
         return $this;
     }
 
+    /**
+     * Reset the generated Select and associated table aliases, if you've
+     * tweaked options and need to generate the Select again.
+     *
+     * @return $this
+     */
     public function reset()
     {
         $this->select  = null;
         $this->aliases = [];
+
+        return $this;
     }
 
+    /**
+     * Get the generated Select object.  Will generated it, if that hasn't
+     * occurred yet.
+     *
+     * @return Select
+     */
     public function select()
     {
         if (!$this->select) {
@@ -62,6 +132,13 @@ class TableListing
         return $this->select;
     }
 
+    /**
+     * Generate the Select object for this listing.  Will include the columns
+     * from the listing's Table, any foreign key references, and also allow all
+     * field providers to augment the Select as needed.
+     *
+     * @return Select
+     */
     private function generateSelect()
     {
         $select = $this->table->select();
@@ -73,6 +150,12 @@ class TableListing
         return $select;
     }
 
+    /**
+     * Get the basic columns contained in the listing table.
+     *
+     * @param Select $select
+     * @return Select
+     */
     private function selectFromTable(Select $select)
     {
         return $select->from(
@@ -80,6 +163,24 @@ class TableListing
         );
     }
 
+    /**
+     * Join against any tables referenced by foreign keys in order to get a
+     * reasonable value to display for them.  If the foreign key in the listing
+     * table is nullable, we'll use a LEFT JOIN so that a missing foreign key
+     * value does not exclude the record from the result set.
+     *
+     * We follow a naming convention for these values in result sets: the
+     * foreign key ends with "_id" and the value in the result set is aliased to
+     * that foreign key column name minus "_id".  For example, let's say the
+     * foreign key column was "favorite_book_id".  In the result set for the
+     * listing query, we'd include an alias of "favorite_book" that pointed
+     * to the "title" column of the referenced "books" table.  That way, both
+     * the integer favorite_book_id and the title favorite_book are available
+     * when we render the listing.
+     *
+     * @param Select $select
+     * @return Select
+     */
     private function selectForeignKeyValues(Select $select)
     {
         $tableAlias = $this->getAlias($this->table->getTableName());
@@ -113,6 +214,14 @@ class TableListing
         return $select;
     }
 
+    /**
+     * Allow each field provider on the Table to augment the Select object.
+     * This is how many-to-many and EAV fields get their values folded into a
+     * listing query.
+     *
+     * @param Select $select
+     * @return Select
+     */
     private function selectFieldProviderValues(Select $select)
     {
         /* @var $provider ProviderInterface */
@@ -123,6 +232,12 @@ class TableListing
         return $select;
     }
 
+    /**
+     * Get an alias for the provided table name.
+     *
+     * @param $tableName
+     * @return string
+     */
     private function getAlias($tableName)
     {
         if (array_key_exists($tableName, $this->aliases)) {
@@ -142,6 +257,19 @@ class TableListing
         return $alias;
     }
 
+    /**
+     * Determine a reasonable value to use as a title for a foreign key
+     * reference.  We'll look for a name or title in the referenced table.  If
+     * neither is present, we just grab the first column, which is probably the
+     * ID itself.
+     *
+     * However, you can call setReferenceTitleColumn() to supply a different
+     * column to use or an Expr object.
+     *
+     * @param $localColumn
+     * @param array $reference
+     * @return string|Expr
+     */
     private function findReferenceTitleColumn($localColumn, array $reference)
     {
         if (array_key_exists($localColumn, $this->referenceTitleColumns)) {

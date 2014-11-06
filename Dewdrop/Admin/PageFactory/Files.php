@@ -34,9 +34,8 @@ class Files implements PageFactoryInterface
         $inflectedName = $this->inflector->camelize($name);
         $fullPath      = $this->component->getPath() . '/' . $inflectedName . '.php';
 
-        if (file_exists($fullPath)) {
-            $reflectedClass = new ReflectionClass($this->component);
-            $pageClass      = $reflectedClass->getNamespaceName() . '\\' . $inflectedName;
+        if ('component' !== $name && file_exists($fullPath)) {
+            $pageClass = $this->getComponentNamespace() . '\\' . $inflectedName;
 
             require_once $fullPath;
 
@@ -51,12 +50,24 @@ class Files implements PageFactoryInterface
         $pages = array();
         $files = glob($this->component->getPath() . '/*.php');
 
-        foreach ($files as $file) {
-            $name = $this->inflector->hyphenize(basename($file, '.php'));
+        $namespace = $this->getComponentNamespace();
 
-            $pages[$name] = $file;
+        foreach ($files as $file) {
+            $urlName   = $this->inflector->hyphenize(basename($file, '.php'));
+            $className = $namespace . '\\' . $this->inflector->camelize($urlName);
+
+            if ('component' !== $urlName) {
+                $pages[] = new Page($urlName, $file, $className);
+            }
         }
 
         return $pages;
+    }
+
+    private function getComponentNamespace()
+    {
+        $reflectedClass = new ReflectionClass($this->component);
+
+        return $reflectedClass->getNamespaceName();
     }
 }

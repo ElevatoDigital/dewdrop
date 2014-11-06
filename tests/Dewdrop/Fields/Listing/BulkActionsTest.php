@@ -47,7 +47,6 @@ class BulkActionsTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(1, count($this->bulkActions->getActions()));
 
         $button = current($this->bulkActions->getActions());
-        $output = $button->render(new \Dewdrop\View\View());
 
         $this->assertInstanceOf('\Dewdrop\Fields\Listing\BulkActions\Button', $button);
     }
