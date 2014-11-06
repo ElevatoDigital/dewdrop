@@ -89,30 +89,16 @@ class Field extends BaseField
     }
 
     /**
-     * When retrieving option pairs for a many-to-many relationship, we don't look
-     * for the reference on the source table, like with a one-to-many relationship.
-     * Instead, we look for the matching reference on the cross-reference table.
+     * Get the reference that can be used to retrieve option pairs.  How we retrieve
+     * this will vary for one-to-many vs many-to-many contexts.  In the case of
+     * many-to-many fields, we grab it from the relationship definition rather than
+     * the table metadata.
      *
-     * @return \Dewdrop\Fields\OptionPairs
+     * @return array
      */
-    public function getOptionPairs()
+    protected function getOptionPairsReference()
     {
-        if (null === $this->optionPairs) {
-            $this->optionPairs = new OptionPairs($this->table->getAdapter());
-
-            $ref = $this->manyToManyRelationship->getOptionPairsReference();
-
-            if ($ref) {
-                $this->optionPairs->setOptions(
-                    array(
-                        'tableName'   => $ref['table'],
-                        'valueColumn' => $ref['column']
-                    )
-                );
-            }
-        }
-
-        return $this->optionPairs;
+        return $this->manyToManyRelationship->getOptionPairsReference();
     }
 
     /**

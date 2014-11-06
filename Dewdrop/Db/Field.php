@@ -453,7 +453,7 @@ class Field extends FieldAbstract
         if (null === $this->optionPairs) {
             $this->optionPairs = new OptionPairs($this->table->getAdapter());
 
-            $ref = $this->table->getMetadata('references', $this->name);
+            $ref = $this->getOptionPairsReference();
 
             if ($ref) {
                 $this->optionPairs->setOptions(
@@ -466,6 +466,17 @@ class Field extends FieldAbstract
         }
 
         return $this->optionPairs;
+    }
+
+    /**
+     * Get the reference that can be used to retrieve option pairs.  How we retrieve
+     * this will vary for one-to-many vs many-to-many contexts.
+     *
+     * @return array
+     */
+    protected function getOptionPairsReference()
+    {
+        return $this->table->getMetadata('references', $this->name);
     }
 
     /**
