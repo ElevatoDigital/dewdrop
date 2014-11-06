@@ -450,14 +450,19 @@ class Field extends FieldAbstract
     public function getInputFilter()
     {
         if (null === $this->inputFilter) {
-            $this->inputFilter = new Input($this->getControlName());
-
-            $this->getInputFilterBuilder()->attachFiltersAndValidatorsForField($this, $this->inputFilter);
+            $this->inputFilter = $this->getInputFilterBuilder()->createInputForField($this);
         }
 
         return $this->inputFilter;
     }
 
+    /**
+     * Provide an alternative input filter build, if you'd like to use different
+     * validators and filters for your field objects by default.
+     *
+     * @param InputFilterBuilder $inputFilterBuilder
+     * @return $this
+     */
     public function setInputFilterBuilder(InputFilterBuilder $inputFilterBuilder)
     {
         $this->inputFilterBuilder = $inputFilterBuilder;
@@ -465,6 +470,12 @@ class Field extends FieldAbstract
         return $this;
     }
 
+    /**
+     * Get the InputFilterBuilder that can be used to create default validators
+     * and filters for the field.
+     *
+     * @return InputFilterBuilder
+     */
     public function getInputFilterBuilder()
     {
         return $this->inputFilterBuilder ?: Pimple::getResource('db.field.input-filter-builder');

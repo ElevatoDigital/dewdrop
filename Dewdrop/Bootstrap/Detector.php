@@ -13,12 +13,8 @@ namespace Dewdrop\Bootstrap;
 use Dewdrop\Auth\Db\UsersTableGateway;
 use Dewdrop\Config;
 use Dewdrop\Db\Adapter as DbAdapter;
-use Dewdrop\Db\Field\InputFilterBuilder;
 use Dewdrop\Exception;
-use Dewdrop\Inflector;
 use Dewdrop\Paths;
-use Dewdrop\Request;
-use Dewdrop\View\View;
 use Pimple;
 use Silex\Application;
 use Silex\Provider\SessionServiceProvider;
@@ -114,42 +110,21 @@ class Detector
             $pimple['debug'] = false;
         }
 
-        if (!isset($pimple['dewdrop-request'])) {
-            $pimple['dewdrop-request'] = $pimple->share(
-                function () {
-                    return new Request();
-                }
-            );
-        }
+        $sharedResources = [
+            'dewdrop-request'               => '\Dewdrop\Request',
+            'paths'                         => '\Dewdrop\Paths',
+            'inflector'                     => '\Dewdrop\Inflector',
+            'db.field.input-filter-builder' => '\Dewdrop\Db\Field\InputFilterBuilder'
+        ];
 
-        if (!isset($pimple['paths'])) {
-            $pimple['paths'] = $pimple->share(
-                function () {
-                    return new Paths();
-                }
-            );
-        }
-
-        if (!isset($pimple['inflector'])) {
-            $pimple['inflector'] = $pimple->share(
-                function () {
-                    return new Inflector();
-                }
-            );
-        }
-
-        if (!isset($pimple['view'])) {
-            $pimple['view'] = function () {
-                return new View();
-            };
-        }
-
-        if (!isset($pimple['db.field.input-filter-builder'])) {
-            $pimple['db.field.input-filter-builder'] = $pimple->share(
-                function () {
-                    return new InputFilterBuilder();
-                }
-            );
+        foreach ($sharedResources as $resourceName => $className) {
+            if (!isset($pimple[$resourceName])) {
+                $pimple[$resourceName] = $pimple->share(
+                    function () use ($className) {
+                        return new $className();
+                    }
+                );
+            }
         }
 
         if (!isset($pimple['session'])) {
