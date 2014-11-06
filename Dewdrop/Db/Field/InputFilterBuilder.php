@@ -13,10 +13,8 @@ namespace Dewdrop\Db\Field;
 use Dewdrop\Db\Field;
 use Dewdrop\Filter\NullableDbBoolean as NullableDbBooleanFilter;
 use Zend\Filter;
-use Zend\Filter\FilterChain;
 use Zend\InputFilter\Input;
 use Zend\Validator;
-use Zend\Validator\ValidatorChain;
 
 /**
  * This class adds default filters and validators to a field's input filter,
@@ -25,19 +23,53 @@ use Zend\Validator\ValidatorChain;
 class InputFilterBuilder
 {
     /**
+     * The types for which we'll be handling adding inputs/filters.
+     *
+     * @var array
+     */
+    protected $types = [
+        'ManyToMany',
+        'String',
+        'Date',
+        'Boolean',
+        'Integer',
+        'Float'
+    ];
+
+    /**
+     * Metadata from the DB for the provided field.
+     *
+     * @var array
+     */
+    protected $metadata;
+
+    /**
      * Examine the field's type and attach filters and validators accordingly.
      *
      * @param Field $field
-     * @param Input $input
+     * @param array $metadata
      * @return Input
      */
-    public function createInputForField(Field $field)
+    public function createInputForField(Field $field, array $metadata)
+    {
+        $this->metadata = $metadata;
+
+        $input = $this->createInput($field);
+
+        foreach ($this->types as $type) {
+            if ($field->isType($type)) {
+                $method = "attachFor{$type}";
+                $input  = $this->$method($input);
+                break;
+            }
+        }
+
+        return $input;
+    }
+
+    protected function createInput(Field $field)
     {
         $input = new Input($field->getControlName());
-
-        $validators = $input->getValidatorChain();
-        $filters    = $input->getFilterChain();
-        $metadata   = $field->getMetadata();
 
         if ($field->isRequired() && !$field->isType('boolean')) {
             $input->setAllowEmpty(false);
@@ -45,22 +77,19 @@ class InputFilterBuilder
             $input->setAllowEmpty(true);
         }
 
-        if (!$field->isType('manytomany')) {
-            return $input;
-        }
+        return $input;
+    }
 
-        if ($field->isType('string')) {
-            $this->attachForString($validators, $filters, $metadata['LENGTH']);
-        } elseif ($field->isType('date')) {
-            $this->attachForDate($validators, $filters);
-        } elseif ($field->isType('boolean')) {
-            $this->attachForBoolean($validators, $filters, $metadata['NULLABLE']);
-        } elseif ($field->isType('integer')) {
-            $this->attachForInteger($validators, $filters);
-        } elseif ($field->isType('float')) {
-            $this->attachForFloat($validators, $filters);
-        }
-
+    /**
+     * The only reason we provide a special case for ManyToMany, really, is to
+     * avoid the normal integer filters/validators being applied to what will
+     * not be a scalar value.
+     *
+     * @param Input $input
+     * @return Input
+     */
+    protected function attachForManyToMany(Input $input)
+    {
         return $input;
     }
 
@@ -69,29 +98,34 @@ class InputFilterBuilder
      * the DB metadata, we use that to add a StringLength validator.  We always
      * add filters to trim strings and convert empty strings to null.
      *
-     * @param ValidatorChain $validators
-     * @param FilterChain $filters
-     * @param null|int $length
+     * @param Input $input
+     * @return Input
      */
-    protected function attachForString(ValidatorChain $validators, FilterChain $filters, $length)
+    protected function attachForString(Input $input)
     {
+        $length = $this->metadata['LENGTH'];
+
         if ($length && 0 < (int) $length) {
-            $validators->attach(new Validator\StringLength(0, $length));
+            $input->getValidatorChain()->attach(new Validator\StringLength(0, $length));
         }
 
-        $filters->attach(new Filter\StringTrim());
-        $filters->attach(new Filter\Null(Filter\Null::TYPE_STRING));
+        $input->getFilterChain()->attach(new Filter\StringTrim());
+        $input->getFilterChain()->attach(new Filter\Null(Filter\Null::TYPE_STRING));
+
+        return $input;
     }
 
     /**
      * Attach validator for date fields.
      *
-     * @param ValidatorChain $validators
-     * @param FilterChain $filters
+     * @param Input $input
+     * @return Input
      */
-    protected function attachForDate(ValidatorChain $validators, FilterChain $filters)
+    protected function attachForDate(Input $input)
     {
-        $validators->attach(new Validator\Date());
+        $input->getValidatorChain()->attach(new Validator\Date());
+
+        return $input;
     }
 
     /**
@@ -103,40 +137,45 @@ class InputFilterBuilder
      * the boolean value.  If the DB column is not nullable, we convert all values
      * to integers.
      *
-     * @param ValidatorChain $validators
-     * @param FilterChain $filters
-     * @param boolean $nullable
+     * @param Input $input
+     * @return Input
      */
-    protected function attachForBoolean(ValidatorChain $validators, FilterChain $filters, $nullable)
+    protected function attachForBoolean(Input $input)
     {
-        if ($nullable) {
-            $filters->attach(new NullableDbBooleanFilter());
+        if ($this->metadata['NULLABLE']) {
+            $input->getFilterChain()->attach(new NullableDbBooleanFilter());
         } else {
-            $filters->attach(new Filter\Int());
+            $input->getFilterChain()->attach(new Filter\Int());
         }
+
+        return $input;
     }
 
     /**
      * Ensure integer fields are filtered to ints.
      *
-     * @param ValidatorChain $validators
-     * @param FilterChain $filters
+     * @param Input $input
+     * @return Input
      */
-    protected function attachForInteger(ValidatorChain $validators, FilterChain $filters)
+    protected function attachForInteger(Input $input)
     {
-        $filters->attach(new Filter\Int());
-        $validators->attach(new \Zend\I18n\Validator\Int());
+        $input->getFilterChain()->attach(new Filter\Int());
+        $input->getValidatorChain()->attach(new \Zend\I18n\Validator\Int());
+
+        return $input;
     }
 
     /**
      * Ensure float fields are filtered to floats.
      *
-     * @param ValidatorChain $validators
-     * @param FilterChain $filters
+     * @param Input $input
+     * @return Input
      */
-    protected function attachForFloat(ValidatorChain $validators, FilterChain $filters)
+    protected function attachForFloat(Input $input)
     {
-        $filters->attach(new Filter\Digits());
-        $validators->attach(new \Zend\I18n\Validator\Float());
+        $input->getFilterChain()->attach(new Filter\Digits());
+        $input->getValidatorChain()->attach(new \Zend\I18n\Validator\Float());
+
+        return $input;
     }
 }

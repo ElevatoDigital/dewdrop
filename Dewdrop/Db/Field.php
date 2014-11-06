@@ -14,7 +14,6 @@ use Dewdrop\Db\Field\InputFilterBuilder;
 use Dewdrop\Fields\FieldAbstract;
 use Dewdrop\Fields\OptionPairs;
 use Dewdrop\Pimple;
-use Zend\InputFilter\Input;
 
 /**
  * Field objects provide a way to leverage database metadata throughout
@@ -350,16 +349,6 @@ class Field extends FieldAbstract
     }
 
     /**
-     * Get the metadata from the DB adapter for this field.
-     *
-     * @return array
-     */
-    public function getMetadata()
-    {
-        return $this->metadata;
-    }
-
-    /**
      * Manually override the default control name for this field.
      *
      * This can be useful and necessary if you are using multiple instances of
@@ -450,7 +439,7 @@ class Field extends FieldAbstract
     public function getInputFilter()
     {
         if (null === $this->inputFilter) {
-            $this->inputFilter = $this->getInputFilterBuilder()->createInputForField($this);
+            $this->inputFilter = $this->getInputFilterBuilder()->createInputForField($this, $this->metadata);
         }
 
         return $this->inputFilter;
@@ -571,7 +560,7 @@ class Field extends FieldAbstract
      */
     public function isType()
     {
-        $args = func_get_args();
+        $args = array_map('strtolower', func_get_args());
 
         if (in_array($this->metadata['GENERIC_TYPE'], $args) || in_array($this->metadata['DATA_TYPE'], $args)) {
             return true;
@@ -664,7 +653,7 @@ class Field extends FieldAbstract
      *
      * @return boolean
      */
-    protected function isTypeManyToMany()
+    protected function isTypeManytomany()
     {
         return false;
     }

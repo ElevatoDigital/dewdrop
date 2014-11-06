@@ -101,12 +101,12 @@ class Field extends BaseField
     }
 
     /**
-     * Override \Dewdrop\Db\Field's isTypeManyToMany() method to always return
+     * Override \Dewdrop\Db\Field's isTypeManytomany() method to always return
      * true for many-to-many fields.
      *
      * @return boolean
      */
-    protected function isTypeManyToMany()
+    protected function isTypeManytomany()
     {
         return true;
     }
