@@ -238,6 +238,17 @@ class Definition
     }
 
     /**
+     * Get the index/name of the column in the attribute definition that tells us
+     * if a value is required.
+     *
+     * @return string
+     */
+    public function getRequiredIndex()
+    {
+        return $this->requiredIndex;
+    }
+
+    /**
      * Get a \Dewdrop\Db\Adapter::describeTable() compatible metadata definition.
      * This allows EAV field's to integrate nicely with the standard Field API.
      *
@@ -265,7 +276,7 @@ class Definition
             'DATA_TYPE'        => $attribute['backend_type'],
             'GENERIC_TYPE'     => $this->detectGenericType($attribute['backend_type']),
             'DEFAULT'          => $attribute['default_value'],
-            'NULLABLE'         => !($attribute[$this->requiredIndex]),
+            'NULLABLE'         => true,
             'LENGTH'           => null,
             'SCALE'            => null,
             'PRECISION'        => null,

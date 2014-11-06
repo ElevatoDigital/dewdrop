@@ -248,7 +248,7 @@ class Content extends HelperAbstract
      * @param array $rowData
      * @return string
      */
-    protected function renderDbText(FieldInterface $field, array $rowData)
+    protected function renderDbText(DbField $field, array $rowData)
     {
         return $this->view->escapeHtml($rowData[$field->getName()]);
     }
@@ -263,16 +263,22 @@ class Content extends HelperAbstract
      * @param array $rowData
      * @return string
      */
-    protected function renderDbReference(FieldInterface $field, array $rowData)
+    protected function renderDbReference(DbField $field, array $rowData)
     {
         $name = preg_replace('/_id$/', '', $field->getName());
 
         return $this->view->escapeHtml($rowData[$name]);
     }
 
-    protected function renderDbBoolean(FieldInterface $field, array $rowData)
+    protected function renderDbBoolean(DbField $field, array $rowData)
     {
-        return ($rowData[$field->getName()] ? 'Yes' : 'No');
+        $value = $rowData[$field->getName()];
+
+        if (null === $value || '' === $value) {
+            return '';
+        } else {
+            return ($value ? 'Yes' : 'No');
+        }
     }
 
     /**
@@ -284,7 +290,7 @@ class Content extends HelperAbstract
      * @param array $rowData
      * @return string
      */
-    protected function renderDbDate(FieldInterface $field, array $rowData)
+    protected function renderDbDate(DbField $field, array $rowData)
     {
         $value     = $rowData[$field->getName()];
         $timestamp = strtotime($value);
@@ -305,7 +311,7 @@ class Content extends HelperAbstract
      * @param array $rowData
      * @return string
      */
-    protected function renderDbTimestamp(FieldInterface $field, array $rowData)
+    protected function renderDbTimestamp(DbField $field, array $rowData)
     {
         $value     = $rowData[$field->getName()];
         $timestamp = strtotime($value);

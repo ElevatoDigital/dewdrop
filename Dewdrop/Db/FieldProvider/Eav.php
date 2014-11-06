@@ -58,10 +58,17 @@ class Eav implements ProviderInterface
      */
     public function instantiate($name)
     {
-        $def   = $this->table->getEav();
-        $field = new Field($this->table, $name, $def->getFieldMetadata($name));
+        $definition = $this->table->getEav();
+        $metadata   = $definition->getFieldMetadata($name);
+        $attribute  = $definition->getAttribute($name);
 
-        $field->setDefinition($def);
+        $field = new Field($this->table, $name, $metadata);
+
+        $field->setDefinition($definition);
+
+        if ($attribute[$definition->getRequiredIndex()]) {
+            $field->setRequired(true);
+        }
 
         return $field;
     }

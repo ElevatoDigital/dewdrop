@@ -4,7 +4,6 @@ body {
 
 .bulk-action-check-all {
     position: relative;
-    top: -27px;
     left: 8px;
 }
 
@@ -16,6 +15,7 @@ body {
     margin-bottom: 0;
     position: fixed;
     width: 100%;
+    z-index: 100;
 }
 
 .bulk-action-panel.in {

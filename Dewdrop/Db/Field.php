@@ -12,6 +12,7 @@ namespace Dewdrop\Db;
 
 use Dewdrop\Fields\FieldAbstract;
 use Dewdrop\Fields\OptionPairs;
+use Dewdrop\Filter\NullableDbBoolean as NullableDbBooleanFilter;
 use Zend\Filter;
 use Zend\InputFilter\Input;
 use Zend\Validator;
@@ -547,7 +548,11 @@ class Field extends FieldAbstract
         } elseif ($this->isType('date')) {
             $validators->attach(new Validator\Date());
         } elseif ($this->isType('boolean')) {
-            $filters->attach(new Filter\Int());
+            if ($metadata['NULLABLE']) {
+                $filters->attach(new NullableDbBooleanFilter());
+            } else {
+                $filters->attach(new Filter\Int());
+            }
         } elseif ($this->isType('integer')) {
             $filters->attach(new Filter\Int());
             $validators->attach(new \Zend\I18n\Validator\Int());

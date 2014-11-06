@@ -144,7 +144,7 @@ class Button implements ActionInterface
     public function render(View $view)
     {
         return sprintf(
-            '<input name="%s" type="submit" class="btn btn-primary" value="%s" />',
+            '<input name="%s" type="submit" class="btn btn-default" value="%s" />',
             $view->escapeHtmlAttr($this->id),
             $view->escapeHtmlAttr($this->buttonTitle)
         );

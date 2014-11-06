@@ -90,13 +90,6 @@ if ($this->isSortable) {
 
 $paginationHelper = $this->listing->getSelectModifierByName('SelectPaginate');
 
-echo $this->pagination(
-    $totalRowCount,
-    $paginationHelper->getPageSize(),
-    $paginationHelper->getPage(),
-    (1 === $totalRowCount ? $this->singularTitle : $this->pluralTitle)
-);
-
 if ($this->bulkActions) {
     echo $this->bulkActionForm()->close(
         $this->bulkActions,
@@ -105,6 +98,13 @@ if ($this->bulkActions) {
         $this->pluralTitle
     );
 }
+
+echo $this->pagination(
+    $totalRowCount,
+    $paginationHelper->getPageSize(),
+    $paginationHelper->getPage(),
+    (1 === $totalRowCount ? $this->singularTitle : $this->pluralTitle)
+);
 
 echo $this->bootstrapColumnsModal(
     $this->fields->getVisibleFields($this->groupingFilter),
