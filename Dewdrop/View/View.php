@@ -208,7 +208,7 @@ class View
      *     )
      * );
      *
-     * @param string $name
+     * @param string|array $name
      * @param mixed $value
      * @return \Dewdrop\View\View
      */
