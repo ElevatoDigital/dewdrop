@@ -5,6 +5,7 @@ body {
 .bulk-action-check-all {
     position: relative;
     left: 8px;
+    top: -15px;
 }
 
 .bulk-action-panel {
