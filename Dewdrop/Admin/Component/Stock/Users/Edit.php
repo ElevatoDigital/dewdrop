@@ -25,8 +25,7 @@ class Edit extends StockEdit
      */
     protected function checkPermissions()
     {
-        $permissions = $this->component->getPermissions();
-        $user        = Pimple::getResource('user');
+        $user = Pimple::getResource('user');
 
         if ($user->get('user_id') !== (int) $this->request->getQuery('user_id')) {
             parent::checkPermissions();
@@ -34,6 +33,11 @@ class Edit extends StockEdit
     }
 
     /**
+     * Handle submission of the edit form.  This primarily exists (rather
+     * than using the stock Edit->process()) for the password hashing.
+     *
+     * @todo Find a better way to handle the password hashing.
+     *
      * @param \Dewdrop\Admin\ResponseHelper\Standard $responseHelper
      * @return void
      */

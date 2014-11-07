@@ -25,18 +25,22 @@ use WP_Session;
 class Session implements ArrayAccess
 {
     /**
+     * A \Dewdrop\Paths object for getting info about the application environment.
      * @var Paths
      */
     protected $paths;
 
     /**
-     * @var \Symfony\Component\HttpFoundation\Session\Session|Wp_Session
+     * The session data storage container appropriate for the current environment.
+     *
+     * @var \Symfony\Component\HttpFoundation\Session\Session|WP_Session
      */
     protected $container;
 
     /**
+     * Provide a Pimple container for retrieval of session storage.
+     *
      * @param PimpleProper $pimple
-     * @return void
      */
     public function __construct(PimpleProper $pimple)
     {

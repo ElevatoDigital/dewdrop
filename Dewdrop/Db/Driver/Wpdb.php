@@ -356,6 +356,15 @@ class Wpdb implements DriverInterface
         return $wpdbResult;
     }
 
+    /**
+     * Pick an appropriate generic data type for the supplied MySQL native
+     * data type.
+     *
+     * @param string $nativeType
+     * @param mixed $length
+     * @return string
+     * @throws Exception
+     */
     public function mapNativeTypeToGenericType($nativeType, $length)
     {
         switch ($nativeType) {
@@ -497,6 +506,7 @@ class Wpdb implements DriverInterface
      * Use the functions available in the RDBMS to truncate the provided timestamp
      * column to a date.
      *
+     * @param string $timestamp
      * @return string
      */
     public function truncateTimeStampToDate($timestamp)

@@ -10,7 +10,18 @@
 
 namespace Dewdrop\Admin\Component;
 
+use Dewdrop\Fields\FieldInterface;
+
+/**
+ * Implementing this interface on a CrudInterface component will make your
+ * index/listing page user-sortable via drag and drop.
+ */
 interface SortableListingInterface
 {
+    /**
+     * Get the field that stores your custom sort order values (e.g. sort_index).
+     *
+     * @return FieldInterface
+     */
     public function getSortField();
 }

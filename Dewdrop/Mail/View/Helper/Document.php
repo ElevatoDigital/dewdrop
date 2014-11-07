@@ -19,6 +19,7 @@ class Document extends AbstractMailHelper
     /**
      * Open the HTML document, including the supplied title in the &lt;title&gt; tag.
      *
+     * @param string $title
      * @return string
      */
     public function open($title)

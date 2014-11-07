@@ -15,6 +15,7 @@ use Dewdrop\Admin\Component\CrudInterface;
 use Dewdrop\Exception;
 use Dewdrop\Pimple;
 use Symfony\Component\Security\Core\Role\Role as SfRole;
+use Symfony\Component\Security\Core\User\UserInterface as SfSecurityUserInterface;
 
 /**
  * This class allows you to adjust the permissions for an admin component.  It
@@ -66,6 +67,7 @@ class Permissions
      * Provide the component that these permissions should be applied to.
      *
      * @param mixed $component
+     * @param null|bool $debug
      * @throws Exception
      */
     public function __construct($component, $debug = null)
@@ -94,6 +96,7 @@ class Permissions
      * Register a number of permissions that we make available on CrudInterface
      * components.
      *
+     * @param CrudInterface $component
      * @return $this
      */
     public function registerAndSetDefaultsForCrudInterface(CrudInterface $component)
@@ -122,7 +125,7 @@ class Permissions
                 ->set($name, true);
         }
 
-        // @ todo Re-enabled these pages once they're complete
+        // @ todo Re-enable these pages once they're complete
         $this->set('custom-views', false);
         $this->set('notifications', false);
 
@@ -260,7 +263,14 @@ class Permissions
         return $this;
     }
 
-    protected function getUserRoleValues($user)
+    /**
+     * Get the role values (rather than the clumsy SfRole objects) for the
+     * provided user object.
+     *
+     * @param SfSecurityUserInterface $user
+     * @return array
+     */
+    protected function getUserRoleValues(SfSecurityUserInterface $user)
     {
         $roles = [];
 

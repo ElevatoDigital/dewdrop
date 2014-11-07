@@ -10,20 +10,28 @@
 
 namespace Dewdrop\Admin\PageFactory;
 
+use Dewdrop\Admin\Component\ComponentAbstract;
 use Dewdrop\Admin\Component\CrudInterface;
 use ReflectionClass;
 
 /**
- * Page factory for CRUD-capable components
+ * Page factory for CRUD-capable components.  Provides a lot of CRUD functionality
+ * without the need for per-component page files.  You can override any of these
+ * pages by adding a file to your component (see Files page factory) and can disable
+ * some of the provided functionality via your component's permissions.
  */
 class Crud implements PageFactoryInterface
 {
     /**
-     * @var \Dewdrop\Admin\Component\CrudInterface
+     * The component the pages will be provided for.
+     *
+     * @var CrudInterface|ComponentAbstract
      */
     protected $component;
 
     /**
+     * The map of URL names to page classes this factory serves.
+     *
      * @var array
      */
     protected $pageClassMap = [
@@ -44,7 +52,7 @@ class Crud implements PageFactoryInterface
     ];
 
     /**
-     * Constructor
+     * Provide the component for which the pages will be generated.
      *
      * @param CrudInterface $component
      */
@@ -79,6 +87,8 @@ class Crud implements PageFactoryInterface
     }
 
     /**
+     * List the pages this factory is capable of producing.
+     *
      * @return array
      */
     public function listAvailablePages()

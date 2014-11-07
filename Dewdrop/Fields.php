@@ -333,6 +333,13 @@ class Fields implements ArrayAccess, IteratorAggregate, Countable
         return $field;
     }
 
+    /**
+     * Prepend the supplied field (or custom field ID) to the field set.
+     *
+     * @param mixed $field
+     * @param string|null $modelName
+     * @return FieldInterface
+     */
     public function prepend($field, $modelName = null)
     {
         $field = $this->prepareFieldForAdding($field, $modelName);
@@ -342,11 +349,29 @@ class Fields implements ArrayAccess, IteratorAggregate, Countable
         return $field;
     }
 
+    /**
+     * An alias to add().  Just here because it's odd to have prepend()
+     * and not append().
+     *
+     * @param mixed $field
+     * @param string|null $modelName
+     * @return FieldInterface
+     */
     public function append($field, $modelName = null)
     {
         return $this->add($field, $modelName);
     }
 
+    /**
+     * Prepare to add a field for the supplied arguments.  If $field is a string
+     * we'll create a new CustomField.  Otherwise, we'll just directly add the
+     * field object itself.
+     *
+     * @param mixed $field
+     * @param string|null $modelName
+     * @return FieldInterface
+     * @throws Exception
+     */
     private function prepareFieldForAdding($field, $modelName = null)
     {
         if (is_string($field)) {

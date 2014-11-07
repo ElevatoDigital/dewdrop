@@ -395,6 +395,13 @@ class Relationship
         return $this->referenceColumnName;
     }
 
+    /**
+     * Set the name of the column (or an Expr) that should be used when building
+     * the list of values to add to a Select in augmentSelect().
+     *
+     * @param string|Expr $titleColumn
+     * @return $this
+     */
     public function setReferenceTitleColumn($titleColumn)
     {
         $this->referenceTitleColumn = $titleColumn;
@@ -506,6 +513,14 @@ class Relationship
         );
     }
 
+    /**
+     * Get a subquery that can be used when filtering by a many-to-many field.
+     * Basically gets all the anchor column values that are associated with the
+     * selected reference column value in the cross-reference table.
+     *
+     * @param integer $value
+     * @return string
+     */
     public function getFilterSubquery($value)
     {
         $db = $this->sourceTable->getAdapter();
@@ -614,6 +629,15 @@ class Relationship
         return $where;
     }
 
+    /**
+     * Attempt to get a reasonable reference title column for many-to-many
+     * values retrieved in augmentSelect().  Will use name or title, if available,
+     * and then fall back to the first column in the reference table.  You can
+     * override this behavior with setReferenceTitleColumn().
+     *
+     * @return Expr|string
+     * @throws Exception
+     */
     private function findReferenceTitleColumn()
     {
         if ($this->referenceTitleColumn) {

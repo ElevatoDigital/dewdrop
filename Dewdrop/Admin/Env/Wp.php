@@ -75,6 +75,7 @@ class Wp extends EnvAbstract
      * return submenu-friendly URLs when a submenu item matches the supplied
      * page and params arguments.
      *
+     * @param ComponentAbstract $component
      * @param string $page
      * @param array $params
      * @return string
@@ -165,7 +166,10 @@ class Wp extends EnvAbstract
      * @param string $page The name of the page to route to (e.g. "Index" or "Edit").
      * @param Response $response Inject a response object, usually for tests.
      *
-     * @return \Dewdrop\Admin\ComponentAbstract
+     * @param ComponentAbstract $component
+     * @param string|null $page
+     * @param Response|null $response
+     * @return ComponentAbstract
      */
     public function adminInit(ComponentAbstract $component, $page = null, Response $response = null)
     {

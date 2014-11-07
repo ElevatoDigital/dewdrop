@@ -126,6 +126,12 @@ class Standard
         return $this;
     }
 
+    /**
+     * Redirect to an arbitrary URL rather than a page in the same admin component.
+     *
+     * @param string $url
+     * @return $this
+     */
     public function redirectToUrl($url)
     {
         $this->redirectUrl = $url;

@@ -81,7 +81,10 @@ class BootstrapTable extends Table
     }
 
     /**
-     * @param int $page
+     * Generate a URL for sorting.
+     *
+     * @param string $id
+     * @param string $direction
      * @return string
      */
     protected function url($id, $direction)

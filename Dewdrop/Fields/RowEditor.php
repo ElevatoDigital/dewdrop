@@ -303,6 +303,13 @@ class RowEditor
         return null !== $this->deleteField;
     }
 
+    /**
+     * Perform a delete using the RowEditor's delete field, if specified.
+     *
+     * @todo Add support for "active" fields as well.
+     *
+     * @return void
+     */
     public function delete()
     {
         if ($this->hasDeleteField()) {

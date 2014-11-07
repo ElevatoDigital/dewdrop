@@ -69,6 +69,8 @@ class Request
     }
 
     /**
+     * Assemble a URL based upon the current Request information.
+     *
      * @return string
      */
     public function getUrl()
@@ -139,6 +141,12 @@ class Request
         }
     }
 
+    /**
+     * Get the contents of the body of a POST request.  Useful in RESTful
+     * API work.
+     *
+     * @return string
+     */
     public function getPostBody()
     {
         return file_get_contents('php://input');

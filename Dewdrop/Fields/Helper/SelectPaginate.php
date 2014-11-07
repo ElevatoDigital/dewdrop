@@ -10,9 +10,6 @@
 
 namespace Dewdrop\Fields\Helper;
 
-use Dewdrop\Db\Driver\Pdo\Pgsql;
-use Dewdrop\Db\Driver\Wpdb;
-use Dewdrop\Db\Expr;
 use Dewdrop\Db\Select;
 use Dewdrop\Exception;
 use Dewdrop\Fields\FieldInterface;
@@ -20,6 +17,9 @@ use Dewdrop\Fields;
 use Dewdrop\Request;
 
 /**
+ * This helper paginates a Select object so that a single page of a listing
+ * can be retrieved at a time.  Yuo can adjust the number of records to
+ * return per page.
  */
 class SelectPaginate extends HelperAbstract implements SelectModifierInterface
 {
@@ -33,12 +33,14 @@ class SelectPaginate extends HelperAbstract implements SelectModifierInterface
     protected $name = 'selectpaginate';
 
     /**
+     * The current page.
+     *
      * @var int
      */
     private $page;
 
     /**
-     * Page size
+     * The number of records to show per page.
      *
      * @var int
      */
@@ -47,17 +49,36 @@ class SelectPaginate extends HelperAbstract implements SelectModifierInterface
     /**
      * A Request object we can use to look up the current page.
      *
-     * @param Request
+     * @var \Dewdrop\Request
      */
     private $request;
 
+    /**
+     * A param prefix that can be used if you have multiple paginated listings
+     * displayed on a single page.
+     *
+     * @var string
+     */
     private $prefix;
 
+    /**
+     * Provide the HTTP request object that can be used to determine which page
+     * is selected.
+     *
+     * @param Request $request
+     */
     public function __construct(Request $request)
     {
         $this->request = $request;
     }
 
+    /**
+     * Set a prefix that can be used on HTTP parameters to avoid collisions
+     * with other paginated listings.
+     *
+     * @param string $prefix
+     * @return $this
+     */
     public function setPrefix($prefix)
     {
         $this->prefix = $prefix;
@@ -65,12 +86,20 @@ class SelectPaginate extends HelperAbstract implements SelectModifierInterface
         return $this;
     }
 
+    /**
+     * Get the HTTP param prefix.
+     *
+     * @return string
+     */
     public function getPrefix()
     {
         return $this->prefix;
     }
 
     /**
+     * There are no field-specific callables for pagination, so attempting to
+     * look them up always returns false.
+     *
      * @param FieldInterface $field
      * @return false
      */
@@ -80,7 +109,7 @@ class SelectPaginate extends HelperAbstract implements SelectModifierInterface
     }
 
     /**
-     * Returns page
+     * Get current page.
      *
      * @return int
      */
@@ -90,7 +119,7 @@ class SelectPaginate extends HelperAbstract implements SelectModifierInterface
     }
 
     /**
-     * Sets page size
+     * Set number of records displayed per page.
      *
      * @param int $pageSize
      * @return SelectPaginate
@@ -103,7 +132,7 @@ class SelectPaginate extends HelperAbstract implements SelectModifierInterface
     }
 
     /**
-     * Returns page size
+     * Get number of records displayed per page.
      *
      * @return int
      */
@@ -114,7 +143,11 @@ class SelectPaginate extends HelperAbstract implements SelectModifierInterface
 
     /**
      * Using the supplied \Dewdrop\Fields and \Dewdrop\Db\Select, modify the
-     * Select and return it.
+     * Select to include only the current page with the correct number of
+     * records.  The DB driver is used to ensure we can get the total number
+     * of records that _would_ have been returned had no pagination been applied
+     * after the query has been executed (using whatever facility is provided
+     * for that use in the specific RDBMS).
      *
      * @param Fields $fields
      * @param Select $select

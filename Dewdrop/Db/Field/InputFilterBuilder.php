@@ -54,7 +54,7 @@ class InputFilterBuilder
     {
         $this->metadata = $metadata;
 
-        $input = $this->createInput($field);
+        $input = $this->instantiateInput($field);
 
         foreach ($this->types as $type) {
             if ($field->isType($type)) {
@@ -67,7 +67,14 @@ class InputFilterBuilder
         return $input;
     }
 
-    protected function createInput(Field $field)
+    /**
+     * Instantiate an Input object for the supplied field call setAllowEmpty()
+     * depending upon whether the field is required.
+     *
+     * @param Field $field
+     * @return Input
+     */
+    protected function instantiateInput(Field $field)
     {
         $input = new Input($field->getControlName());
 

@@ -30,7 +30,7 @@ class Mock implements DriverInterface
     /**
      * Create new instance with the supplied adapter.
      *
-     * @param \Dewdrop\Db\Adapter
+     * @param \Dewdrop\Db\Adapter $adapter
      */
     public function __construct(Adapter $adapter)
     {
@@ -205,11 +205,17 @@ class Mock implements DriverInterface
         return array();
     }
 
+    /**
+     * Start a new transaction.
+     */
     public function beginTransaction()
     {
 
     }
 
+    /**
+     * Commit the current transaction.
+     */
     public function commit()
     {
 
@@ -282,6 +288,7 @@ class Mock implements DriverInterface
      * Use the functions available in the RDBMS to truncate the provided timestamp
      * column to a date.
      *
+     * @param string $timestamp
      * @return string
      */
     public function truncateTimeStampToDate($timestamp)

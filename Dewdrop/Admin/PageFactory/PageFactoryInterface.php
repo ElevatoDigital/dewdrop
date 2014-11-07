@@ -24,6 +24,9 @@ interface PageFactoryInterface
     public function createPage($name);
 
     /**
+     * List all the pages made available by the factory.  Should return an array
+     * of \Dewdrop\Admin\PageFactory\PageFactoryInterface objects.
+     *
      * @return array
      */
     public function listAvailablePages();

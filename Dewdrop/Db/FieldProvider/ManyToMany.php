@@ -79,6 +79,13 @@ class ManyToMany implements ProviderInterface
         return array_keys($this->table->getManyToManyRelationships());
     }
 
+    /**
+     * Augment the provided Select by adding a comma-separated list of
+     * many-to-many values for all relationships in this field provider.
+     *
+     * @param Select $select
+     * @return Select
+     */
     public function augmentSelect(Select $select)
     {
         /* @var $relationship Relationship */

@@ -122,7 +122,7 @@ class Content extends HelperAbstract
      * Set the content that should be returned if a field's callback returns no
      * output.
      *
-     * @param string $nullContentPlaceholder;
+     * @param string $nullContentPlaceholder
      * @return Content
      */
     public function setNullContentPlaceholder($nullContentPlaceholder)
@@ -270,6 +270,15 @@ class Content extends HelperAbstract
         return $this->view->escapeHtml($rowData[$name]);
     }
 
+    /**
+     * Render a simple yes/no for boolean fields.  We do try to detect the
+     * difference between null and false values to support "tri-state" use
+     * of a boolean field.
+     *
+     * @param DbField $field
+     * @param array $rowData
+     * @return string
+     */
     protected function renderDbBoolean(DbField $field, array $rowData)
     {
         $value = $rowData[$field->getName()];

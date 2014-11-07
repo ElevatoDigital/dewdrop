@@ -291,6 +291,9 @@ class Dbdeploy extends CommandAbstract
      * Run any available updates.  If no updates are available, we display
      * status information instead.
      *
+     * @param array $changesets
+     * @param ChangelogGateway $changelogGateway
+     * @param CliExec $cliExec
      * @return boolean
      */
     public function executeUpdate(array $changesets, ChangelogGateway $changelogGateway, CliExec $cliExec)
@@ -404,6 +407,8 @@ class Dbdeploy extends CommandAbstract
      * of dbdeploy to skip those scripts and move on to those you know still
      * need to be applied to your database.
      *
+     * @param array $changesets
+     * @param ChangelogGateway $changelogGateway
      * @return boolean
      */
     public function executeBackfill(array $changesets, ChangelogGateway $changelogGateway)

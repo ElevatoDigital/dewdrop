@@ -485,8 +485,19 @@ class Pgsql implements DriverInterface
         return $desc;
     }
 
+    /**
+     * Determine the appropriate generic data type for the supplied Postgres
+     * native data type.
+     *
+     * @param string $nativeType
+     * @param mixed $length
+     * @return string
+     * @throws Exception
+     */
     public function mapNativeTypeToGenericType($nativeType, $length)
     {
+        $genericType = null;
+
         switch ($nativeType) {
             case 'smallint':
             case 'int2':
@@ -633,6 +644,7 @@ class Pgsql implements DriverInterface
      * Use the functions available in the RDBMS to truncate the provided timestamp
      * column to a date.
      *
+     * @param string $timestamp
      * @return string
      */
     public function truncateTimeStampToDate($timestamp)
