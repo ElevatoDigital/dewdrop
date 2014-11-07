@@ -99,6 +99,11 @@ class Silex extends EnvAbstract
         return $this->application['inflector']->hyphenize($name);
     }
 
+    /**
+     * Initialize the provided component by setting up routes for it in Silex.
+     *
+     * @param ComponentAbstract $component
+     */
     public function initComponent(ComponentAbstract $component)
     {
         $this->application->match(
@@ -169,6 +174,15 @@ class Silex extends EnvAbstract
         return $view->render($this->layoutName);
     }
 
+    /**
+     * Generate a URL for the provided page and params that will match the
+     * Silex routes set up by this class.
+     *
+     * @param ComponentAbstract $component
+     * @param string $page
+     * @param array $params
+     * @return string
+     */
     public function url(ComponentAbstract $component, $page, array $params = array())
     {
         return '/admin/'
@@ -177,11 +191,24 @@ class Silex extends EnvAbstract
             . $this->assembleQueryString($params, '?');
     }
 
+    /**
+     * Redirect to the provided URL using Silex.
+     *
+     * @param string $url
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
     public function redirect($url)
     {
         return $this->application->redirect($url);
     }
 
+    /**
+     * Build an array of components sorted by the menu position property defined
+     * in each component, falling back to the component titles if no position is
+     * set.
+     *
+     * @return array
+     */
     protected function getSortedComponentsForMenu()
     {
         $components = $this->components;
@@ -189,6 +216,8 @@ class Silex extends EnvAbstract
         usort(
             $components,
             function ($a, $b) {
+                /* @var $a ComponentAbstract */
+                /* @var $b ComponentAbstract */
                 $aPos = $a->getMenuPosition();
                 $bPos = $b->getMenuPosition();
 

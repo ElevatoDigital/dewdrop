@@ -10,13 +10,19 @@
 
 namespace Dewdrop\View\Helper;
 
-use Dewdrop\Exception;
-
+/**
+ * Render pagination controls using Bootstrappy markup.
+ */
 class Pagination extends AbstractHelper
 {
     /**
+     * Render pagination.
+     *
+     * @param integer $rowCount The total number of records available.
+     * @param integer $pageSize The number of records to show on each page.
+     * @param integer $page The currently selected page.
+     * @param string $title The title to use in the record count.
      * @return string
-     * @throws \Dewdrop\Exception
      */
     public function direct($rowCount, $pageSize, $page, $title = 'Records')
     {
@@ -84,6 +90,8 @@ class Pagination extends AbstractHelper
     }
 
     /**
+     * Get a URL for the pagination links.
+     *
      * @param int $page
      * @return string
      */

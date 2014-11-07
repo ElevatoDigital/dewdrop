@@ -87,7 +87,7 @@ class Wp extends EnvAbstract
 
         foreach ($component->getSubmenuPages() as $submenu) {
             if ($submenu['route'] === $page) {
-                $submenuParams  = $subment['params'];
+                $submenuParams  = $submenu['params'];
                 $matchesSubmenu = true;
 
                 foreach ($params as $name => $value) {
@@ -235,6 +235,8 @@ class Wp extends EnvAbstract
      * This is the callback we added to the "admin_menu" action in the
      * register() method.  It essentially tells WP to call this component's
      * route() method whenever the component is accessed.
+     *
+     * @param ComponentAbstract $component
      */
     public function registerMenuPage(ComponentAbstract $component)
     {
@@ -328,6 +330,7 @@ class Wp extends EnvAbstract
      * other resources.  Also, this gives us the chance to run code before WP has
      * rendered any output.
      *
+     * @param ComponentAbstract $component
      * @return boolean
      */
     protected function componentIsCurrentlyActive(ComponentAbstract $component)
