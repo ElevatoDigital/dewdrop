@@ -253,7 +253,7 @@ class Relationship
      * points back to the source table.
      *
      * @throws \Dewdrop\Exception
-     * @return string.
+     * @return string
      */
     public function getXrefAnchorColumnName()
     {
