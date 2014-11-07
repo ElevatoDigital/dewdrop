@@ -61,12 +61,12 @@ class SortListing extends PageAbstract
     {
         if (!$this->request->isPost()) {
             $this->error = json_encode(['result' => 'error', 'message' => 'Must be POST.']);
-            return false;
+            return;
         }
 
         if (!is_array($this->request->getPost('sort_order'))) {
             $this->error = json_encode(['result' => 'error', 'message' => 'sort_order array not available.']);
-            return false;
+            return;
         }
 
         $listing    = $this->component->getListing();
@@ -86,7 +86,6 @@ class SortListing extends PageAbstract
                 );
             } catch (Exception $e) {
                 $this->error = json_encode(['result' => 'error', 'message' => 'Failed to save.']);
-                return false;
             }
         }
     }
