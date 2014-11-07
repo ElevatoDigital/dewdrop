@@ -1,18 +1,66 @@
 <?php
 
+/**
+ * Dewdrop
+ *
+ * @link      https://github.com/DeltaSystems/dewdrop
+ * @copyright Delta Systems (http://deltasys.com)
+ * @license   https://github.com/DeltaSystems/dewdrop/LICENSE
+ */
+
 namespace Dewdrop\Admin\Page\Stock;
 
 use Dewdrop\Admin\Component\BulkActionProcessorInterface;
+use Dewdrop\Admin\Component\ComponentAbstract;
+use Dewdrop\Admin\Component\CrudInterface;
 use Dewdrop\Admin\Component\SortableListingInterface;
 use Dewdrop\Admin\ResponseHelper\Standard as ResponseHelper;
 use Dewdrop\Admin\Page\PageAbstract;
 use Dewdrop\Bootstrap;
 use Dewdrop\Pimple;
 
+/**
+ * Render the primary listing for a component.  This page is more complex
+ * than others in the stock CRUD pages because it provides some navigation for
+ * the remainder of the component and also provides support for some
+ * supplementary interface a CRUD component cam implement:
+ *
+ * 1) SortableListingInterface: Makes the rows in a listing's table sortable.
+ *
+ * 2) BulkActionProcessInterface: Enables checkbxoes on the listing rows to
+ *    allow selection of records and application of actions to them in bulk.
+ */
 class Index extends PageAbstract
 {
+    /**
+     * The CRUD component.
+     *
+     * @var CrudInterface|ComponentAbstract
+     */
+    protected $component;
+
+    /**
+     * If a bulk action fails to process (e.g. returns an input validation
+     * issue), this message will be populate and sent to the view.
+     *
+     * @var string
+     */
     private $bulkActionFailureMessage = '';
 
+    /**
+     * Ensure the user is allowed to view the listing in this component.
+     */
+    public function init()
+    {
+        $this->component->getPermissions()->haltIfNotAllowed('view-listing');
+    }
+
+    /**
+     * If our component is a BulkActionProcessorInterface implementer, then
+     * process those here, handling the result and associated message.
+     *
+     * @param ResponseHelper $responseHelper
+     */
     public function process(ResponseHelper $responseHelper)
     {
         if ($this->component instanceof BulkActionProcessorInterface) {
@@ -30,31 +78,34 @@ class Index extends PageAbstract
         }
     }
 
+    /**
+     * Pass a whole log of stuff into the view.
+     */
     public function render()
     {
-        $this->component->getPermissions()->haltIfNotAllowed('view-listing');
-
         $fields  = $this->component->getFields();
         $listing = $this->component->getListing();
         $filter  = $this->component->getVisibilityFilter();
 
-        $this->view->component        = $this->component;
-        $this->view->permissions      = $this->component->getPermissions();
-        $this->view->singularTitle    = $this->component->getPrimaryModel()->getSingularTitle();
-        $this->view->pluralTitle      = $this->component->getPrimaryModel()->getPluralTitle();
-        $this->view->listing          = $listing;
-        $this->view->visibilityFilter = $filter;
-        $this->view->groupingFilter   = $this->component->getFieldGroupsFilter();
-        $this->view->fields           = $fields;
-        $this->view->debug            = Pimple::getResource('debug');
-        $this->view->isSortable       = ($this->component instanceof SortableListingInterface);
+        $this->view->assign([
+            'component'        => $this->component,
+            'permissions'      => $this->component->getPermissions(),
+            'singularTitle'    => $this->component->getPrimaryModel()->getSingularTitle(),
+            'pluralTitle'      => $this->component->getPrimaryModel()->getPluralTitle(),
+            'listing'          => $listing,
+            'visibilityFilter' => $filter,
+            'groupingFilter'   => $this->component->getFieldGroupsFilter(),
+            'fields'           => $fields,
+            'debug'            => Pimple::getResource('debug'),
+            'isSortable'       => ($this->component instanceof SortableListingInterface),
+            'page'             => $this
+        ]);
 
         if ($this->component instanceof BulkActionProcessorInterface) {
-            $this->view->bulkActions = $this->component->getBulkActions();
-
-            $this->view->bulkActionFailureMessage = $this->bulkActionFailureMessage;
+            $this->view->assign([
+                'bulkActions'              => $this->component->getBulkActions(),
+                'bulkActionFailureMessage' => $this->bulkActionFailureMessage
+            ]);
         }
-
-        $this->view->assign('page', $this);
     }
 }

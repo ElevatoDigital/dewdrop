@@ -1,36 +1,64 @@
 <?php
 
+/**
+ * Dewdrop
+ *
+ * @link      https://github.com/DeltaSystems/dewdrop
+ * @copyright Delta Systems (http://deltasys.com)
+ * @license   https://github.com/DeltaSystems/dewdrop/LICENSE
+ */
+
 namespace Dewdrop\Admin\Page\Stock;
 
+use Dewdrop\Admin\Component\ComponentAbstract;
+use Dewdrop\Admin\Component\CrudInterface;
 use Dewdrop\Admin\Page\PageAbstract;
+use Dewdrop\Admin\ResponseHelper\Standard as ResponseHelper;
 
+/**
+ * This page uses a RowEditor and a couple view helpers (primarily bootstrapForm())
+ * to provide input validation and saving capabilities to a CRUD component.
+ */
 class Edit extends PageAbstract
 {
     /**
-     * @var \Dewdrop\Admin\Component\Stock\Users\Component
+     * The CRUD component.
+     *
+     * @var CrudInterface|ComponentAbstract
      */
     protected $component;
 
     /**
+     * The row editor we'll use to actually perform the validation and editing.
+     *
      * @var \Dewdrop\Fields\RowEditor
      */
     protected $rowEditor;
 
     /**
+     * Was an invalid submission made on this request?
+     *
      * @var bool
      */
-    protected $invalidSubmission;
+    protected $invalidSubmission = false;
 
     /**
+     * Is the record that we're editing new or an existing record being edited?
+     *
      * @var bool
      */
     protected $isNew;
 
     /**
-     * @var \Dewdrop\Auth\Db\UsersTableGateway
+     * The primary model from the CRUD component.
+     *
+     * @var \Dewdrop\Db\Table
      */
     protected $model;
 
+    /**
+     * Setup the row editor and check component permissions.
+     */
     public function init()
     {
         $this->rowEditor = $this->component->getRowEditor();
@@ -44,11 +72,13 @@ class Edit extends PageAbstract
 
         $this->isNew = $this->rowEditor->isNew();
 
-        $this->invalidSubmission = false;
-
         $this->checkPermissions();
     }
 
+    /**
+     * Ensure the user has permission to create or edit records on this CRUD
+     * component.
+     */
     protected function checkPermissions()
     {
         if ($this->isNew) {
@@ -58,7 +88,15 @@ class Edit extends PageAbstract
         }
     }
 
-    public function process($responseHelper)
+    /**
+     * On a POST request, validate the user's input.  If valid, save using the
+     * RowEditor, set a success message and then redirect.  Should also behave
+     * reasonably well when used as an endpoint for an XHR by returning a success
+     * message and the new primary key value.
+     *
+     * @param ResponseHelper $responseHelper
+     */
+    public function process(ResponseHelper $responseHelper)
     {
         if ($this->request->isPost()) {
             $this->invalidSubmission = (!$this->rowEditor->isValid($this->request->getPost()));
@@ -88,15 +126,20 @@ class Edit extends PageAbstract
         }
     }
 
+    /**
+     * Pass a bunch of stuff to the view.  Duh.
+     */
     public function render()
     {
-        $this->view->component         = $this->component;
-        $this->view->isNew             = $this->isNew;
-        $this->view->fields            = $this->component->getFields();
-        $this->view->model             = $this->model;
-        $this->view->rowEditor         = $this->rowEditor;
-        $this->view->request           = $this->request;
-        $this->view->groupingFilter    = $this->component->getFieldGroupsFilter();
-        $this->view->invalidSubmission = $this->invalidSubmission;
+        $this->view->assign([
+            'component'         => $this->component,
+            'isNew'             => $this->isNew,
+            'fields'            => $this->component->getFields(),
+            'model'             => $this->model,
+            'rowEditor'         => $this->rowEditor,
+            'request'           => $this->request,
+            'groupingFilter'    => $this->component->getFieldGroupsFilter(),
+            'invalidSubmission' => $this->invalidSubmission
+        ]);
     }
 }

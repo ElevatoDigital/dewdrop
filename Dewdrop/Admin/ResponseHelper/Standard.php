@@ -150,8 +150,7 @@ class Standard
     {
         $redirectResult = false;
 
-        $this
-            ->executeCallbacks();
+        $this->executeCallbacks();
 
         // Don't execute header modifying actions when on CLI
         if ('cli' !== php_sapi_name()) {

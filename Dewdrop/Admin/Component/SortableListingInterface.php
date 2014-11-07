@@ -10,7 +10,7 @@
 
 namespace Dewdrop\Admin\Component;
 
-use Dewdrop\Fields\FieldInterface;
+use Dewdrop\Db\Field as DbField;
 
 /**
  * Implementing this interface on a CrudInterface component will make your
@@ -21,7 +21,7 @@ interface SortableListingInterface
     /**
      * Get the field that stores your custom sort order values (e.g. sort_index).
      *
-     * @return FieldInterface
+     * @return DbField
      */
     public function getSortField();
 }

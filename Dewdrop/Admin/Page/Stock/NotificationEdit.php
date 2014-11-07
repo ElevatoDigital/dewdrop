@@ -1,26 +1,62 @@
 <?php
 
+/**
+ * Dewdrop
+ *
+ * @link      https://github.com/DeltaSystems/dewdrop
+ * @copyright Delta Systems (http://deltasys.com)
+ * @license   https://github.com/DeltaSystems/dewdrop/LICENSE
+ */
+
 namespace Dewdrop\Admin\Page\Stock;
 
+use Dewdrop\Admin\Component\ComponentAbstract;
+use Dewdrop\Admin\Component\CrudInterface;
 use Dewdrop\Admin\Page\PageAbstract;
+use Dewdrop\Admin\ResponseHelper\Standard as ResponseHelper;
 use Dewdrop\Db\Field as DbField;
+use Dewdrop\Fields;
 use Dewdrop\Fields\RowEditor;
 use Dewdrop\Notification\Gateway as NotificationGateway;
 
+/**
+ * This page is part of an experimental feature (currently disabled by default
+ * in component Permissions.  It allows creation of a notification subscription
+ * for a component.  We're hoping to develop this feature so that users can be
+ * notified when items in their components are created or updated.
+ */
 class NotificationEdit extends PageAbstract
 {
+    /**
+     * The CRUD component.
+     *
+     * @var CrudInterface|ComponentAbstract
+     */
+    protected $component;
+
+    /**
+     * A RowEditor that handles input validation/saving for the subscription.
+     *
+     * @var RowEditor
+     */
     private $rowEditor;
 
+    /**
+     * Fields object form the notification model.
+     *
+     * @var Fields
+     */
     private $fields;
 
-    private $row;
-
+    /**
+     * Ensure the user has permissions to work with notifications in this component
+     * and setup Fields and RowEditor objects.
+     */
     public function init()
     {
         $this->component->getPermissions()->haltIfNotAllowed('notifications');
 
         $gateway = new NotificationGateway($this->component->getDb());
-        $id      = $this->request->getQuery('dewdrop_notification_subscription_id');
 
         $this->fields = $gateway->buildFields(
             $this->component->url('notification-edit'),
@@ -37,19 +73,30 @@ class NotificationEdit extends PageAbstract
         $this->rowEditor->link();
     }
 
-    public function process($responseHelper)
+    /**
+     * Actually save the new notification subscription.
+     *
+     * @todo Make this do something.  Anything.
+     * @param ResponseHelper $responseHelper
+     */
+    public function process(ResponseHelper $responseHelper)
     {
         if ($this->request->isPost()) {
 
         }
     }
 
+    /**
+     * Pass dependencies into the View.
+     */
     public function render()
     {
-        $this->view->component       = $this->component;
-        $this->view->componentModel  = $this->component->getPrimaryModel();
-        $this->view->fields          = $this->fields;
-        $this->view->rowEditor       = $this->rowEditor;
-        $this->view->breadcrumbTitle = ($this->rowEditor->isNew() ? 'Add' : 'Edit');
+        $this->view->assign([
+            'component'       => $this->component,
+            'componentModel'  => $this->component->getPrimaryModel(),
+            'fields'          => $this->fields,
+            'rowEditor'       => $this->rowEditor,
+            'breadcrumbTitle' => ($this->rowEditor->isNew() ? 'Add' : 'Edit')
+        ]);
     }
 }

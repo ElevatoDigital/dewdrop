@@ -1,23 +1,63 @@
 <?php
 
+/**
+ * Dewdrop
+ *
+ * @link      https://github.com/DeltaSystems/dewdrop
+ * @copyright Delta Systems (http://deltasys.com)
+ * @license   https://github.com/DeltaSystems/dewdrop/LICENSE
+ */
+
 namespace Dewdrop\Admin\Page\Stock;
 
-use Exception;
+use Dewdrop\Admin\Component\ComponentAbstract;
+use Dewdrop\Admin\Component\CrudInterface;
 use Dewdrop\Admin\Component\SortableListingInterface;
 use Dewdrop\Admin\Page\PageAbstract;
+use Dewdrop\Admin\ResponseHelper\Standard as ResponseHelper;
+use Dewdrop\Exception;
 
+/**
+ * This page handles the saving of new sort order values for a component that
+ * implements the SortableListingInterface.
+ */
 class SortListing extends PageAbstract
 {
+    /**
+     * The CRUD component.
+     *
+     * @var CrudInterface|ComponentAbstract|SortableListingInterface
+     */
+    protected $component;
+
+    /**
+     * A JSON-encoded error, if processing failed for some reason.
+     *
+     * @var string
+     */
     private $error;
 
+    /**
+     * Ensure the component implements the SortableListingInterface and that the
+     * user is allowed to access the listing for the component.
+     *
+     * @throws Exception
+     */
     public function init()
     {
+        $this->component->getPermissions()->haltIfNotAllowed('view-listing');
+
         if (!$this->component instanceof SortableListingInterface) {
             throw new Exception('Component must implement SortableListingInterface');
         }
     }
 
-    public function process($responseHelper)
+    /**
+     * Save newly POSTed sort order for the listing.
+     *
+     * @param ResponseHelper $responseHelper
+     */
+    public function process(ResponseHelper $responseHelper)
     {
         if (!$this->request->isPost()) {
             $this->error = json_encode(['result' => 'error', 'message' => 'Must be POST.']);
@@ -51,6 +91,10 @@ class SortListing extends PageAbstract
         }
     }
 
+    /**
+     * Send a response back to the XHR -- either an error message or a
+     * success indicator.
+     */
     public function render()
     {
         header('Content-Type: application/json');

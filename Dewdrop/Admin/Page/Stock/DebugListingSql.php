@@ -10,6 +10,8 @@
 
 namespace Dewdrop\Admin\Page\Stock;
 
+use Dewdrop\Admin\Component\ComponentAbstract;
+use Dewdrop\Admin\Component\CrudInterface;
 use Dewdrop\Admin\Page\PageAbstract;
 use SqlFormatter;
 
@@ -24,6 +26,13 @@ use SqlFormatter;
  */
 class DebugListingSql extends PageAbstract
 {
+    /**
+     * The CRUD component.
+     *
+     * @var CrudInterface|ComponentAbstract
+     */
+    protected $component;
+
     /**
      * Get the processed SQL statement from the Listing, pretty print it, and
      * pass it to our view script.

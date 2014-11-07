@@ -10,6 +10,8 @@
 
 namespace Dewdrop\Admin\Page\Stock;
 
+use Dewdrop\Admin\Component\ComponentAbstract;
+use Dewdrop\Admin\Component\CrudInterface;
 use Dewdrop\Admin\Page\PageAbstract;
 use Dewdrop\Fields;
 use Dewdrop\Fields\Test\ListingSort as ListingSortTest;
@@ -22,6 +24,13 @@ use ReflectionClass;
  */
 class DebugTestSorting extends PageAbstract
 {
+    /**
+     * The CRUD component.
+     *
+     * @var CrudInterface|ComponentAbstract
+     */
+    protected $component;
+
     /**
      * Perform the actual tests using a ListingSortTest object and pass the
      * results to our view for rendering.
