@@ -249,7 +249,6 @@ abstract class ComponentAbstract
     /**
      * Get a Request object.
      *
-     * @deprecated
      * @return \Dewdrop\Request
      */
     public function getRequest()
