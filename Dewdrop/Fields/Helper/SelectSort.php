@@ -58,18 +58,56 @@ class SelectSort extends HelperAbstract implements SelectModifierInterface
      */
     protected $name = 'selectsort';
 
+    /**
+     * The field we're sorting by currently.
+     *
+     * @var FieldInterface
+     */
     private $sortedField;
 
+    /**
+     * The direction we're sorting by currently (either ASC or DESC).
+     *
+     * @var string
+     */
     private $sortedDirection;
 
+    /**
+     * The default field we'll sort by.
+     *
+     * @var FieldInterface
+     */
     private $defaultField;
 
+    /**
+     * The default direction (either ASC or DESC) by which we'll sort.
+     *
+     * @var string
+     */
     private $defaultDirection = 'ASC';
 
+    /**
+     * The HTTP request where we'll check the query string to see which
+     * column is sorted and in which direction.
+     *
+     * @var Request
+     */
     private $request;
 
+    /**
+     * A prefix that can be used with HTTP params if you have multiple
+     * sortable listings on a single page and need to prevent them from
+     * colliding with one another's parameters.
+     *
+     * @var string
+     */
     private $prefix;
 
+    /**
+     * Provide the HTTP request that can be used to detect sorting selections.
+     *
+     * @param Request $request
+     */
     public function __construct(Request $request)
     {
         $this->request = $request;
@@ -88,6 +126,13 @@ class SelectSort extends HelperAbstract implements SelectModifierInterface
         return $this;
     }
 
+    /**
+     * Set the HTTP param prefix that can be used to prevent collisions
+     * when multiple sortable listings are rendered on a single page.
+     *
+     * @param string $prefix
+     * @return $this
+     */
     public function setPrefix($prefix)
     {
         $this->prefix = $prefix;
@@ -95,11 +140,23 @@ class SelectSort extends HelperAbstract implements SelectModifierInterface
         return $this;
     }
 
+    /**
+     * Get the HTTP param prefix that can be used to prevent collisions
+     * when multiple sortable listings are rendered on a single page.
+     *
+     * @return string
+     */
     public function getPrefix()
     {
         return $this->prefix;
     }
 
+    /**
+     * Set the field we should sort on by default.
+     *
+     * @param FieldInterface $defaultField
+     * @return $this
+     */
     public function setDefaultField(FieldInterface $defaultField)
     {
         $this->defaultField = $defaultField;
@@ -211,7 +268,7 @@ class SelectSort extends HelperAbstract implements SelectModifierInterface
     }
 
     /**
-     * A default implmenetation for database DATE fields.
+     * A default implementation for database DATE fields.
      *
      * @param DbField $field
      * @param Select $select
@@ -224,7 +281,7 @@ class SelectSort extends HelperAbstract implements SelectModifierInterface
     }
 
     /**
-     * A default implmenetation for most database fields.
+     * A default implementation for most database fields.
      *
      * @param DbField $field
      * @param Select $select
@@ -236,6 +293,15 @@ class SelectSort extends HelperAbstract implements SelectModifierInterface
         return $select->order("{$field->getName()} $direction");
     }
 
+    /**
+     * Provide a default sorting strategy for reference columns.
+     *
+     * @param DbField $field
+     * @param Select $select
+     * @param $direction
+     * @return Select
+     * @throws Select\SelectException
+     */
     public function sortDbReference(DbField $field, Select $select, $direction)
     {
         return $select->order(
@@ -251,6 +317,7 @@ class SelectSort extends HelperAbstract implements SelectModifierInterface
      * custom fields, you'll have to assign your own callback, if you want them
      * to be sortable.
      *
+     * @param FieldInterface $field
      * @return false|callable
      */
     public function detectCallableForField(FieldInterface $field)

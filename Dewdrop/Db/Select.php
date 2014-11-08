@@ -486,6 +486,17 @@ class Select
         return $this;
     }
 
+    /**
+     * Register a new condition set, useful when you want a block of conditions
+     * to be joined to the overall Select, grouped in their own parens.  Useful
+     * to help users build complex boolean queries that interact predictably
+     * with WHERE clause additions you've made in code.
+     *
+     * @param string $name
+     * @param string $conjunction
+     * @return $this
+     * @throws SelectException
+     */
     public function registerConditionSet($name, $conjunction)
     {
         if (self::SQL_AND !== $conjunction && self::SQL_OR !== $conjunction) {
@@ -500,6 +511,19 @@ class Select
         return $this;
     }
 
+    /**
+     * Add a new condition to a condition set.  The set must be registered with
+     * registerConditionSet() prior to calling this method.  Otherwise, it
+     * behaves just like where().
+     *
+     * @param string $setName
+     * @param string $condition
+     * @param mixed $value
+     * @param null|string $type
+     * @param null|integer $number
+     * @return $this
+     * @throws SelectException
+     */
     public function whereConditionSet($setName, $condition, $value = null, $type = null, $number = null)
     {
         if (!isset($this->parts[self::WHERE_CONDITION_SETS][$setName])) {
@@ -1221,6 +1245,12 @@ class Select
         return $sql;
     }
 
+    /**
+     * Render the condition sets that have been registered with this Select.
+     *
+     * @param string $sql
+     * @return string
+     */
     protected function renderWheresets($sql)
     {
         if (count($this->parts[self::WHERE_CONDITION_SETS])) {

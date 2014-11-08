@@ -10,48 +10,64 @@
 
 namespace Dewdrop\View\Helper;
 
-use Dewdrop\Exception;
+use Dewdrop\Admin\Component\CrudInterface;
 use Dewdrop\Fields;
 use Dewdrop\Fields\Helper\CsvCell;
 
 /**
- * Produces a CSV export
+ * Generate a CSV export.
+ *
+ * @todo Look into effect on memory usage of using output buffering here.
+ *
+ * @todo Look into ways to improve handling of response headers.
  */
 class CsvExport extends AbstractHelper
 {
+    /**
+     * If called with no arguments, this method will return the instance of
+     * CsvExport helper itself, so you can call other methods on it directly.
+     * If called with arguments, however, it will go immediately to the render()
+     * method.
+     *
+     * @return $this|string
+     */
     public function direct()
     {
         $args = func_get_args();
 
         if (0 === count($args)) {
             return $this;
-        }
-
-        if (!isset($args[0]) || !$args[0] instanceof Fields ||
-            !isset($args[1]) || !is_array($args[1])
-        ) {
-            throw new Exception('CsvExport accepts either no arguments or a CrudInterface component');
-        }
-
-        if (!isset($args[2])) {
-            $csvCellRenderer = $this->view->csvCellRenderer();
-        } elseif ($args[2] instanceof CsvCell) {
-            $csvCellRenderer = $args[2];
         } else {
-            throw new Exception('Third argument should be null or a CsvCell helper');
+            return call_user_func_array([$this, 'directWithArgs'], $args);
         }
-
-        $fields = $args[0];
-        $data   = $args[1];
-        $output = $this->render($fields, $data, $csvCellRenderer);
-
-        $this->sendHeaders('export.csv');
-
-        return $output;
     }
 
     /**
-     * @param CrudInterface $component
+     * If the direct() method is called with arguments, we validate them with
+     * this method before calling render().
+     *
+     * @param Fields $fields
+     * @param array $data
+     * @param CsvCell $csvCellRenderer
+     * @return string
+     */
+    protected function directWithArgs(Fields $fields, array $data, CsvCell $csvCellRenderer = null)
+    {
+        if (null === $csvCellRenderer) {
+            $csvCellRenderer = $this->view->csvCellRenderer();
+        }
+
+        $this->sendHeaders('export.csv');
+
+        return $this->render($fields, $data, $csvCellRenderer);
+    }
+
+    /**
+     * Render the actual CSV data using the supplied Fields and data.
+     *
+     * @param Fields $fields
+     * @param array $data
+     * @param CsvCell $csvCellRenderer
      * @return string
      */
     public function render(Fields $fields, array $data, CsvCell $csvCellRenderer)
@@ -73,9 +89,11 @@ class CsvExport extends AbstractHelper
 
         // Output CSV data
         $outputHandle = fopen('php://output', 'w');
+
         foreach ($csvRows as $csvRow) {
             fputcsv($outputHandle, $csvRow);
         }
+
         fclose($outputHandle);
 
         // Get output buffer contents
@@ -88,8 +106,9 @@ class CsvExport extends AbstractHelper
     }
 
     /**
-     * Set response headers for a CSV download
+     * Set response headers for a CSV download.
      *
+     * @param string $filename
      * @return void
      */
     public function sendHeaders($filename)
@@ -103,6 +122,8 @@ class CsvExport extends AbstractHelper
     }
 
     /**
+     * Render the rows of output in the body of the CSV.
+     *
      * @param Fields $fields
      * @param array $rows
      * @param CsvCell $csvCell
@@ -129,6 +150,8 @@ class CsvExport extends AbstractHelper
     }
 
     /**
+     * Render header labels for the CSV output.
+     *
      * @param Fields $fields
      * @param CsvCell $csvCell
      * @return array

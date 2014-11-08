@@ -15,9 +15,20 @@ use Dewdrop\Fields\Helper\SelectSort;
 use Dewdrop\Fields\Helper\TableCell as TableCellHelper;
 
 /**
+ * Render an HTML table using a Fields object and an array of data.  Uses
+ * the TableCell field helper to allow you to customize the rendering of
+ * each individual field.
  */
 class Table extends AbstractHelper
 {
+    /**
+     * If no arguments are provided, return this helper instance to allow
+     * the user to call other methods individually.  Otherwise, use
+     * directWithArgs() to validate the user's arguments and render the
+     * table.
+     *
+     * @return $this|string
+     */
     public function direct()
     {
         $args = func_get_args();
@@ -30,6 +41,15 @@ class Table extends AbstractHelper
         }
     }
 
+    /**
+     * Render the full table using the supplied arguments.
+     *
+     * @param Fields $fields
+     * @param array $data
+     * @param null|TableCellHelper $renderer
+     * @param null|SelectSort $sorter
+     * @return string
+     */
     public function directWithArgs(
         Fields $fields,
         array $data,
@@ -48,16 +68,35 @@ class Table extends AbstractHelper
             . $this->close();
     }
 
+    /**
+     * Render the opening table tag.
+     *
+     * @return string
+     */
     public function open()
     {
         return '<table cellspacing="0">';
     }
 
+    /**
+     * Render the closing table tag.
+     *
+     * @return string
+     */
     public function close()
     {
         return '</table>';
     }
 
+    /**
+     * Render the &lt;thead&gt; tag, using the TableCell.Header helper to allow
+     * fields to modify their header content.
+     *
+     * @param Fields $fields
+     * @param TableCellHelper $renderer
+     * @param SelectSort $sorter
+     * @return string
+     */
     public function renderHead(Fields $fields, TableCellHelper $renderer, SelectSort $sorter = null)
     {
         $out = '<thead>';
@@ -87,6 +126,15 @@ class Table extends AbstractHelper
         return $out;
     }
 
+    /**
+     * Render the &lt;tbody&gt; with the TableCell.Content helper to allow
+     * each field's cell content to be modified.
+     *
+     * @param Fields $fields
+     * @param array $data
+     * @param TableCellHelper $renderer
+     * @return string
+     */
     public function renderBody(Fields $fields, array $data, TableCellHelper $renderer)
     {
         $rowIndex = 0;
@@ -133,6 +181,15 @@ class Table extends AbstractHelper
         return $out;
     }
 
+    /**
+     * Render a sort link to display inside a &lt;th&gt; cell.
+     *
+     * @param string $content
+     * @param string $fieldId
+     * @param string $direction
+     * @param SelectSort $sorter
+     * @return string
+     */
     protected function renderSortLink($content, $fieldId, $direction, SelectSort $sorter = null)
     {
         return sprintf(

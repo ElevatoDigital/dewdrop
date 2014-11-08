@@ -1,22 +1,38 @@
 <?php
 
+/**
+ * Dewdrop
+ *
+ * @link      https://github.com/DeltaSystems/dewdrop
+ * @copyright Delta Systems (http://deltasys.com)
+ * @license   https://github.com/DeltaSystems/dewdrop/LICENSE
+ */
+
 namespace Dewdrop\Notification;
 
-use Dewdrop\Db\Expr;
+use Dewdrop\Db\Field;
 use Dewdrop\Db\Table;
 use Dewdrop\Fields;
-use Zend\Escaper\Escaper;
+use Dewdrop\Fields\Helper\TableCell\Content as TableCellHelper;
+use Dewdrop\View\View;
 use Zend\InputFilter\Input;
 
+/**
+ * A table gateway for interacting with dewdrop_notification_subscriptions data
+ * in the DB.
+ */
 class Gateway extends Table
 {
+    /**
+     * Basic configuration and field customization.
+     */
     public function init()
     {
         $this->setTableName('dewdrop_notification_subscriptions');
 
         $this->customizeField(
             'dewdrop_notification_frequency_id',
-            function ($field) {
+            function (Field $field) {
                 $field->setLabel('Frequency');
             }
         );
@@ -44,6 +60,12 @@ class Gateway extends Table
         return $this->fetchRow($select);
     }
 
+    /**
+     * Select the notification subscriptions for the specified component.
+     *
+     * @param $fullyQualifiedComponentName
+     * @return \Dewdrop\Db\Select
+     */
     public function selectByComponent($fullyQualifiedComponentName)
     {
         $select = $this->select();
@@ -63,6 +85,16 @@ class Gateway extends Table
         return $select;
     }
 
+    /**
+     * Build a Fields object that can be used for displaying or editing
+     * subscriptions.
+     *
+     * @todo Refactor this into a separate class.
+     *
+     * @param string $editUrl
+     * @param Fields $componentFields
+     * @return Fields
+     */
     public function buildFields($editUrl, Fields $componentFields)
     {
         $fields = new Fields();
@@ -74,8 +106,8 @@ class Gateway extends Table
                 ->setVisible(true)
                 ->assignHelperCallback(
                     'TableCell.Content',
-                    function ($helper, array $rowData) use ($editUrl) {
-                        return $helper->getEscaper()->escapeHtml(
+                    function (TableCellHelper $helper, array $rowData) use ($editUrl) {
+                        return $helper->getView()->escapeHtml(
                             $this->renderRecipients($rowData['dewdrop_notification_subscription_id'])
                         );
                     }
@@ -83,7 +115,7 @@ class Gateway extends Table
                 ->setEditable(true)
                 ->assignHelperCallback(
                     'EditControl.Control',
-                    function ($helper, $view) {
+                    function ($helper, View $view) {
                         return $view->inputText(
                             'recipients',
                             $this->renderRecipients(
@@ -102,26 +134,12 @@ class Gateway extends Table
                     }
                 )
             ->add($this->field('dewdrop_notification_frequency_id'))
-            ->add($this->field('when_added'))
-                ->assignHelperCallback(
-                    'TableCell.Content',
-                    function ($helper, array $rowData) {
-                        return $this->renderBooleanTableCell($rowData['when_added']);
-                    }
-                )
-            ->add($this->field('when_edited'))
-                ->assignHelperCallback(
-                    'TableCell.Content',
-                    function ($helper, array $rowData) {
-                        return $this->renderBooleanTableCell($rowData['when_edited']);
-                    }
-                )
             ->add('fields')
                 ->setLabel('Which fields would you like to include in the notification emails?')
                 ->setEditable(true)
                 ->assignHelperCallback(
                     'EditControl.Control',
-                    function ($helper, $view) use ($componentFields) {
+                    function ($helper, View $view) use ($componentFields) {
                         $options = array();
 
                         foreach ($componentFields->getVisibleFields() as $id => $field) {
@@ -150,15 +168,12 @@ class Gateway extends Table
         return $fields;
     }
 
-    private function renderBooleanTableCell($value)
-    {
-        return sprintf(
-            '<span class="text-%s glyphicon glyphicon-%s"></span>',
-            ($value ? 'success' : 'danger'),
-            ($value ? 'ok' : 'remove')
-        );
-    }
-
+    /**
+     * Render a comma-separated list of recipients for a subscription.
+     *
+     * @param $subscriptionId
+     * @return string
+     */
     private function renderRecipients($subscriptionId)
     {
         if (!$subscriptionId) {
@@ -175,6 +190,15 @@ class Gateway extends Table
         return implode(', ', $this->getAdapter()->fetchCol($select));
     }
 
+    /**
+     * Get the fields that have been selected for a subscription.
+     *
+     * @todo Can now use or ManyToMany stuff instead of this.
+     *
+     * @param $id
+     * @param array $options
+     * @return array
+     */
     private function getSelectedFields($id, array $options)
     {
         if (!$id) {

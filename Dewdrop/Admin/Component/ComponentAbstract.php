@@ -10,6 +10,7 @@
 
 namespace Dewdrop\Admin\Component;
 
+use Dewdrop\Admin\Env\EnvInterface;
 use Dewdrop\Admin\PageFactory\Files as PageFilesFactory;
 use Dewdrop\Admin\PageFactory\PageFactoryInterface;
 use Dewdrop\Admin\Permissions;
@@ -21,7 +22,7 @@ use ReflectionClass;
 
 /**
  * This class enables you to define how your component should appear and wire
- * into the WP admin shell.  For example, the $title property determines what
+ * into the admin shell.  For example, the $title property determines what
  * your plugin will be labeled in the admin navigation and the addToSubmenu()
  * method will allow you to add submenu items for your component.
  */
@@ -37,7 +38,7 @@ abstract class ComponentAbstract
     protected $submenuPages = array();
 
     /**
-     * The title to display for this component in the WP admin navigation.
+     * The title to display for this component in the admin navigation.
      *
      * @var string
      */
@@ -51,7 +52,7 @@ abstract class ComponentAbstract
     private $icon;
 
     /**
-     * The position this item should take in the WP admin navigation menu.
+     * The position this item should take in the admin navigation menu.
      *
      * To see the current menu positions, you can var_dump($_GLOBALS['menu']).
      * Note that is you pick an already used menu position, you will essentially
@@ -65,11 +66,60 @@ abstract class ComponentAbstract
      */
     private $menuPosition = null;
 
+    /**
+     * The page factories registered with this component to provide page objects.
+     *
+     * @var array
+     */
     private $pageFactories = array();
 
+    /**
+     * The permissions for this component.
+     *
+     * @var Permissions
+     */
     private $permissions;
 
+    /**
+     * Whether the admin environment should wrap the page environment with the
+     * layout (i.e. admin shell chrome.
+     *
+     * @var bool
+     */
     protected $shouldRenderLayout = true;
+
+    /**
+     * The Pimple object used to supply dependencies to the admin component.
+     * Basically used as a service locator in this context, which makes testability
+     * a bit trickier in the context of the component class itself.  However, it
+     * makes using component classes in other contexts (e.g. testing your page
+     * classes) much easier.
+     *
+     * @var Pimple
+     */
+    protected $pimple;
+
+    /**
+     * The admin environment.  Used to do anything environment (i.e. WP or Silex)
+     * specific, like perform redirects.
+     *
+     * @var EnvInterface
+     */
+    protected $env;
+
+    /**
+     * The path to the component class.
+     *
+     * @var string
+     */
+    protected $path;
+
+    /**
+     * The component name (as it would show up in the URL, for example).
+     *
+     * @var string
+     */
+    protected $name;
 
     /**
      * Create a component instance using the DB adapter creating by the Wiring
@@ -83,7 +133,7 @@ abstract class ComponentAbstract
         $this->pimple = ($pimple ?: DewdropPimple::getInstance());
         $this->env    = $this->getPimpleResource('admin');
 
-        // Component metadaata retrieved via reflection
+        // Component metadata retrieved via reflection
         $reflectionClass = new ReflectionClass($this);
 
         $this->path = dirname($reflectionClass->getFileName());
@@ -103,11 +153,25 @@ abstract class ComponentAbstract
      */
     abstract public function init();
 
+    /**
+     * Check to see if the supplied resource is present in the component's Pimple
+     * or in the Dewdrop Pimple.
+     *
+     * @param string $name
+     * @return bool
+     */
     public function hasPimpleResource($name)
     {
         return isset($this->pimple[$name]) || DewdropPimple::hasResource($name);
     }
 
+    /**
+     * Get the named Pimple resource from the component's local container or the
+     * Dewdrop container.
+     *
+     * @param $name
+     * @return mixed
+     */
     public function getPimpleResource($name)
     {
         if (isset($this->pimple[$name])) {
@@ -117,11 +181,22 @@ abstract class ComponentAbstract
         }
     }
 
+    /**
+     * Get all the page factories associated with this component.
+     *
+     * @return array
+     */
     public function getPageFactories()
     {
         return $this->pageFactories;
     }
 
+    /**
+     * Add a new page factory to this component.
+     *
+     * @param PageFactoryInterface $pageFactory
+     * @return $this
+     */
     public function addPageFactory(PageFactoryInterface $pageFactory)
     {
         $this->pageFactories[] = $pageFactory;
@@ -129,26 +204,54 @@ abstract class ComponentAbstract
         return $this;
     }
 
+    /**
+     * Get the Pimple container used by this component.
+     *
+     * @return Pimple
+     */
     public function getPimple()
     {
         return $this->pimple;
     }
 
+    /**
+     * Get the path to this component's class.
+     *
+     * @return string
+     */
     public function getPath()
     {
         return $this->path;
     }
 
+    /**
+     * Get a Inflector object.
+     *
+     * @deprecated
+     * @return \Dewdrop\Inflector
+     */
     public function getInflector()
     {
         return $this->getPimpleResource('inflector');
     }
 
+    /**
+     * Get a Paths object.
+     *
+     * @deprecated
+     * @return \Dewdrop\Paths
+     */
     public function getPaths()
     {
         return $this->getPimpleResource('paths');
     }
 
+    /**
+     * Get a Request object.
+     *
+     * @deprecated
+     * @return \Dewdrop\Request
+     */
     public function getRequest()
     {
         return $this->getPimpleResource('dewdrop-request');
@@ -165,6 +268,11 @@ abstract class ComponentAbstract
         return $this->getPimpleResource('db');
     }
 
+    /**
+     * Get the Permissions object for this component.
+     *
+     * @return Permissions
+     */
     public function getPermissions()
     {
         if (!$this->permissions) {
@@ -174,9 +282,18 @@ abstract class ComponentAbstract
         return $this->permissions;
     }
 
+    /**
+     * Iterate over the page factories, attempting to create a page object for
+     * the supplied name.  If no page factory can handle the page name, that's
+     * a 404.
+     *
+     * @param string $name
+     * @return \Dewdrop\Admin\Page\PageAbstract|false
+     * @throws Exception
+     */
     public function createPageObject($name)
     {
-        $page = null;
+        $page = false;
 
         /* @var $factory PageFactoryInterface */
         foreach ($this->getPageFactories() as $factory) {
@@ -227,6 +344,11 @@ abstract class ComponentAbstract
         return $this;
     }
 
+    /**
+     * Add a divider to the component's submenu.
+     *
+     * @return $this
+     */
     public function addSubmenuDivider()
     {
         $this->submenuPages[] = array(
@@ -246,16 +368,35 @@ abstract class ComponentAbstract
         return $this->submenuPages;
     }
 
+    /**
+     * Get the name of the component (i.e. the string that would represent it
+     * in the URL.
+     *
+     * @return string
+     */
     public function getName()
     {
         return $this->env->inflectComponentName($this->name);
     }
 
+    /**
+     * Get a fully-qualified name for the component that can be used when
+     * referencing the component in externals systems like the DB.
+     *
+     * @return string
+     */
     public function getFullyQualifiedName()
     {
         return '/application/admin/' . $this->getName();
     }
 
+    /**
+     * Set whether the admin environment should wrap the page's output with
+     * the layout (the admin shell chrome).
+     *
+     * @param boolean $shouldRenderLayout
+     * @return $this
+     */
     public function setShouldRenderLayout($shouldRenderLayout)
     {
         $this->shouldRenderLayout = $shouldRenderLayout;
@@ -263,13 +404,18 @@ abstract class ComponentAbstract
         return $this;
     }
 
+    /**
+     * Check to see whether the page output should be wrapped by the layout.
+     *
+     * @return bool
+     */
     public function shouldRenderLayout()
     {
         return $this->shouldRenderLayout;
     }
 
     /**
-     * Set the title of this component as it should be displayed in the WP
+     * Set the title of this component as it should be displayed in the
      * admin menu.
      *
      * @param string $title
@@ -282,13 +428,18 @@ abstract class ComponentAbstract
         return $this;
     }
 
+    /**
+     * Get the title of the component that would be displayed in the admin menu.
+     *
+     * @return string
+     */
     public function getTitle()
     {
         return $this->title;
     }
 
     /**
-     * Set the icon that should be used in this component's WP admin menu
+     * Set the icon that should be used in this component's admin menu
      * entry.
      *
      * @param string $icon
@@ -301,6 +452,12 @@ abstract class ComponentAbstract
         return $this;
     }
 
+    /**
+     * Get the icon that should be displayed for the component in the
+     * admin menu.
+     *
+     * @return string
+     */
     public function getIcon()
     {
         return $this->icon;
@@ -320,6 +477,12 @@ abstract class ComponentAbstract
         return $this;
     }
 
+    /**
+     * Get the position at which this component should be rendered in the
+     * admin shell nav menu.
+     *
+     * @return int
+     */
     public function getMenuPosition()
     {
         return $this->menuPosition;
