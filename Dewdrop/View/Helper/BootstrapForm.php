@@ -10,13 +10,11 @@
 
 namespace Dewdrop\View\Helper;
 
-use Dewdrop\Exception;
 use Dewdrop\Fields;
 use Dewdrop\Fields\FieldInterface;
 use Dewdrop\Fields\GroupedFields;
 use Dewdrop\Fields\GroupedFields\Group;
 use Dewdrop\Fields\Helper\EditControl as Renderer;
-use Dewdrop\Pimple;
 use Zend\InputFilter\Input;
 use Zend\InputFilter\InputFilter;
 
@@ -37,13 +35,7 @@ class BootstrapForm extends AbstractHelper
      */
     public function direct()
     {
-        $args = func_get_args();
-
-        if (0 === count($args)) {
-            return $this;
-        } else {
-            return call_user_func_array(array($this, 'directWithArgs'), $args);
-        }
+        return $this->delegateIfArgsProvided(func_get_args());
     }
 
     /**
@@ -117,6 +109,7 @@ class BootstrapForm extends AbstractHelper
     {
         $output = '<ul class="nav nav-tabs">';
 
+        /* @var $group Group */
         foreach ($groupedFields->getGroups() as $index => $group) {
             if (count($group)) {
                 $output .= sprintf(

@@ -182,14 +182,16 @@ class Wp extends EnvAbstract
                 $response = new Response();
             }
 
-            $response->setPage($page);
+            if ($page) {
+                $response->setPage($page);
 
-            $this->output = $component->dispatchPage($page, $response);
+                $this->output = $component->dispatchPage($page, $response);
 
-            // If AJAX or non-layout response, render now to avoid WP shell mucking it up
-            if ($component->getRequest()->isAjax() || !$component->shouldRenderLayout()) {
-                echo $this->output;
-                exit;
+                // If AJAX or non-layout response, render now to avoid WP shell mucking it up
+                if ($component->getRequest()->isAjax() || !$component->shouldRenderLayout()) {
+                    echo $this->output;
+                    exit;
+                }
             }
         }
 
@@ -330,7 +332,7 @@ class Wp extends EnvAbstract
      * other resources.  Also, this gives us the chance to run code before WP has
      * rendered any output.
      *
-     * @param ComponentAbstract $component
+     *
      * @return boolean
      */
     protected function componentIsCurrentlyActive(ComponentAbstract $component)

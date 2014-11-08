@@ -31,14 +31,7 @@ class Table extends AbstractHelper
      */
     public function direct()
     {
-        $args = func_get_args();
-
-        // No argument passed, assume they want to call other methods
-        if (0 === count($args)) {
-            return $this;
-        } else {
-            return call_user_func_array([$this, 'directWithArgs'], $args);
-        }
+        return $this->delegateIfArgsProvided(func_get_args());
     }
 
     /**

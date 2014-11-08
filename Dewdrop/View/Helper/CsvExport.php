@@ -10,7 +10,6 @@
 
 namespace Dewdrop\View\Helper;
 
-use Dewdrop\Admin\Component\CrudInterface;
 use Dewdrop\Fields;
 use Dewdrop\Fields\Helper\CsvCell;
 
@@ -33,13 +32,7 @@ class CsvExport extends AbstractHelper
      */
     public function direct()
     {
-        $args = func_get_args();
-
-        if (0 === count($args)) {
-            return $this;
-        } else {
-            return call_user_func_array([$this, 'directWithArgs'], $args);
-        }
+        return $this->delegateIfArgsProvided(func_get_args());
     }
 
     /**

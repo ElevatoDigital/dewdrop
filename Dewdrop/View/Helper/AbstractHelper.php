@@ -78,6 +78,24 @@ abstract class AbstractHelper
     }
 
     /**
+     * Useful in cases where you want to just return the helper if the user didn't
+     * provide any args to direct(), but want to call a short-cut method if they
+     * did.
+     *
+     * @param array $args
+     * @param string $method
+     * @return $this|string
+     */
+    protected function delegateIfArgsProvided(array $args, $method = 'directWithArgs')
+    {
+        if (0 === count($args)) {
+            return $this;
+        } else {
+            return call_user_func_array([$this, $method], $args);
+        }
+    }
+
+    /**
      * Delegate to one of three methods depending upon the contents of the $args
      * array:
      *
