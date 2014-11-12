@@ -62,6 +62,7 @@ use Dewdrop\View\Helper\BulkActionCheckboxField;
  * @method string inputText()
  * @method string pagination()
  * @method string select()
+ * @method string summernote()
  * @method mixed table()
  * @method \Dewdrop\Fields\Helper\TableCell tableCellRenderer()
  * @method Helper\TableSortHandle tableSortHandle()
@@ -148,6 +149,7 @@ class View
         'inputtext'               => '\Dewdrop\View\Helper\InputText',
         'pagination'              => '\Dewdrop\View\Helper\Pagination',
         'select'                  => '\Dewdrop\View\Helper\Select',
+        'summernote'              => '\Dewdrop\View\Helper\Summernote',
         'table'                   => '\Dewdrop\View\Helper\Table',
         'tablecellrenderer'       => '\Dewdrop\View\Helper\TableCellRenderer',
         'tablesorthandle'         => '\Dewdrop\View\Helper\TableSortHandle',
