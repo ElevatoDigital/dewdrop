@@ -25,6 +25,7 @@
         "bootstrap":      "3.*",
         "velocity":       "0.1.*",
         "requirejs":      "2.*",
-        "requirejs-text": "2.*"
+        "requirejs-text": "2.*",
+        "summernote":     "0.5.*"
     }
 }
