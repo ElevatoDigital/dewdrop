@@ -94,24 +94,28 @@ class Table extends AbstractHelper
     {
         $out = '<thead>';
 
-        foreach ($fields as $index => $field) {
-            $out .= '<th scope="col">';
+        if(count($fields) > 0) {
+            $out .= '<tr>';
+            foreach ($fields as $index => $field) {
+                $out .= '<th scope="col">';
 
-            $content = $renderer->getHeaderRenderer()->render($field);
+                $content = $renderer->getHeaderRenderer()->render($field);
 
-            if (!$field->isSortable()) {
-                $out .= $content;
-            } else {
-                $direction = 'asc';
+                if (!$field->isSortable()) {
+                    $out .= $content;
+                } else {
+                    $direction = 'asc';
 
-                if ($sorter && $sorter->getSortedField() === $field && 'ASC' === $sorter->getSortedDirection()) {
-                    $direction = 'desc';
+                    if ($sorter && $sorter->getSortedField() === $field && 'ASC' === $sorter->getSortedDirection()) {
+                        $direction = 'desc';
+                    }
+
+                    $out .= $this->renderSortLink($content, $field->getQueryStringId(), $direction, $sorter);
                 }
 
-                $out .= $this->renderSortLink($content, $field->getQueryStringId(), $direction, $sorter);
+                $out .= '</th>';
             }
-
-            $out .= '</th>';
+            $out .= '</tr>';
         }
 
         $out .= '</thead>';
