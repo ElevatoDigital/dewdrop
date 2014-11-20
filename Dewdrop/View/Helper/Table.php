@@ -94,24 +94,8 @@ class Table extends AbstractHelper
     {
         $out = '<thead>';
 
-        foreach ($fields as $index => $field) {
-            $out .= '<th scope="col">';
-
-            $content = $renderer->getHeaderRenderer()->render($field);
-
-            if (!$field->isSortable()) {
-                $out .= $content;
-            } else {
-                $direction = 'asc';
-
-                if ($sorter && $sorter->getSortedField() === $field && 'ASC' === $sorter->getSortedDirection()) {
-                    $direction = 'desc';
-                }
-
-                $out .= $this->renderSortLink($content, $field->getQueryStringId(), $direction, $sorter);
-            }
-
-            $out .= '</th>';
+        if (count($fields)) {
+            $out .= '<tr>' . $this->renderHeadCells($fields, $renderer, $sorter) . '</tr>';
         }
 
         $out .= '</thead>';
@@ -191,5 +175,40 @@ class Table extends AbstractHelper
             $this->view->escapeHtmlAttr($direction),
             $this->view->escapeHtml($content)
         );
+    }
+
+    /**
+     * Render all the &lt;th&gt; cells that will be contained in the &lt;thead&gt;.
+     *
+     * @param Fields $fields
+     * @param TableCellHelper $renderer
+     * @param SelectSort $sorter
+     * @return string
+     */
+    protected function renderHeadCells(Fields $fields, TableCellHelper $renderer, SelectSort $sorter = null)
+    {
+        $out = '';
+
+        foreach ($fields as $index => $field) {
+            $out .= '<th scope="col">';
+
+            $content = $renderer->getHeaderRenderer()->render($field);
+
+            if (!$field->isSortable()) {
+                $out .= $content;
+            } else {
+                $direction = 'asc';
+
+                if ($sorter && $sorter->getSortedField() === $field && 'ASC' === $sorter->getSortedDirection()) {
+                    $direction = 'desc';
+                }
+
+                $out .= $this->renderSortLink($content, $field->getQueryStringId(), $direction, $sorter);
+            }
+
+            $out .= '</th>';
+        }
+
+        return $out;
     }
 }
