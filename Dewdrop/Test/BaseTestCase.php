@@ -37,6 +37,23 @@ abstract class BaseTestCase extends PHPUnit_Framework_TestCase implements DomInt
     }
 
     /**
+     * Assert that the supplied CSS selector does not have matches in the supplied HTML.
+     *
+     * @param string $selector A CSS selected.
+     * @param string $html The HTML you are selecting against.
+     * @return void
+     */
+    public function assertNotMatchesDomQuery($selector, $html)
+    {
+        $results = $this->queryDom($selector, $html);
+
+        $this->assertTrue(
+            count($results) === 0,
+            "The HTML output does match the DOM query when it should not \"{$selector}\".  Output: " . $html
+        );
+    }
+
+    /**
      * Use the supplied CSS selector to query the HTML.  Returns the results
      * as a \Zend\Dom\NodeList, which can be iterated over to inspect the
      * resulting DOMElement objects as needed.
