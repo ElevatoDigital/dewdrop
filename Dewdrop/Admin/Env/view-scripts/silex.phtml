@@ -11,13 +11,13 @@
 
         <?php
         foreach ($this->dependencies['css'] as $css) {
-            printf('<link href="%s" rel="stylesheet" />', $this->bowerUrl($css));
+            printf('<link href="%s" rel="stylesheet" />', $this->urlCachePrefix($this->bowerUrl($css)));
         }
         ?>
 
         <?php
         if ($this->viewHeadLink) {
-            echo $this->viewHeadLink;
+            echo $this->urlCachePrefix()->headLink($this->viewHeadLink);
         }
         ?>
 
@@ -119,7 +119,7 @@
 
         <?php
         foreach ($this->dependencies['js'] as $js) {
-            printf('<script src="%s"></script>', $this->bowerUrl($js));
+            printf('<script src="%s"></script>', $this->urlCachePrefix($this->bowerUrl($js)));
         }
         ?>
 
@@ -129,7 +129,7 @@
 
         <?php
         if ($this->viewHeadScript) {
-            echo $this->viewHeadScript;
+            echo $this->urlCachePrefix()->headScript($this->viewHeadScript);
         }
         ?>
     </body>

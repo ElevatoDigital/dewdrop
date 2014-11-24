@@ -67,6 +67,7 @@ use Dewdrop\View\Helper\BulkActionCheckboxField;
  * @method \Dewdrop\Fields\Helper\TableCell tableCellRenderer()
  * @method Helper\TableSortHandle tableSortHandle()
  * @method string textarea()
+ * @method string urlCachePrefix()
  * @method string wpAdminNotice()
  * @method string wpCheckboxList()
  * @method string wpColorPicker()
@@ -154,6 +155,7 @@ class View
         'tablecellrenderer'       => '\Dewdrop\View\Helper\TableCellRenderer',
         'tablesorthandle'         => '\Dewdrop\View\Helper\TableSortHandle',
         'textarea'                => '\Dewdrop\View\Helper\Textarea',
+        'urlcacheprefix'          => '\Dewdrop\View\Helper\UrlCachePrefix',
         'wpadminnotice'           => '\Dewdrop\View\Helper\WpAdminNotice',
         'wpcheckboxlist'          => '\Dewdrop\View\Helper\WpCheckboxList',
         'wpcolorpicker'           => '\Dewdrop\View\Helper\WpColorPicker',

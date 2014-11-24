@@ -11,6 +11,7 @@
 namespace Dewdrop\Admin\Env;
 
 use Dewdrop\Admin\Component\ComponentAbstract;
+use Dewdrop\Pimple;
 use Dewdrop\View\View;
 use Silex\Application;
 use Zend\View\Helper\HeadLink;
@@ -152,7 +153,7 @@ class Silex extends EnvAbstract
      */
     public function renderLayout($content, HeadScript $headScript = null, HeadLink $headLink = null)
     {
-        $view = new View();
+        $view = Pimple::getResource('view');
         $view->setScriptPath($this->layoutPath);
 
         $session = ($this->session ?: $this->application['session']);
