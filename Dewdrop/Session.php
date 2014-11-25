@@ -13,10 +13,6 @@ namespace Dewdrop;
 use ArrayAccess;
 use Pimple as PimpleProper;
 use Silex\Application as SilexApplication;
-use Symfony\Component\HttpFoundation\Session\Session as SymfonySession;
-use Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeFileSessionHandler;
-use Symfony\Component\HttpFoundation\Session\Storage\MockFileSessionStorage;
-use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
 use WP_Session;
 
 /**
@@ -44,53 +40,7 @@ class Session implements ArrayAccess
      */
     public function __construct(PimpleProper $pimple)
     {
-        $this->paths = $pimple['paths'];
-
-        if ($this->paths->isWp()) {
-            $this->container = WP_Session::get_instance();
-        } else {
-
-            if (!isset($pimple['session.test'])) {
-                $pimple['session.test'] = false;
-            }
-
-            if (!isset($pimple['session.storage.options'])) {
-                $pimple['session.storage.options'] = [];
-            }
-
-            if (!isset($pimple['session.default_locale'])) {
-                $pimple['session.default_locale'] = 'en';
-            }
-
-            if (!$pimple->offsetExists('session.storage.save_path')) {
-                $pimple['session.storage.save_path'] = null;
-            }
-
-            $pimple['session.storage.handler'] = $pimple->share(function (PimpleProper $pimple) {
-                return new NativeFileSessionHandler($pimple['session.storage.save_path']);
-            });
-
-            $pimple['session.storage.native'] = $pimple->share(function (PimpleProper $pimple) {
-                return new NativeSessionStorage(
-                    $pimple['session.storage.options'],
-                    $pimple['session.storage.handler']
-                );
-            });
-
-            $pimple['session.storage.test'] = $pimple->share(function () {
-                return new MockFileSessionStorage();
-            });
-
-            if (!isset($pimple['session.storage'])) {
-                if ($pimple['session.test']) {
-                    $pimple['session.storage'] = $pimple['session.storage.test'];
-                } else {
-                    $pimple['session.storage'] = $pimple['session.storage.native'];
-                }
-            }
-
-            $this->container = new SymfonySession($pimple['session.storage']);
-        }
+        $this->container = $pimple['session'];
     }
 
     /**

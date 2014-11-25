@@ -390,6 +390,19 @@ abstract class ComponentAbstract
     }
 
     /**
+     * Get an identifier that can be used when storing this component's
+     * listing query string parameters in the session.  We store the params
+     * so that we can redirect while maintaining filter and pagination
+     * state.
+     *
+     * @return string
+     */
+    public function getListingQueryParamsSessionName()
+    {
+        return rtrim($this->getFullyQualifiedName(), '/') . '/listing-query-params';
+    }
+
+    /**
      * Set whether the admin environment should wrap the page's output with
      * the layout (the admin shell chrome).
      *

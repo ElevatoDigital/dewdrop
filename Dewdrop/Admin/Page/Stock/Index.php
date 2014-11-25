@@ -18,6 +18,7 @@ use Dewdrop\Admin\ResponseHelper\Standard as ResponseHelper;
 use Dewdrop\Admin\Page\PageAbstract;
 use Dewdrop\Bootstrap;
 use Dewdrop\Pimple;
+use Dewdrop\Session;
 
 /**
  * Render the primary listing for a component.  This page is more complex
@@ -27,7 +28,7 @@ use Dewdrop\Pimple;
  *
  * 1) SortableListingInterface: Makes the rows in a listing's table sortable.
  *
- * 2) BulkActionProcessInterface: Enables checkbxoes on the listing rows to
+ * 2) BulkActionProcessInterface: Enables checkboxes on the listing rows to
  *    allow selection of records and application of actions to them in bulk.
  */
 class Index extends PageAbstract
@@ -48,11 +49,21 @@ class Index extends PageAbstract
     private $bulkActionFailureMessage = '';
 
     /**
+     * Session storage for remembering query params for redirects.
+     *
+     * @var Session
+     */
+    private $session;
+
+    /**
      * Ensure the user is allowed to view the listing in this component.
      */
     public function init()
     {
         $this->component->getPermissions()->haltIfNotAllowed('view-listing');
+
+        $this->session = new Session(Pimple::getInstance());
+        $this->session->set($this->component->getListingQueryParamsSessionName(), $this->request->getQuery());
     }
 
     /**
@@ -70,9 +81,12 @@ class Index extends PageAbstract
                 if (!$result->isSuccess()) {
                     $this->bulkActionFailureMessage = $result->getMessage();
                 } else {
+                    $index  = $this->component->getListingQueryParamsSessionName();
+                    $params = (isset($this->session[$index]) ? $this->session[$index] : []);
+
                     $responseHelper
                         ->setSuccessMessage($result->getMessage())
-                        ->redirectToAdminPage('Index');
+                        ->redirectToAdminPage('Index', $params);
                 }
             }
         }

@@ -67,7 +67,7 @@ use Dewdrop\View\Helper\BulkActionCheckboxField;
  * @method \Dewdrop\Fields\Helper\TableCell tableCellRenderer()
  * @method Helper\TableSortHandle tableSortHandle()
  * @method string textarea()
- * @method string urlCachePrefix()
+ * @method mixed urlCachePrefix()
  * @method string wpAdminNotice()
  * @method string wpCheckboxList()
  * @method string wpColorPicker()

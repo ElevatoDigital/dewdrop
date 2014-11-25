@@ -14,6 +14,8 @@ use Dewdrop\Admin\Component\ComponentAbstract;
 use Dewdrop\Admin\Component\CrudInterface;
 use Dewdrop\Admin\Page\PageAbstract;
 use Dewdrop\Admin\ResponseHelper\Standard as ResponseHelper;
+use Dewdrop\Pimple;
+use Dewdrop\Session;
 
 /**
  * This page uses a RowEditor and a couple view helpers (primarily bootstrapForm())
@@ -113,7 +115,11 @@ class Edit extends PageAbstract
                 $this->rowEditor->save();
 
                 if (!$this->request->isAjax()) {
-                    $responseHelper->redirectToAdminPage('index');
+                    $session = new Session(Pimple::getInstance());
+                    $index   = $this->component->getListingQueryParamsSessionName();
+                    $params  = (isset($session[$index]) ? $session[$index] : []);
+
+                    $responseHelper->redirectToAdminPage('index', $params);
                 } else {
                     header('Content-Type: application/json');
                     echo json_encode([
