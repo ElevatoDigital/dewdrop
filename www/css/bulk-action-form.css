@@ -27,3 +27,8 @@ body {
     display: none;
     padding-bottom: 10px;
 }
+
+.bulk-action-wrapper {
+    display: inline-block;
+    padding: 0 15px;
+}

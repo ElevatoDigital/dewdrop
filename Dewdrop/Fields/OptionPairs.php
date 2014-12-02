@@ -199,6 +199,33 @@ class OptionPairs
     }
 
     /**
+     * Fetch the option pairs and wrap them in an array that will preserve their
+     * sort order when passed by to the client in JSON.  If you just use a normal
+     * key-value array here, like you'd get from fetch(), the options will be
+     * sorted by their numeric key value in JSON/JavaScript rather than by the
+     * sort order defined in the option Select statement.
+     *
+     * Returns an array where each element is another associated array containing
+     * "value" and "title" keys.
+     *
+     * @return array
+     */
+    public function fetchJsonWrapper()
+    {
+        $options = $this->fetch();
+        $output  = [];
+
+        foreach ($options as $value => $title) {
+            $output[] = [
+                'value' => $value,
+                'title' => $title
+            ];
+        }
+
+        return $output;
+    }
+
+    /**
      * Generate a \Dewdrop\Db\Select object for retrieving options using the
      * metadata of the option table.  Prior to this method being called, at
      * least the $tableName property must be set.  We will attempt to guess

@@ -21,7 +21,7 @@
             <?php
             /* @var $action \Dewdrop\Fields\Listing\BulkActions\ActionInterface */
             foreach ($this->bulkActions->getActions() as $action) {
-                echo '<div class="col-md-3">';
+                echo '<div class="bulk-action-wrapper">';
                 echo $action->render($this);
                 echo '</div>';
             }

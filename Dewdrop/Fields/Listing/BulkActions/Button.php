@@ -62,6 +62,20 @@ class Button implements ActionInterface
     private $callback;
 
     /**
+     * Any stylesheets that should be added to the view for this button.
+     *
+     * @var array
+     */
+    private $stylesheets = [];
+
+    /**
+     * Any JavaScript files that should be added to the view for this button.
+     *
+     * @var array
+     */
+    private $scriptFiles = [];
+
+    /**
      * Provide the BulkActions object this action is associated with.
      *
      * @param BulkActions $bulkActions
@@ -111,15 +125,14 @@ class Button implements ActionInterface
     }
 
     /**
-     * Button actions are processed when the submit input is available in POST
-     * and has the title as its value.
+     * Button actions are processed when the submit input is available in POST.
      *
      * @return bool
      */
     public function shouldProcess()
     {
         return $this->bulkActions->getRequest()->isPost() &&
-            $this->buttonTitle === $this->bulkActions->getRequest()->getPost($this->id);
+            $this->bulkActions->getRequest()->getPost($this->id);
     }
 
     /**
@@ -136,6 +149,32 @@ class Button implements ActionInterface
     }
 
     /**
+     * Append a stylesheet to include when rendering this button.
+     *
+     * @param string $stylesheet
+     * @return $this
+     */
+    public function appendStylesheet($stylesheet)
+    {
+        $this->stylesheets[] = $stylesheet;
+
+        return $this;
+    }
+
+    /**
+     * Append a JavaScript file to include when rendering this button.
+     *
+     * @param string $scriptFile
+     * @return $this
+     */
+    public function appendScriptFile($scriptFile)
+    {
+        $this->scriptFiles[] = $scriptFile;
+
+        return $this;
+    }
+
+    /**
      * Render the submit button for this action.
      *
      * @param View $view
@@ -143,8 +182,17 @@ class Button implements ActionInterface
      */
     public function render(View $view)
     {
+        foreach ($this->stylesheets as $stylesheet) {
+            $view->headLink()->appendStylesheet($stylesheet);
+        }
+
+        foreach ($this->scriptFiles as $file) {
+            $view->headScript()->appendFile($file);
+        }
+
         return sprintf(
-            '<input name="%s" type="submit" class="btn btn-default" value="%s" />',
+            '<input id="%s" name="%s" type="submit" class="btn btn-default" value="%s" />',
+            $view->escapeHtmlAttr($this->id),
             $view->escapeHtmlAttr($this->id),
             $view->escapeHtmlAttr($this->buttonTitle)
         );

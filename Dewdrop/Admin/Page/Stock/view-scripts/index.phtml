@@ -5,6 +5,13 @@ $view = $this;
 ?>
 
 <?php
+if ($this->bulkActionFailureMessage) {
+    printf(
+        '<div class="alert alert-danger">%s</div>',
+        $this->escapeHtml($this->bulkActionFailureMessage)
+    );
+}
+
 echo $this->adminComponentNav($this->component);
 echo $this->bootstrapFilterForm()->adminPanel($this->component);
 ?>

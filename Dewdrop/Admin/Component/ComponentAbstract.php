@@ -131,7 +131,7 @@ abstract class ComponentAbstract
     public function __construct(Pimple $pimple = null)
     {
         $this->pimple = ($pimple ?: DewdropPimple::getInstance());
-        $this->env    = $this->getPimpleResource('admin');
+        $this->env = $this->getPimpleResource('admin');
 
         // Component metadata retrieved via reflection
         $reflectionClass = new ReflectionClass($this);
@@ -334,10 +334,10 @@ abstract class ComponentAbstract
     public function addToSubmenu($title, $page, $params = array())
     {
         $this->submenuPages[] = array(
-            'title'  => $title,
-            'route'  => ucfirst($page),
+            'title' => $title,
+            'route' => ucfirst($page),
             'params' => $params,
-            'url'    => $this->url($page, $params)
+            'url' => $this->url($page, $params)
         );
 
         return $this;
@@ -566,6 +566,9 @@ abstract class ComponentAbstract
         // Capture output generated during render rather than returned
         if (!$output) {
             $output = ob_get_clean();
+        } elseif (is_array($output)) {
+            $this->renderJsonResponse($output);
+            exit;
         }
 
         // Automatically render view if no output is generated
@@ -582,6 +585,21 @@ abstract class ComponentAbstract
                 $page->getView()->headLink()
             );
         }
+    }
+
+    /**
+     * Render the supplied output as a JSON response.  This method is mostly
+     * in place to allow mocking (and thus dodging the exit statement) during
+     * testing.
+     *
+     * @param array $output
+     * @return void
+     */
+    protected function renderJsonResponse(array $output)
+    {
+        header('Content-Type: application/json');
+        echo json_encode($output);
+        exit;
     }
 
     /**
