@@ -568,7 +568,6 @@ abstract class ComponentAbstract
             $output = ob_get_clean();
         } elseif (is_array($output)) {
             $this->renderJsonResponse($output);
-            exit;
         }
 
         // Automatically render view if no output is generated
