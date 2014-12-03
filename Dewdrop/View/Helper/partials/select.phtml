@@ -1,4 +1,13 @@
-<select class="<?php echo $this->escapeHtmlAttr(implode(' ', $this->classes));?>" name="<?php echo $this->escapeHtmlAttr($this->name);?>" id="<?php echo $this->escapeHtmlAttr($this->id);?>">
+<select
+    class="<?php echo $this->escapeHtmlAttr(implode(' ', $this->classes));?>"
+    name="<?php echo $this->escapeHtmlAttr($this->name);?>"
+    id="<?php echo $this->escapeHtmlAttr($this->id);?>"
+    <?php
+    foreach ($this->attributes as $name => $value) {
+        echo $this->escapeHtmlAttr($name), '=', $this->escapeHtmlAttr($value), "\n";
+    }
+    ?>
+    >
     <?php if ($this->showBlank): ?>
     <option value=""><?php echo $this->escapeHtml($this->blankTitle);?></option>
     <?php endif; ?>
