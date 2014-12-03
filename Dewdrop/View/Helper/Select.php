@@ -57,22 +57,22 @@ class Select extends AbstractHelper
      * @param array $options The key-value pairs representing the select options.
      * @param mixed $value The selected value.
      * @param mixed $classes Any CSS classes you'd like to add.
+     * @param array $attributes Any additional HTML attribute key-value pairs for the <select>.
      * @return string
      */
-    public function directExplicit($name, array $options, $value, $classes = null)
+    public function directExplicit($name, array $options, $value, $classes = null, array $attributes = [])
     {
         if (null !== $classes && !is_array($classes)) {
             $classes = array($classes);
         }
 
-        return $this->directArray(
-            array(
-                'name'    => $name,
-                'value'   => $value,
-                'options' => $options,
-                'classes' => $classes
-            )
-        );
+        return $this->directArray([
+            'name'       => $name,
+            'value'      => $value,
+            'options'    => $options,
+            'classes'    => $classes,
+            'attributes' => $attributes,
+        ]);
     }
 
     /**
@@ -101,15 +101,16 @@ class Select extends AbstractHelper
 
         return $this->partial(
             'select.phtml',
-            array(
+            [
                 'name'       => $name,
                 'id'         => $id,
                 'value'      => $value,
                 'options'    => $options,
                 'classes'    => $classes,
                 'blankTitle' => $blankTitle,
-                'showBlank'  => $showBlank
-            )
+                'showBlank'  => $showBlank,
+                'attributes' => $attributes,
+            ]
         );
     }
 
@@ -124,8 +125,8 @@ class Select extends AbstractHelper
     {
         $this
             ->checkRequired($options, array('name', 'value', 'options'))
-            ->ensurePresent($options, array('id', 'classes', 'blankTitle'))
-            ->ensureArray($options, array('options', 'classes'));
+            ->ensurePresent($options, array('id', 'classes', 'blankTitle', 'attributes'))
+            ->ensureArray($options, array('options', 'classes', 'attributes'));
 
         return $options;
     }
