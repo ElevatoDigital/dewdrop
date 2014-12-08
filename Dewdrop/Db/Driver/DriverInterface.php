@@ -183,6 +183,14 @@ interface DriverInterface
     public function mapNativeTypeToGenericType($nativeType, $length);
 
     /**
+     * Returns the given value quoted.
+     *
+     * @param string $value
+     * @return string
+     */
+    public function quoteInternal($value);
+
+    /**
      * Begin a new transaction.
      *
      * @return void

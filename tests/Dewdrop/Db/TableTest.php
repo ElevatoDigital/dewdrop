@@ -161,7 +161,7 @@ class TableTest extends DbTestCase
 
     public function testInsertAddsToTableSuccessfullyAndReturnsCountOfRowsAffected()
     {
-        $affected = $this->table->insert(
+        $lastInsertId = $this->table->insert(
             array(
                 'name'                   => 'Peach',
                 'is_delicious'           => 1,
@@ -169,7 +169,7 @@ class TableTest extends DbTestCase
             )
         );
 
-        $this->assertEquals(1, $affected);
+        $this->assertEquals(6, $lastInsertId);
         $this->assertEquals(6, $this->db->lastInsertId());
         $this->assertEquals(6, $this->db->fetchOne('SELECT COUNT(*) FROM dewdrop_test_fruits'));
     }

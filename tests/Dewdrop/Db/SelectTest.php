@@ -2,13 +2,15 @@
 
 namespace Dewdrop\Db;
 
-use Dewdrop\Db\Adapter\Mock;
-use Dewdrop\Db\Expr;
+use Dewdrop\Db\Driver\Mock as MockDriver;
 use Dewdrop\Db\Select\SelectException;
 use Dewdrop\Test\BaseTestCase;
 
 class SelectTest extends BaseTestCase
 {
+    /**
+     * @var \Dewdrop\Db\Adapter|\PHPUnit_Framework_MockObject_MockObject|null
+     */
     protected $db = null;
 
     /**
@@ -31,7 +33,7 @@ class SelectTest extends BaseTestCase
             array()
         );
 
-        $driver = new \Dewdrop\Db\Driver\Mock($this->db);
+        $driver = new MockDriver($this->db);
 
         $this->db->setDriver($driver);
     }

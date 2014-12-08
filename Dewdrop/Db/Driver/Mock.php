@@ -14,7 +14,7 @@ use Dewdrop\Db\Adapter;
 use Dewdrop\Db\Select;
 
 /**
- * A mock DB adpater driver for use during testing.  You can certainly
+ * A mock DB adapter driver for use during testing.  You can certainly
  * create a mock of a normal driver class, but this is a little easier
  * to use in some situations.
  */
@@ -96,6 +96,17 @@ class Mock implements DriverInterface
     public function query($sql, $bind = array())
     {
         return array();
+    }
+
+    /**
+     * Returns the given value quoted.
+     *
+     * @param string $value
+     * @return string
+     */
+    public function quoteInternal($value)
+    {
+        return '\'' . str_replace('\'', '\\\'', $value) . '\'';
     }
 
     /**
