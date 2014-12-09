@@ -14,6 +14,10 @@ class ManyToMany
 
     const OP_NOT_CONTAINS = 'not-contains';
 
+    const OP_EMPTY = 'is-empty';
+
+    const OP_NOT_EMPTY = 'is-not-empty';
+
     /**
      * @var Relationship
      */
@@ -41,11 +45,6 @@ class ManyToMany
             throw new InvalidOperator("{$operator} is not a valid operator for many-to-many filters.");
         }
 
-        // Don't attempt to filter if no value is available
-        if (!$value) {
-            return $select;
-        }
-
         return $this->filter($operator, $select, $conditionSetName, $value);
     }
 
@@ -56,7 +55,16 @@ class ManyToMany
             $this->relationship->getSourceColumnName()
         );
 
-        $operator = (self::OP_CONTAINS === $operator ? 'IN' : 'NOT IN');
+        switch ($operator) {
+            case self::OP_NOT_EMPTY:
+            case self::OP_CONTAINS:
+                $operator = 'IN';
+                break;
+            case self::OP_NOT_CONTAINS:
+            case self::OP_EMPTY:
+                $operator = 'NOT IN';
+                break;
+        }
 
         return $select->whereConditionSet(
             $conditionSetName,
@@ -69,7 +77,9 @@ class ManyToMany
     {
         static $validOperators = array(
             self::OP_CONTAINS,
-            self::OP_NOT_CONTAINS
+            self::OP_NOT_CONTAINS,
+            self::OP_EMPTY,
+            self::OP_NOT_EMPTY
         );
 
         return in_array($operator, $validOperators);

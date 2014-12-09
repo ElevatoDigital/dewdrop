@@ -1,7 +1,9 @@
 <%
 var operators = {
-    "is":     "is",
-    "is-not": "is not"
+    "is":           "is",
+    "is-not":       "is not",
+    "is-blank":     "is blank",
+    "is-not-blank": "is not blank"
 };
 %>
 
@@ -20,12 +22,12 @@ var operators = {
 <select name="ftr-value.<%- inputIndex %>" class="form-control filter-value input-sm">
     <option value=""></option>
 
-    <% _.each(options, function (option, key) { %>
+    <% _.each(options, function (option) { %>
 
-    <% if (values.value === key) { %>
-    <option value="<%- key %>" selected="selected"><%- option %></option>
+    <% if (values.value === option.value) { %>
+    <option value="<%- option.value %>" selected="selected"><%- option.title %></option>
     <% } else { %>
-    <option value="<%- key %>"><%- option %></option>
+    <option value="<%- option.value %>"><%- option.title %></option>
     <% } %>
 
     <% }); %>

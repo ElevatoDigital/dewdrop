@@ -67,7 +67,7 @@ class FilterType extends HelperAbstract
             return array(
                 'type'    => $type,
                 'options' => array(
-                    'options' => $field->getOptionPairs()->fetch()
+                    'options' => $field->getOptionPairs()->fetchJsonWrapper()
                 )
             );
         };

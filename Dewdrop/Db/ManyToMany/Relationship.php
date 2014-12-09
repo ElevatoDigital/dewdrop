@@ -525,12 +525,17 @@ class Relationship
     {
         $db = $this->sourceTable->getAdapter();
 
-        return $db->quoteInto(
-            "SELECT {$db->quoteIdentifier($this->xrefTableName . '.' . $this->xrefAnchorColumnName)}
-            FROM {$db->quoteIdentifier($this->xrefTableName)}
-            WHERE {$db->quoteIdentifier($this->xrefTableName . '.' . $this->xrefReferenceColumnName)} = ?",
-            $value
-        );
+        $sql = "SELECT {$db->quoteIdentifier($this->xrefTableName . '.' . $this->xrefAnchorColumnName)}
+            FROM {$db->quoteIdentifier($this->xrefTableName)} ";
+
+        if ($value) {
+            $sql .= $db->quoteInto(
+                "WHERE {$db->quoteIdentifier($this->xrefTableName . '.' . $this->xrefReferenceColumnName)} = ?",
+                $value
+            );
+        }
+
+        return $sql;
     }
 
     /**
