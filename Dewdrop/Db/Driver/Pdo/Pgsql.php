@@ -195,9 +195,9 @@ class Pgsql implements DriverInterface
 
     /**
      * Get the last insert ID from the driver after performing an insert on a table
-     * with an auto-incrementing primary key.
+     * with an auto-incrementing primary key, or null on failure.
      *
-     * @return integer
+     * @return int|null
      */
     public function lastInsertId()
     {
@@ -213,10 +213,22 @@ class Pgsql implements DriverInterface
         if ($meta) {
             foreach ($meta['columns'] as $name => $columnMeta) {
                 if ($columnMeta['PRIMARY'] && $columnMeta['IDENTITY']) {
-                    return $this->fetchOne(
-                        'SELECT CURRVAL(PG_GET_SERIAL_SEQUENCE(?, ?))',
-                        array($table, $name)
-                    );
+                    $currval = $this->fetchOne('SELECT CURRVAL(PG_GET_SERIAL_SEQUENCE(?, ?))', [$table, $name]);
+                    // Account for possibility of non-serial integer key with default of nextval(sequence)
+                    if (null === $currval) {
+                        $currval = $this->fetchOne(
+                            'SELECT
+                              CURRVAL(SUBSTRING(column_default FROM \'(?i)nextval\\\\(\'\'([^\'\']+)\'))
+                            FROM information_schema.columns
+                            WHERE table_name = ?
+                            AND column_name = ?',
+                            [
+                                $table,
+                                $name,
+                            ]
+                        );
+                    }
+                    return $currval;
                 }
             }
         }

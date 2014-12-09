@@ -111,6 +111,13 @@ class Adapter
     protected $lastInsertTableName;
 
     /**
+     * Path to database table metadata.
+     *
+     * @var string
+     */
+    protected $tableMetadataPath;
+
+    /**
      * Create new adapter using the wpdb object as the driver
      *
      * @param mixed $driver
@@ -168,16 +175,41 @@ class Adapter
      */
     public function getTableMetadata($table)
     {
-        $paths = new Paths();
-        $path  = $paths->getModels() . '/metadata/' . $table . '.php';
+        $path = $this->getTableMetadataPath() . "/{$table}.php";
 
         if (!file_exists($path) || !is_readable($path)) {
             throw new Exception("Could not find metadata for table \"{$table}\"");
         }
 
-        $metadata = require $path;
+        return require $path;
+    }
 
-        return $metadata;
+    /**
+     * Returns table metadata filesystem path.
+     *
+     * @return string
+     */
+    public function getTableMetadataPath()
+    {
+        if (null === $this->tableMetadataPath) {
+            $paths                   = new Paths();
+            $this->tableMetadataPath = $paths->getModels() . '/metadata';
+        }
+
+        return $this->tableMetadataPath;
+    }
+
+    /**
+     * Sets table metadata filesystem path.
+     *
+     * @param string $tableMetadataPath
+     * @return Adapter
+     */
+    public function setTableMetadataPath($tableMetadataPath)
+    {
+        $this->tableMetadataPath = (string) $tableMetadataPath;
+
+        return $this;
     }
 
     /**
