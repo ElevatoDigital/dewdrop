@@ -49,7 +49,7 @@ class DbMetadata extends CommandAbstract
     public function execute()
     {
         $db   = $this->getDbAdapter();
-        $path = $this->paths->getModels() . '/metadata';
+        $path = $this->getPath();
 
         if (!file_exists($path)) {
             mkdir($path);
@@ -131,5 +131,13 @@ class DbMetadata extends CommandAbstract
     {
         $db = $this->runner->connectDb();
         return $db;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getPath()
+    {
+        return $this->paths->getModels() . '/metadata';
     }
 }
