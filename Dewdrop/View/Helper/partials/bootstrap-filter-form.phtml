@@ -33,6 +33,14 @@
                 'options'  => $filterTypeAndOptions['options']
             );
         }
+
+        // Alphabetize filter fields by label
+        usort(
+            $config,
+            function ($a, $b) {
+                return strnatcasecmp($a['label'], $b['label']);
+            }
+        );
         ?>
 
         <script type="text/javascript">
