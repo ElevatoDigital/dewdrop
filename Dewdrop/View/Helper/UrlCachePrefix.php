@@ -26,7 +26,7 @@ use Zend\View\Helper\HeadScript;
  * RewriteEngine On
  *
  * # Strip cache-busting prefixes from URLs
- * RewriteRule ^cache-[\dA-Z.\-_]+/(.+) $1 [L,NC]
+ * RewriteRule ^cache-[\dA-Z.\-_]+/(.+) $1 [L]
  * </pre>
  *
  * And then set the prefix of this helper to cache-build-1234.  When you

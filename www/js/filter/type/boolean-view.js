@@ -1,10 +1,20 @@
 define(
-    function () {
-        return Backbone.View.extend({
-            render: function () {
-                this.$el.append('boolean');
+    ['type/base-view', 'text!type/boolean-template.html'],
+    function (BaseView, templateHtml) {
+        'use strict';
 
-                return this;
+        var template = _.template(templateHtml);
+
+        return BaseView.extend({
+            template: template,
+
+            updateValues: function () {
+                this.model.set(
+                    'values',
+                    {
+                        value: this.$el.find('select').val()
+                    }
+                );
             }
         });
     }

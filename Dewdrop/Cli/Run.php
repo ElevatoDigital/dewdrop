@@ -36,7 +36,6 @@ class Run
     private $commandClasses = array(
         'Help',
         'WpInit',
-        'BuildMetadata',
         'Dbdeploy',
         'DbMetadata',
         'AuthHashPassword',

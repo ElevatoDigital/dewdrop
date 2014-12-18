@@ -99,7 +99,7 @@ class EditHelperDetector
         }
 
         throw new Exception(
-            'Fields\EditHelperDetector: Could not find a suitable view helper for field '
+            'Fields\EditHelperDetector: Could not find a suitaable view helper for field '
             . $field->getControlName() . '.'
         );
     }

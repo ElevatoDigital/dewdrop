@@ -1,12 +1,21 @@
 define(
-    function () {
+    ['type/base-view', 'text!type/reference-template.html'],
+    function (BaseView, templateHtml) {
         'use strict';
 
-        return Backbone.View.extend({
-            render: function () {
-                this.$el.append('reference');
+        var template = _.template(templateHtml);
 
-                return this;
+        return BaseView.extend({
+            template: template,
+
+            updateValues: function () {
+                this.model.set(
+                    'values',
+                    {
+                        comp:  this.$el.find('select').val(),
+                        value: this.$el.find('select.filter-value').val()
+                    }
+                );
             }
         });
     }

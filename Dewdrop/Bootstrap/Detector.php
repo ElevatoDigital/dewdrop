@@ -127,21 +127,6 @@ class Detector
             }
         }
 
-        if (!isset($pimple['dewdrop-build'])) {
-            $pimple['dewdrop-build'] = $pimple->share(
-                function () use ($pimple) {
-                    if (defined('APPLICATION_ENV') && 'development' === APPLICATION_ENV) {
-                        return microtime(true);
-                    } else {
-                        /* @var $paths \Dewdrop\Paths */
-                        $paths = $pimple['paths'];
-
-                        return require $paths->getAppRoot() . '/dewdrop-build.php';
-                    }
-                }
-            );
-        }
-
         if (!isset($pimple['session'])) {
             /* @var $paths Paths */
             $paths = $pimple['paths'];
