@@ -33,7 +33,7 @@ define(
                             values: values
                         };
 
-                        this.add(modelData);
+                        this.add(modelData); 
                     },
                     this
                 );

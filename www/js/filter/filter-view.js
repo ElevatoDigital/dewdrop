@@ -4,7 +4,7 @@ define(
         'use strict';
 
         var template = _.template(templateHtml);
-
+        
         return Backbone.View.extend({
             events: {
                 'change .filter-field': 'selectField',
@@ -50,8 +50,8 @@ define(
 
                     this.$el.find('.filter-control-wrapper').html(
                         typeFactory(
-                            selectedField.get('type'),
-                            selectedField.get('options'),
+                            selectedField.get('type'), 
+                            selectedField.get('inputOptions'),
                             this.model,
                             this.index
                         ).render().el

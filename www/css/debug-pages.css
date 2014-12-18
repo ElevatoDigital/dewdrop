@@ -1,8 +1,0 @@
-.debug-pages-panel .panel-body {
-    overflow: auto;
-    height: 300px;
-}
-
-.debug-pages-panel.inactive {
-    text-decoration: line-through;
-}

@@ -9,8 +9,6 @@ define(
 
             inputIndex: null,
 
-            options: null,
-
             events: {
                 'change select': 'focusInput',
                 'blur input':    'updateValues',
@@ -19,18 +17,13 @@ define(
 
             initialize: function (attributes, options) {
                 this.inputIndex = attributes.inputIndex;
-
-                if ('undefined' !== typeof attributes.options) {
-                    this.options = attributes.options;
-                }
             },
 
             render: function () {
                 this.$el.html(
                     this.template({
                         inputIndex: this.inputIndex,
-                        values:     this.model.get('values'),
-                        options:    this.options
+                        values:     this.model.get('values')
                     })
                 );
 
@@ -51,11 +44,11 @@ define(
 
             focusInput: function () {
                 var inputs = this.$el.find('input');
-
+                
                 if (inputs.length) {
                     inputs.first().focus();
                 }
-
+                
                 this.updateValues();
             },
 
