@@ -12,6 +12,7 @@ namespace Dewdrop\Db\Field;
 
 use Dewdrop\Db\Field;
 use Dewdrop\Filter\NullableDbBoolean as NullableDbBooleanFilter;
+use Dewdrop\Filter\NullableDbInteger as NullableDbIntegerFilter;
 use Zend\Filter;
 use Zend\InputFilter\Input;
 use Zend\Validator;
@@ -166,7 +167,12 @@ class InputFilterBuilder
      */
     protected function attachForInteger(Input $input)
     {
-        $input->getFilterChain()->attach(new Filter\Int());
+        if ($this->metadata['NULLABLE']) {
+            $input->getFilterChain()->attach(new NullableDbIntegerFilter());
+        } else {
+            $input->getFilterChain()->attach(new Filter\Int());
+        }
+        
         $input->getValidatorChain()->attach(new \Zend\I18n\Validator\Int());
 
         return $input;
