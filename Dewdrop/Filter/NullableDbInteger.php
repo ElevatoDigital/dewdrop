@@ -20,9 +20,7 @@ class NullableDbInteger extends AbstractFilter
 {
     /**
      * For empty strings (think HTTP requests, where everything is a string), or
-     * actual nulls, we return null.  If not, we return the value cast to an int,
-     * which is friendlier than dragging around the actual boolean because those
-     * don't play nice with the DBs.
+     * actual nulls, we return null.  If not, we return the value cast to an int.
      *
      * @param mixed $value
      * @return int|null
