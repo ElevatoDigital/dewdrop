@@ -110,6 +110,11 @@ class Silex extends EnvAbstract
         $this->application->match(
             '/admin/' . $component->getName() . '/{page}',
             function ($page) use ($component) {
+                /* @var $component ComponentAbstract */
+                foreach ($this->components as $preDispatchComponent) {
+                    $preDispatchComponent->preDispatch();
+                }
+
                 return $component->dispatchPage($page);
             }
         )
