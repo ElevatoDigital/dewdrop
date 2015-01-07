@@ -12,6 +12,7 @@ namespace Dewdrop\Fields\GroupedFields;
 
 use Dewdrop\Fields;
 use Dewdrop\Fields\GroupedFields;
+use Dewdrop\Fields\UserInterface;
 
 /**
  * A group of fields in a \Dewdrop\Fields\GroupedFields collection.  Each
@@ -34,10 +35,13 @@ class Group extends Fields
      * Supply the GroupedFields object that contains this group.
      *
      * @param GroupedFields $groupedFields
+     * @param UserInterface $user
      */
-    public function __construct(GroupedFields $groupedFields)
+    public function __construct(GroupedFields $groupedFields, UserInterface $user = null)
     {
         $this->groupedFields = $groupedFields;
+
+        parent::__construct([], $user);
     }
 
     /**
