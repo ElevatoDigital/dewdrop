@@ -11,7 +11,6 @@
 namespace Dewdrop\View\Helper;
 
 use Dewdrop\Db\Field;
-use Dewdrop\Exception;
 
 /**
  * Render a checkbox node.  This helper can optionally leverage a
