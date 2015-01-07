@@ -243,8 +243,13 @@ class RowEditor
 
                 /* @var $filter \Zend\Filter\FilterChain */
                 $filter = $inputFilter->get($id)->getFilterChain();
+                $value  = $data[$id];
 
-                $field->setValue($filter->filter($data[$id]));
+                if (!$value && $field instanceof DbField && $field->isType('reference')) {
+                    $value = null;
+                }
+
+                $field->setValue($filter->filter($value));
             } elseif ($field instanceof DbField && $field->isType('boolean')) {
                 /**
                  * Checkboxes are omitted from POST completely when not checked, so this
@@ -252,6 +257,11 @@ class RowEditor
                  * from the data.
                  */
                 $field->setValue(0);
+            } elseif ($field instanceof DbField && $field->isType('manytomany')) {
+                /**
+                 * A similar special case for empty checkbox lists in manytomany fields.
+                 */
+                $field->setValue([]);
             }
         }
 
