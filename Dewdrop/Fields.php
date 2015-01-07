@@ -81,7 +81,7 @@ use Dewdrop\Fields\UserInterface;
  *    and getEditableFields() objects all will return new \Dewdrop\Fields objects
  *    that contain only the fields allowed by the method you called.  When calling
  *    any of this methods, you can pass any number of \Dewdrop\Fields\Filter
- *    objects as well to futher sort or limit the fields you get back.
+ *    objects as well to further sort or limit the fields you get back.
  *
  * 3) You can iterate over the Fields object just like an array.
  *
