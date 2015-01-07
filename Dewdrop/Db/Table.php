@@ -24,6 +24,20 @@ use Dewdrop\Pimple;
 abstract class Table
 {
     /**
+     * Constant to clarify behavior of second param to createRow().
+     *
+     * @const
+     */
+    const SHARE_FIELD_OBJECTS_WITH_ROW = true;
+
+    /**
+     * Constant to clarify behavior of second param to createRow().
+     *
+     * @const
+     */
+    const NEW_FIELD_OBJECTS_PER_ROW = false;
+
+    /**
      * Field providers can check for the existence of and create objects
      * for fields of various types (e.g. concrete DB columns or EAV
      * fields).
@@ -691,13 +705,30 @@ abstract class Table
      * Create a new row object, assigning the provided data as its initial
      * state.
      *
+     * By default, rows share the same field objects that were instantiated
+     * on the table itself.  This makes it easy to customize fields prior to
+     * the row being available.  However, in some rare cases, you want to edit
+     * multiple rows created from the same model instance.  To do so, you'll
+     * need new field objects per-row.  To achieve this separation, you can
+     * call this method with Table::NEW_FIELD_OBJECTS_PER_ROW as the second
+     * parameter.
+     *
      * @param array $data
+     * @param boolean $shareFieldObjectsWithRow
      * @return \Dewdrop\Db\Row
      */
-    public function createRow(array $data = array())
+    public function createRow(array $data = array(), $shareFieldObjectsWithRow = self::SHARE_FIELD_OBJECTS_WITH_ROW)
     {
-        $className = $this->rowClass;
-        return new $className($this, $data);
+        $rowClass = $this->rowClass;
+
+        if (self::SHARE_FIELD_OBJECTS_WITH_ROW === $shareFieldObjectsWithRow) {
+            $model = $this;
+        } else {
+            $tableClass = get_class($this);
+            $model      = new $tableClass($this->getAdapter());
+        }
+
+        return new $rowClass($model, $data);
     }
 
     /**
