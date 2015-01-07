@@ -52,25 +52,42 @@
                 <div class="collapse navbar-collapse" id="admin-nav-collapse">
                     <ul class="nav navbar-nav">
                         <?php
+                        /* @var $component \Dewdrop\Admin|Component\ComponentAbstract */
                         foreach ($this->components as $component) {
                             if (!$component->getPermissions()->can('access') || !$component->getPermissions()->can('display-menu')) {
                                 continue;
                             }
 
                             $submenuPages = $component->getSubmenuPages();
+                            $badgeContent = '';
+                            $activeClass  = '';
+
+                            if ($component->getBadgeContent()) {
+                                $badgeContent = sprintf(
+                                    ' <span class="badge">%s</span>',
+                                    $this->escapeHtml($component->getBadgeContent())
+                                );
+                            }
+
+                            if ($component->isActive()) {
+                                $activeClass = 'active ';
+                            }
 
                             if (0 === count($submenuPages)) {
                                 printf(
-                                    '<li><a href="/admin/%s">%s</a></li>',
+                                    '<li class="%s"><a href="/admin/%s">%s%s</a></li>',
+                                    $activeClass,
                                     $this->escapeHtmlAttr($component->getName()),
-                                    $this->escapeHtml($component->getTitle())
+                                    $this->escapeHtml($component->getTitle()),
+                                    $badgeContent
                                 );
                             } else {
                                 echo '<li class="dropdown">';
 
                                 printf(
-                                    '<a href="#" class="dropdown-toggle" data-toggle="dropdown">%s <b class="caret"></b></a>',
-                                    $this->escapeHtml($component->getTitle())
+                                    '<a href="#" class="dropdown-toggle" data-toggle="dropdown">%s%s <b class="caret"></b></a>',
+                                    $this->escapeHtml($component->getTitle()),
+                                    $badgeContent
                                 );
 
                                 echo '<ul class="dropdown-menu">';
