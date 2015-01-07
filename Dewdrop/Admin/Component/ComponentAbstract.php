@@ -67,6 +67,14 @@ abstract class ComponentAbstract
     private $menuPosition = null;
 
     /**
+     * Content that should be displayed in a "badge" alongside this component's
+     * menu item.
+     *
+     * @var string
+     */
+    private $badgeContent = null;
+
+    /**
      * The page factories registered with this component to provide page objects.
      *
      * @var array
@@ -122,6 +130,14 @@ abstract class ComponentAbstract
     protected $name;
 
     /**
+     * Whether this component is active (currently in charge of dispatching a
+     * page/response).
+     *
+     * @var boolean
+     */
+    private $active = false;
+
+    /**
      * Create a component instance using the DB adapter creating by the Wiring
      * class.
      *
@@ -152,6 +168,14 @@ abstract class ComponentAbstract
      * information like the title and the icon.
      */
     abstract public function init();
+
+    /**
+     * This method will be called before any admin page is dispatched.
+     */
+    public function preDispatch()
+    {
+
+    }
 
     /**
      * Check to see if the supplied resource is present in the component's Pimple
@@ -265,6 +289,16 @@ abstract class ComponentAbstract
     public function getDb()
     {
         return $this->getPimpleResource('db');
+    }
+
+    /**
+     * Check to see if this component is active.
+     *
+     * @return boolean
+     */
+    public function isActive()
+    {
+        return $this->active;
     }
 
     /**
@@ -451,6 +485,30 @@ abstract class ComponentAbstract
     }
 
     /**
+     * Set the badge content that should be displayed alongside this component's
+     * navigation.
+     *
+     * @param string $badgeContent
+     * @return $this
+     */
+    public function setBadgeContent($badgeContent)
+    {
+        $this->badgeContent = $badgeContent;
+
+        return $this;
+    }
+
+    /**
+     * Get the badge content assigned to this component.
+     *
+     * @return string
+     */
+    public function getBadgeContent()
+    {
+        return $this->badgeContent;
+    }
+
+    /**
      * Set the icon that should be used in this component's admin menu
      * entry.
      *
@@ -529,6 +587,8 @@ abstract class ComponentAbstract
      */
     public function dispatchPage($page = null, Response $response = null)
     {
+        $this->active = true;
+
         if (!$this->getPermissions()->can('access')) {
             return $this->env->redirect('/admin/');
         }
@@ -563,11 +623,11 @@ abstract class ComponentAbstract
 
         $output = $page->render();
 
-        // Capture output generated during render rather than returned
-        if (!$output) {
-            $output = ob_get_clean();
-        } elseif (is_array($output)) {
+        if (is_array($output)) {
             $this->renderJsonResponse($output);
+        } elseif (!$output) {
+            // Capture output generated during render rather than returned
+            $output = ob_get_clean();
         }
 
         // Automatically render view if no output is generated
