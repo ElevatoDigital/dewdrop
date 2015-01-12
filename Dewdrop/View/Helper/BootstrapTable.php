@@ -21,13 +21,27 @@ use Dewdrop\Fields\Helper\SelectSort;
 class BootstrapTable extends Table
 {
     /**
+     * Table wrapper's id HTML attribute.
+     *
+     * @var string
+     */
+    protected $tableWrapperId;
+
+    /**
      * Open the table for rendering.  Notice the .table-responsive wrapper.
      *
      * @return string
      */
     public function open()
     {
-        return '<div class="table-responsive"><table class="bootstrap-table table table-hover">';
+        $tableWrapperIdAttr = '';
+        if (null !== $this->tableWrapperId) {
+            $tableWrapperIdAttr = ' id="' . $this->view->escapeHtmlAttr($this->tableWrapperId) . '"';
+        }
+
+        return <<<HTML
+            <div class="table-responsive"{$tableWrapperIdAttr}><table class="bootstrap-table table table-hover">
+HTML;
     }
 
     /**
@@ -38,6 +52,28 @@ class BootstrapTable extends Table
     public function close()
     {
         return '</table></div>';
+    }
+
+    /**
+     * Return the table wrapper's id HTML attribute.
+     *
+     * @return string|null
+     */
+    public function getTableWrapperId()
+    {
+        return $this->tableWrapperId;
+    }
+
+    /**
+     * Set the table wrapper's id HTML attribute
+     * @param string $tableWrapperId
+     * @return BootstrapTable
+     */
+    public function setTableWrapperId($tableWrapperId)
+    {
+        $this->tableWrapperId = (string) $tableWrapperId;
+
+        return $this;
     }
 
     /**
