@@ -26,8 +26,8 @@ define(
 
                 _.each(
                     window[name],
-                    function (field, index) {
-                        this.add(field); 
+                    function (field) {
+                        this.add(field);
                     },
                     this
                 );

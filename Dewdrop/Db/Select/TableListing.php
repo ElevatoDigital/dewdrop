@@ -15,6 +15,7 @@ use Dewdrop\Db\Expr;
 use Dewdrop\Db\FieldProvider\ProviderInterface;
 use Dewdrop\Db\Select;
 use Dewdrop\Db\Table;
+use Dewdrop\Exception;
 
 /**
  * This class can assist in creating a Select object to provide the data for
@@ -28,11 +29,6 @@ use Dewdrop\Db\Table;
  *
  * If, for example, you wanted to show all the fields in an address rather than just
  * a single value to represent that foreign key value.
- *
- * @todo The ability to handle situations were the same table is referenced twice.
- *
- * If, for example, you had both a shipping_address_id and a billing_address_id, the
- * table alias code would have an issue with that right now.
  */
 class TableListing
 {
@@ -89,11 +85,12 @@ class TableListing
     /**
      * Override the reference title column for a foreign key.  The first
      * parameter should be the name of the foreign key column in the primary
-     * table.  The second parameter is a column name from the referenced table
-     * or an Expr object.
+     * table.  The second parameter is a column name from the referenced table,
+     * an Expr object, or a callback that will be passed the generated table
+     * alias for the referenced table for use in creating an Expr.
      *
      * @param string $foreignKeyColumn
-     * @param string $titleColumn
+     * @param mixed $titleColumn
      * @return $this
      */
     public function setReferenceTitleColumn($foreignKeyColumn, $titleColumn)
@@ -159,7 +156,8 @@ class TableListing
     private function selectFromTable(Select $select)
     {
         return $select->from(
-            [$this->getAlias($this->table->getTableName()) => $this->table->getTableName()]
+            [$this->getAlias($this->table->getTableName()) => $this->table->getTableName()],
+            ['*']
         );
     }
 
@@ -183,7 +181,8 @@ class TableListing
      */
     private function selectForeignKeyValues(Select $select)
     {
-        $tableAlias = $this->getAlias($this->table->getTableName());
+        $tableAlias     = $this->getAlias($this->table->getTableName());
+        $tableInstances = [];
 
         foreach ($this->table->getMetadata('references') as $column => $reference) {
             $metadata = $this->table->getMetadata('columns', $column);
@@ -195,10 +194,17 @@ class TableListing
             }
 
             $refTable = $reference['table'];
-            $refAlias = $this->getAlias($refTable);
+
+            if (!array_key_exists($refTable, $tableInstances)) {
+                $tableInstances[$refTable] = 0;
+            }
+
+            $refAlias = $this->getAlias($refTable, $tableInstances[$refTable], $column);
+
+            $tableInstances[$refTable] += 1;
 
             $columnAlias = preg_replace('/_id$/i', '', $column);
-            $titleColumn = $this->findReferenceTitleColumn($column, $reference);
+            $titleColumn = $this->findReferenceTitleColumn($column, $reference, $refAlias);
 
             $select->$join(
                 [$refAlias => $refTable],
@@ -235,24 +241,36 @@ class TableListing
     /**
      * Get an alias for the provided table name.
      *
-     * @param $tableName
+     * @param string $tableName
+     * @param null|integer $instance
      * @return string
      */
-    private function getAlias($tableName)
+    private function getAlias($tableName, $instance = null, $anchorColumn = null)
     {
-        if (array_key_exists($tableName, $this->aliases)) {
-            return $this->aliases[$tableName];
+        $aliasKey = $tableName;
+
+        // Used to support multiple joins on the same table
+        if (null !== $instance) {
+            $aliasKey .= $instance;
         }
 
-        $chars = 1;
-        $alias = substr($tableName, 0, $chars);
+        if (array_key_exists($aliasKey, $this->aliases)) {
+            return $this->aliases[$aliasKey];
+        }
 
-        while (in_array($alias, $this->aliases)) {
+        $chars = 0;
+        $alias = null;
+
+        while ((!$alias || in_array($alias, $this->aliases)) && $chars < strlen($tableName)) {
             $chars += 1;
             $alias  = substr($tableName, 0, $chars);
         }
 
-        $this->aliases[$tableName] = $alias;
+        if (in_array($alias, $this->aliases)) {
+            $alias .= $instance;
+        }
+
+        $this->aliases[$aliasKey] = $alias;
 
         return $alias;
     }
@@ -268,12 +286,23 @@ class TableListing
      *
      * @param $localColumn
      * @param array $reference
+     * @param string $alias
      * @return string|Expr
      */
-    private function findReferenceTitleColumn($localColumn, array $reference)
+    private function findReferenceTitleColumn($localColumn, array $reference, $alias)
     {
         if (array_key_exists($localColumn, $this->referenceTitleColumns)) {
-            return $this->referenceTitleColumns[$localColumn];
+            $value = $this->referenceTitleColumns[$localColumn];
+
+            if (is_callable($value)) {
+                $value = call_user_func($value, $alias);
+
+                if (!is_string($value) && !$value instanceof Expr) {
+                    throw new Exception('Title column callbacks should return a string or Expr.');
+                }
+            }
+
+            return $value;
         }
 
         $metadata = $this->db->getTableMetadata($reference['table']);
