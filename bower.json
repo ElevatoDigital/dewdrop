@@ -26,6 +26,7 @@
         "velocity":       "0.1.*",
         "requirejs":      "2.*",
         "requirejs-text": "2.*",
-        "summernote":     "0.5.*"
+        "summernote":     "0.5.*",
+        "timepicker":     "1.4.*"
     }
 }
