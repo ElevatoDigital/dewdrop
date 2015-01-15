@@ -60,6 +60,7 @@ use Dewdrop\View\Helper\BulkActionCheckboxField;
  * @method void inlineScript()
  * @method string inputCheckbox()
  * @method string inputText()
+ * @method string inputTimestamp()
  * @method string pagination()
  * @method string select()
  * @method string summernote()
@@ -148,6 +149,7 @@ class View
         'inlinescript'            => '\Dewdrop\View\Helper\InlineScript',
         'inputcheckbox'           => '\Dewdrop\View\Helper\InputCheckbox',
         'inputtext'               => '\Dewdrop\View\Helper\InputText',
+        'inputtimestamp'          => '\Dewdrop\View\Helper\InputTimestamp',
         'pagination'              => '\Dewdrop\View\Helper\Pagination',
         'select'                  => '\Dewdrop\View\Helper\Select',
         'summernote'              => '\Dewdrop\View\Helper\Summernote',
