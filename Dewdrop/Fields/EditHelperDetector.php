@@ -96,6 +96,8 @@ class EditHelperDetector
             return 'textarea';
         } elseif ($field->isType('text', 'integer', 'float')) {
             return 'inputText';
+        } elseif ($field->isType('timestamp')) {
+            return 'inputTimestamp';
         }
 
         throw new Exception(
