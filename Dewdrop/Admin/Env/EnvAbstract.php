@@ -42,8 +42,9 @@ abstract class EnvAbstract implements EnvInterface
      *
      * @var array
      */
-    protected $coreClientSideDependencies = array(
-        'js' => array(
+    protected $coreClientSideDependencies = [
+        'js' => [
+            'modernizr'    => '/dewdrop/www/js/modernizr.custom.63049.js',
             'jquery'       => '/jquery/dist/jquery.min.js',
             'bootstrap'    => '/bootstrap/dist/js/bootstrap.min.js',
             'keymaster'    => '/keymaster/keymaster.js',
@@ -54,12 +55,12 @@ abstract class EnvAbstract implements EnvInterface
             'backbone'     => '/backbone/backbone.js',
             'requirejs'    => '/requirejs/require.js',
             'dewdrop-core' => '/dewdrop/www/js/core.js'
-        ),
-        'css' => array(
+        ],
+        'css' => [
             'bootstrap'     => '/bootstrap/dist/css/bootstrap.min.css',
             'dewdrop-admin' => '/dewdrop/www/css/admin.css'
-        )
-    );
+        ]
+    ];
 
     /**
      * Inflect a component name for use in URLs and routes.
