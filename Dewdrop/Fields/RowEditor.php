@@ -238,7 +238,9 @@ class RowEditor
 
         /* @var $field DbField */
         foreach ($this->fields->getEditableFields() as $field) {
-            if (array_key_exists($field->getId(), $data)) {
+            $presentInData = array_key_exists($field->getId(), $data);
+
+            if ($presentInData) {
                 $id = $field->getId();
 
                 /* @var $filter \Zend\Filter\FilterChain */
@@ -262,6 +264,11 @@ class RowEditor
                  * A similar special case for empty checkbox lists in manytomany fields.
                  */
                 $field->setValue([]);
+            }
+
+            // If field was not present in user-supplied data, use the field's current value for validation purposes
+            if (!$presentInData) {
+                $data[$field->getId()] = $field->getValue();
             }
         }
 
