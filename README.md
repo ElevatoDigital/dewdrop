@@ -56,7 +56,9 @@ $ ./vendor/bin/dewdrop dbdeploy      # Create stock database tables used by Dewd
 $ ./vendor/bin/dewdrop dewdrop-test  # Run the Dewdrop test suite to ensure everything is working as expected
 ```
 
-*Step 5.* Proceed with your plugin development as described in the
+*Step 5.* Dewdrop requites the installation of the [WordPress Session Manager Plugin](https://wordpress.org/plugins/wp-session-manager/). You will need to install it.
+
+*Step 6.* Proceed with your plugin development as described in the
 [WordPress Codex](https://codex.wordpress.org/Writing_a_Plugin).
 
 ### Standalone Applications
