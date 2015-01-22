@@ -24,7 +24,7 @@ var operators = {
 
     <% _.each(options, function (option, key) { %>
 
-    <% if (values.value === key) { %>
+    <% if (parseInt(values.value, 10) === option.value) { %>
     <option value="<%- option.value %>" selected="selected"><%- option.title %></option>
     <% } else { %>
     <option value="<%- option.value %>"><%- option.title %></option>

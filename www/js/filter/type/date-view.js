@@ -42,7 +42,6 @@ define(
             },
 
             updateValues: function () {
-                console.log(this.$el.find('input.filter-start').val());
                 this.model.set(
                     'values',
                     {
