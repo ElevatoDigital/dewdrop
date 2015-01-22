@@ -523,6 +523,6 @@ class Wpdb implements DriverInterface
      */
     public function quoteInternal($input)
     {
-        return mysql_real_escape_string($input);
+        return "'" . $this->wpdb->escape($input) . "'";
     }
 }
