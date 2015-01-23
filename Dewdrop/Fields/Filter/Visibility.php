@@ -214,7 +214,7 @@ class Visibility implements FilterInterface
         // We always delete per-user settings
         foreach ($references as $column => $value) {
             $where .= $this->dbAdapter->quoteInto(
-                sprintf('AND %s = ?', $this->dbAdapter->quoteIdentifier($column)),
+                sprintf(' AND %s = ?', $this->dbAdapter->quoteIdentifier($column)),
                 $value
             );
         }
@@ -226,7 +226,7 @@ class Visibility implements FilterInterface
             $where = $this->dbAdapter->quoteInto('component = ?', $this->componentName);
 
             foreach ($references as $column => $value) {
-                $where .= sprintf('AND %s IS NULL', $this->dbAdapter->quoteIdentifier($column));
+                $where .= sprintf(' AND %s IS NULL', $this->dbAdapter->quoteIdentifier($column));
             }
 
             $this->dbAdapter->delete($this->dbTableName, $where);
