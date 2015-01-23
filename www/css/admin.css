@@ -143,6 +143,14 @@ tr:hover .row-actions {
     padding-top: 10px;
 }
 
+.bootstrap-columns-modal .settings {
+    margin-top: 7px;
+}
+
+.bootstrap-columns-modal .settings label {
+    font-weight: normal;
+}
+
 @media (max-width: 767px) {
     .row-actions {
         visibility: visible;

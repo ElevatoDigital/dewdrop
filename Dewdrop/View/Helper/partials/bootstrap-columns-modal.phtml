@@ -1,4 +1,4 @@
-<div class="modal fade" id="<?php echo $this->escapeHtmlAttr($this->id);?>" tabindex="-1" role="dialog" aria-hidden="true">
+<div class="modal fade bootstrap-columns-modal" id="<?php echo $this->escapeHtmlAttr($this->id);?>" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog">
         <form action="<?php echo $this->escapeHtmlAttr($this->actionUrl);?>" method="POST">
             <div class="modal-content">
@@ -7,7 +7,9 @@
                     <h4 class="modal-title">Adjust Columns</h4>
                 </div>
                 <div class="modal-body">
-                    <p>Select the columns you'd like to display from the list below.</p>
+                    <div class="alert alert-info">
+                        <p>Select the columns you'd like to display from the list below.</p>
+                    </div>
                     <ul class="list-group">
                         <?php
                         foreach ($this->available as $availableField) {
@@ -46,8 +48,15 @@
                     </ul>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <input type="submit" class="btn btn-primary" value="Save changes" />
+                    <?php if ($this->filterByUser) :?>
+                    <div class="settings pull-left">
+                        <label for="apply_to_all_users" class="text-muted">
+                            <input type="checkbox" id="apply_to_all_users" name="apply_to_all_users" value="1" />
+                            Make these selections the default for all users
+                        </label>
+                    </div>
+                    <?php endif;?>
+                    <input type="submit" class="btn btn-primary" value="Save" />
                 </div>
             </div>
         </form>

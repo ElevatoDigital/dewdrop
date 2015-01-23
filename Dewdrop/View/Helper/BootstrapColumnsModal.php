@@ -25,21 +25,23 @@ class BootstrapColumnsModal extends AbstractHelper
      * objects to render a modal that enables a user to check/un-check columns
      * they'd like to have displayed.
      *
-     * @param Fields $availableFields
-     * @param Fields $visibleFields
+     * @param Fields $available
+     * @param Fields $visible
      * @param string $actionUrl
+     * @param boolean $filterByUser
      * @param string $id
      * @return string
      */
-    public function direct(Fields $availableFields, Fields $visibleFields, $actionUrl, $id = null)
+    public function direct(Fields $available, Fields $visible, $actionUrl, $filterByUser = false, $id = null)
     {
         return $this->partial(
             'bootstrap-columns-modal.phtml',
             array(
-                'id'        => ($id ?: 'adjust-columns-modal'),
-                'actionUrl' => $actionUrl,
-                'visible'   => $visibleFields->getVisibleFields(),
-                'available' => $availableFields->getVisibleFields()
+                'id'           => ($id ?: 'adjust-columns-modal'),
+                'actionUrl'    => $actionUrl,
+                'visible'      => $visible->getVisibleFields(),
+                'available'    => $available->getVisibleFields(),
+                'filterByUser' => $filterByUser
             )
         );
     }

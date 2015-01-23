@@ -40,13 +40,14 @@ class AdjustVisibility extends PageAbstract
     {
         $this->component->getPermissions()->haltIfNotAllowed('adjust-columns');
 
-        $selections = $this->request->getPost('visible_columns');
+        $selections      = $this->request->getPost('visible_columns');
+        $applyToAllUsers = (boolean) $this->request->getPost('apply_to_all_users', false);
 
         if (is_array($selections)) {
             /* @var $filter VisibilityFilter */
             $filter = $this->component->getVisibilityFilter();
 
-            $filter->save($this->component->getFields(), $selections);
+            $filter->save($this->component->getFields(), $selections, $applyToAllUsers);
         }
 
         $responseHelper->redirectToAdminPage('index');

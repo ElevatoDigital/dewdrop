@@ -118,7 +118,8 @@ echo $this->pagination(
 echo $this->bootstrapColumnsModal(
     $this->fields->getVisibleFields($this->groupingFilter),
     $this->fields->getVisibleFields($this->visibilityFilter),
-    $this->adminUrl('adjust-visibility')
+    $this->adminUrl('adjust-visibility'),
+    $this->visibilityFilter->canBeFilteredByUser()
 );
 
 $this->headScript()->appendFile($this->bowerUrl('/dewdrop/www/js/listing-keyboard-shortcuts.js'));
