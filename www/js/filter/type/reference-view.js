@@ -8,7 +8,7 @@ define(
         return BaseView.extend({
             template: template,
 
-            inputOperators: ['contains', 'not-contains'],
+            inputOperators: ['is', 'is-not'],
 
             noInputOperators: ['empty', 'not-empty'],
 
