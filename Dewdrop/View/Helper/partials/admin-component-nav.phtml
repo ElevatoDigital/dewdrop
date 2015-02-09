@@ -14,7 +14,7 @@
 
     <div class="collapse navbar-collapse" id="admin-index-collapse">
         <?php if ($this->permissions->can('export')) :?>
-        <a href="<?php echo $this->escapeHtmlAttr($this->adminUrl('export', array('format' => 'csv')));?>" class="btn btn-link btn-link-first navbar-btn">Export</a>
+        <a href="<?php echo $this->escapeHtmlAttr($this->adminUrl('export', array('format' => 'csv'), false));?>" class="btn btn-link btn-link-first navbar-btn">Export</a>
         <?php endif;?>
 
         <?php if ($this->permissions->can('adjust-columns')) :?>

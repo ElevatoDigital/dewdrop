@@ -31,10 +31,15 @@ class AdminUrl extends AbstractHelper implements PageDelegateInterface
      * @see PageAbstract::url()
      * @param string $page
      * @param array $params
+     * @param boolean $resetParams
      * @return string
      */
-    public function direct($page, array $params = array())
+    public function direct($page, array $params = array(), $resetParams = true)
     {
+        if (!$resetParams) {
+            $params = array_merge($this->view->getRequest()->getQuery(), $params);
+        }
+
         return $this->page->url($page, $params);
     }
 
