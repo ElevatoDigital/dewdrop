@@ -144,9 +144,10 @@ class GenAdminComponent extends CommandAbstract
         $this->createFolder($newDir);
 
         $templateReplacements = array(
-            '{{namespace}}' => ($this->namespace ?: $this->inflectNamespaceFromFolder()),
-            '{{title}}'     => str_replace("'", "\'", $this->title),
-            '{{model}}'     => $this->model ?: $this->inflectModelFromTitle(),
+            '{{namespace}}'     => ($this->namespace ?: $this->inflectNamespaceFromFolder()),
+            '{{title}}'         => str_replace("'", "\'", $this->title),
+            '{{model}}'         => $this->model ?: $this->inflectModelFromTitle(),
+            '{{primaryKey}}'    => $inflector->singularize($this->title) . '_id',
         );
 
         $templatesDir = __DIR__ . '/gen-templates/admin-component';
