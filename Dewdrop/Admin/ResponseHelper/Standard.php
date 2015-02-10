@@ -186,7 +186,7 @@ class Standard
     public function executeSuccessMessage()
     {
         if ($this->successMessage) {
-            $this->session->set('successMessage', $this->successMessage);
+            $this->session->offsetSet('successMessage', $this->successMessage);
         }
 
         return $this;
