@@ -10,6 +10,8 @@
 
 namespace Dewdrop\Cli\Command;
 
+use Dewdrop\Inflector;
+
 /**
  * Generate files for a new admin component.
  *
