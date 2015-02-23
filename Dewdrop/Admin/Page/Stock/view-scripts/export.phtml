@@ -3,7 +3,12 @@
 // Don't render the layout
 $this->component->setShouldRenderLayout(false);
 
-$fields = $this->component->getFields()->getVisibleFields();
+$fields = $this->component->getFields()->getVisibleFields(
+    [
+        $this->component->getVisibilityFilter(),
+        $this->component->getFieldGroupsFilter()
+    ]
+);
 
 echo $this->csvExport()->render(
     $fields,
