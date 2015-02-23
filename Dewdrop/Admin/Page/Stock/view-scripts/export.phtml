@@ -10,6 +10,8 @@ $fields = $this->component->getFields()->getVisibleFields(
     ]
 );
 
+$this->component->getListing()->removeSelectModifierByName('selectpaginate');
+
 echo $this->csvExport()->render(
     $fields,
     $this->component->getListing()->fetchData($fields),
