@@ -13,7 +13,7 @@ namespace Dewdrop\Fields;
 use Dewdrop\Db\Adapter;
 use Dewdrop\Db\Expr;
 use Dewdrop\Db\Select;
-use Dewdrop\Exception;
+use Dewdrop\Exception as DewdropException;
 
 /**
  * The OptionPairs class makes it easy to retrieve a list of key-value pairs
@@ -85,7 +85,7 @@ class OptionPairs
             if (method_exists($this, $setter)) {
                 $this->$setter($value);
             } else {
-                throw new Exception("OptionPairs: Unknown option \"{$key}\"");
+                throw new DewdropException("OptionPairs: Unknown option \"{$key}\"");
             }
         }
 
@@ -291,7 +291,7 @@ class OptionPairs
             }
         }
 
-        throw new Exception('OptionPairs: Title column could not be auto-detected.  Please specify manually.');
+        throw new DewdropException('OptionPairs: Title column could not be auto-detected.  Please specify manually.');
     }
 
     /**
@@ -314,7 +314,7 @@ class OptionPairs
             }
         }
 
-        throw new Exception('OptionPairs: Could not auto-detect value column.  Please specify manually.');
+        throw new DewdropException('OptionPairs: Could not auto-detect value column.  Please specify manually.');
     }
 
     /**
@@ -397,7 +397,7 @@ class OptionPairs
     protected function loadTableMetadata()
     {
         if (!$this->tableName) {
-            throw new Exception('Table name must be set prior to loading metadata.');
+            throw new DewdropException('Table name must be set prior to loading metadata.');
         }
 
         return $this->dbAdapter->getTableMetadata($this->tableName);
