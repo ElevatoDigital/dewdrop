@@ -85,6 +85,14 @@ class RowEditor
     private $deleteField;
 
     /**
+     * Default values for rows by model name.  Will set these automatically
+     * once the rows are linked.
+     *
+     * @var array
+     */
+    private $defaultsByModelName = [];
+
+    /**
      * Supply the fields and HTTP request that will be used during editing.
      *
      * @param Fields $fields
@@ -96,6 +104,46 @@ class RowEditor
         $this->fields            = $fields;
         $this->request           = $request;
         $this->inputFilterHelper = ($inputFilterHelper ?: new InputFilterHelper());
+    }
+
+    /**
+     * Set some default values for the row matching the supplied model name.
+     * Once the rows are linked, your defaults will be applied automatically.
+     *
+     * @param string $modelName
+     * @param array $defaults
+     * @return $this
+     * @throws Exception
+     */
+    public function setDefaults($modelName, array $defaults)
+    {
+        $this->defaultsByModelName[$modelName] = $defaults;
+
+        if ($this->hasRow($modelName)) {
+            $this->applyDefaults($this->getRow($modelName), $defaults);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Apply the supplied default values to the row, skipping any fields
+     * that already have a value.
+     *
+     * @param Row $row
+     * @param array $defaults
+     * @return $this
+     * @throws \Dewdrop\Exception
+     */
+    private function applyDefaults(Row $row, array $defaults)
+    {
+        foreach ($defaults as $key => $value) {
+            if (!$row->get($key)) {
+                $row->set($key, $value);
+            }
+        }
+
+        return $this;
     }
 
     /**
@@ -133,6 +181,7 @@ class RowEditor
                     $modelName,
                     $link->link($this->getModel($modelName))
                 );
+
             }
         }
 
@@ -414,6 +463,17 @@ class RowEditor
     }
 
     /**
+     * Check to see if the row editor has a row with the given model name.
+     *
+     * @param string $modelName
+     * @return bool
+     */
+    public function hasRow($modelName)
+    {
+        return array_key_exists($modelName, $this->rowsByName);
+    }
+
+    /**
      * Assign the provided row object to the named model.  This will iterate
      * over all the fields and call setRow() on each one associated with
      * the named model so that their values can be set and retrieved for
@@ -440,6 +500,10 @@ class RowEditor
 
         if ($this->deleteField) {
             $this->deleteField->setRow($row);
+        }
+
+        if (array_key_exists($modelName, $this->defaultsByModelName)) {
+            $this->applyDefaults($row, $this->defaultsByModelName[$modelName]);
         }
 
         $this->rowsByName[$modelName] = $row;
