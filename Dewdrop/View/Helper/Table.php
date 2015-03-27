@@ -194,7 +194,7 @@ class Table extends AbstractHelper
 
             $content = $renderer->getHeaderRenderer()->render($field);
 
-            if (!$field->isSortable()) {
+            if (!$field->isSortable() || !$sorter) {
                 $out .= $content;
             } else {
                 $direction = 'asc';

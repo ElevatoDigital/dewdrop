@@ -59,12 +59,20 @@ class Edit extends PageAbstract
     protected $model;
 
     /**
+     * The fields used when rendering the edit form.
+     *
+     * @var \Dewdrop\Fields
+     */
+    protected $fields;
+
+    /**
      * Setup the row editor and check component permissions.
      */
-    public function init()
+    public final function init()
     {
-        $this->rowEditor = $this->component->getRowEditor();
-        $this->model     = $this->component->getPrimaryModel();
+        $this->rowEditor = $this->getRowEditor();
+        $this->model     = $this->getModel();
+        $this->fields    = $this->getFields();
 
         // Ensure primary key field is instantiated so that it is linked by row editor
         $this->component->getFields()->add($this->component->getListing()->getPrimaryKey())
@@ -75,6 +83,21 @@ class Edit extends PageAbstract
         $this->isNew = $this->rowEditor->isNew();
 
         $this->checkPermissions();
+    }
+
+    protected function getRowEditor()
+    {
+        return $this->component->getRowEditor();
+    }
+
+    protected function getModel()
+    {
+        return $this->component->getPrimaryModel();
+    }
+
+    protected function getFields()
+    {
+        return $this->component->getFields($this->component->getFieldGroupsFilter());
     }
 
     /**
@@ -98,7 +121,7 @@ class Edit extends PageAbstract
      *
      * @param ResponseHelper $responseHelper
      */
-    public function process(ResponseHelper $responseHelper)
+    public final function process(ResponseHelper $responseHelper)
     {
         if ($this->request->isPost()) {
             $this->invalidSubmission = (!$this->rowEditor->isValid($this->request->getPost()));
@@ -115,11 +138,7 @@ class Edit extends PageAbstract
                 $this->rowEditor->save();
 
                 if (!$this->request->isAjax()) {
-                    $session = new Session(Pimple::getInstance());
-                    $index   = $this->component->getListingQueryParamsSessionName();
-                    $params  = (isset($session[$index]) ? $session[$index] : []);
-
-                    $responseHelper->redirectToAdminPage('index', $params);
+                    $this->redirect($responseHelper);
                 } else {
                     header('Content-Type: application/json');
                     echo json_encode([
@@ -132,19 +151,27 @@ class Edit extends PageAbstract
         }
     }
 
+    protected function redirect(ResponseHelper $responseHelper)
+    {
+        $session = new Session(Pimple::getInstance());
+        $index   = $this->component->getListingQueryParamsSessionName();
+        $params  = (isset($session[$index]) ? $session[$index] : []);
+
+        $responseHelper->redirectToAdminPage('index', $params);
+    }
+
     /**
      * Pass a bunch of stuff to the view.  Duh.
      */
-    public function render()
+    public final function render()
     {
         $this->view->assign([
             'component'         => $this->component,
             'isNew'             => $this->isNew,
-            'fields'            => $this->component->getFields(),
+            'fields'            => $this->fields,
             'model'             => $this->model,
             'rowEditor'         => $this->rowEditor,
             'request'           => $this->request,
-            'groupingFilter'    => $this->component->getFieldGroupsFilter(),
             'invalidSubmission' => $this->invalidSubmission
         ]);
     }

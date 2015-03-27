@@ -63,11 +63,12 @@ class View extends PageAbstract
             'data'           => $data,
             'id'             => $id,
             'groupingFilter' => $this->component->getFieldGroupsFilter(),
-            'permissions'    => $this->component->getPermissions()
+            'permissions'    => $this->component->getPermissions(),
+            'isAjax'         => $this->request->isAjax()
         ]);
 
         // When requested over XHR, turn off the layout (admin shell chrome)
-        if ($this->component->getRequest()->isAjax()) {
+        if ($this->request->isAjax()) {
             $this->component->setShouldRenderLayout(false);
         }
     }

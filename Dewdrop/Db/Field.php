@@ -11,6 +11,7 @@
 namespace Dewdrop\Db;
 
 use Dewdrop\Db\Field\InputFilterBuilder;
+use Dewdrop\Exception;
 use Dewdrop\Fields\FieldAbstract;
 use Dewdrop\Fields\OptionPairs;
 use Dewdrop\Pimple;
@@ -278,10 +279,16 @@ class Field extends FieldAbstract
 
     /**
      * Retrieve the value of this field for the associated row, if available.
+     *
+     * @throws Exception
      * @return mixed
      */
     public function getValue()
     {
+        if (!$this->row) {
+            throw new Exception("Attempting to retrieve value for {$this->name} field with no row assigned.");
+        }
+
         return $this->row->get($this->name);
     }
 
