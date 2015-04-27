@@ -51,7 +51,7 @@ body {
 .navbar-right-btn-group {
     max-width: 220px;
     top: 0;
-    position: absolute;
+    position: relative;
     right: 15px;
 }
 
