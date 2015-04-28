@@ -186,7 +186,6 @@ class InputFilterBuilder
      */
     protected function attachForFloat(Input $input)
     {
-        $input->getFilterChain()->attach(new Filter\Digits());
         $input->getValidatorChain()->attach(new \Zend\I18n\Validator\Float());
 
         return $input;
