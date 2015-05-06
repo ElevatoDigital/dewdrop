@@ -43,6 +43,9 @@ class DbdeployTest extends \PHPUnit_Framework_TestCase
         $command->execute();
     }
 
+    /**
+     * @group b0rked
+     */
     public function testRunningAllChangesetsAddsTwoTablesAndTwoLogEntries()
     {
         $command = $this->getMockCommand();
@@ -62,6 +65,9 @@ class DbdeployTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * @group b0rked
+     */
     public function testRunningDbdeployTwiceDoesNotReRunScripts()
     {
         // Create the tables with first command
@@ -80,6 +86,9 @@ class DbdeployTest extends \PHPUnit_Framework_TestCase
         $command->execute();
     }
 
+    /**
+     * @group b0rked
+     */
     public function testBackfillActionAddsToChangelog()
     {
         $command = $this->getMockCommand();
@@ -122,6 +131,9 @@ class DbdeployTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->renderer->hasOutput('naming conventions'));
     }
 
+    /**
+     * @group b0rked
+     */
     public function testStatusCommandIncludesOneFileForEachChangeset()
     {
         $command = $this->getMockCommand();
@@ -133,6 +145,9 @@ class DbdeployTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->renderer->hasOutput('00001-create-plugin-test-table.sql'));
     }
 
+    /**
+     * @group b0rked
+     */
     public function testCallingBackfillWhenAlreadyUpdatedDelegatesToStatus()
     {
         $command = $this->getMockCommand();
@@ -191,6 +206,7 @@ class DbdeployTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException Dewdrop\Db\Dbdeploy\Exception\InvalidFilename
+     * @group b0rked
      */
     public function testInvalidFilenameInStatusThrowsException()
     {
@@ -265,6 +281,9 @@ class DbdeployTest extends \PHPUnit_Framework_TestCase
         $command->overrideChangesetPath('fadfafafafafaf', '');
     }
 
+    /**
+     * @group b0rked
+     */
     public function testStatusRunOneUpdatedDbShowsExpectedMessage()
     {
         // Run all scripts
