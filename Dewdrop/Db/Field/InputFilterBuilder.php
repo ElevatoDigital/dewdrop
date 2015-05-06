@@ -13,6 +13,7 @@ namespace Dewdrop\Db\Field;
 use Dewdrop\Db\Field;
 use Dewdrop\Filter\NullableDbBoolean as NullableDbBooleanFilter;
 use Dewdrop\Filter\NullableDbInteger as NullableDbIntegerFilter;
+use Dewdrop\Filter\NullableDbFloat   as NullableDbFloatFilter;
 use Zend\Filter;
 use Zend\InputFilter\Input;
 use Zend\Validator;
@@ -186,6 +187,10 @@ class InputFilterBuilder
      */
     protected function attachForFloat(Input $input)
     {
+        if ($this->metadata['NULLABLE']) {
+            $input->getFilterChain()->attach(new NullableDbFloatFilter());
+        }
+
         $input->getValidatorChain()->attach(new \Zend\I18n\Validator\Float());
 
         return $input;
