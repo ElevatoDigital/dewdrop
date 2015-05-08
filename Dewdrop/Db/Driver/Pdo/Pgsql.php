@@ -517,6 +517,8 @@ class Pgsql implements DriverInterface
                     $genericType = 'boolean';
                     break;
                 }
+		// If int2 and $length != 2, then non-boolean
+		// value, and continue to case 'int2'
             case 'int':
             case 'int2':
             case 'int4':
