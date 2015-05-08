@@ -169,7 +169,8 @@ class ListingTest extends \PHPUnit_Framework_TestCase
     public function testFetchDataStillReturnsArrayWhenThereIsNoData()
     {
         $db  = Pimple::getResource('db');
-        $db->query('TRUNCATE TABLE dewdrop_test_fruits CASCADE');
+
+	$db->query('DELETE FROM dewdrop_test_fruits');
 
         $this->assertEquals(array(), $this->listing->fetchData($this->getFields()));
     }
@@ -248,7 +249,8 @@ class ListingTest extends \PHPUnit_Framework_TestCase
         $db  = Pimple::getResource('db');
         $out = array();
 
-        $db->query('TRUNCATE TABLE dewdrop_test_fruits CASCADE');
+	$db->query('DELETE FROM dewdrop_test_fruits');
+
         $db->insert('dewdrop_test_fruits', array('name' => 'APPLE'));
         $out['APPLE'] = $db->lastInsertId();
 
