@@ -46,7 +46,9 @@ class Dewdrop_Cli_RunTest extends PHPUnit_Framework_TestCase
 
     public function testCommandAutoDetection()
     {
-        $originalArg = $_SERVER['argv'][1];
+        if (isset($_SERVER['argv'][1])) {
+            $originalArg = $_SERVER['argv'][1];
+        }
 
         $_SERVER['argv'][1] = 'gen-admin-component';
 
@@ -63,7 +65,9 @@ class Dewdrop_Cli_RunTest extends PHPUnit_Framework_TestCase
 
         $runner->run();
 
-        $_SERVER['argv'][1] = $originalArg;
+        if (isset($originalArg)) {
+            $_SERVER['argv'][1] = $originalArg;
+        }
     }
 
     public function testExecuteCommand()
