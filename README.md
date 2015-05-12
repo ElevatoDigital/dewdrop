@@ -165,6 +165,17 @@ additional dependency on [Silex](http://silex.sensiolabs.org/), a PHP micro-fram
                         return $adapter;
                     }
                 );
+
+                $this->application['admin'] = $this->application->share(
+                    function () {
+                        $admin = new SilexAdmin($this->application);
+    
+                        $admin->setTitle('My Application');
+    
+                        return $admin;
+                    }
+                );
+
             }
     
             return $this->application;
