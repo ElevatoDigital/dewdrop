@@ -47,6 +47,37 @@ class ComponentAbstractTest extends BaseTestCase
         $this->assertInstanceOf('\Dewdrop\Db\Adapter', $this->component->getDb());
     }
 
+    public function testHasPimpleResourceReturnsFalseWhenInvalidResourceName()
+    {
+        $this->assertFalse($this->component->hasPimpleResource('invalidPimple'));
+    }
+
+    public function testGetPageFactoriesReturnsArrayOfFiles()
+    {
+        $this->assertContainsOnlyInstancesOf('\Dewdrop\Admin\PageFactory\Files', $this->component->getPageFactories());
+    }
+
+    public function testGetPimpleReturnsComponentPimpleInstance()
+    {
+        $testPimple = new \Pimple();
+        $this->component = new \DewdropTest\Admin\Animals\Component($testPimple);
+
+        $this->assertSame($testPimple, $this->component->getPimple());
+
+        $testBPimple = new \Pimple();
+        $this->component = new \DewdropTest\Admin\Animals\Component($testBPimple);
+
+        $this->assertNotSame($testPimple, $this->component->getPimple());
+    }
+
+    public function testGetPathReturnsCorrectPath()
+    {
+        $reflectionClass = new \ReflectionClass($this->component);
+        $testPath = dirname($reflectionClass->getFileName());
+
+        $this->assertEquals($testPath, $this->component->getPath());
+    }
+
     public function testGeneratesUrlForSpecifiedPageWithNoSubmenusOrParams()
     {
         $this->assertContains(
