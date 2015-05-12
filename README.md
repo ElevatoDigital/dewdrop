@@ -69,6 +69,7 @@ additional dependency on [Silex](http://silex.sensiolabs.org/), a PHP micro-fram
 1. Add a `.gitignore` file in your project root directory that includes the `/vendor` directory, since we'll use
     [Composer](https://getcomposer.org/) to install Dewdrop and its dependencies. 
 1. Add a `composer.json` file similar to the example below:
+
     ```json
     {
         "autoload": {
