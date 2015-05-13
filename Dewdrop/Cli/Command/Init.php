@@ -10,8 +10,6 @@
 
 namespace Dewdrop\Cli\Command;
 
-use Dewdrop\Exception;
-
 /**
  * A command to handle creation of folders commonly used in a stand-alone
  * Dewdrop application. This command should be run after installing
@@ -42,7 +40,7 @@ class Init extends CommandAbstract
     public function execute()
     {
         if ($message = $this->commandShouldExecute()) {
-            return $this->abort($message);
+            $this->abort($message);
         }
     }
 
