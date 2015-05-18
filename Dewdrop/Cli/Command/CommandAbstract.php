@@ -157,18 +157,19 @@ abstract class CommandAbstract
     private $examples = array();
 
     /**
-     * Instantiate command with a runner and renderer.  After the command
-     * sub-class runs its init() method, check to ensure the required basic
+     * Instantiate command with a runner, renderer, and optional paths.  After the
+     * command sub-class runs its init() method, check to ensure the required basic
      * properties were set.
      *
      * @param Run $runner
      * @param RendererInterface $renderer
+     * @param Paths $paths optional
      */
     public function __construct(Run $runner, RendererInterface $renderer, Paths $paths = null)
     {
         $this->runner   = $runner;
         $this->renderer = $renderer;
-        $this->paths    = $paths ? $paths : new Paths();
+        $this->paths    = $paths ?: new Paths();
 
         // All commands support the --help argument
         $this->addArg(
