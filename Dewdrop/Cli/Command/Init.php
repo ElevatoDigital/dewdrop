@@ -17,6 +17,14 @@ namespace Dewdrop\Cli\Command;
  */
 class Init extends CommandAbstract
 {
+
+    /**
+     * Directory of current Dewdrop application
+     *
+     * @var string
+     */
+    protected $directory;
+
     /**
      * Setup the arguments, examples and aliases for this command.
      */
@@ -39,11 +47,12 @@ class Init extends CommandAbstract
      */
     public function execute()
     {
-        $applicationPath = $this->paths->getAppRoot();
+        $this->setDirectory($this->paths->getAppRoot());
 
-        if ($message = $this->commandShouldExecute($applicationPath)) {
+        if ($message = $this->commandShouldExecute($this->directory)) {
             $this->abort($message);
         }
+
     }
 
     /**
@@ -52,13 +61,26 @@ class Init extends CommandAbstract
      * @param $appPath path of the current install
      * @return false|string returns double negative for execution, or error message
      */
-    protected function commandShouldExecute($applicationPath)
+    protected function commandShouldExecute($dir)
     {
-        if (false !== stripos($applicationPath, 'wp-content/plugins')) {
+        if (false !== stripos($dir, 'wp-content/plugins')) {
             return 'You appear to be running Dewdrop in a WP plugin. Run command wp-init instead.';
         }
 
         return false;
+    }
+
+    /**
+     * Set directory to Dewdrop application directory
+     *
+     * @param string $dir
+     * @return \Dewdrop\Cli\Command\Init
+     */
+    public function setDirectory($directory)
+    {
+        $this->directory = $directory;
+
+        return $this;
     }
 
     /**
