@@ -164,11 +164,11 @@ abstract class CommandAbstract
      * @param Run $runner
      * @param RendererInterface $renderer
      */
-    public function __construct(Run $runner, RendererInterface $renderer)
+    public function __construct(Run $runner, RendererInterface $renderer, Paths $paths = null)
     {
         $this->runner   = $runner;
         $this->renderer = $renderer;
-        $this->paths    = new Paths();
+        $this->paths    = $paths ? $paths : new Paths();
 
         // All commands support the --help argument
         $this->addArg(
