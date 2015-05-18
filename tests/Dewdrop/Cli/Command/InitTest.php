@@ -62,7 +62,19 @@ class InitTest extends PHPUnit_Framework_TestCase
 
     public function testShouldAbortWithMessage()
     {
-        $this->command->execute();
+        $paths = $this->getMock(
+            '\Dewdrop\Paths',
+            array('getAppRoot')
+        );
+
+        $paths
+            ->expects($this->once())
+            ->method('getAppRoot')
+            ->will($this->returnValue('/some/wordpress/path/wp-content/plugins/plugin'));
+
+        $init = new Init($this->runner, $this->renderer, $paths);
+
+        $init->execute();
 
         $this->assertTrue($this->renderer->hasOutput('You appear to be running Dewdrop in a WP plugin. Run command wp-init instead.'));
     }
