@@ -74,13 +74,11 @@ class Init extends CommandAbstract
      * Set directory to Dewdrop application directory
      *
      * @param string $dir
-     * @return \Dewdrop\Cli\Command\Init
+     * @return void
      */
     public function setDirectory($directory)
     {
         $this->directory = $directory;
-
-        return $this;
     }
 
     /**
