@@ -39,7 +39,9 @@ class Init extends CommandAbstract
      */
     public function execute()
     {
-        if ($message = $this->commandShouldExecute()) {
+        $applicationPath = $this->paths->getAppRoot();
+
+        if ($message = $this->commandShouldExecute($applicationPath)) {
             $this->abort($message);
         }
     }
@@ -47,11 +49,16 @@ class Init extends CommandAbstract
     /**
      * This command should only be executable under certain conditions.
      *
+     * @param $appPath path of the current install
      * @return false|string returns double negative for execution, or error message
      */
-    protected function commandShouldExecute()
+    protected function commandShouldExecute($applicationPath)
     {
-        return 'Should not execute';
+        if (false !== stripos($applicationPath, 'wp-content/plugins')) {
+            return 'You appear to be running Dewdrop in a WP plugin. Run command wp-init instead.';
+        }
+
+        return false;
     }
 
     /**

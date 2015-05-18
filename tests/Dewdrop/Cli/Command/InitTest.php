@@ -35,10 +35,20 @@ class InitTest extends PHPUnit_Framework_TestCase
 
     public function testShouldNotExecuteInWpEnvironment()
     {
+        $paths = $this->getMock(
+            '\Dewdrop\Paths',
+            array('getAppRoot')
+        );
+
+        $paths
+            ->expects($this->once())
+            ->method('getAppRoot')
+            ->will($this->returnValue('/some/wordpress/path/wp-content/plugins/plugin'));
+
         $init = $this->getMock(
             '\Dewdrop\Cli\Command\Init',
             array('abort'),
-            array($this->runner, $this->renderer)
+            array($this->runner, $this->renderer, $paths)
         );
 
         $init
@@ -54,6 +64,6 @@ class InitTest extends PHPUnit_Framework_TestCase
     {
         $this->command->execute();
 
-        $this->assertTrue($this->renderer->hasOutput('Should not execute'));
+        $this->assertTrue($this->renderer->hasOutput('You appear to be running Dewdrop in a WP plugin. Run command wp-init instead.'));
     }
 }
