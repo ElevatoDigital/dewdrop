@@ -118,7 +118,7 @@ class GenAdminComponent extends CommandAbstract
     }
 
     /**
-     * Create component folders and files from the templates in "gen-templates".
+     * Create component folders and files from the templates in "cli-templates".
      *
      * @return void
      */
@@ -149,7 +149,7 @@ class GenAdminComponent extends CommandAbstract
             '{{model}}'     => $this->model ?: $this->inflectModelFromTitle(),
         );
 
-        $templatesDir = __DIR__ . '/gen-templates/admin-component';
+        $templatesDir = __DIR__ . '/cli-templates/admin-component';
 
         $this->writeFileFromTemplate(
             "{$newDir}/Component.php",

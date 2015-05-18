@@ -122,7 +122,7 @@ class GenEav extends CommandAbstract
             str_replace(
                 array_keys($templateReplacements),
                 $templateReplacements,
-                file_get_contents(__DIR__ . '/gen-templates/eav/eav-tables.sql')
+                file_get_contents(__DIR__ . '/cli-templates/eav/eav-tables.sql')
             )
         );
 

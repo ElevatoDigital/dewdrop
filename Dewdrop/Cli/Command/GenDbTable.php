@@ -125,7 +125,7 @@ class GenDbTable extends CommandAbstract
             str_replace(
                 array_keys($templateReplacements),
                 $templateReplacements,
-                file_get_contents(__DIR__ . '/gen-templates/db-table/ModelClass.tpl')
+                file_get_contents(__DIR__ . '/cli-templates/db-table/ModelClass.tpl')
             )
         );
 
@@ -139,7 +139,7 @@ class GenDbTable extends CommandAbstract
             str_replace(
                 array_keys($templateReplacements),
                 $templateReplacements,
-                file_get_contents(__DIR__ . '/gen-templates/db-table/dbdeploy-delta.sql')
+                file_get_contents(__DIR__ . '/cli-templates/db-table/dbdeploy-delta.sql')
             )
         );
 
