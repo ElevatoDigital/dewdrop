@@ -91,11 +91,19 @@ class InitTest extends PHPUnit_Framework_TestCase
             ->method('getAppRoot')
             ->will($this->returnValue('/some/non/wordpress/path'));
 
-        $init = new Init($this->runner, $this->renderer, $paths);
+        $init = $this->getMock(
+            '\Dewdrop\Cli\Command\Init',
+            array('abort'),
+            array($this->runner, $this->renderer, $paths)
+        );
 
+        $init
+            ->expects($this->exactly(0))
+            ->method('abort');
+
+        $init
+            ->parseArgs(array());
         $init->execute();
-
-        $this->assertFalse($this->renderer->hasOutput('You appear to be running Dewdrop in a WP plugin. Run command wp-init instead.'));
     }
 
 }
