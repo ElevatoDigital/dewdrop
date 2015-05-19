@@ -4,6 +4,8 @@ namespace Dewdrop\Cli\Command;
 
 use Dewdrop\Cli\Renderer\Mock as MockRenderer;
 use PHPUnit_Framework_TestCase;
+use org\bovigo\vfs\vfsStream as vfsStream,
+    org\bovigo\vfs\vfsStreamDirectory;
 
 class InitTest extends PHPUnit_Framework_TestCase
 {
@@ -22,8 +24,15 @@ class InitTest extends PHPUnit_Framework_TestCase
      */
     protected $renderer;
 
+    /**
+     * @var WhatClassHuh
+     */
+    protected $root;
+
     public function setUp()
     {
+        $this->root = vfsStream::setup();
+
         $this->renderer = new MockRenderer();
         $this->runner   = $this->getMock(
             '\Dewdrop\Cli\Run',
@@ -129,6 +138,10 @@ class InitTest extends PHPUnit_Framework_TestCase
         $init
             ->parseArgs(array());
         $init->execute();
+    }
+
+    public function testConfigFileCreated()
+    {
     }
 
 }
