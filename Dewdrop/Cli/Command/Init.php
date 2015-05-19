@@ -76,30 +76,35 @@ class Init extends CommandAbstract
      * @param string $dir
      * @return void
      */
-    public function setDirectory($directory)
+    protected function setDirectory($directory)
     {
         $this->directory = $directory;
     }
 
     /**
-     * This wrapper is really only in place so that we can mock it during testing.
-     *
-     * @param string $path
-     * @return boolean
-     */
-    protected function folderExists($path)
+    * Get the current directory (for testing)
+    *
+    * @return string
+    */
+    public function getDirectory()
     {
-        return file_exists($path);
+        return $this->directory;
     }
 
     /**
-     * This wrapper is really only in place so that we can mock it during testing.
+     * Write a file at the specified path with the supplied contents.
+     *
+     * This is a separate method so that it's easy to mock during testing.
      *
      * @param string $path
-     * @return void
+     * @param string $contents
+     * @return \Dewdrop\Cli\Command\Init
      */
-    protected function createFolder($path)
+    protected function writeFile($path, $contents)
     {
-        mkdir($path);
+        file_put_contents($path, $contents);
+
+        return $this;
     }
+
 }

@@ -33,6 +33,31 @@ class InitTest extends PHPUnit_Framework_TestCase
         $this->command  = new Init($this->runner, $this->renderer);
     }
 
+    public function testShouldCorrectlySetDirectory()
+    {
+        $dir = '/expected/root/directory';
+
+        $paths = $this->getMock(
+            '\Dewdrop\Paths',
+            array('getAppRoot')
+        );
+
+        $paths
+            ->expects($this->once())
+            ->method('getAppRoot')
+            ->will($this->returnValue($dir));
+
+        $init = $this->getMock(
+            '\Dewdrop\Cli\Command\Init',
+            null,
+            array($this->runner, $this->renderer, $paths)
+        );
+
+        $init->execute();
+
+        $this->assertEquals($init->getDirectory(), $dir);
+    }
+
     public function testShouldNotExecuteInWpEnvironment()
     {
         $paths = $this->getMock(
