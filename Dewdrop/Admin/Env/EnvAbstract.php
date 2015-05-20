@@ -11,6 +11,7 @@
 namespace Dewdrop\Admin\Env;
 
 use Dewdrop\Admin\Component\ComponentAbstract;
+use Dewdrop\Exception;
 use Dewdrop\Pimple;
 use Dewdrop\Session;
 use DirectoryIterator;
@@ -61,6 +62,47 @@ abstract class EnvAbstract implements EnvInterface
             'dewdrop-admin' => '/dewdrop/www/css/admin.css'
         ]
     ];
+
+    /**
+     * Prepend a client-side dependency you'd like to use throughout the admin environment.
+     *
+     * @param string $type Either "css" or "js".
+     * @param string $name An identifier for the dependency.
+     * @param string $path The path (in your bower_components folder) to the dependency.
+     * @return $this
+     */
+    public function prependClientSideDependency($type, $name, $path)
+    {
+        if (!array_key_exists($type, $this->coreClientSideDependencies)) {
+            throw new Exception('Client-side dependencies must be of type "css" or "js".');
+        }
+
+        $this->coreClientSideDependencies[$type] = array_merge(
+            array($name => $path),
+            $this->coreClientSideDependencies[$type]
+        );
+
+        return $this;
+    }
+
+    /**
+     * Append a client-side dependency you'd like to use throughout the admin environment.
+     *
+     * @param string $type Either "css" or "js".
+     * @param string $name An identifier for the dependency.
+     * @param string $path The path (in your bower_components folder) to the dependency.
+     * @return $this
+     */
+    public function appendClientSideDependency($type, $name, $path)
+    {
+        if (!array_key_exists($type, $this->coreClientSideDependencies)) {
+            throw new Exception('Client-side dependencies must be of type "css" or "js".');
+        }
+
+        $this->coreClientSideDependencies[$type][$name] = $path;
+
+        return $this;
+    }
 
     /**
      * Inflect a component name for use in URLs and routes.
