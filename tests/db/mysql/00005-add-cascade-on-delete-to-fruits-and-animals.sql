@@ -1,0 +1,4 @@
+ALTER TABLE dewdrop_test_fruits_eaten_by_animals DROP FOREIGN KEY dewdrop_test_fruits_eaten_by_animals_ibfk_1;
+ALTER TABLE dewdrop_test_fruits_eaten_by_animals DROP FOREIGN KEY dewdrop_test_fruits_eaten_by_animals_ibfk_2;
+ALTER TABLE dewdrop_test_fruits_eaten_by_animals ADD FOREIGN KEY (animal_id) references dewdrop_test_animals (dewdrop_test_animal_id) ON DELETE CASCADE;
+ALTER TABLE dewdrop_test_fruits_eaten_by_animals ADD FOREIGN KEY (fruit_id) references dewdrop_test_fruits (dewdrop_test_fruit_id) ON DELETE CASCADE;

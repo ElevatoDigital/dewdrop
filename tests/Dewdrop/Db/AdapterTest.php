@@ -310,7 +310,7 @@ class AdapterTest extends DbTestCase
      */
     public function testBadFetchOneThrowsException()
     {
-        $this->db->fetchCol('not even close to valid sql');
+        $this->db->fetchOne('not even close to valid sql');
     }
 
     /**

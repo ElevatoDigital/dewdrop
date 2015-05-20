@@ -24,11 +24,13 @@ class Button extends AbstractMailHelper
      */
     public function direct($content, $href)
     {
+        $escapedHref = $this->view->escapeHtmlAttr($href);
+
         return $this->partial(
             'button.phtml',
             array(
                 'content' => $content,
-                'href'    => $href
+                'href'    => $escapedHref
             )
         );
     }

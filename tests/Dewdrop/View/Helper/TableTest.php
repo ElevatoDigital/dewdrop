@@ -79,30 +79,105 @@ class TableTest extends BaseTestCase
         $this->assertEquals('test-field-value', $out);
     }
 
-    public function testSorting()
+    public function testTableHeaderSortLinkShouldNotRenderIfFieldIsNotSortable()
+    {
+        $fieldSortedOn = $this->fields->get('test-field-id');
+        $fieldSortedOn->setSortable(false);
+
+        $out = $this->view->table($this->fields, array());
+
+        $this->assertNotMatchesDomQuery('table thead th a', $out);
+    }
+
+    public function testTableHeaderSortLinkShouldNotRenderIfNoSorterProvided()
     {
         $fieldSortedOn = $this->fields->get('test-field-id');
 
-        /* test default ascending th link */
         $out = $this->view->table($this->fields, array());
 
+        $this->assertNotMatchesDomQuery('table thead th a', $out);
+    }
+
+    public function testTableHeaderSortLinkShouldRenderIfSorterProvided()
+    {
+        $request = $this->view->getRequest();
+        $sorter = $this->getMock(
+            '\Dewdrop\Fields\Helper\SelectSort',
+            [],
+            [$request]
+        );
+
+        $out = $this->view->table($this->fields, array(), null, $sorter);
+
+        $this->assertMatchesDomQuery('table thead th a', $out);
+    }
+
+    public function testTableHeaderSortLinkShouldContainQuestionMarkForUrlParams()
+    {
+        $request = $this->view->getRequest();
+        $sorter = $this->getMock(
+            '\Dewdrop\Fields\Helper\SelectSort',
+            [],
+            [$request]
+        );
+
+        $out = $this->view->table($this->fields, array(), null, $sorter);
         $result = $this->queryDom('table thead th a', $out);
         $out = $result->current()->getAttribute('href');
 
-        $this->assertEquals('?sort=test-field-id&dir=asc', $out);
+        $this->assertContains('?', $out);
+    }
 
-        /* test default descending th link, given a query param */
+    public function testTableHeaderSortLinkShouldContainSortableFieldId()
+    {
         $request = $this->view->getRequest();
-        $request->setQuery('sort', 'test-field-id')
+        $sorter = $this->getMock(
+            '\Dewdrop\Fields\Helper\SelectSort',
+            [],
+            [$request]
+        );
+
+        $out = $this->view->table($this->fields, array(), null, $sorter);
+        $result = $this->queryDom('table thead th a', $out);
+        $out = $result->current()->getAttribute('href');
+
+        $this->assertContains('sort=test-field-id', $out);
+    }
+
+    public function testTableHeaderSortLinkShouldRenderToSortByAscByDefault()
+    {
+        $request = $this->view->getRequest();
+        $sorter = $this->getMock(
+            '\Dewdrop\Fields\Helper\SelectSort',
+            [],
+            [$request]
+        );
+
+        $out = $this->view->table($this->fields, array(), null, $sorter);
+        $result = $this->queryDom('table thead th a', $out);
+        $out = $result->current()->getAttribute('href');
+
+        $this->assertContains('dir=asc', $out);
+    }
+
+    public function testTableHeaderSortLinkShouldRenderToSortByDescIfCurrentlySortedByAsc()
+    {
+        $request = $this->view->getRequest();
+        $request
+	    ->setQuery('sort', 'test-field-id')
             ->setQuery('dir', 'asc');
-        $sorter = $this->getMock('\Dewdrop\Fields\Helper\SelectSort',
+
+        $sorter = $this->getMock(
+            '\Dewdrop\Fields\Helper\SelectSort',
             ['isSorted', 'getSortedField', 'getSortedDirection'],
             [$request]
         );
+
         $sorter->expects($this->any())
             ->method('isSorted')
             ->will($this->returnValue(true));
 
+        $fieldSortedOn = $this->fields->get('test-field-id');
         $sorter->expects($this->any())
             ->method('getSortedField')
             ->will($this->returnValue($fieldSortedOn));
@@ -112,16 +187,9 @@ class TableTest extends BaseTestCase
             ->will($this->returnValue('ASC'));
 
         $out = $this->view->table($this->fields, array(), null, $sorter);
-
         $result = $this->queryDom('table thead th a', $out);
         $out = $result->current()->getAttribute('href');
 
         $this->assertEquals('?sort=test-field-id&dir=desc', $out);
-
-        /* test that sort link is not there when sort is not set */
-        $fieldSortedOn->setSortable(false);
-
-        $out = $this->view->table($this->fields, array());
-        $this->assertNotMatchesDomQuery('table thead th a', $out);
     }
 }
