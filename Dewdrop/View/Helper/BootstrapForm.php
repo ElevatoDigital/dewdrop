@@ -76,14 +76,18 @@ class BootstrapForm extends AbstractHelper
      *
      * @param string $action
      * @param string $method
+     * @param string $id
+     * @param string $class
      * @return string
      */
-    public function open($action = '', $method = 'POST')
+    public function open($action = '', $method = 'POST', $id = '', $class = '')
     {
         return sprintf(
-            '<form role="form" action="%s" method="%s">',
+            '<form role="form" action="%s" method="%s" id="%s" class="%s">',
             $this->view->escapeHtmlAttr($action),
-            $this->view->escapeHtmlAttr($method)
+            $this->view->escapeHtmlAttr($method),
+            $this->view->escapeHtmlAttr($id),
+            $this->view->escapeHtmlAttr($class)
         );
     }
 
