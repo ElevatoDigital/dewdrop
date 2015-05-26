@@ -53,7 +53,12 @@ class BootstrapFormTest extends BaseTestCase
 
     public function testOpenMethodAllowsCustomClass()
     {
-        $this->assertContains('class="CUSTOM CUSTOM2"', $this->view->bootstrapForm()->open('', '', '', 'CUSTOM CUSTOM2'));
+        $this->assertContains('class="CUSTOM"', $this->view->bootstrapForm()->open('', '', '', 'CUSTOM'));
+    }
+
+    public function testOpenMethodAllowsMultipleCustomClassesWithHtmlEscaped()
+    {
+        $this->assertContains('class="CUSTOM&#x20;CUSTOM2"', $this->view->bootstrapForm()->open('', '', '', 'CUSTOM CUSTOM2'));
     }
 
     public function testCloseMethodClosesTheFormTag()
