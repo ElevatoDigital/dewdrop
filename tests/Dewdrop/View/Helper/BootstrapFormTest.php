@@ -32,6 +32,8 @@ class BootstrapFormTest extends BaseTestCase
         $this->assertContains('<form ', $html);
         $this->assertContains('method="POST"', $html);
         $this->assertContains('action=""', $html);
+        $this->assertContains('id=""', $html);
+        $this->assertContains('class=""', $html);
     }
 
     public function testOpenMethodAllowsCustomAction()
@@ -42,6 +44,21 @@ class BootstrapFormTest extends BaseTestCase
     public function testOpenMethodAllowsCustomMethod()
     {
         $this->assertContains('method="CUSTOM"', $this->view->bootstrapForm()->open('', 'CUSTOM'));
+    }
+
+    public function testOpenMethodAllowsCustomId()
+    {
+        $this->assertContains('id="CUSTOM"', $this->view->bootstrapForm()->open('', '', 'CUSTOM'));
+    }
+
+    public function testOpenMethodAllowsCustomClass()
+    {
+        $this->assertContains('class="CUSTOM"', $this->view->bootstrapForm()->open('', '', '', 'CUSTOM'));
+    }
+
+    public function testOpenMethodAllowsMultipleCustomClassesWithHtmlEscaped()
+    {
+        $this->assertContains('class="CUSTOM&#x20;CUSTOM2"', $this->view->bootstrapForm()->open('', '', '', 'CUSTOM CUSTOM2'));
     }
 
     public function testCloseMethodClosesTheFormTag()
