@@ -1,0 +1,68 @@
+<ol class="breadcrumb">
+    <li><a href="<?php echo $this->escapeHtmlAttr($this->adminUrl('index'));?>"><?php echo $this->escapeHtml($this->title);?></a></li>
+    <li class="active">Count <?php echo $this->escapeHtml($this->model->getPluralTitle());?></li>
+</ol>
+
+<div class="panel panel-default">
+    <div class="panel-body">
+        <?php echo $this->bootstrapForm()->open('', 'GET');?>
+
+        <div class="form-group">
+            <label>Select a Field to Group the <?php echo $this->escapeHtml($this->model->getPluralTitle());?> By</label>
+            <?php
+            $fields  = $this->fields->getVisibleFields();
+            $options = [];
+
+            foreach ($fields as $field) {
+                $options[$field->getQueryStringId()] = $field->getLabel();
+            }
+
+            asort($options);
+
+            echo $this->bootstrapSelect(
+                [
+                    'name'    => 'group_field',
+                    'options' => $options,
+                    'value'   => $this->selectedField,
+                ]
+            );
+            ?>
+        </div>
+
+        <?php
+        /*
+        <div class="form-group">
+            <label>Filter the Counted <?php echo $this->escapeHtml($this->model->getPluralTitle());?></label>
+            <div>
+                <a class="btn btn-default" href="#" data-toggle="collapse" data-target="#filter-panel"><span class="glyphicon glyphicon-filter"></span> Select Filters</a>
+            </div>
+        </div>
+
+        <?php
+        $selectFilter = $this->listing->getSelectModifierByName('SelectFilter');
+        ?>
+        <div class="panel panel-default collapse <?php echo ($selectFilter->hasFilters() ? 'in' : '');?>" id="filter-panel">
+            <div class="panel-body">
+                <?php
+                echo $this->bootstrapFilterForm(
+                    $this->fields,
+                    $selectFilter,
+                    $this->model->getPluralTitle()
+                );
+                ?>
+            </div>
+        </div>
+        */
+        ?>
+
+        <?php
+        echo $this->bootstrapForm()->renderSubmitButton('Generate Counts');
+        echo $this->bootstrapForm()->close();
+        ?>
+    </div>
+</div>
+
+<?php
+if ($this->countFields) {
+    echo $this->bootstrapTable($this->countFields, $this->data);
+}

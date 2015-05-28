@@ -309,6 +309,24 @@ class Fields implements ArrayAccess, IteratorAggregate, Countable
     }
 
     /**
+     * Get the field matching the supplied query string ID from this collection.
+     *
+     * @param string $id
+     * @return FieldInterface
+     */
+    public function getByQueryStringId($id)
+    {
+        /* @var $field FieldInterface */
+        foreach ($this->fields as $field) {
+            if ($field->getQueryStringId() === $id) {
+                return $field;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Add the supplied field to this collection.  Can be a FieldInterface
      * object or a string, in which case a new custom field will be added
      * with the supplied string as its ID.

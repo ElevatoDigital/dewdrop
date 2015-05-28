@@ -113,6 +113,7 @@ class Permissions
             'edit'           => "Edit existing {$plural}",
             'export'         => 'Export data to a file',
             'filter'         => "Filter {$plural}",
+            'count-fields'   => "Count {$plural} while grouping by fields",
             'sort-fields'    => "Sort and group {$singular} fields",
             'notifications'  => "Subscribe to be notified when {$plural} are added or updated",
             'view'           => "See an individual {$singular} in detail",
@@ -124,6 +125,9 @@ class Permissions
                 ->register($name, $description)
                 ->set($name, true);
         }
+
+        // This feature is disabled by default.  Can be turned on whenever its wanted.
+        $this->set('count-fields', false);
 
         // @ todo Re-enable these pages once they're complete
         $this->set('custom-views', false);
