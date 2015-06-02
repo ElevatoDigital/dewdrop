@@ -627,8 +627,7 @@ class Field extends FieldAbstract
      */
     protected function isTypeInteger()
     {
-        return 'integer' === $this->metadata['DATA_TYPE'] ||
-            $this->isType('int', 'mediumint', 'smallint', 'bigint');
+        return 'integer' === $this->metadata['GENERIC_TYPE'];
     }
 
     /**
@@ -639,8 +638,7 @@ class Field extends FieldAbstract
      */
     protected function isTypeFloat()
     {
-        return 'float' === $this->metadata['DATA_TYPE'] ||
-            $this->isType('dec', 'decimal', 'double', 'double precision', 'fixed');
+        return 'float' === $this->metadata['GENERIC_TYPE'];
     }
 
     /**
