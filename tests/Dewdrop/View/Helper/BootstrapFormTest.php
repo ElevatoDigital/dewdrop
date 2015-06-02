@@ -66,6 +66,16 @@ class BootstrapFormTest extends BaseTestCase
         $this->assertEquals('</form>', $this->view->bootstrapForm()->close());
     }
 
+    public function testRenderSubmitButtonAllowsCustomClass()
+    {
+        $this->assertContains('class="CUSTOM', $this->view->bootstrapForm()->renderSubmitButton('', 'CUSTOM'));
+    }
+
+    public function testRenderSubmitButtonAllowsMultipleCustomClassesWithHtmlEscaped()
+    {
+        $this->assertContains('class="CUSTOM&#x20;CUSTOM2', $this->view->bootstrapForm()->renderSubmitButton('', 'CUSTOM CUSTOM2'));
+    }
+
     public function testRenderFieldsExcludesNonEditableFields()
     {
         $html = $this->view->bootstrapForm()->renderFields(
