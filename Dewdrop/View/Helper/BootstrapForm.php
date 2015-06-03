@@ -273,18 +273,21 @@ class BootstrapForm extends AbstractHelper
     }
 
     /**
-     * Render a simple submit button at the footer of the form.
+     * Render a simple submit button at the footer of the form,
+     * with optional classes on that submit button.
      *
      * @param string $title
+     * @param string $classes optional
      * @return string
      */
-    public function renderSubmitButton($title = 'Save Changes')
+    public function renderSubmitButton($title = 'Save Changes', $classes = '')
     {
         return sprintf(
             '<div class="form-group">
-                <input type="submit" value="%s" class="btn btn-primary" />
+                <input type="submit" value="%s" class="%s btn btn-primary" />
             </div>',
-            $this->view->escapeHtmlAttr($title)
+            $this->view->escapeHtmlAttr($title),
+            $this->view->escapeHtmlAttr($classes)
         );
     }
 
