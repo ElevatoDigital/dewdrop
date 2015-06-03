@@ -325,6 +325,10 @@ class Content extends HelperAbstract
         $value     = $rowData[$field->getName()];
         $timestamp = strtotime($value);
 
-        return $this->view->escapeHtml(date($this->dateFormat . ' ' . $this->timeFormat, $timestamp));
+        if ($timestamp) {
+            return $this->view->escapeHtml(date($this->dateFormat . ' ' . $this->timeFormat, $timestamp));
+        } else {
+            return '';
+        }
     }
 }
