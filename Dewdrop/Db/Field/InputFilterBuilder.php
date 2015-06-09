@@ -13,10 +13,7 @@ namespace Dewdrop\Db\Field;
 use Dewdrop\Db\Field;
 use Dewdrop\Filter\NullableDbBoolean as NullableDbBooleanFilter;
 use Dewdrop\Filter\NullableDbInteger as NullableDbIntegerFilter;
-use Dewdrop\Filter\NullableDbFloat   as NullableDbFloatFilter;
 use Zend\Filter;
-use Zend\I18n\Validator\IsFloat;
-use Zend\I18n\Validator\IsInt;
 use Zend\InputFilter\Input;
 use Zend\Validator;
 
@@ -121,7 +118,7 @@ class InputFilterBuilder
         }
 
         $input->getFilterChain()->attach(new Filter\StringTrim());
-        $input->getFilterChain()->attach(new Filter\ToNull(Filter\ToNull::TYPE_STRING));
+        $input->getFilterChain()->attach(new Filter\Null(Filter\Null::TYPE_STRING));
 
         return $input;
     }
@@ -156,7 +153,7 @@ class InputFilterBuilder
         if ($this->metadata['NULLABLE']) {
             $input->getFilterChain()->attach(new NullableDbBooleanFilter());
         } else {
-            $input->getFilterChain()->attach(new Filter\ToInt());
+            $input->getFilterChain()->attach(new Filter\Int());
         }
 
         return $input;
@@ -173,10 +170,12 @@ class InputFilterBuilder
         if ($this->metadata['NULLABLE']) {
             $input->getFilterChain()->attach(new NullableDbIntegerFilter());
         } else {
-            $input->getFilterChain()->attach(new Filter\ToInt());
+            $input->getFilterChain()
+                ->attach(new Filter\Null(Filter\Null::TYPE_STRING))
+                ->attach(new Filter\Int());
         }
-        
-        $input->getValidatorChain()->attach(new IsInt());
+
+        $input->getValidatorChain()->attach(new \Zend\I18n\Validator\Int());
 
         return $input;
     }
@@ -189,11 +188,8 @@ class InputFilterBuilder
      */
     protected function attachForFloat(Input $input)
     {
-        if ($this->metadata['NULLABLE']) {
-            $input->getFilterChain()->attach(new NullableDbFloatFilter());
-        }
-
-        $input->getValidatorChain()->attach(new IsFloat());
+        $input->getFilterChain()->attach(new Filter\Digits());
+        $input->getValidatorChain()->attach(new \Zend\I18n\Validator\Float());
 
         return $input;
     }
