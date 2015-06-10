@@ -20,5 +20,7 @@
         }
     );
 
+    moment.locale(navigator.language);
+
     window.DEWDROP = DEWDROP;
 }());
