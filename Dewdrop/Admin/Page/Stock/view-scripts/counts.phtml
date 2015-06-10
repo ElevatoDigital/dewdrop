@@ -3,9 +3,9 @@
     <li class="active">Count <?php echo $this->escapeHtml($this->model->getPluralTitle());?></li>
 </ol>
 
+<?php echo $this->bootstrapForm()->open('', 'GET');?>
 <div class="panel panel-default">
     <div class="panel-body">
-        <?php echo $this->bootstrapForm()->open('', 'GET');?>
 
         <div class="form-group">
             <label>Select a Field to Group the <?php echo $this->escapeHtml($this->model->getPluralTitle());?> By</label>
@@ -29,40 +29,28 @@
             ?>
         </div>
 
-        <?php
-        /*
-        <div class="form-group">
-            <label>Filter the Counted <?php echo $this->escapeHtml($this->model->getPluralTitle());?></label>
+        <div class="filter-form form-group">
+            <label>Filter the <?php echo $this->escapeHtml($this->model->getPluralTitle());?> Before Counting</label>
             <div>
-                <a class="btn btn-default" href="#" data-toggle="collapse" data-target="#filter-panel"><span class="glyphicon glyphicon-filter"></span> Select Filters</a>
-            </div>
-        </div>
-
-        <?php
-        $selectFilter = $this->listing->getSelectModifierByName('SelectFilter');
-        ?>
-        <div class="panel panel-default collapse <?php echo ($selectFilter->hasFilters() ? 'in' : '');?>" id="filter-panel">
-            <div class="panel-body">
                 <?php
-                echo $this->bootstrapFilterForm(
+                echo $this->bootstrapFilterForm()->inline(
                     $this->fields,
-                    $selectFilter,
+                    $this->listing->getSelectModifierByName('SelectFilter'),
                     $this->model->getPluralTitle()
                 );
                 ?>
             </div>
         </div>
-        */
-        ?>
+    </div>
 
-        <?php
-        echo $this->bootstrapForm()->renderSubmitButton('Generate Counts');
-        echo $this->bootstrapForm()->close();
-        ?>
+    <div class="panel-footer">
+        <input type="submit" value="Generate Counts" class="btn btn-primary" />
+        <a class="btn btn-link" href="<?php echo $this->adminUrl('counts-export', $this->request->getQuery());?>">Export</a>
     </div>
 </div>
+<?php echo $this->bootstrapForm()->close();?>
 
 <?php
 if ($this->countFields) {
-    echo $this->bootstrapTable($this->countFields, $this->data);
+    echo $this->bootstrapTable($this->countFields, $this->data, $this->renderer);
 }

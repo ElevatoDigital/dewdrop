@@ -13,6 +13,7 @@ namespace Dewdrop\Fields\Helper\CsvCell;
 use Dewdrop\Db\Field as DbField;
 use Dewdrop\Fields\FieldInterface;
 use Dewdrop\Fields\Helper\HelperAbstract;
+use Dewdrop\Fields\Helper\CellRenderer\ContentHelperInterface;
 
 /**
  * The header helper allows you to render the content of the header for
@@ -34,7 +35,7 @@ use Dewdrop\Fields\Helper\HelperAbstract;
  * );
  * </pre>
  */
-class Content extends HelperAbstract
+class Content extends HelperAbstract implements ContentHelperInterface
 {
     /**
      * The name for this helper, used when you want to define a global custom
@@ -59,7 +60,7 @@ class Content extends HelperAbstract
      *
      * @var string
      */
-    private $nullContentPlaceholder = '';
+    private $nullContentPlaceholder = 'None';
 
     /**
      * The default format for rendering dates.  Uses PHP's date() syntax.

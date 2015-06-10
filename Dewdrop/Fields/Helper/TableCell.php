@@ -59,7 +59,7 @@ use Dewdrop\View\View;
  * );
  * </pre>
  */
-class TableCell
+class TableCell implements CellRendererInterface
 {
     /**
      * The helper used to render &lt;td&gt; content.

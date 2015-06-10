@@ -29,16 +29,23 @@ class AdminComponentNav extends AbstractHelper
     public function direct(ComponentAbstract $component)
     {
         if ($component instanceof CrudInterface) {
-            $title = $component->getPrimaryModel()->getSingularTitle();
+            $singularTitle = $component->getPrimaryModel()->getSingularTitle();
         } else {
-            $title = $component->getTitle();
+            $singularTitle = $component->getTitle();
+        }
+
+        if ($component instanceof CrudInterface) {
+            $pluralTitle = $component->getPrimaryModel()->getPluralTitle();
+        } else {
+            $pluralTitle = $component->getTitle();
         }
 
         return $this->partial(
             'admin-component-nav.phtml',
             array(
                 'permissions'   => $component->getPermissions(),
-                'singularTitle' => $title
+                'singularTitle' => $singularTitle,
+                'pluralTitle'   => $pluralTitle
             )
         );
     }

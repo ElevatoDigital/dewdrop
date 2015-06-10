@@ -11,6 +11,7 @@
 namespace Dewdrop\Fields\Helper\CsvCell;
 
 use Dewdrop\Fields\FieldInterface;
+use Dewdrop\Fields\Helper\CellRenderer\HeaderHelperInterface;
 use Dewdrop\Fields\Helper\HelperAbstract;
 
 /**
@@ -36,7 +37,7 @@ use Dewdrop\Fields\Helper\HelperAbstract;
  * content, so you only need to supply a custom callback if the field label
  * is not appropriate.
  */
-class Header extends HelperAbstract
+class Header extends HelperAbstract implements HeaderHelperInterface
 {
     /**
      * The name for this helper, used when you want to define a global custom

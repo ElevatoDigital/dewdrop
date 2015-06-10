@@ -18,7 +18,7 @@
         <?php endif;?>
 
         <?php if ($this->permissions->can('count-fields')) :?>
-        <a href="<?php echo $this->escapeHtmlAttr($this->adminUrl('counts'));?>" class="btn btn-link navbar-btn">Counts</a>
+        <a href="<?php echo $this->escapeHtmlAttr($this->adminUrl('counts'));?>" class="btn btn-link navbar-btn">Count <?php echo $this->escapeHtml($this->pluralTitle);?></a>
         <?php endif;?>
 
         <?php if ($this->permissions->can('adjust-columns')) :?>

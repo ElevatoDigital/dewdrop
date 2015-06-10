@@ -13,6 +13,7 @@ namespace Dewdrop\Fields\Helper\TableCell;
 use Dewdrop\Db\Field as DbField;
 use Dewdrop\Fields\FieldInterface;
 use Dewdrop\Fields\Helper\HelperAbstract;
+use Dewdrop\Fields\Helper\CellRenderer\ContentHelperInterface;
 use Dewdrop\View\View;
 
 /**
@@ -35,7 +36,7 @@ use Dewdrop\View\View;
  * );
  * </pre>
  */
-class Content extends HelperAbstract
+class Content extends HelperAbstract implements ContentHelperInterface
 {
     /**
      * The name for this helper, used when you want to define a global custom
@@ -325,10 +326,6 @@ class Content extends HelperAbstract
         $value     = $rowData[$field->getName()];
         $timestamp = strtotime($value);
 
-        if ($timestamp) {
-            return $this->view->escapeHtml(date($this->dateFormat . ' ' . $this->timeFormat, $timestamp));
-        } else {
-            return '';
-        }
+        return $this->view->escapeHtml(date($this->dateFormat . ' ' . $this->timeFormat, $timestamp));
     }
 }

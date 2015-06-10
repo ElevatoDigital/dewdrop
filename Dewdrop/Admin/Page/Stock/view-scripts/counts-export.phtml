@@ -1,0 +1,4 @@
+<?php
+
+echo $this->csvExport()->render($this->fields->getVisibleFields(), $this->data, $this->renderer);
+echo $this->csvExport()->sendHeaders("{$this->title} Count Export.csv");

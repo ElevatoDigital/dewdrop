@@ -37,6 +37,7 @@ class Crud implements PageFactoryInterface
     protected $pageClassMap = [
         'adjust-visibility'  => '\Dewdrop\Admin\Page\Stock\AdjustVisibility',
         'counts'             => '\Dewdrop\Admin\Page\Stock\Counts',
+        'counts-export'      => '\Dewdrop\Admin\Page\Stock\CountsExport',
         'debug-fields'       => '\Dewdrop\Admin\Page\Stock\DebugFields',
         'debug-listing-sql'  => '\Dewdrop\Admin\Page\Stock\DebugListingSql',
         'debug-pages'        => '\Dewdrop\Admin\Page\Stock\DebugPages',
