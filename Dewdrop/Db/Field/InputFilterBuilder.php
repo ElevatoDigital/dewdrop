@@ -11,6 +11,7 @@
 namespace Dewdrop\Db\Field;
 
 use Dewdrop\Db\Field;
+use Dewdrop\Filter\IsoDate as IsoDateFilter;
 use Dewdrop\Filter\NullableDbBoolean as NullableDbBooleanFilter;
 use Dewdrop\Filter\NullableDbInteger as NullableDbIntegerFilter;
 use Zend\Filter;
@@ -131,6 +132,7 @@ class InputFilterBuilder
      */
     protected function attachForDate(Input $input)
     {
+        $input->getFilterChain()->attach(new IsoDateFilter());
         $input->getValidatorChain()->attach(new Validator\Date());
 
         return $input;
