@@ -122,7 +122,9 @@ class View
      */
     private $helperClasses = array(
         'admincomponentnav'       => '\Dewdrop\View\Helper\AdminComponentNav',
+        'adminfooter'             => '\Dewdrop\View\Helper\AdminFooter',
         'adminnotice'             => '\Dewdrop\View\Helper\AdminNotice',
+        'admintitle'              => '\Dewdrop\View\Helper\AdminTitle',
         'adminurl'                => '\Dewdrop\View\Helper\AdminUrl',
         'bootstraptable'          => '\Dewdrop\View\Helper\BootstrapTable',
         'bootstrapcolumnsmodal'   => '\Dewdrop\View\Helper\BootstrapColumnsModal',
@@ -148,6 +150,7 @@ class View
         'headstyle'               => '\Zend\View\Helper\HeadStyle',
         'inlinescript'            => '\Dewdrop\View\Helper\InlineScript',
         'inputcheckbox'           => '\Dewdrop\View\Helper\InputCheckbox',
+        'inputdate'               => '\Dewdrop\View\Helper\InputDate',
         'inputtext'               => '\Dewdrop\View\Helper\InputText',
         'inputtimestamp'          => '\Dewdrop\View\Helper\InputTimestamp',
         'pagination'              => '\Dewdrop\View\Helper\Pagination',
@@ -157,6 +160,7 @@ class View
         'tablecellrenderer'       => '\Dewdrop\View\Helper\TableCellRenderer',
         'tablesorthandle'         => '\Dewdrop\View\Helper\TableSortHandle',
         'textarea'                => '\Dewdrop\View\Helper\Textarea',
+        'url'                     => '\Dewdrop\View\Helper\Url',
         'urlcacheprefix'          => '\Dewdrop\View\Helper\UrlCachePrefix',
         'wpadminnotice'           => '\Dewdrop\View\Helper\WpAdminNotice',
         'wpcheckboxlist'          => '\Dewdrop\View\Helper\WpCheckboxList',
