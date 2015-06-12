@@ -33,6 +33,10 @@ body {
     padding: 0 25px;
 }
 
+.modal .panel .list-group-item {
+    padding: 10px 15px;
+}
+
 .modal .list-group-item .checkbox {
     margin: 0;
     padding: 0;
