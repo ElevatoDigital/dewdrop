@@ -12,7 +12,6 @@ namespace Dewdrop\Admin\Env;
 
 use Dewdrop\Admin\Component\ComponentAbstract;
 use Dewdrop\Admin\Response;
-use Dewdrop\Pimple;
 use Dewdrop\View\View;
 use Zend\View\Helper\HeadLink;
 use Zend\View\Helper\HeadScript;
@@ -105,23 +104,12 @@ class Wp extends EnvAbstract
                         $route = '/' . $submenu['route'];
                     }
 
-                    return $this->filterUrl("{$base}{$route}{$query}");
+                    return "{$base}{$route}{$query}";
                 }
             }
         }
 
-        return $this->filterUrl("{$base}&route={$page}{$query}");
-    }
-
-    protected function filterUrl($url)
-    {
-        if (Pimple::hasResource('url-filter')) {
-            /* @var $filter callable */
-            $filter = Pimple::getResource('url-filter');
-            $url    = $filter($url);
-        }
-
-        return $url;
+        return "{$base}&route={$page}{$query}";
     }
 
     /**

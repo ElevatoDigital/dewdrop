@@ -30,7 +30,7 @@ foreach ($this->model->getPrimaryKey() as $field) {
 
 <?php
 echo $this->bootstrapForm(
-    $this->fields,
+    $this->fields->getEditableFields(),
     $this->rowEditor->getInputFilter()
 );
 ?>

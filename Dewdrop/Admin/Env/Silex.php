@@ -90,16 +90,6 @@ class Silex extends EnvAbstract
     }
 
     /**
-     * Get the title for this admin environment.
-     *
-     * @return string
-     */
-    public function getTitle()
-    {
-        return $this->title;
-    }
-
-    /**
      * Inflect a component name for use in URLs and routes.
      *
      * @param string $name
@@ -127,22 +117,8 @@ class Silex extends EnvAbstract
 
                 return $component->dispatchPage($page);
             }
-        );
-
-        $this->application->get(
-            '/admin/' . $component->getName(),
-            function () use ($component) {
-                $url = '/admin/' . $component->getName() . '/index';
-
-                if (Pimple::hasResource('url-filter')) {
-                    /* @var $filter callable */
-                    $filter = Pimple::getResource('url-filter');
-                    $url    = $filter($url);
-                }
-
-                return $this->application->redirect($url);
-            }
-        );
+        )
+        ->value('page', 'index');
     }
 
     /**
@@ -194,7 +170,6 @@ class Silex extends EnvAbstract
 
         $view
             ->assign('title', $this->title)
-            ->assign('env', $this)
             ->assign('components', $this->getSortedComponentsForMenu())
             ->assign('content', $content)
             ->assign('user', (isset($this->application['user']) ? $this->application['user'] : null))
@@ -216,18 +191,10 @@ class Silex extends EnvAbstract
      */
     public function url(ComponentAbstract $component, $page, array $params = array())
     {
-        $url = '/admin/'
+        return '/admin/'
             . $component->getName() . '/'
             . $this->application['inflector']->hyphenize($page)
             . $this->assembleQueryString($params, '?');
-
-        if (Pimple::hasResource('url-filter')) {
-            /* @var $filter callable */
-            $filter = Pimple::getResource('url-filter');
-            $url    = $filter($url);
-        }
-
-        return $url;
     }
 
     /**

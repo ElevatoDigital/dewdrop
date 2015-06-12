@@ -12,8 +12,6 @@ namespace Dewdrop\Fields;
 
 use Dewdrop\Db\Field as DbField;
 use Dewdrop\Db\Row;
-use Dewdrop\Db\Table;
-use Dewdrop\Exception;
 use Dewdrop\Fields;
 use Dewdrop\Fields\Helper\InputFilter as InputFilterHelper;
 use Dewdrop\Fields\RowEditor\Link\LinkInterface;
@@ -236,27 +234,6 @@ class RowEditor
     public function linkByQueryString($modelName, $queryStringVariableName)
     {
         return $this->addLink($modelName, new QueryStringLink($this->request, $queryStringVariableName));
-    }
-
-    /**
-     * A shortcut for linkByQueryString() that uses Table object get the model
-     * and query string param name.
-     *
-     * @param Table $model
-     * @return RowEditor
-     */
-    public function linkTableByQueryString(Table $table)
-    {
-        $primaryKey = $table->getPrimaryKey();
-
-        if (1 !== count($primaryKey)) {
-            throw new Exception('Can only use linkTableByQueryString() when a single primary key column is present.');
-        }
-
-        return $this->linkByQueryString(
-            $table->getTableName(),
-            current($primaryKey)
-        );
     }
 
     /**
