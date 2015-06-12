@@ -68,7 +68,7 @@ class Edit extends PageAbstract
     /**
      * Setup the row editor and check component permissions.
      */
-    final public function init()
+    public function init()
     {
         $this->rowEditor = $this->getRowEditor();
         $this->model     = $this->getModel();
@@ -121,7 +121,7 @@ class Edit extends PageAbstract
      *
      * @param ResponseHelper $responseHelper
      */
-    final public function process(ResponseHelper $responseHelper)
+    public function process(ResponseHelper $responseHelper)
     {
         if ($this->request->isPost()) {
             $this->invalidSubmission = (!$this->rowEditor->isValid($this->request->getPost()));
@@ -163,12 +163,12 @@ class Edit extends PageAbstract
     /**
      * Pass a bunch of stuff to the view.  Duh.
      */
-    final public function render()
+    public function render()
     {
         $this->view->assign([
             'component'         => $this->component,
             'isNew'             => $this->isNew,
-            'fields'            => $this->fields,
+            'fields'            => $this->fields->getEditableFields($this->component->getFieldGroupsFilter()),
             'model'             => $this->model,
             'rowEditor'         => $this->rowEditor,
             'request'           => $this->request,
