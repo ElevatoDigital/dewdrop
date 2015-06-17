@@ -13,7 +13,6 @@ namespace Dewdrop\Fields;
 use Dewdrop\Db\Field as DbField;
 use Dewdrop\Db\Row;
 use Dewdrop\Db\Table;
-use Dewdrop\Exception;
 use Dewdrop\Fields;
 use Dewdrop\Fields\Helper\InputFilter as InputFilterHelper;
 use Dewdrop\Fields\RowEditor\Link\LinkInterface;
