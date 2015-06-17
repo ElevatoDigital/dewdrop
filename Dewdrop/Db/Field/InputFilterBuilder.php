@@ -14,6 +14,7 @@ use Dewdrop\Db\Field;
 use Dewdrop\Filter\IsoDate as IsoDateFilter;
 use Dewdrop\Filter\NullableDbBoolean as NullableDbBooleanFilter;
 use Dewdrop\Filter\NullableDbInteger as NullableDbIntegerFilter;
+use Dewdrop\Filter\NullableDbFloat as NullableDbFloatFilter;
 use Zend\Filter;
 use Zend\InputFilter\Input;
 use Zend\Validator;
@@ -190,8 +191,12 @@ class InputFilterBuilder
      */
     protected function attachForFloat(Input $input)
     {
-        $input->getFilterChain()->attach(new Filter\Digits());
-        $input->getValidatorChain()->attach(new \Zend\I18n\Validator\IsFloat());
+        if ($this->metadata['NULLABLE']) {
+            $input->getFilterChain()->attach(new NullableDbFloatFilter());
+        } else {
+            $input->getFilterChain()->attach(new Filter\Digits());
+            $input->getValidatorChain()->attach(new \Zend\I18n\Validator\IsFloat());
+        }
 
         return $input;
     }
