@@ -83,5 +83,7 @@ class SortFields extends PageAbstract
             'component'   => $this->component,
             'fields'      => $this->component->getFields()
         ]);
+
+        return $this->renderView();
     }
 }

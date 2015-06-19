@@ -51,5 +51,7 @@ class DebugTestSorting extends PageAbstract
         $this->view->results         = $tester->run();
         $this->view->displayFields   = new Fields();
         $this->view->componentFields = $this->component->getFields();
+
+        return $this->renderView();
     }
 }

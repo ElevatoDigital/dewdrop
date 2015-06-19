@@ -98,5 +98,7 @@ class NotificationEdit extends PageAbstract
             'rowEditor'       => $this->rowEditor,
             'breadcrumbTitle' => ($this->rowEditor->isNew() ? 'Add' : 'Edit')
         ]);
+
+        return $this->renderView();
     }
 }

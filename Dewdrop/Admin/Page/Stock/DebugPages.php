@@ -32,5 +32,7 @@ class DebugPages extends PageAbstract
         $this->view->assign([
             'pageFactories' => $this->component->getPageFactories(),
         ]);
+
+        return $this->renderView();
     }
 }

@@ -121,5 +121,7 @@ class Index extends PageAbstract
                 'bulkActionFailureMessage' => $this->bulkActionFailureMessage
             ]);
         }
+
+        return $this->renderView();
     }
 }

@@ -34,5 +34,6 @@ class Export extends PageAbstract
     {
         $this->component->getPermissions()->haltIfNotAllowed('export');
         $this->view->assign('component', $this->component);
+        return $this->renderView();
     }
 }

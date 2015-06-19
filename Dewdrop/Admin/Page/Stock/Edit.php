@@ -139,13 +139,6 @@ class Edit extends PageAbstract
 
                 if (!$this->request->isAjax()) {
                     $this->redirect($responseHelper);
-                } else {
-                    header('Content-Type: application/json');
-                    echo json_encode([
-                        'result' => 'success',
-                        'id'     => $this->component->getListing()->getPrimaryKey()->getValue()
-                    ]);
-                    exit;
                 }
             }
         }
@@ -165,14 +158,40 @@ class Edit extends PageAbstract
      */
     public function render()
     {
-        $this->view->assign([
-            'component'         => $this->component,
-            'isNew'             => $this->isNew,
-            'fields'            => $this->fields->getEditableFields($this->component->getFieldGroupsFilter()),
-            'model'             => $this->model,
-            'rowEditor'         => $this->rowEditor,
-            'request'           => $this->request,
-            'invalidSubmission' => $this->invalidSubmission
-        ]);
+        if ($this->request->isAjax()) {
+            return $this->renderAjaxResponse();
+        } else {
+            $this->view->assign([
+                'component'         => $this->component,
+                'isNew'             => $this->isNew,
+                'fields'            => $this->fields->getEditableFields($this->component->getFieldGroupsFilter()),
+                'model'             => $this->model,
+                'rowEditor'         => $this->rowEditor,
+                'request'           => $this->request,
+                'invalidSubmission' => $this->invalidSubmission
+            ]);
+
+            return $this->renderView();
+        }
+    }
+
+    public function renderAjaxResponse()
+    {
+        if (!$this->request->isPost()) {
+            return ['result' => 'error', 'message' => 'AJAX edit requests must be POST'];
+        } else if (!$this->invalidSubmission) {
+            return ['result' => 'success', 'id' => $this->component->getListing()->getPrimaryKey()->getValue()];
+        } else {
+            $messages = [];
+
+            foreach ($this->fields->getEditableFields() as $field) {
+                $messages[$field->getHtmlId()] = $this->rowEditor->getMessages($field);
+            }
+
+            return [
+                'result'   => 'invalid',
+                'messages' => $messages
+            ];
+        }
     }
 }

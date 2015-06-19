@@ -29,6 +29,13 @@ class Delete extends PageAbstract
     protected $component;
 
     /**
+     * The result to return in the JSON response.
+     *
+     * @var string
+     */
+    private $result = 'error';
+
+    /**
      * Ensure the user has the permission to delete records in this component.
      */
     public function init()
@@ -48,9 +55,7 @@ class Delete extends PageAbstract
             $rowEditor->link();
             $rowEditor->delete();
 
-            header('Content-Type: application/json');
-            echo json_encode(['result' => 'success']);
-            exit;
+            $this->result = 'success';
         }
     }
 
@@ -60,8 +65,6 @@ class Delete extends PageAbstract
      */
     public function render()
     {
-        header('Content-Type: application/json');
-        echo json_encode(['result' => 'error']);
-        exit;
+        return ['result' => $this->result];
     }
 }

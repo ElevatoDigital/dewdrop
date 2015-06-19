@@ -46,5 +46,7 @@ class CountsExport extends PageAbstract
                 'renderer' => $renderer,
             ]
         );
+
+        return $this->renderView();
     }
 }

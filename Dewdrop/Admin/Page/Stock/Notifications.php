@@ -59,5 +59,7 @@ class Notifications extends PageAbstract
             'component'      => $this->component,
             'componentModel' => $this->component->getPrimaryModel()
         ]);
+
+        return $this->renderView();
     }
 }

@@ -96,9 +96,6 @@ class SortListing extends PageAbstract
      */
     public function render()
     {
-        header('Content-Type: application/json');
-        $this->component->setShouldRenderLayout(false);
-        echo (null === $this->error ? json_encode(['result' => 'success']) : $this->error);
-        exit;
+        return (null === $this->error ? json_encode(['result' => 'success']) : $this->error);
     }
 }

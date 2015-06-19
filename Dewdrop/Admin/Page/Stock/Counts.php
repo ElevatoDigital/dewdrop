@@ -64,5 +64,7 @@ class Counts extends PageAbstract
                 'request'       => $this->request
             ]
         );
+
+        return $this->renderView();
     }
 }

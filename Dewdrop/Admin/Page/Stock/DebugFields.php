@@ -40,5 +40,7 @@ class DebugFields extends PageAbstract
 
         $this->view->displayFields   = new Fields();
         $this->view->componentFields = $this->component->getFields();
+
+        return $this->renderView();
     }
 }

@@ -71,5 +71,7 @@ class View extends PageAbstract
         if ($this->request->isAjax()) {
             $this->component->setShouldRenderLayout(false);
         }
+
+        return $this->renderView();
     }
 }

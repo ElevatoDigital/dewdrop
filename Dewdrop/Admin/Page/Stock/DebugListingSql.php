@@ -44,5 +44,7 @@ class DebugListingSql extends PageAbstract
         $select = $this->component->getListing()->getModifiedSelect($this->component->getFields());
 
         $this->view->formattedSql = SqlFormatter::format((string) $select);
+
+        return $this->renderView();
     }
 }

@@ -18,10 +18,15 @@
     </nav>
 <?php endif;?>
 <?php
+/* @var $renderer \Dewdrop\Fields\Helper\TableCell */
+$renderer = $this->tableCellRenderer();
+
+$renderer->getContentRenderer()->setViewMode(\Dewdrop\Fields\Helper\TableCell\Content::VIEW_MODE_DETAIL);
+
 echo $this->bootstrapDetailsView(
     $this->fields->getVisibleFields($this->groupingFilter),
     $this->data,
-    $this->tableCellRenderer(),
+    $renderer,
     $this->id
 );
 ?>
