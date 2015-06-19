@@ -12,6 +12,7 @@ namespace Dewdrop\Db;
 
 use ArrayAccess;
 use Dewdrop\Exception;
+use Dewdrop\SaveHandlerInterface;
 
 /**
  * The Row class provides a simple way to manipulate the values associated
@@ -69,7 +70,7 @@ use Dewdrop\Exception;
  * APIs, leveraging the database metadata to add validators, retrieve lists
  * of options, etc.
  */
-class Row implements ArrayAccess
+class Row implements ArrayAccess, SaveHandlerInterface
 {
     /**
      * The data represented by this row.
