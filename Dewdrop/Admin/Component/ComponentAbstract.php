@@ -138,6 +138,13 @@ abstract class ComponentAbstract
     private $active = false;
 
     /**
+     * Callbacks registered with this component via onPageDispatch().
+     *
+     * @var array
+     */
+    private $pageDispatchCallbacks = [];
+
+    /**
      * Create a component instance using the DB adapter creating by the Wiring
      * class.
      *
@@ -559,6 +566,26 @@ abstract class ComponentAbstract
     }
 
     /**
+     * Register a callback to run when the page matching the supplied name
+     * is dispatched on this component.  Your callback will receive the new
+     * page object as its first argument.
+     *
+     * @param $pageName
+     * @param callable $callback
+     * @return $this
+     */
+    public function onPageDispatch($pageName, callable $callback)
+    {
+        if (!array_key_exists($pageName, $this->pageDispatchCallbacks)) {
+            $this->pageDispatchCallbacks[$pageName] = [];
+        }
+
+        $this->pageDispatchCallbacks[$pageName][] = $callback;
+
+        return $this;
+    }
+
+    /**
      * Make sure the title property was set in the component's init()
      * method.
      *
@@ -594,7 +621,14 @@ abstract class ComponentAbstract
         }
 
         if (is_string($page)) {
+            $name = $page;
             $page = $this->createPageObject($page);
+
+            if (array_key_exists($name, $this->pageDispatchCallbacks)) {
+                foreach ($this->pageDispatchCallbacks[$name] as $callback) {
+                    call_user_func($callback, $page);
+                }
+            }
         }
 
         if (null === $response) {
