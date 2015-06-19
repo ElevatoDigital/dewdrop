@@ -35,22 +35,23 @@ class Crud implements PageFactoryInterface
      * @var array
      */
     protected $pageClassMap = [
-        'adjust-visibility'  => '\Dewdrop\Admin\Page\Stock\AdjustVisibility',
-        'counts'             => '\Dewdrop\Admin\Page\Stock\Counts',
-        'counts-export'      => '\Dewdrop\Admin\Page\Stock\CountsExport',
-        'debug-fields'       => '\Dewdrop\Admin\Page\Stock\DebugFields',
-        'debug-listing-sql'  => '\Dewdrop\Admin\Page\Stock\DebugListingSql',
-        'debug-pages'        => '\Dewdrop\Admin\Page\Stock\DebugPages',
-        'debug-test-sorting' => '\Dewdrop\Admin\Page\Stock\DebugTestSorting',
-        'delete'             => '\Dewdrop\Admin\Page\Stock\Delete',
-        'edit'               => '\Dewdrop\Admin\Page\Stock\Edit',
-        'export'             => '\Dewdrop\Admin\Page\Stock\Export',
-        'index'              => '\Dewdrop\Admin\Page\Stock\Index',
-        'notification-edit'  => '\Dewdrop\Admin\Page\Stock\NotificationEdit',
-        'notifications'      => '\Dewdrop\Admin\Page\Stock\Notifications',
-        'sort-fields'        => '\Dewdrop\Admin\Page\Stock\SortFields',
-        'sort-listing'       => '\Dewdrop\Admin\Page\Stock\SortListing',
-        'view'               => '\Dewdrop\Admin\Page\Stock\View'
+        'adjust-visibility'   => '\Dewdrop\Admin\Page\Stock\AdjustVisibility',
+        'counts'              => '\Dewdrop\Admin\Page\Stock\Counts',
+        'counts-export'       => '\Dewdrop\Admin\Page\Stock\CountsExport',
+        'debug-fields'        => '\Dewdrop\Admin\Page\Stock\DebugFields',
+        'debug-listing-sql'   => '\Dewdrop\Admin\Page\Stock\DebugListingSql',
+        'debug-pages'         => '\Dewdrop\Admin\Page\Stock\DebugPages',
+        'debug-test-sorting'  => '\Dewdrop\Admin\Page\Stock\DebugTestSorting',
+        'delete'              => '\Dewdrop\Admin\Page\Stock\Delete',
+        'edit'                => '\Dewdrop\Admin\Page\Stock\Edit',
+        'export'              => '\Dewdrop\Admin\Page\Stock\Export',
+        'index'               => '\Dewdrop\Admin\Page\Stock\Index',
+        'notification-edit'   => '\Dewdrop\Admin\Page\Stock\NotificationEdit',
+        'notifications'       => '\Dewdrop\Admin\Page\Stock\Notifications',
+        'render-edit-control' => '\Dewdrop\Admin\Page\Stock\RenderEditControl',
+        'sort-fields'         => '\Dewdrop\Admin\Page\Stock\SortFields',
+        'sort-listing'        => '\Dewdrop\Admin\Page\Stock\SortListing',
+        'view'                => '\Dewdrop\Admin\Page\Stock\View'
     ];
 
     /**
