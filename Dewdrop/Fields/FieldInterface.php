@@ -352,4 +352,19 @@ interface FieldInterface
      * @return FieldInterface
      */
     public function forbidEditingForRole($role);
+
+    /**
+     * Set a value for this field.
+     *
+     * @param mixed $value
+     * @return mixed
+     */
+    public function setValue($value);
+
+    /**
+     * Return the value for this field.
+     *
+     * @return mixed
+     */
+    public function getValue();
 }
