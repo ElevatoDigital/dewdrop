@@ -119,6 +119,13 @@ class Field extends FieldAbstract
     private $controlName;
 
     /**
+     * An identifier suitable for use in an HTML ID attribute.
+     *
+     * @var string
+     */
+    private $htmlId;
+
+    /**
      * The \Zend\InputFilter\Input instance used to validate and filter this
      * field.
      *
@@ -369,6 +376,10 @@ class Field extends FieldAbstract
     {
         $this->controlName = $controlName;
 
+        if ($this->inputFilter) {
+            $this->inputFilter->setName($this->controlName);
+        }
+
         return $this;
     }
 
@@ -415,6 +426,19 @@ class Field extends FieldAbstract
     }
 
     /**
+     * Override the default HTML ID for this field.
+     *
+     * @param string $htmlId
+     * @return $this
+     */
+    public function setHtmlId($htmlId)
+    {
+        $this->htmlId = $htmlId;
+
+        return $this;
+    }
+
+    /**
      * Get a version of the control name using underscores as word separators to
      * be more friendly in CSS selectors, etc.
      *
@@ -422,7 +446,7 @@ class Field extends FieldAbstract
      */
     public function getHtmlId()
     {
-        return str_replace(':', '_', $this->getControlName());
+        return $this->htmlId ?: str_replace(':', '_', $this->getControlName());
     }
 
     /**
