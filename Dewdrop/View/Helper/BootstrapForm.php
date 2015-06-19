@@ -54,19 +54,8 @@ class BootstrapForm extends AbstractHelper
     {
         $renderer = ($renderer ?: $this->view->editControlRenderer());
 
-        /**
-         * Only render groups in a tab view if there is more than 1 group because
-         * when there is only 1 group, that means only the default "ungrouped"
-         * or "other" set is present.
-         */
-        if ($fields instanceof GroupedFields && 1 < count($fields->getGroups())) {
-            $renderMethod = 'renderGroupedFields';
-        } else {
-            $renderMethod = 'renderFields';
-        }
-
         return $this->open()
-            . $this->$renderMethod($fields, $inputFilter, $renderer)
+            . $this->renderContent($fields, $inputFilter, $renderer)
             . $this->renderSubmitButton()
             . $this->close();
     }
@@ -99,6 +88,27 @@ class BootstrapForm extends AbstractHelper
     public function close()
     {
         return '</form>';
+    }
+
+    /**
+     * Only render groups in a tab view if there is more than 1 group because
+     * when there is only 1 group, that means only the default "ungrouped"
+     * or "other" set is present.
+     *
+     * @param Fields $fields
+     * @param InputFilter $inputFilter
+     * @param Renderer $renderer
+     * @return mixed
+     */
+    public function renderContent(Fields $fields, InputFilter $inputFilter, Renderer $renderer)
+    {
+        if ($fields instanceof GroupedFields && 1 < count($fields->getGroups())) {
+            $renderMethod = 'renderGroupedFields';
+        } else {
+            $renderMethod = 'renderFields';
+        }
+
+        return $this->$renderMethod($fields, $inputFilter, $renderer);
     }
 
     /**
@@ -166,39 +176,67 @@ class BootstrapForm extends AbstractHelper
         $output = '';
 
         foreach ($fields->getEditableFields() as $field) {
-            $output  .= '<div class="">';
-            $input    = ($inputFilter->has($field->getId()) ? $inputFilter->get($field->getId()) : null);
-            $messages = ($input ? $input->getMessages() : null);
-
-            $output .= sprintf(
-                $this->renderFormGroupOpenTag(),
-                ($messages ? ' has-feedback has-error alert alert-danger' : '')
-            );
-
-            $controlOutput = $renderer->getControlRenderer()->render($field, $fieldPosition);
-
-            if ($this->controlRequiresLabel($controlOutput)) {
-                $output .= $this->renderLabel($field, $renderer, $input);
-            }
-
-            $output .= $controlOutput;
-
-            if ($messages) {
-                $output .= $this->renderMessages($messages);
-            }
-
-            if ($field->getNote()) {
-                $output .= sprintf(
-                    '<div class="help-block">%s</div>',
-                    $this->view->escapeHtml($field->getNote())
-                );
-            }
-
-            $output .= '</div>';
+            $output .= '<div class="">';
+            $output .= $this->renderFieldContent($field, $inputFilter, $renderer, $fieldPosition);
             $output .= '</div>';
 
             $fieldPosition += 1;
         }
+
+        return $output;
+    }
+
+    public function renderFieldsInTableRow(Fields $fields, InputFilter $inputFilter, Renderer $renderer)
+    {
+        $output = '<tr>';
+
+        foreach ($fields->getEditableFields() as $field) {
+            $output .= '<td>';
+            $output .= $this->renderFieldContent($field, $inputFilter, $renderer, 100, false);
+            $output .= '</td>';
+        }
+
+        $output .= '</tr>';
+
+        return $output;
+    }
+
+    public function renderFieldContent(
+        FieldInterface $field,
+        InputFilter $inputFilter,
+        Renderer $renderer,
+        $position,
+        $renderLabels = true
+    ) {
+        $output   = '';
+        $input    = ($inputFilter->has($field->getId()) ? $inputFilter->get($field->getId()) : null);
+        $messages = ($input ? $input->getMessages() : null);
+
+        $output .= sprintf(
+            $this->renderFormGroupOpenTag(),
+            ($messages ? ' has-feedback has-error alert alert-danger' : '')
+        );
+
+        $controlOutput = $renderer->getControlRenderer()->render($field, $position);
+
+        if ($renderLabels && $this->controlRequiresLabel($controlOutput)) {
+            $output .= $this->renderLabel($field, $renderer, $input);
+        }
+
+        $output .= $controlOutput;
+
+        if ($messages) {
+            $output .= $this->renderMessages($messages);
+        }
+
+        if ($field->getNote()) {
+            $output .= sprintf(
+                '<div class="help-block">%s</div>',
+                $this->view->escapeHtml($field->getNote())
+            );
+        }
+
+        $output .= '</div>';
 
         return $output;
     }
@@ -235,8 +273,25 @@ class BootstrapForm extends AbstractHelper
         }
 
         return sprintf(
-            '<label class="control-label" for="%s">%s%s</label>',
+            '<label class="control-label" for="%s">%s</label>',
             $this->view->escapeHtmlAttr($field->getHtmlId()),
+            $this->renderLabelContent($field, $renderer, $input)
+        );
+    }
+
+    /**
+     * Render the content of a label for the supplied field, included a "required" flag when
+     * appropriate.
+     *
+     * @param FieldInterface $field
+     * @param Renderer $renderer
+     * @param Input $input
+     * @return string
+     */
+    public function renderLabelContent(FieldInterface $field, Renderer $renderer, Input $input = null)
+    {
+        return sprintf(
+            '%s%s',
             $renderer->getLabelRenderer()->render($field),
             ($input && !$input->allowEmpty() ? $this->renderRequiredFlag() : '')
         );
@@ -302,6 +357,8 @@ class BootstrapForm extends AbstractHelper
      */
     protected function controlRequiresLabel($output)
     {
-        return false === stripos($output, '<label') || false !== stripos($output, '<ul');
+        return (false === stripos($output, '<label') && false === stripos($output, 'panel-default'))
+            || false !== stripos($output, '<ul')
+            || false !== stripos($output, 'option-input-decorator');
     }
 }
