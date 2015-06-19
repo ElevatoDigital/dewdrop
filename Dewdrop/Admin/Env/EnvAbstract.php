@@ -201,6 +201,24 @@ abstract class EnvAbstract implements EnvInterface
     }
 
     /**
+     * Retrieve a component by name.
+     *
+     * @param string $name
+     * @return ComponentAbstract
+     */
+    public function getComponent($name)
+    {
+        /* @var $component ComponentAbstract */
+        foreach ($this->components as $component) {
+            if ($name === $component->getName()) {
+                return $component;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Assemble the remainder of a URL query string.
      *
      * @param array $params

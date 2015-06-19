@@ -84,6 +84,14 @@ interface EnvInterface
     public function initComponent(ComponentAbstract $component);
 
     /**
+     * Retrieve a component by name.
+     *
+     * @param string $name
+     * @return ComponentAbstract
+     */
+    public function getComponent($name);
+
+    /**
      * Perforn a redirect to the supplied URL using whatever method is preferred
      * by the current environment.
      *
