@@ -844,7 +844,7 @@ abstract class Table
         foreach ($data as $column => $value) {
             $metadata = $this->getMetadata('columns', $column);
 
-            if (!$metadata || ($metadata['PRIMARY'] && null === $value)) {
+            if (!$metadata || (isset($metadata['PRIMARY']) && $metadata['PRIMARY'] && null === $value)) {
                 unset($data[$column]);
             }
         }
