@@ -11,7 +11,6 @@
 namespace Dewdrop\View\Helper;
 
 use Dewdrop\Admin\Env\Silex as SilexEnv;
-use Dewdrop\Pimple;
 
 /**
  * This view helper renders the admin area's title in the stock Silex admin
