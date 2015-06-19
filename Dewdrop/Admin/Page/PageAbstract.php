@@ -93,6 +93,26 @@ abstract class PageAbstract
                 ->setPage($this);
     }
 
+    public function createStockPage($name)
+    {
+        /* @var $inflector \Dewdrop\Inflector */
+        $inflector = Pimple::getResource('inflector');
+        $className = '\Dewdrop\Admin\Page\Stock\\' . $inflector->camelize($name);
+
+        /* @var $page PageAbstract */
+        $page = new $className(
+            $this->component,
+            $this->request,
+            __DIR__ . '/Stock/view-scripts'
+        );
+
+        $page->getView()
+            ->assignInstance('headlink', $this->view->headLink())
+            ->assignInstance('headscript', $this->view->headScript());
+
+        return $page;
+    }
+
     /**
      * Create any resources that need to be accessible both for processing
      * and rendering.
@@ -133,7 +153,7 @@ abstract class PageAbstract
     /**
      * Assign variables to your page's view and render the output.
      *
-     * @return void
+     * @return mixed
      */
     public function render()
     {
