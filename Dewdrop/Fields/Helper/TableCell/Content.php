@@ -39,6 +39,16 @@ use Dewdrop\View\View;
 class Content extends HelperAbstract implements ContentHelperInterface
 {
     /**
+     * @const
+     */
+    const VIEW_MODE_TABLE = 'table';
+
+    /**
+     * @const
+     */
+    const VIEW_MODE_DETAIL = 'detail';
+
+    /**
      * The name for this helper, used when you want to define a global custom
      * callback for a given field
      *
@@ -46,6 +56,14 @@ class Content extends HelperAbstract implements ContentHelperInterface
      * @var string
      */
     protected $name = 'tablecell.content';
+
+    /**
+     * The current view mode of this renderer.  Either VIEW_MODE_TABLE or
+     * VIEW_MODE_DETAIL.
+     *
+     * @var string
+     */
+    protected $viewMode = self::VIEW_MODE_TABLE;
 
     /**
      * A view object used for rendering and escaping.
@@ -92,6 +110,43 @@ class Content extends HelperAbstract implements ContentHelperInterface
     public function __construct(View $view)
     {
         $this->view = $view;
+    }
+
+    /**
+     * Switch the view mode of this renderer.  Must by either VIEW_MODE_TABLE
+     * or VIEW_MODE_DETAIL.  Allows callback authors to detect table view vs
+     * detail view and render accordingly.
+     *
+     * @param string $viewMode
+     * @return $this
+     */
+    public function setViewMode($viewMode)
+    {
+        $this->viewMode = $viewMode;
+
+        return $this;
+    }
+
+    /**
+     * Check to see if this renderer is being used to render a table for
+     * multiple records rather than the details of a single record.
+     *
+     * @return bool
+     */
+    public function isTableView()
+    {
+        return self::VIEW_MODE_TABLE === $this->viewMode;
+    }
+
+    /**
+     * Check to see if this renderer is being used to render a single
+     * record's details rather than a collection of records.
+     *
+     * @return bool
+     */
+    public function isDetailView()
+    {
+        return self::VIEW_MODE_DETAIL === $this->viewMode;
     }
 
     /**
