@@ -1,40 +1,51 @@
 (function () {
-    var decorators = $('.option-input-decorator');
+    $(document).on(
+        'click',
+        '.option-input-decorator .btn-add-option',
+        function (e) {
+            var well = findWrappingDecorator(this).find('.well:first');
 
-    var setupDecorator = function (decorator) {
-        var toggle = decorator.find('.btn-add-option:first'),
-            submit = decorator.find('.btn-submit-option:last'),
-            well   = decorator.find('.well:first');
+            e.preventDefault();
 
-        toggle.on(
-            'click',
-            function (e) {
+            if ('block' === well.css('display')) {
+                well.velocity('slideUp');
+            } else {
+                well.velocity('slideDown');
+                well.find('input:first').focus();
+            }
+        }
+    );
+
+    $(document).on(
+        'click',
+        '.option-input-decorator .btn-submit-option',
+        function (e) {
+            e.preventDefault();
+            submitDecorator(findWrappingDecorator(this));
+        }
+    );
+
+    /* Remove all inputs that were part of an option-input-decorator prior to actual submit */
+    $(document).on(
+        'submit',
+        'form',
+        function () {
+            $('.option-input-decorator .well').remove();
+        }
+    );
+
+    $(document).on(
+        'keydown',
+        function (e) {
+            // Ignore "enter" key on option-input-decorator inputs so we don't submit the overall form
+            if (13 === e.which && $(e.target).is('.option-input-decorator :input')) {
                 e.preventDefault();
-
-                if ('block' === well.css('display')) {
-                    well.velocity('slideUp');
-                } else {
-                    well.velocity('slideDown');
-                    well.find('input:first').focus();
-                }
             }
-        );
+        }
+    );
 
-        submit.on(
-            'click',
-            function (e) {
-                e.preventDefault();
-                submitDecorator(decorator);
-            }
-        );
-
-        /* Remove all inputs that were part of an option-input-decorator prior to actual submit */
-        decorator.closest('form').on(
-            'submit',
-            function (e) {
-                well.remove();
-            }
-        );
+    var findWrappingDecorator = function (node) {
+        return $(node).closest('.option-input-decorator');
     };
 
     var submitDecorator = function (decorator) {
@@ -137,21 +148,4 @@
             }
         );
     };
-
-    $(document).on(
-        'keydown',
-        function (e) {
-            if (13 === e.which && $(e.target).is('.option-input-decorator :input')) {
-                e.preventDefault();
-            }
-        }
-    );
-
-    decorators.each(
-        function (index, decorator) {
-            decorator = $(decorator);
-
-            setupDecorator(decorator);
-        }
-    );
 }());
