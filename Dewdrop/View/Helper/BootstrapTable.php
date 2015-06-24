@@ -35,6 +35,7 @@ class BootstrapTable extends Table
     public function open()
     {
         $tableWrapperIdAttr = '';
+
         if (null !== $this->tableWrapperId) {
             $tableWrapperIdAttr = ' id="' . $this->view->escapeHtmlAttr($this->tableWrapperId) . '"';
         }

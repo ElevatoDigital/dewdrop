@@ -18,6 +18,7 @@ use Dewdrop\Paths;
 use Pimple;
 use Silex\Application;
 use Silex\Provider\SessionServiceProvider;
+use Symfony\Component\HttpFoundation\Response;
 use WP_Session;
 
 /**
@@ -125,6 +126,16 @@ class Detector
                     }
                 );
             }
+        }
+
+        if ($pimple instanceof Application) {
+            $pimple->error(
+                function (Exception $e) use ($pimple) {
+                    if ($pimple['debug']) {
+                        return new Response($e->render());
+                    }
+                }
+            );
         }
 
         if (!isset($pimple['dewdrop-build'])) {

@@ -357,7 +357,11 @@ class BootstrapForm extends AbstractHelper
      */
     protected function controlRequiresLabel($output)
     {
-        return (false === stripos($output, '<label') && false === stripos($output, 'panel-default'))
+        if (false !== stripos($output, 'panel-default')) {
+            return false;
+        }
+
+        return false === stripos($output, '<label')
             || false !== stripos($output, '<ul')
             || false !== stripos($output, 'option-input-decorator');
     }

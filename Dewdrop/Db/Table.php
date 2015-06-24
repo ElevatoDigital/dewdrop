@@ -333,6 +333,7 @@ abstract class Table
 
         $field = null;
 
+        /* @var $provider \Dewdrop\Db\FieldProvider\ProviderInterface */
         foreach ($this->fieldProviders as $provider) {
             if ($provider->has($name)) {
                 $field = $provider->instantiate($name);

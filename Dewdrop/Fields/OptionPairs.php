@@ -14,6 +14,7 @@ use Dewdrop\Db\Adapter;
 use Dewdrop\Db\Expr;
 use Dewdrop\Db\Select;
 use Dewdrop\Exception as DewdropException;
+use Dewdrop\Fields\OptionPairs\TitleColumnNotDetectedException;
 
 /**
  * The OptionPairs class makes it easy to retrieve a list of key-value pairs
@@ -271,7 +272,7 @@ class OptionPairs
      * not found a suitable candidate, an exception will be thrown telling
      * the developer to manually specify the title column.
      *
-     * @throws \Dewdrop\Exception
+     * @throws TitleColumnNotDetectedException
      * @param array $columns The "columns" portion of the table metadata.
      * @return string
      */
@@ -286,12 +287,16 @@ class OptionPairs
         }
 
         foreach ($columns as $column => $meta) {
-            if (false !== stripos($meta['DATA_TYPE'], 'char')) {
+            if ('text' === $meta['GENERIC_TYPE']) {
                 return $column;
             }
         }
 
-        throw new DewdropException('OptionPairs: Title column could not be auto-detected.  Please specify manually.');
+        $exception = new TitleColumnNotDetectedException('Title column could not be auto-detected.');
+        $exception
+            ->setTableName($this->tableName)
+            ->setColumns($columns);
+        throw $exception;
     }
 
     /**

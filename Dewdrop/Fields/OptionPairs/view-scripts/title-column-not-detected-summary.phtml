@@ -1,0 +1,62 @@
+<h4>Background</h4>
+<p>
+    When retrieving a list of options for a field, Dewdrop uses the \Dewdrop\Fields\OptionPairs class.  OptionPairs
+    by default will attempt to build a SQL statement for fetching options from the database using schema metadata.  When
+    auto-detecting the title for each option, it looks for one of three candidates:
+</p>
+
+<ol>
+    <li>A "name" column.</li>
+    <li>A "title" column.</li>
+    <li>Any column with the Dewdrop generic data type of "text" (e.g. CHAR, VARCHAR, etc.).</li>
+</ol>
+
+<p>
+    When Dewdrop can't find any of those three candidates in your option table, you get this exception.
+</p>
+
+<h4>Your Code</h4>
+
+<div class="row">
+    <div class="col-md-4">
+        <p>
+            You're attempting to fetch options from the <code><?php echo $this->escapeHtml($this->tableName);?></code>
+            table.  However, that table does not have a "name", "title" or text-type column in it.
+        </p>
+        <p>
+            Configure the OptionPairs object to use one of the columns in your database table as the title for
+            each option using the <code>setTitleColumn()</code> method or by manually manipulating the generated
+            \Dewdrop\Db\Select object with <code>getStmt()</code> or <code>setStmt()</code>.
+        </p>
+        <p>
+            See the examples tab for more information.
+        </p>
+    </div>
+    <div class="col-md-8">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h5 class="panel-title"><?php echo $this->escapeHtml($this->tableName);?></h5>
+            </div>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Generic Type</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    foreach ($this->columns as $name => $metadata) {
+                        echo '<tr>';
+
+                        printf('<td>%s</td>', $this->escapeHtml($name));
+                        printf('<td>%s</td>', $this->escapeHtml($metadata['GENERIC_TYPE']));
+
+                        echo '</tr>';
+                    }
+                    ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
