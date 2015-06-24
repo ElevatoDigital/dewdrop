@@ -457,7 +457,7 @@ class RowCollectionEditor implements SaveHandlerInterface
         }
 
         if ($this->rowEditorCallback) {
-            call_user_func($this->rowEditorCallback, $editor);
+            call_user_func($this->rowEditorCallback, $editor, $data);
         }
 
         $fields->add($this->createDeleteField($editor));
