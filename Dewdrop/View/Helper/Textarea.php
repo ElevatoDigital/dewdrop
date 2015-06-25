@@ -19,9 +19,9 @@ use \Dewdrop\Exception;
  *
  * Example usage:
  *
- * <code>
+ * <pre>
  * echo $this->textarea($this->fields->get('animals:long_description'));
- * </code>
+ * </pre>
  */
 class Textarea extends AbstractHelper
 {
@@ -43,17 +43,18 @@ class Textarea extends AbstractHelper
      * and then render the input.
      *
      * @param Field $field
+     * @param array $options
      * @return string
      */
-    protected function directField(Field $field)
+    protected function directField(Field $field, array $options = array())
     {
-        return $this->directArray(
-            array(
-                'name'  => $field->getControlName(),
-                'id'    => $field->getHtmlId(),
-                'value' => $field->getValue()
-            )
+        $fieldDefaults = array(
+            'name'  => $field->getControlName(),
+            'id'    => $field->getHtmlId(),
+            'value' => $field->getValue()
         );
+
+        return $this->directArray($fieldDefaults + $options);
     }
 
     /**
@@ -102,12 +103,13 @@ class Textarea extends AbstractHelper
         return $this->partial(
             'textarea.phtml',
             array(
-                'name'    => $name,
-                'id'      => $id,
-                'value'   => $value,
-                'classes' => $classes,
-                'rows'    => $rows,
-                'cols'    => $cols
+                'name'      => $name,
+                'id'        => $id,
+                'value'     => $value,
+                'classes'   => $classes,
+                'rows'      => $rows,
+                'cols'      => $cols,
+                'autofocus' => $autofocus
             )
         );
     }
@@ -125,7 +127,7 @@ class Textarea extends AbstractHelper
     {
         $this
             ->checkRequired($options, array('name', 'value'))
-            ->ensurePresent($options, array('classes', 'id', 'rows', 'cols'))
+            ->ensurePresent($options, array('classes', 'id', 'rows', 'cols', 'autofocus'))
             ->ensureArray($options, array('classes'));
 
         return $options;

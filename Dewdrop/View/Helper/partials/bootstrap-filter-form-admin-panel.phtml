@@ -1,0 +1,9 @@
+<?php
+$selectFilter = $this->component->getListing()->getSelectModifierByName('SelectFilter');
+?>
+
+<div id="admin-filter-panel" class="panel panel-default admin-filter-panel collapse<?php echo ($selectFilter->hasFilters() ? ' in' : '');?>">
+    <div class="panel-body">
+        <?php echo $this->form;?>
+    </div>
+</div>

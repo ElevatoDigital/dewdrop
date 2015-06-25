@@ -10,13 +10,11 @@
 
 namespace Dewdrop\Db;
 
-use Dewdrop\Paths;
-use Dewdrop\Exception;
 use Dewdrop\Db\Eav\Definition as EavDefinition;
-use Dewdrop\Db\ManyToMany\Field as ManyToManyField;
 use Dewdrop\Db\ManyToMany\Relationship as ManyToManyRelationship;
-use Dewdrop\Db\Row;
-use Dewdrop\Db\Field;
+use Dewdrop\Db\Select\TableListing;
+use Dewdrop\Exception;
+use Dewdrop\Pimple;
 
 /**
  * The table class provides a gateway to the a single DB table by providing
@@ -25,6 +23,20 @@ use Dewdrop\Db\Field;
  */
 abstract class Table
 {
+    /**
+     * Constant to clarify behavior of second param to createRow().
+     *
+     * @const
+     */
+    const SHARE_FIELD_OBJECTS_WITH_ROW = true;
+
+    /**
+     * Constant to clarify behavior of second param to createRow().
+     *
+     * @const
+     */
+    const NEW_FIELD_OBJECTS_PER_ROW = false;
+
     /**
      * Field providers can check for the existence of and create objects
      * for fields of various types (e.g. concrete DB columns or EAV
@@ -84,13 +96,6 @@ abstract class Table
     private $db;
 
     /**
-     * Paths utility to help in finding DB metadata files
-     *
-     * @var \Dewdrop\Paths
-     */
-    private $paths;
-
-    /**
      * The name of the DB table represented by this table class.
      *
      * @var string
@@ -127,12 +132,10 @@ abstract class Table
      * Create new table object with supplied DB adapter
      *
      * @param Adapter $db
-     * @param Paths $paths
      */
-    public function __construct(Adapter $db, Paths $paths = null)
+    public function __construct(Adapter $db = null)
     {
-        $this->db    = $db;
-        $this->paths = ($paths ?: new Paths());
+        $this->db = ($db ?: Pimple::getResource('db'));
 
         $this->fieldProviders[] = new FieldProvider\Metadata($this);
         $this->fieldProviders[] = new FieldProvider\ManyToMany($this);
@@ -330,6 +333,7 @@ abstract class Table
 
         $field = null;
 
+        /* @var $provider \Dewdrop\Db\FieldProvider\ProviderInterface */
         foreach ($this->fieldProviders as $provider) {
             if ($provider->has($name)) {
                 $field = $provider->instantiate($name);
@@ -481,9 +485,9 @@ abstract class Table
      *
      * For example, to get metadata only for the "name" column, you would call:
      *
-     * <code>
+     * <pre>
      * $this->getMetadata('columns', 'name');
-     * </code>
+     * </pre>
      *
      * @param string $section
      * @param string $index
@@ -525,7 +529,7 @@ abstract class Table
 
         foreach ($this->getMetadata('columns') as $column => $metadata) {
             if ($metadata['PRIMARY']) {
-                $position  = $metadata['PRIMARY_POSITION'];
+                $position = $metadata['PRIMARY_POSITION'];
 
                 $columns[$position] = $column;
             }
@@ -557,24 +561,75 @@ abstract class Table
     }
 
     /**
+     * Generate a listing Select object.  A listing attempts to include
+     * values for foreign keys, many-to-many relationships for contexts
+     * such as admin CRUD components where you intend to display all the
+     * information related to a certain set of entities.
+     *
+     * @return Select
+     */
+    public function selectListing()
+    {
+        $listing = new TableListing($this);
+        return $listing->select();
+    }
+
+    /**
+     * By default, returns the same value as selectListing().  However,
+     * this is here as a placeholder for any admin-area specific listing
+     * changes you need to make for this model.
+     *
+     * @return Select
+     */
+    public function selectAdminListing()
+    {
+        return $this->selectListing();
+    }
+
+    /**
+     * Get all the field providers added to this table.
+     *
+     * @return array
+     */
+    public function getFieldProviders()
+    {
+        return $this->fieldProviders;
+    }
+
+    /**
      * Insert a new row.
      *
      * Data should be supplied as key value pairs, with the keys representing
      * the column names.
      *
+     * We return the ID of the inserted row because if we do not return it from
+     * insert(), it will be impossible to retrieve it, if we have many-to-many
+     * or EAV fields that also inserted rows before this method returns.
+     *
      * @param array $data
-     * @return integer Number of affected rows.
+     * @return integer|null Last insert ID, if the table has auto-incrementing key.
      */
     public function insert(array $data)
     {
-        $result = $this->db->insert(
+        $this->db->insert(
             $this->tableName,
-            $this->filterDataArrayForPhysicalColumns($data)
+            $this->augmentInsertedDataArrayWithDateFields(
+                $this->filterDataArrayForPhysicalColumns($data)
+            )
         );
 
+        $result = null;
+
+        foreach ($this->getMetadata('columns') as $column => $metadata) {
+            if ($metadata['IDENTITY'] && $metadata['PRIMARY']) {
+                $result = $this->getAdapter()->lastInsertId();
+                break;
+            }
+        }
+
         $this
-            ->saveManyToManyRelationships($data)
-            ->saveEav($data);
+            ->saveManyToManyRelationships($data, $result)
+            ->saveEav($data, $result);
 
         return $result;
     }
@@ -588,10 +643,15 @@ abstract class Table
      *
      * @param array $data
      * @param string $where
+     * @return integer The number of rows affected.
      */
     public function update(array $data, $where)
     {
-        $updateData = $this->filterDataArrayForPhysicalColumns($data);
+        $result = 0;
+
+        $updateData = $this->augmentUpdatedDataArrayWithDateFields(
+            $this->filterDataArrayForPhysicalColumns($data)
+        );
 
         // Only perform primary update statement if a physical column is being updated
         if (count($updateData)) {
@@ -619,7 +679,7 @@ abstract class Table
     /**
      * Find a single row based upon primary key value.
      *
-     * @return \Dewdrop\Db\Row
+     * @return \Dewdrop\Db\Row|null
      */
     public function find()
     {
@@ -638,7 +698,7 @@ abstract class Table
         return $this->db->fetchRow(
             $this->assembleFindSql($args),
             array(),
-            ARRAY_A
+            Adapter::ARRAY_A
         );
     }
 
@@ -646,25 +706,48 @@ abstract class Table
      * Create a new row object, assigning the provided data as its initial
      * state.
      *
+     * By default, rows share the same field objects that were instantiated
+     * on the table itself.  This makes it easy to customize fields prior to
+     * the row being available.  However, in some rare cases, you want to edit
+     * multiple rows created from the same model instance.  To do so, you'll
+     * need new field objects per-row.  To achieve this separation, you can
+     * call this method with Table::NEW_FIELD_OBJECTS_PER_ROW as the second
+     * parameter.
+     *
      * @param array $data
+     * @param boolean $shareFieldObjectsWithRow
      * @return \Dewdrop\Db\Row
      */
-    public function createRow(array $data = array())
+    public function createRow(array $data = array(), $shareFieldObjectsWithRow = self::SHARE_FIELD_OBJECTS_WITH_ROW)
     {
-        $className = $this->rowClass;
-        return new $className($this, $data);
+        $rowClass = $this->rowClass;
+
+        if (self::SHARE_FIELD_OBJECTS_WITH_ROW === $shareFieldObjectsWithRow) {
+            $model = $this;
+        } else {
+            $tableClass = get_class($this);
+            $model      = new $tableClass($this->getAdapter());
+        }
+
+        return new $rowClass($model, $data);
     }
 
     /**
-     * Fetch a single row by running the provided SQL.
+     * Fetch a single row by running the provided SQL.  If no matching row is found,
+     * null will be returned.
      *
      * @param string|\Dewdrop\Db\Select $sql
-     * @return \Dewdrop\Db\Row
+     * @param array $bind
+     * @return null|Row
      */
-    public function fetchRow($sql)
+    public function fetchRow($sql, array $bind = array())
     {
         $className = $this->rowClass;
-        $data      = $this->db->fetchRow($sql, array(), ARRAY_A);
+        $data      = $this->db->fetchRow($sql, $bind, Adapter::ARRAY_A);
+
+        if (null === $data) {
+            return null;
+        }
 
         return new $className($this, $data);
     }
@@ -697,6 +780,42 @@ abstract class Table
     }
 
     /**
+     * If this table has date_created or datetime_created columns, supply a
+     * value for them automatically during insert().
+     *
+     * @param array $data
+     * @return array
+     */
+    private function augmentInsertedDataArrayWithDateFields(array $data)
+    {
+        if ($this->getMetadata('columns', 'date_created')) {
+            $data['date_created'] = date('Y-m-d G:i:s');
+        } elseif ($this->getMetadata('columns', 'datetime_created')) {
+            $data['datetime_created'] = date('Y-m-d G:i:s');
+        }
+
+        return $this->augmentUpdatedDataArrayWithDateFields($data);
+    }
+
+    /**
+     * If this table has date_updated or datetime_updated columns, supply a
+     * value for them automatically during update().
+     *
+     * @param array $data
+     * @return array
+     */
+    private function augmentUpdatedDataArrayWithDateFields(array $data)
+    {
+        if ($this->getMetadata('columns', 'date_updated')) {
+            $data['date_updated'] = date('Y-m-d G:i:s');
+        } elseif ($this->getMetadata('columns', 'datetime_updated')) {
+            $data['datetime_updated'] = date('Y-m-d G:i:s');
+        }
+
+        return $data;
+    }
+
+    /**
      * Assemble SQL for finding a row by its primary key.
      *
      * @param array $args The primary key values
@@ -724,7 +843,9 @@ abstract class Table
     private function filterDataArrayForPhysicalColumns(array $data)
     {
         foreach ($data as $column => $value) {
-            if (!$this->getMetadata('columns', $column)) {
+            $metadata = $this->getMetadata('columns', $column);
+
+            if (!$metadata || (isset($metadata['PRIMARY']) && $metadata['PRIMARY'] && null === $value)) {
                 unset($data[$column]);
             }
         }
@@ -737,9 +858,10 @@ abstract class Table
      * insert() or update().
      *
      * @param array $data
+     * @param integer $pkeyValue
      * @return \Dewdrop\Db\Table
      */
-    private function saveManyToManyRelationships(array $data)
+    private function saveManyToManyRelationships(array $data, $pkeyValue = null)
     {
         foreach ($data as $name => $values) {
             if ($this->hasManyToManyRelationship($name)) {
@@ -750,7 +872,7 @@ abstract class Table
                 if (isset($data[$anchorName]) && $data[$anchorName]) {
                     $anchorValue = $data[$anchorName];
                 } else {
-                    $anchorValue = $this->getAdapter()->lastInsertId();
+                    $anchorValue = $pkeyValue;
                 }
 
                 // Can only save xref values if we have anchor value
@@ -769,9 +891,10 @@ abstract class Table
      * via the $data array itself or the lastInsertId().
      *
      * @param array $data
+     * @param integer $pkeyValue
      * @return \Dewdrop\Db\Table
      */
-    private function saveEav(array $data)
+    private function saveEav(array $data, $pkeyValue = null)
     {
         if ($this->hasEav()) {
             $pkey = array();
@@ -781,7 +904,7 @@ abstract class Table
                 if (isset($data[$pkeyColumn]) && $data[$pkeyColumn]) {
                     $pkey[] = $data[$pkeyColumn];
                 } else {
-                    $pkey[] = $this->getAdapter()->lastInsertId();
+                    $pkey[] = $pkeyValue;
                 }
             }
 

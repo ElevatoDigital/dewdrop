@@ -1,0 +1,56 @@
+<ol class="breadcrumb">
+    <li><a href="<?php echo $this->escapeHtmlAttr($this->adminUrl('index'));?>"><?php echo $this->escapeHtml($this->title);?></a></li>
+    <li class="active">Count <?php echo $this->escapeHtml($this->model->getPluralTitle());?></li>
+</ol>
+
+<?php echo $this->bootstrapForm()->open('', 'GET');?>
+<div class="panel panel-default">
+    <div class="panel-body">
+
+        <div class="form-group">
+            <label>Select a Field to Group the <?php echo $this->escapeHtml($this->model->getPluralTitle());?> By</label>
+            <?php
+            $fields  = $this->fields->getVisibleFields();
+            $options = [];
+
+            foreach ($fields as $field) {
+                $options[$field->getQueryStringId()] = $field->getLabel();
+            }
+
+            asort($options);
+
+            echo $this->bootstrapSelect(
+                [
+                    'name'    => 'group_field',
+                    'options' => $options,
+                    'value'   => $this->selectedField,
+                ]
+            );
+            ?>
+        </div>
+
+        <div class="filter-form form-group">
+            <label>Filter the <?php echo $this->escapeHtml($this->model->getPluralTitle());?> Before Counting</label>
+            <div>
+                <?php
+                echo $this->bootstrapFilterForm()->inline(
+                    $this->fields,
+                    $this->listing->getSelectModifierByName('SelectFilter'),
+                    $this->model->getPluralTitle()
+                );
+                ?>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel-footer">
+        <input type="submit" value="Generate Counts" class="btn btn-primary" />
+        <a class="btn btn-link" href="<?php echo $this->adminUrl('counts-export', $this->request->getQuery());?>">Export</a>
+    </div>
+</div>
+<?php echo $this->bootstrapForm()->close();?>
+
+<?php
+if ($this->countFields) {
+    echo $this->bootstrapTable($this->countFields, $this->data, $this->renderer);
+}

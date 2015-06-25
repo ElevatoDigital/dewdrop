@@ -10,6 +10,10 @@
 
 namespace Dewdrop\Test\Admin;
 
+/**
+ * This interface defined methods useful for testing admin components without
+ * having to manually wire up and/or mock admin routing and dispatching.
+ */
 interface AdminInterface
 {
     /**

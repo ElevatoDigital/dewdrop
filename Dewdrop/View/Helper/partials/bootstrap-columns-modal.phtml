@@ -1,0 +1,64 @@
+<div class="modal fade bootstrap-columns-modal" id="<?php echo $this->escapeHtmlAttr($this->id);?>" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <form action="<?php echo $this->escapeHtmlAttr($this->actionUrl);?>" method="POST">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">Adjust Columns</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-info">
+                        <p>Select the columns you'd like to display from the list below.</p>
+                    </div>
+                    <ul class="list-group">
+                        <?php
+                        foreach ($this->available as $availableField) {
+                            $isVisible = false;
+
+                            foreach ($this->visible as $visibleField) {
+                                if ($visibleField->getId() === $availableField->getId()) {
+                                    $isVisible = true;
+                                    break;
+                                }
+                            }
+
+                            echo '<li class="list-group-item">';
+
+                            echo '<div class="checkbox">';
+
+                            printf(
+                                '<label for="%s">',
+                                $this->escapeHtmlAttr($availableField->getHtmlId())
+                            );
+
+                            printf(
+                                '<input type="checkbox" id="%s" name="visible_columns[]" value="%s" %s />',
+                                $this->escapeHtmlAttr($availableField->getHtmlId()),
+                                $this->escapeHtmlAttr($availableField->getId()),
+                                ($isVisible ? 'checked="checked"' : '')
+                            );
+
+                            echo ' ';
+                            echo $this->escapeHtml($availableField->getLabel());
+                            echo '</label>';
+                            echo '</div>';
+                            echo '</li>';
+                        }
+                        ?>
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <?php if ($this->filterByUser) :?>
+                    <div class="settings pull-left">
+                        <label for="apply_to_all_users" class="text-muted">
+                            <input type="checkbox" id="apply_to_all_users" name="apply_to_all_users" value="1" />
+                            Make these selections the default for all users
+                        </label>
+                    </div>
+                    <?php endif;?>
+                    <input type="submit" class="btn btn-primary" value="Save" />
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

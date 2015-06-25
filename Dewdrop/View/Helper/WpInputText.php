@@ -16,9 +16,9 @@ namespace Dewdrop\View\Helper;
  *
  * Example usage:
  *
- * <code>
+ * <pre>
  * echo $this->wpInputText($this->fields->get('animals:latin_name'));
- * </code>
+ * </pre>
  *
  * @deprecated See \Dewdrop\View\Helper\InputText
  */

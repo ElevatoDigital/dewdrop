@@ -10,8 +10,6 @@
 
 namespace Dewdrop\Cli\Command;
 
-use DirectoryIterator;
-
 /**
  * Use PHP_CodeSniffer to check that your plugin code conforms to your coding
  * style of choice.  By default, we use the PSR-2 coding style.
@@ -97,30 +95,14 @@ class Sniff extends CommandAbstract
             $this->phpcs = $this->autoDetectExecutable('phpcs');
         }
 
-        $pluginRoot = $this->paths->getPluginRoot();
-
-        $vendorDirsToIgnore = array();
-
-        $directory = new DirectoryIterator("{$pluginRoot}/vendor");
-
-        /* @var $item DirectoryIterator */
-        foreach ($directory as $item) {
-            if ($item->isDir() && ! $item->isDot() && 'deltasystems' !== ($filename = $item->getFilename())) {
-                $vendorDirsToIgnore[] = $filename;
-            }
-        }
-
-        $vendorDirsToIgnoreString = 'vendor/' . implode('/*,vendor/', $vendorDirsToIgnore) . '/*';
-
         $cmd = sprintf(
             '%s --standard=%s --extensions=php '
-            . '--ignore=*/Zend/* --ignore=*/tests/* --ignore=*/models/metadata/* '
-            . '--ignore=' . escapeshellarg($vendorDirsToIgnoreString)
+            . '--ignore=*/vendor/* --ignore=*/metadata/* --ignore=*/tests/* --ignore=*/www/* --ignore=*/.git/* '
             . '%s %s',
             $this->phpcs,
             escapeshellarg($this->standard),
             $this->getFallbackArgString(),
-            escapeshellarg($pluginRoot)
+            escapeshellarg($this->paths->getPluginRoot())
         );
 
         $this->passthru($cmd);

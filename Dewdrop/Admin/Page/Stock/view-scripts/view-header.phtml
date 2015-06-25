@@ -1,0 +1,32 @@
+<?php if (!$this->isAjax) :?>
+<div class="page-header">
+    <h1>View <?php echo $this->escapeHtml($this->singularTitle);?></h1>
+</div>
+<?php else:?>
+<div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h4 class="modal-title">View <?php echo $this->escapeHtml($this->singularTitle);?></h4>
+</div>
+<div class="modal-body">
+<?php endif;?>
+
+<?php if ($this->permissions->can('edit')):?>
+    <nav class="navbar navbar-default navbar-admin-index" role="navigation">
+        <div class="navbar-header">
+            <a href="<?php echo $this->escapeHtmlAttr($this->adminUrl('edit', $this->params));?>" class="btn btn-primary navbar-btn">Edit <?php echo $this->escapeHtml($this->singularTitle);?></a>
+        </div>
+    </nav>
+<?php endif;?>
+<?php
+/* @var $renderer \Dewdrop\Fields\Helper\TableCell */
+$renderer = $this->tableCellRenderer();
+
+$renderer->getContentRenderer()->setViewMode(\Dewdrop\Fields\Helper\TableCell\Content::VIEW_MODE_DETAIL);
+
+echo $this->bootstrapDetailsView(
+    $this->fields->getVisibleFields($this->groupingFilter),
+    $this->data,
+    $renderer,
+    $this->id
+);
+?>

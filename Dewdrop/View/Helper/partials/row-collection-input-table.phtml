@@ -1,0 +1,102 @@
+<?php
+$renderHiddenInputs = function ($editor) {
+    $out = '<tr class="row-collection-hidden-input-row">';
+
+    /* @var $editor \Dewdrop\Fields\RowEditor */
+    /* @var $row \Dewdrop\Db\Row */
+    foreach ($editor->getRows() as $row) {
+        foreach ($row->getTable()->getPrimaryKey() as $field) {
+            /* @var $field \Dewdrop\Db\Field */
+            $field = $row->field($field);
+
+            $out .= sprintf(
+                '<input type="hidden" name="%s:%s[]" value="%s" />',
+                $this->escapeHtmlAttr($this->rowCollectionEditor->getId()),
+                $this->escapeHtmlAttr($field->getControlName()),
+                $this->escapeHtmlAttr($field->getValue())
+            );
+        }
+    }
+
+    $out .= sprintf(
+        '<input class="row-collection-queued-to-delete" type="hidden" name="%s:queued_to_delete[]" value="0" />',
+        $this->escapeHtmlAttr($this->rowCollectionEditor->getId())
+    );
+
+    $out .= '</tr>';
+
+    return $out;
+}
+?>
+<div class="panel panel-default row-collection-input-table" data-editor-count="<?php echo $this->escapeHtmlAttr(count($this->rowCollectionEditor->getEditors()));?>">
+    <div class="panel-heading">
+        <h3 class="panel-title"><?php echo $this->escapeHtml($this->rowCollectionEditor->getTitle());?></h3>
+    </div>
+    <div class="panel-body">
+        <nav class="navbar navbar-default">
+            <div class="navbar-left navbar-form">
+                <a class="btn btn-default btn-add-row" href="#">Add <?php echo $this->escapeHtml($this->rowCollectionEditor->getSingularTitle());?></a>
+            </div>
+        </nav>
+
+        <?php
+        /* @var $blankEditor \Dewdrop\Fields\RowEditor */
+        $blankEditor = $this->rowCollectionEditor->getBlankEditor();
+        $renderer    = $this->editControlRenderer();
+
+        $blankTemplate = $this->bootstrapForm()->renderFieldsInTableRow(
+            $blankEditor->getFields(),
+            $blankEditor->getInputFilter(),
+            $renderer
+        );
+
+        $blankTemplate .= $renderHiddenInputs($blankEditor);
+        ?>
+
+        <span class="row-template" data-row-collection-template="<?php echo $this->escapeHtmlAttr($blankTemplate);?>"></span>
+
+        <div class="alert alert-warning alert-no-records" style="display: none">
+            No <?php echo $this->escapeHtml($this->rowCollectionEditor->getPluralTitle());?> found.
+        </div>
+
+        <?php echo $this->bootstrapTable()->open();?>
+            <thead>
+                <tr>
+                    <?php
+                    foreach ($blankEditor->getFields() as $field) {
+                        $input = null;
+
+                        if ($blankEditor->getInputFilter()->has($field->getId())) {
+                            $input = $blankEditor->getInputFilter()->get($field->getId());
+                        }
+
+                        if ('delete' === $field->getId()) {
+                            echo '<th class="row-collection-delete-column">';
+                        } else {
+                            echo '<th>';
+                        }
+
+                        echo $this->bootstrapForm()->renderLabelContent($field, $renderer, $input);
+
+                        echo '</th>';
+                    }
+                    ?>
+                </tr>
+            </thead>
+            <tbody>
+                <?php
+                /* @var $editor \Dewdrop\Fields\RowEditor */
+                foreach ($this->rowCollectionEditor->getEditors() as $editor) {
+                    echo $this->bootstrapForm()->renderFieldsInTableRow(
+                        $editor->getFields(),
+                        $editor->getInputFilter(),
+                        $this->editControlRenderer()
+                    );
+
+                    echo $renderHiddenInputs($editor);
+                }
+                ?>
+            </tbody>
+        <?php echo $this->bootstrapTable()->close();?>
+    </div>
+</div>

@@ -1,0 +1,35 @@
+<?php
+printf(
+    '<button type="button" class="btn btn-xs btn-default"  data-container="body" data-toggle="modal" data-target="#%s_sql_modal">View SQL</button>',
+    $this->escapeHtmlAttr($this->field->getHtmlId())
+);
+?>
+
+<div class="modal fade" id="<?php echo $this->escapeHtmlAttr($this->field->getHtmlId());?>_sql_modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">Generated SQL for sorting <strong><?php echo $this->escapeHtml($this->field->getId());?></strong></h4>
+            </div>
+            <div class="modal-body">
+                <h5>Ascending</h5>
+                <?php
+                if ($this->asc) {
+                    echo \SqlFormatter::format($this->asc);
+                } else {
+                    echo '<div class="alert alert-danger">No SQL generated.  Please check your field\'s SelectSort callback.</div>';
+                }
+                ?>
+                <h5>Descending</h5>
+                <?php
+                if ($this->desc) {
+                    echo \SqlFormatter::format($this->desc);
+                } else {
+                    echo '<div class="alert alert-danger">No SQL generated.  Please check your field\'s SelectSort callback.</div>';
+                }
+                ?>
+            </div>
+        </div>
+    </div>
+</div>

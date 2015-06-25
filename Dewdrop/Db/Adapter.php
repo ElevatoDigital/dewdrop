@@ -10,6 +10,8 @@
 
 namespace Dewdrop\Db;
 
+use Dewdrop\Db\Adapter\GroupKeyNotPresentInResultsetException;
+use Dewdrop\Db\Driver\DriverInterface;
 use Dewdrop\Db\Driver\Wpdb as WpdbDriver;
 use Dewdrop\Exception;
 use Dewdrop\Paths;
@@ -46,6 +48,13 @@ class Adapter
     const CASE_LOWER = 2;
     const CASE_NATURAL = 0;
     const CASE_UPPER = 1;
+
+    /**
+     * How to handle case folding for keys in result sets.
+     *
+     * @var int
+     */
+    protected $caseFolding = self::CASE_NATURAL;
 
     /**
      * Keys are UPPERCASE SQL datatypes or the constants
@@ -94,20 +103,47 @@ class Adapter
     protected $driver;
 
     /**
+     * The name of the table that was affected by the most recent call to insert()
+     * is stored here so that we can use it to retrieve the last insert ID when
+     * using PostgreSQL.
+     *
+     * @var mixed
+     */
+    protected $lastInsertTableName;
+
+    /**
+     * Path to database table metadata.
+     *
+     * @var string
+     */
+    protected $tableMetadataPath;
+
+    /**
      * Create new adapter using the wpdb object as the driver
      *
      * @param mixed $driver
      */
     public function __construct($driver = null)
     {
-        if (null === $driver) {
-        }
-
         if ($driver instanceof wpdb) {
             $driver = new WpdbDriver($this, $driver);
         }
 
         $this->driver = $driver;
+    }
+
+    /**
+     * Set the driver that will be used by this adapter to communicate directly
+     * with the RDBMS.
+     *
+     * @param DriverInterface $driver
+     * @return \Dewdrop\Db\Adapter
+     */
+    public function setDriver(DriverInterface $driver)
+    {
+        $this->driver = $driver;
+
+        return $this;
     }
 
     /**
@@ -122,6 +158,16 @@ class Adapter
     }
 
     /**
+     * Get the driver being used to perform work for this DB adapter.
+     *
+     * @return DriverInterface
+     */
+    public function getDriver()
+    {
+        return $this->driver;
+    }
+
+    /**
      * Returns table metadata information.
      *
      * @param string $table
@@ -130,16 +176,41 @@ class Adapter
      */
     public function getTableMetadata($table)
     {
-        $paths = new Paths();
-        $path  = $paths->getModels() . '/metadata/' . $table . '.php';
+        $path = $this->getTableMetadataPath() . "/{$table}.php";
 
         if (!file_exists($path) || !is_readable($path)) {
             throw new Exception("Could not find metadata for table \"{$table}\"");
         }
 
-        $metadata = require $path;
+        return require $path;
+    }
 
-        return $metadata;
+    /**
+     * Returns table metadata filesystem path.
+     *
+     * @return string
+     */
+    public function getTableMetadataPath()
+    {
+        if (null === $this->tableMetadataPath) {
+            $paths                   = new Paths();
+            $this->tableMetadataPath = $paths->getModels() . '/metadata';
+        }
+
+        return $this->tableMetadataPath;
+    }
+
+    /**
+     * Sets table metadata filesystem path.
+     *
+     * @param string $tableMetadataPath
+     * @return Adapter
+     */
+    public function setTableMetadataPath($tableMetadataPath)
+    {
+        $this->tableMetadataPath = (string) $tableMetadataPath;
+
+        return $this;
     }
 
     /**
@@ -163,6 +234,80 @@ class Adapter
     public function fetchAll($sql, $bind = array(), $fetchMode = null)
     {
         return $this->driver->fetchAll($sql, $bind, $fetchMode);
+    }
+
+    /**
+     * Fetch all results for the supplied SQL statement and group them into
+     * a nested array using the supplied $groupKey.
+     *
+     * For exapmle, if you had a resultset containing these three rows:
+     *
+     * <pre>
+     * name | family_id
+     * ----------------
+     * Bob  | 1
+     * Tim  | 1
+     * Ken  | 2
+     * </pre>
+     *
+     * And you called fetchAllGroupedByKey() with a $groupKey of 'family_id',
+     * you'd get the following array in return:
+     *
+     * <pre>
+     * [
+     *     1 => [
+     *         ['name' => 'Bob', 'family_id' => 1],
+     *         ['name' => 'Tim', 'family_id' => 1],
+     *     ],
+     *     2 => [
+     *         ['name' => 'Ken', 'family_id' => 2],
+     *     ]
+     * ]
+     * </pre>
+     *
+     * @param string|\Dewdrop\Db\Select $sql
+     * @param string $groupKey
+     * @param array $bind
+     * @param string $fetchMode
+     * @return array
+     */
+    public function fetchAllGroupedByKey($sql, $groupKey, $bind = array(), $fetchMode = null)
+    {
+        $rows = $this->fetchAll($sql, $bind, $fetchMode);
+        $out  = [];
+
+        if (count($rows)) {
+            $validationRow = current($rows);
+
+            // Convert validation row to array from stdClass in case fetchMode returned an object
+            if (is_object($validationRow)) {
+                $validationRow = get_object_vars($validationRow);
+            }
+
+            if (is_array($validationRow) && !isset($validationRow[$groupKey])) {
+                $exception = new GroupKeyNotPresentInResultsetException("'{$groupKey}' was not present in results.");
+                $exception
+                    ->setGroupKey($groupKey)
+                    ->setValidationRow($validationRow);
+                throw $exception;
+            }
+        }
+
+        foreach ($rows as $row) {
+            if (is_array($row)) {
+                $groupValue = $row[$groupKey];
+            } else {
+                $groupValue = $row->$groupKey;
+            }
+
+            if (!array_key_exists($groupKey, $out)) {
+                $out[$groupKey] = [];
+            }
+
+            $out[$groupValue][] = $row;
+        }
+
+        return $out;
     }
 
     /**
@@ -210,7 +355,7 @@ class Adapter
      */
     public function fetchPairs($sql, $bind = array())
     {
-        $rs  = $this->fetchAll($sql, $bind, ARRAY_N);
+        $rs  = $this->fetchAll($sql, $bind, self::ARRAY_N);
         $out = array();
 
         foreach ($rs as $row) {
@@ -224,7 +369,7 @@ class Adapter
      * Fetch a single scalar value from the results of the supplied SQL
      * statement.
      *
-     * @param string|\Dewdrop\Db\Select
+     * @param string|\Dewdrop\Db\Select $sql
      * @param array $bind
      * @return mixed
      */
@@ -262,13 +407,16 @@ class Adapter
              . ' (' . implode(', ', $cols) . ') '
              . 'VALUES (' . implode(', ', $vals) . ')';
 
-        $bind = array_values($bind);
+        $bind   = array_values($bind);
+        $result = $this->query($sql, $bind);
 
-        return $this->query($sql, $bind);
+        $this->lastInsertTableName = $table;
+
+        return $result;
     }
 
     /**
-     * Get the last insert ID from \wpdb after performing an insert on a table
+     * Get the last insert ID from after performing an insert on a table
      * with an auto-incrementing primary key.
      *
      * @return integer
@@ -276,6 +424,18 @@ class Adapter
     public function lastInsertId()
     {
         return $this->driver->lastInsertId();
+    }
+
+    /**
+     * Retrieve the name of the table affected by the last call to insert().
+     * Allows us to get last insert ID when using drivers that don't have a
+     * function for that built-in (i.e. pgsql).
+     *
+     * @return string
+     */
+    public function getLastInsertTableName()
+    {
+        return $this->lastInsertTableName;
     }
 
     /**
@@ -350,7 +510,7 @@ class Adapter
      * Run the supplied query, binding the supplied data to the statement
      * prior to execution.
      *
-     * @param string|\Dewdrop\Db\Select
+     * @param string|\Dewdrop\Db\Select $sql
      * @param array $bind
      * @return mixed
      */
@@ -491,7 +651,7 @@ class Adapter
         if (is_int($value) || is_float($value)) {
             return $value;
         }
-        return "'" . mysql_real_escape_string($value) . "'";
+        return $this->driver->quoteInternal($value);
     }
 
     /**
@@ -500,12 +660,12 @@ class Adapter
      * The placeholder is a question-mark; all placeholders will be replaced
      * with the quoted value.   For example:
      *
-     * <code>
+     * <pre>
      * $text = "WHERE date < ?";
      * $date = "2005-01-02";
      * $safe = $sql->quoteInto($text, $date);
      * // $safe = "WHERE date < '2005-01-02'"
-     * </code>
+     * </pre>
      *
      * @param string  $text  The text with a placeholder.
      * @param mixed   $value The value to quote.
@@ -657,7 +817,7 @@ class Adapter
      */
     public function listTables()
     {
-        return $this->fetchCol('SHOW TABLES');
+        return $this->driver->listTables();
     }
 
     /**
@@ -666,14 +826,14 @@ class Adapter
      *
      * The array has the following format:
      *
-     * <code>
+     * <pre>
      * array(
      *     'column_name' => array(
      *         'table'  => 'foreign_table',
      *         'column' => 'foreign_column'
      *     )
      * )
-     * </code>
+     * </pre>
      *
      * @param string $tableName
      * @return array
@@ -688,13 +848,13 @@ class Adapter
      *
      * The array has the following format:
      *
-     * <code>
+     * <pre>
      * array(
      *     'key_name' => array(
      *         sequence_in_index => 'column_name'
      *     )
      * )
-     * </code>
+     * </pre>
      *
      * @param string $tableName
      * @return array
@@ -737,6 +897,26 @@ class Adapter
     }
 
     /**
+     * Begin a new transaction.
+     *
+     * @return void
+     */
+    public function beginTransaction()
+    {
+        return $this->driver->beginTransaction();
+    }
+
+    /**
+     * Commit the current transaction.
+     *
+     * @return void
+     */
+    public function commit()
+    {
+        $this->driver->commit();
+    }
+
+    /**
      * Helper method to change the case of the strings used
      * when returning result sets in FETCH_ASSOC and FETCH_BOTH
      * modes.
@@ -750,7 +930,7 @@ class Adapter
      */
     public function foldCase($key)
     {
-        switch ($this->_caseFolding) {
+        switch ($this->caseFolding) {
             case self::CASE_LOWER:
                 $value = strtolower((string) $key);
                 break;

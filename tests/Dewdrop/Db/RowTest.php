@@ -22,8 +22,7 @@ class RowTest extends DbTestCase
 
         require_once __DIR__ . '/table/DewdropTestFruits.php';
 
-        $wpdb     = new \wpdb(DB_USER, DB_PASSWORD, DB_NAME, DB_HOST);
-        $this->db = new Adapter($wpdb);
+        $this->db = $GLOBALS['dewdrop_pimple']['db'];
 
         $this->table = new \DewdropTest\DewdropTestFruits($this->db);
     }

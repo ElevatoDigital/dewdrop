@@ -1,0 +1,33 @@
+<div class="bulk-action-check-all">
+    <label for="<?php echo $this->escapeHtmlAttr($this->bulkActions->getId());?>_check_all">
+        <input type="checkbox" id="<?php echo $this->escapeHtmlAttr($this->bulkActions->getId());?>_check_all" />
+        Check All
+    </label>
+</div>
+
+<?php if ($this->totalCount > $this->visibleCount) :?>
+<div class="alert alert-info bulk-action-check-all-alert">
+    All <?php echo $this->escapeHtml($this->visibleCount);?> <?php echo $this->escapeHtml($this->pluralTitle);?> on this page are selected.
+    <label for="<?php echo $this->escapeHtmlAttr($this->bulkActions->getId());?>_check_pages">
+        ( <input type="checkbox" id="<?php echo $this->escapeHtmlAttr($this->bulkActions->getId());?>_check_pages" name="<?php echo $this->escapeHtmlAttr($this->bulkActions->getId());?>_check_pages" value="1">
+        Check all <?php echo $this->escapeHtml($this->totalCount);?> <?php echo $this->escapeHtml($this->pluralTitle);?> across all pages)
+    </label>
+</div>
+<?php endif;?>
+
+<div class="panel panel-default bulk-action-panel">
+    <div class="panel-body">
+        <div class="row">
+            <?php
+            /* @var $action \Dewdrop\Fields\Listing\BulkActions\ActionInterface */
+            foreach ($this->bulkActions->getActions() as $action) {
+                echo '<div class="bulk-action-wrapper">';
+                echo $action->render($this);
+                echo '</div>';
+            }
+            ?>
+        </div>
+    </div>
+</div>
+
+</form>

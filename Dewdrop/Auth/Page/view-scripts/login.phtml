@@ -1,0 +1,53 @@
+<?php
+$messages = array(
+    'Bad credentials' => 'Incorrect username or password.'
+);
+
+if ($this->error) {
+    $this->error = str_replace(array_keys($messages), $messages, $this->error);
+}
+?>
+
+<div class="panel panel-default">
+    <div class="panel-heading"><h3 class="panel-title"><?php echo ($this->headerHtml ?: $this->escapeHtml($this->title));?></h3></div>
+    <div class="panel-body">
+        <form action="/admin/login-check" method="post">
+
+            <?php if ($this->error):?>
+            <div class="alert alert-danger"><?php echo $this->escapeHtml($this->error); ?></div>
+            <?php endif;?>
+
+            <?php if ($this->token):?>
+                <div class="alert alert-success">Password successfully reset.</div>
+            <?php endif;?>
+
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input id="username" type="text" name="_username" class="form-control" autofocus
+                    value="<?php echo $this->escapeHtmlAttr($this->lastUsername); ?>" />
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input id="password" type="password" name="_password" class="form-control" value="" />
+            </div>
+
+            <div class="form-group">
+                <div class=" remember-me pull-right">
+                    <label for="_remember_me">
+                        <input type="checkbox" name="_remember_me" id="_remember_me" />
+                        Remember me on this device
+                    </label>
+                </div>
+                <button type="submit" class="btn btn-primary">Sign In</button>
+            </div>
+        </form>
+    </div>
+    <div class="panel-footer"><a href="/auth/forgot-password">Lost username or password?</a></div>
+</div>
+
+<?php
+if ($this->error) {
+    $this->headScript()->appendFile($this->bowerUrl('/dewdrop/www/js/auth-error.js'));
+}
+?>

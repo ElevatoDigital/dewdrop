@@ -1,0 +1,57 @@
+<div class="page-header">
+    <h1><span class="glyphicon glyphicon-wrench"></span> View Pages</h1>
+</div>
+
+<?php
+
+$activePages = [];
+$pageData    = [];
+$fileRoot    = isset($_SERVER['DOCUMENT_ROOT']) ? $_SERVER['DOCUMENT_ROOT'] : '';
+
+/* @var $factory \Dewdrop\Admin\PageFactory\PageFactoryInterface */
+foreach ($this->pageFactories as $factory) {
+    /* @var $page \Dewdrop\Admin\PageFactory\Page */
+    foreach ($factory->listAvailablePages() as $page) {
+        $pageData[] = [
+            'url'       => $page->getName(),
+            'className' => $page->getClassName(),
+            'file'      => str_replace($fileRoot, '', $page->getFile()),
+            'active'    => (!in_array($page->getName(), $activePages) ? true : false),
+            'docs'      => $page->getDocBlock(),
+            'factory'   => get_class($factory)
+        ];
+
+        if (!in_array($page->getName(), $activePages)) {
+            $activePages[] = $page->getName();
+        }
+    }
+}
+?>
+<div class="row">
+    <?php foreach ($pageData as $page) :?>
+    <div class="col-md-4 col-sm-6">
+        <?php if ($page['active']): ?>
+        <div class="panel panel-default debug-pages-panel">
+        <?php else: ?>
+        <div class="panel panel-default debug-pages-panel inactive">
+        <?php endif;?>
+            <div class="panel-heading">
+                <h3 class="panel-title"><?php echo $this->escapeHtml($page['url']);?></h3>
+            </div>
+            <div class="panel-body">
+                <?php if ($page['docs']): ?>
+                <p><?php echo $page['docs'];?></p>
+                <?php else: ?>
+                <p class="text-muted">&lt;no docs provided&gt;</p>
+                <?php endif;?>
+                <p>
+                    <strong>Class:</strong> <?php echo $this->escapeHtml(ltrim($page['className'], '\\'));?><br />
+                    <strong>Factory:</strong> <?php echo $this->escapeHtml($page['factory']);?>
+                </p>
+            </div>
+        </div>
+    </div>
+    <?php endforeach;?>
+</div>
+
+<?php $this->headLink()->appendStylesheet($this->bowerUrl('/dewdrop/www/css/debug-pages.css'));?>

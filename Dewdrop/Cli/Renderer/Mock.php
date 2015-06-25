@@ -26,7 +26,7 @@ class Mock implements RendererInterface
     /**
      * Display the primary title for the output.
      *
-     * @param string
+     * @param string $title
      * @returns RendererInterface
      */
     public function title($title)
@@ -39,7 +39,7 @@ class Mock implements RendererInterface
     /**
      * Display a subhead, or 2nd-level header.
      *
-     * @param string
+     * @param string $subhead
      * @returns RendererInterface
      */
     public function subhead($subhead)
@@ -52,7 +52,7 @@ class Mock implements RendererInterface
     /**
      * Display a single line or block of text.
      *
-     * @param string
+     * @param string $text
      * @returns RendererInterface
      */
     public function text($text)
@@ -82,7 +82,7 @@ class Mock implements RendererInterface
     /**
      * Display a success message.
      *
-     * @param string
+     * @param string $message
      * @returns RendererInterface
      */
     public function success($message)
@@ -95,7 +95,7 @@ class Mock implements RendererInterface
     /**
      * Display a warning message.
      *
-     * @param string
+     * @param string $warning
      * @returns RendererInterface
      */
     public function warn($warning)
@@ -108,7 +108,7 @@ class Mock implements RendererInterface
     /**
      * Display an error message.
      *
-     * @param string
+     * @param string $error
      * @returns RendererInterface
      */
     public function error($error)

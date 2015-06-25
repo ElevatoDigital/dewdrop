@@ -1,0 +1,13 @@
+.option-input-decorator .well {
+    display: none;
+    margin-top: 15px;
+}
+
+.option-input-decorator .well h4 {
+    margin-top: 0;
+}
+
+.option-input-decorator-or {
+    margin-left: 15px;
+}
+

@@ -12,7 +12,6 @@ namespace Dewdrop\View\Helper;
 
 use Dewdrop\Db\Field;
 
-
 /**
  * Render a basic HTML &lt;select&gt; element using the supplied options.
  */
@@ -57,17 +56,23 @@ class Select extends AbstractHelper
      * @param string $name The name attribute for the <select>.
      * @param array $options The key-value pairs representing the select options.
      * @param mixed $value The selected value.
+     * @param mixed $classes Any CSS classes you'd like to add.
+     * @param array $attributes Any additional HTML attribute key-value pairs for the <select>.
      * @return string
      */
-    public function directExplicit($name, array $options, $value)
+    public function directExplicit($name, array $options, $value, $classes = null, array $attributes = [])
     {
-        return $this->directArray(
-            array(
-                'name'    => $name,
-                'value'   => $value,
-                'options' => $options
-            )
-        );
+        if (null !== $classes && !is_array($classes)) {
+            $classes = array($classes);
+        }
+
+        return $this->directArray([
+            'name'       => $name,
+            'value'      => $value,
+            'options'    => $options,
+            'classes'    => $classes,
+            'attributes' => $attributes,
+        ]);
     }
 
     /**
@@ -80,20 +85,32 @@ class Select extends AbstractHelper
     {
         extract($this->prepareOptionsArray($options));
 
+        if (!isset($showBlank)) {
+            $showBlank = true;
+        }
+
         if (null === $id) {
             $id = $name;
+        }
+
+        if (0 === count($classes)) {
+            $classes[] = 'form-control';
         }
 
         $value = (string) $value;
 
         return $this->partial(
             'select.phtml',
-            array(
-                'name'    => $name,
-                'id'      => $id,
-                'value'   => $value,
-                'options' => $options
-            )
+            [
+                'name'       => $name,
+                'id'         => $id,
+                'value'      => $value,
+                'options'    => $options,
+                'classes'    => $classes,
+                'blankTitle' => $blankTitle,
+                'showBlank'  => $showBlank,
+                'attributes' => $attributes,
+            ]
         );
     }
 
@@ -108,8 +125,8 @@ class Select extends AbstractHelper
     {
         $this
             ->checkRequired($options, array('name', 'value', 'options'))
-            ->ensurePresent($options, array('id'))
-            ->ensureArray($options, array('options'));
+            ->ensurePresent($options, array('id', 'classes', 'blankTitle', 'attributes'))
+            ->ensureArray($options, array('options', 'classes', 'attributes'));
 
         return $options;
     }

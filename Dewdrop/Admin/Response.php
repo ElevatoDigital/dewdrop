@@ -40,7 +40,7 @@ class Response
      * for short-circuiting of the dispatch logic.  Will only be
      * present if process() is called.
      *
-     * @param \Dewdrop\Admin\ResponseHelper\Standard
+     * @param ResponseHelper
      */
     protected $helper;
 
@@ -79,7 +79,7 @@ class Response
      * with during testing.
      *
      * @param PageAbstract $page
-     * @return \Dewdrop\Admin\Response\ResponseInterface
+     * @return $this
      */
     public function setPage(PageAbstract $page)
     {
@@ -102,7 +102,7 @@ class Response
      * Set whether the page's process method was called.
      *
      * @param boolean $wasProcessed
-     * @return \Dewdrop\Admin\Response\ResponseInterface
+     * @return $this
      */
     public function setWasProcessed($wasProcessed)
     {
@@ -125,7 +125,7 @@ class Response
      * Set the response helper associated with this response.
      *
      * @param ResponseHelper $helper
-     * @return \Dewdrop\Admin\Response\ResponseInterface
+     * @return $this
      */
     public function setHelper(ResponseHelper $helper)
     {
@@ -143,7 +143,7 @@ class Response
      */
     public function getHelper()
     {
-        return ($this->helper ?: $this->page->createResposneHelper());
+        return ($this->helper ?: $this->page->createResponseHelper());
     }
 
     /**
@@ -165,9 +165,13 @@ class Response
      */
     public function executeQueuedActions()
     {
-        $this->executeHelper();
+        $result = $this->executeHelper();
 
-        return $this->helper->willShortCircuitResponse();
+        if ($this->helper->willShortCircuitResponse()) {
+            return $result;
+        }
+
+        return false;
     }
 
     /**
@@ -184,10 +188,10 @@ class Response
      * This is separated into its own method to allow mocking of queued
      * action execution during testing.
      *
-     * @return void
+     * @return mixed
      */
     protected function executeHelper()
     {
-        $this->helper->execute();
+        return $this->helper->execute();
     }
 }

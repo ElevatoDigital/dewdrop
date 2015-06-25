@@ -20,11 +20,11 @@ use Dewdrop\Db\Field;
  *
  * Example usage:
  *
- * <code>
+ * <pre>
  * echo $this->wpEditRow()->open($this->fields->get('model:field_name'));
  * echo $this->wpInputText($this->fields->get('model:field_name'));
  * echo $this->wpEditRow()->close();
- * </code>
+ * </pre>
  */
 class WpEditRow extends AbstractHelper
 {

@@ -15,7 +15,7 @@ use Dewdrop\Admin\Page\PageAbstract;
 /**
  * Get a URL for a page in the current admin component.
  */
-class AdminUrl extends AbstractHelper
+class AdminUrl extends AbstractHelper implements PageDelegateInterface
 {
     /**
      * The page this helper's view is attached to.
@@ -31,10 +31,15 @@ class AdminUrl extends AbstractHelper
      * @see PageAbstract::url()
      * @param string $page
      * @param array $params
+     * @param boolean $resetParams
      * @return string
      */
-    public function direct($page, array $params = array())
+    public function direct($page, array $params = array(), $resetParams = true)
     {
+        if (!$resetParams) {
+            $params = array_merge($this->view->getRequest()->getQuery(), $params);
+        }
+
         return $this->page->url($page, $params);
     }
 
@@ -49,5 +54,16 @@ class AdminUrl extends AbstractHelper
         $this->page = $page;
 
         return $this;
+    }
+
+    /**
+     * Return the page this helper users to geneate URLs so that partials
+     * can function properly.
+     *
+     * @return PageAbstract
+     */
+    public function getPage()
+    {
+        return $this->page;
     }
 }

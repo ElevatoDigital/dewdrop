@@ -660,16 +660,21 @@ abstract class CommandAbstract
     }
 
     /**
-     * Attempt to locate the named executable using "which", if it is
-     * available.  Otherwise, just return the name and hope it is in
-     * the user's $PATH.
+     * First, we check to see if the executable is present in Composer's
+     * "./vendor/bin/" folder.  Then, we attempt to locate the named
+     * executable using "which", if it is available.  Otherwise, just
+     * return the name and hope it is in the user's $PATH.
      *
      * @param string $name
      * @return string
      */
     protected function autoDetectExecutable($name)
     {
-        if (!file_exists('/usr/bin/which')) {
+        $composerPath = getcwd() . '/vendor/bin/' . $name;
+
+        if (file_exists($composerPath)) {
+            return $composerPath;
+        } elseif (!file_exists('/usr/bin/which')) {
             return $name;
         } else {
             return trim(shell_exec("which {$name}")) ?: $name;

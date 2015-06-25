@@ -22,17 +22,19 @@ use Dewdrop\Db\Select\SelectException;
  */
 class Select
 {
-    const DISTINCT       = 'distinct';
-    const COLUMNS        = 'columns';
-    const FROM           = 'from';
-    const UNION          = 'union';
-    const WHERE          = 'where';
-    const GROUP          = 'group';
-    const HAVING         = 'having';
-    const ORDER          = 'order';
-    const LIMIT_COUNT    = 'limitcount';
-    const LIMIT_OFFSET   = 'limitoffset';
-    const FOR_UPDATE     = 'forupdate';
+    const DISTINCT             = 'distinct';
+    const PRE_COLUMNS_OPTIONS  = 'precolumnsoptions';
+    const COLUMNS              = 'columns';
+    const FROM                 = 'from';
+    const UNION                = 'union';
+    const WHERE                = 'where';
+    const WHERE_CONDITION_SETS = 'wheresets';
+    const GROUP                = 'group';
+    const HAVING               = 'having';
+    const ORDER                = 'order';
+    const LIMIT_COUNT          = 'limitcount';
+    const LIMIT_OFFSET         = 'limitoffset';
+    const FOR_UPDATE           = 'forupdate';
 
     const INNER_JOIN     = 'inner join';
     const LEFT_JOIN      = 'left join';
@@ -76,23 +78,25 @@ class Select
     /**
      * The initial values for the $parts array.
      * NOTE: It is important for the 'FOR_UPDATE' part to be last to ensure
-     * meximum compatibility with database adapters.
+     * maximum compatibility with database adapters.
      *
      * @var array
      */
-    protected static $partsInit = array(
-        self::DISTINCT     => false,
-        self::COLUMNS      => array(),
-        self::UNION        => array(),
-        self::FROM         => array(),
-        self::WHERE        => array(),
-        self::GROUP        => array(),
-        self::HAVING       => array(),
-        self::ORDER        => array(),
-        self::LIMIT_COUNT  => null,
-        self::LIMIT_OFFSET => null,
-        self::FOR_UPDATE   => false
-    );
+    protected static $partsInit = [
+        self::DISTINCT             => false,
+        self::PRE_COLUMNS_OPTIONS  => [],
+        self::COLUMNS              => [],
+        self::UNION                => [],
+        self::FROM                 => [],
+        self::WHERE                => [],
+        self::WHERE_CONDITION_SETS => [],
+        self::GROUP                => [],
+        self::HAVING               => [],
+        self::ORDER                => [],
+        self::LIMIT_COUNT          => null,
+        self::LIMIT_OFFSET         => null,
+        self::FOR_UPDATE           => false
+    ];
 
     /**
      * Specify legal join types.
@@ -180,6 +184,19 @@ class Select
     }
 
     /**
+     * Adds an option verbatim to the SQL before the selected columns
+     *
+     * @param string $option
+     * @return Select
+     */
+    public function preColumnsOption($option)
+    {
+        $this->parts[static::PRE_COLUMNS_OPTIONS][] = $option;
+
+        return $this;
+    }
+
+    /**
      * Adds a FROM table and optional columns to the query.
      *
      * The first parameter $name can be a simple string, in which case the
@@ -240,13 +257,13 @@ class Select
      * The first parameter has to be an array of \Dewdrop\Db\Select or
      * sql query strings.
      *
-     * <code>
+     * <pre>
      * $sql1 = $db->select();
      * $sql2 = "SELECT ...";
      * $select = $db->select()
      *      ->union(array($sql1, $sql2))
      *      ->order("id");
-     * </code>
+     * </pre>
      *
      * @param  array $select Array of select clauses for the union.
      * @param  string $type
@@ -418,7 +435,7 @@ class Select
      * and replaced into the condition wherever a question-mark
      * appears. Array values are quoted and comma-separated.
      *
-     * <code>
+     * <pre>
      * // simplest but non-secure
      * $select->where("id = $id");
      *
@@ -427,16 +444,16 @@ class Select
      *
      * // alternatively, with named binding
      * $select->where('id = :id');
-     * </code>
+     * </pre>
      *
      * Note that it is more correct to use named bindings in your
      * queries for values other than strings. When you use named
      * bindings, don't forget to pass the values when actually
      * making a query:
      *
-     *e<code>
+     * <pre>
      * $db->fetchAll($select, array('id' => 5));
-     * </code>
+     * </pre>
      *
      * @param string   $cond  The WHERE condition.
      * @param mixed    $value OPTIONAL The value to quote into the condition.
@@ -465,6 +482,59 @@ class Select
     public function orWhere($cond, $value = null, $type = null)
     {
         $this->parts[self::WHERE][] = $this->whereInternal($cond, $value, $type, false);
+
+        return $this;
+    }
+
+    /**
+     * Register a new condition set, useful when you want a block of conditions
+     * to be joined to the overall Select, grouped in their own parens.  Useful
+     * to help users build complex boolean queries that interact predictably
+     * with WHERE clause additions you've made in code.
+     *
+     * @param string $name
+     * @param string $conjunction
+     * @return $this
+     * @throws SelectException
+     */
+    public function registerConditionSet($name, $conjunction)
+    {
+        if (self::SQL_AND !== $conjunction && self::SQL_OR !== $conjunction) {
+            throw new SelectException('Condition sets must use AND or OR');
+        }
+
+        $this->parts[self::WHERE_CONDITION_SETS][$name] = array(
+            'conjunction' => $conjunction,
+            'conditions'  => array()
+        );
+
+        return $this;
+    }
+
+    /**
+     * Add a new condition to a condition set.  The set must be registered with
+     * registerConditionSet() prior to calling this method.  Otherwise, it
+     * behaves just like where().
+     *
+     * @param string $setName
+     * @param string $condition
+     * @param mixed $value
+     * @param null|string $type
+     * @param null|integer $number
+     * @return $this
+     * @throws SelectException
+     */
+    public function whereConditionSet($setName, $condition, $value = null, $type = null, $number = null)
+    {
+        if (!isset($this->parts[self::WHERE_CONDITION_SETS][$setName])) {
+            throw new SelectException("Adding condition to unregistered set: {$setName}");
+        }
+
+        if (null !== $value) {
+            $condition = $this->adapter->quoteInto($condition, $value, $type, $number);
+        }
+
+        $this->parts[self::WHERE_CONDITION_SETS][$setName]['conditions'][] = $condition;
 
         return $this;
     }
@@ -574,9 +644,6 @@ class Select
                     $val = trim($matches[1]);
                     $direction = $matches[2];
                 }
-                if (preg_match('/\(.*\)/', $val)) {
-                    $val = new Expr($val);
-                }
                 $this->parts[self::ORDER][] = array($val, $direction);
             }
         }
@@ -640,6 +707,28 @@ class Select
             throw new SelectException("Invalid Select part '$part'");
         }
         return $this->parts[$part];
+    }
+
+    /**
+     * This method will quote the supplied table and column name pair, using
+     * whatever alias has been defined for the table on this Select object.
+     * This can be useful when you're modifying a Select and you are not sure
+     * what aliases have been added for the table you want to reference.
+     *
+     * @throws SelectException
+     * @param string $tableName
+     * @param string $columnName
+     * @return string
+     */
+    public function quoteWithAlias($tableName, $columnName)
+    {
+        foreach ($this->getPart(self::FROM) as $queryName => $info) {
+            if ($tableName === $info['tableName'] || $queryName === $tableName) {
+                return $this->getAdapter()->quoteIdentifier("{$queryName}.{$columnName}");
+            }
+        }
+
+        throw new SelectException("Table {$tableName} could not be found in the query.");
     }
 
     /**
@@ -806,12 +895,12 @@ class Select
      * then completes the ON condition by using the same field for the FROM
      * table and the JOIN table.
      *
-     * <code>
+     * <pre>
      * $select = $db->select()->from('table1')
      *                        ->joinUsing('table2', 'column1');
      *
      * // SELECT * FROM table1 JOIN table2 ON table1.column1 = table2.column2
-     * </code>
+     * </pre>
      *
      * These joins are called by the developer simply by adding 'Using' to the
      * method name. E.g.
@@ -825,7 +914,7 @@ class Select
      * @param string $name
      * @param string $cond
      * @param string|array $cols
-     * @param string schema
+     * @param string $schema
      * @return \Dewdrop\Db\Select This \Dewdrop\Db\Select object.
      */
     public function joinUsingInternal($type, $name, $cond, $cols = '*', $schema = null)
@@ -1021,6 +1110,21 @@ class Select
     }
 
     /**
+     * Renders pre-columns options
+     *
+     * @param string $sql
+     * @return string
+     */
+    protected function renderPrecolumnsoptions($sql)
+    {
+        foreach ($this->parts[static::PRE_COLUMNS_OPTIONS] as $option) {
+            $sql .= " {$option}";
+        }
+
+        return $sql;
+    }
+
+    /**
      * Render DISTINCT clause
      *
      * @param string   $sql SQL query
@@ -1136,6 +1240,37 @@ class Select
     {
         if ($this->parts[self::FROM] && $this->parts[self::WHERE]) {
             $sql .= ' ' . self::SQL_WHERE . ' ' .  implode(' ', $this->parts[self::WHERE]);
+        }
+
+        return $sql;
+    }
+
+    /**
+     * Render the condition sets that have been registered with this Select.
+     *
+     * @param string $sql
+     * @return string
+     */
+    protected function renderWheresets($sql)
+    {
+        if (count($this->parts[self::WHERE_CONDITION_SETS])) {
+            $setIndex = 0;
+
+            foreach ($this->parts[self::WHERE_CONDITION_SETS] as $set) {
+                if (!count($set['conditions'])) {
+                    continue;
+                }
+
+                if (0 < $setIndex || $this->parts[self::WHERE]) {
+                    $sql .= ' AND ';
+                } else {
+                    $sql .= ' WHERE ';
+                }
+
+                $sql .= '(' . implode(' ' . $set['conjunction'] . ' ', $set['conditions']) . ')';
+
+                $setIndex += 1;
+            }
         }
 
         return $sql;

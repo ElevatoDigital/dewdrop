@@ -51,7 +51,7 @@ abstract class AbstractHelper
      * This method is used by \Dewdrop\View\View::__call() to allow direct
      * execution of a helper.
      *
-     * @return \Dewdrop\View\Helper\AbstractHelper
+     * @return mixed
      */
     public function direct()
     {
@@ -74,13 +74,25 @@ abstract class AbstractHelper
      */
     public function partial($name, array $data)
     {
-        $view = new View($this->view->getEscaper());
+        return $this->view->partial($name, $data, __DIR__ . '/partials');
+    }
 
-        $view
-            ->setScriptPath(__DIR__ . '/partials')
-            ->assign($data);
-
-        return $view->render($name);
+    /**
+     * Useful in cases where you want to just return the helper if the user didn't
+     * provide any args to direct(), but want to call a short-cut method if they
+     * did.
+     *
+     * @param array $args
+     * @param string $method
+     * @return $this|string
+     */
+    protected function delegateIfArgsProvided(array $args, $method = 'directWithArgs')
+    {
+        if (0 === count($args)) {
+            return $this;
+        } else {
+            return call_user_func_array([$this, $method], $args);
+        }
     }
 
     /**

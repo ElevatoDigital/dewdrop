@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="">
+        <meta name="author" content="">
+
+        <title><?php echo $this->escapeHtml($this->title);?></title>
+
+        <?php
+        foreach ($this->dependencies['css'] as $css) {
+            printf('<link href="%s" rel="stylesheet" />', $this->urlCachePrefix($this->bowerUrl($css)));
+        }
+        ?>
+
+        <?php
+        if ($this->viewHeadLink) {
+            echo $this->urlCachePrefix()->headLink($this->viewHeadLink);
+        }
+        ?>
+
+        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+          <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+          <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+    </head>
+
+    <?php
+    $envClass = '';
+
+    if (defined('APPLICATION_ENV')) {
+        $envClass = 'env-' . APPLICATION_ENV;
+    }
+    ?>
+    <body class="<?php echo $envClass;?>">
+    <div class="container-fluid">
+        <nav class="navbar navbar-default navbar-inverse navbar-fixed-top" role="navigation">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#admin-nav-collapse">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <?php echo $this->adminTitle($this->env);?>
+                </div>
+
+                <div class="collapse navbar-collapse" id="admin-nav-collapse">
+                    <ul class="nav navbar-nav">
+                        <?php
+                        /* @var $component \Dewdrop\Admin|Component\ComponentAbstract */
+                        foreach ($this->components as $component) {
+                            if (!$component->getPermissions()->can('access') || !$component->getPermissions()->can('display-menu')) {
+                                continue;
+                            }
+
+                            $submenuPages = $component->getSubmenuPages();
+                            $badgeContent = '';
+                            $activeClass  = '';
+
+                            if ($component->getBadgeContent()) {
+                                $badgeContent = sprintf(
+                                    ' <span class="badge">%s</span>',
+                                    $this->escapeHtml($component->getBadgeContent())
+                                );
+                            }
+
+                            if ($component->isActive()) {
+                                $activeClass = 'active ';
+                            }
+
+                            if (0 === count($submenuPages)) {
+                                printf(
+                                    '<li class="%s"><a href="%s">%s%s</a></li>',
+                                    $activeClass,
+                                    $this->escapeHtmlAttr($this->url('/admin/' . $component->getName() . '/index')),
+                                    $this->escapeHtml($component->getTitle()),
+                                    $badgeContent
+                                );
+                            } else {
+                                echo '<li class="dropdown">';
+
+                                printf(
+                                    '<a href="#" class="dropdown-toggle" data-toggle="dropdown">%s%s <b class="caret"></b></a>',
+                                    $this->escapeHtml($component->getTitle()),
+                                    $badgeContent
+                                );
+
+                                echo '<ul class="dropdown-menu">';
+
+                                foreach ($submenuPages as $page) {
+                                    if (isset($page['isDivider']) && $page['isDivider']) {
+                                        echo '<li class="divider"></li>';
+                                    } else {
+                                        printf(
+                                            '<li><a href="%s">%s</a></li>',
+                                            $this->escapeHtmlAttr($this->url($page['url'])),
+                                            $this->escapeHtml($page['title'])
+                                        );
+                                    }
+                                }
+
+                                echo '</ul>';
+
+                                echo '</li>';
+                            }
+                        }
+                        ?>
+                    </ul>
+                    <?php if ($this->user):?>
+                    <ul class="nav navbar-nav navbar-right">
+                        <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-user"></span> <?php echo $this->escapeHtml($this->user->getShortName());?> <b class="caret"></b></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="<?php echo $this->escapeHtmlAttr($this->url('/admin/users/edit?user_id=' . $this->user->getId()));?>">Account Info</a></li>
+                                <li><a href="<?php echo $this->escapeHtmlAttr($this->url('/admin/users/change-password?user_id=' . $this->user->getId()));?>">Change Password</a></li>
+                                <li class="divider"></li>
+                                <li><a href="<?php echo $this->escapeHtmlAttr('/admin/logout');?>">Logout</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <?php endif;?>
+                </div>
+            </div>
+        </nav>
+
+        <?php echo $this->adminFooter();?>
+
+        <?php if ($this->successMessage) : ?>
+        <div class="alert alert-success"><?php echo $this->escapeHtml($this->successMessage);?></div>
+        <?php endif;?>
+
+        <?php echo $this->content;?>
+
+        <?php
+        foreach ($this->dependencies['js'] as $js) {
+            printf('<script src="%s"></script>', $this->urlCachePrefix($this->bowerUrl($js)));
+        }
+        ?>
+
+        <script type="text/javascript">
+            jQuery.fn.animate = jQuery.fn.velocity;
+        </script>
+
+        <?php
+        if ($this->viewHeadScript) {
+            echo $this->urlCachePrefix()->headScript($this->viewHeadScript);
+        }
+        ?>
+    </body>
+</html>

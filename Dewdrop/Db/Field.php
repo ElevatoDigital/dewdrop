@@ -10,10 +10,12 @@
 
 namespace Dewdrop\Db;
 
+use Dewdrop\Db\Field\InputFilterBuilder;
+use Dewdrop\Exception;
+use Dewdrop\Fields\FieldAbstract;
+use Dewdrop\Fields\OptionGroups;
 use Dewdrop\Fields\OptionPairs;
-use Zend\Filter;
-use Zend\InputFilter\Input;
-use Zend\Validator;
+use Dewdrop\Pimple;
 
 /**
  * Field objects provide a way to leverage database metadata throughout
@@ -21,15 +23,23 @@ use Zend\Validator;
  * how the field should be labeled, any notes that should be displayed with
  * it, any validators that should be included, etc.
  */
-class Field
+class Field extends FieldAbstract
 {
     /**
      * A \Dewdrop\Fields\OptionPairs object for use in retrieving key-value
      * pair options for a foreign key field.
      *
-     * @var \Dewdrop\Fields\OptionPairs
+     * @var OptionPairs
      */
     protected $optionPairs;
+
+    /**
+     * A \Dewdrop\Fields\OptionGroups object for use in retrieving key-value
+     * pair groups for a foreign key field.
+     *
+     * @var \Dewdrop\Fields\OptionGroups
+     */
+    protected $optionGroups;
 
     /**
      * The table this field is associated with.
@@ -70,12 +80,13 @@ class Field
     private $label;
 
     /**
-     * Any notes that should be displayed along with this field when it is
-     * displayed to users.
+     * Typically, DB fields use IDs that are composed of the table name followed
+     * by a separator and then the field name.  If you have a naming conflict,
+     * though, you can set an alternate group name for the field.
      *
      * @var string
      */
-    private $note = '';
+    private $groupName;
 
     /**
      * The metadata related to this column.  The metadata includes the
@@ -108,21 +119,75 @@ class Field
      *
      * By default, this property with have the value of:
      *
-     * <code>
+     * <pre>
      * table_name:column_name
-     * </code>
+     * </pre>
      *
      * @var string
      */
     private $controlName;
 
     /**
-     * The \Zend\InputFilter\Filter instance used to validate and filter this
+     * An identifier suitable for use in an HTML ID attribute.
+     *
+     * @var string
+     */
+    private $htmlId;
+
+    /**
+     * The \Zend\InputFilter\Input instance used to validate and filter this
      * field.
      *
-     * @var \Zend\InputFilter\Filter
+     * @var \Zend\InputFilter\Input
      */
     private $inputFilter;
+
+    /**
+     * Object used to populate this field's input filter based upon its type.
+     *
+     * @var InputFilterBuilder
+     */
+    private $inputFilterBuilder;
+
+    /**
+     * The ID for this field.  Used when interacting with the \Dewdrop\Fields
+     * APIs.
+     *
+     * @var string
+     */
+    private $id;
+
+    /**
+     * All field capabilities are enabled by default for DB (whereas all are
+     * disabled by default in custom fields).
+     *
+     * @var array
+     */
+    protected $visible = array(FieldAbstract::AUTHORIZATION_ALLOW_ALL);
+
+    /**
+     * All field capabilities are enabled by default for DB (whereas all are
+     * disabled by default in custom fields).
+     *
+     * @var array
+     */
+    protected $sortable = array(FieldAbstract::AUTHORIZATION_ALLOW_ALL);
+
+    /**
+     * All field capabilities are enabled by default for DB (whereas all are
+     * disabled by default in custom fields).
+     *
+     * @var array
+     */
+    protected $filterable = array(FieldAbstract::AUTHORIZATION_ALLOW_ALL);
+
+    /**
+     * All field capabilities are enabled by default for DB (whereas all are
+     * disabled by default in custom fields).
+     *
+     * @var array
+     */
+    protected $editable = array(FieldAbstract::AUTHORIZATION_ALLOW_ALL);
 
     /**
      * Create new field with a reference to the table that instantiated it,
@@ -170,7 +235,7 @@ class Field
      * field is required.  When the metadata says the column is not NULLABLE,
      * then it is marked as being required.
      *
-     * @return boolaen
+     * @return boolean
      */
     public function isRequired()
     {
@@ -196,6 +261,26 @@ class Field
     }
 
     /**
+     * Check to see if this field has an associated row.
+     *
+     * @return boolean
+     */
+    public function hasRow()
+    {
+        return null !== $this->row;
+    }
+
+    /**
+     * Get the row associated with this field.
+     *
+     * @return Row
+     */
+    public function getRow()
+    {
+        return $this->row;
+    }
+
+    /**
      * Set the value of this field on the associated row, if available.
      *
      * @param mixed $value
@@ -210,10 +295,16 @@ class Field
 
     /**
      * Retrieve the value of this field for the associated row, if available.
+     *
+     * @throws Exception
      * @return mixed
      */
     public function getValue()
     {
+        if (!$this->row) {
+            throw new Exception("Attempting to retrieve value for {$this->name} field with no row assigned.");
+        }
+
         return $this->row->get($this->name);
     }
 
@@ -224,6 +315,31 @@ class Field
     public function getName()
     {
         return $this->name;
+    }
+
+    /**
+     * Set the ID of this field.  If no ID is set on database fields, we'll
+     * fall back to getControlName().
+     *
+     * @param string $id
+     * @return \Dewdrop\Db\Field
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+
+        return $this;
+    }
+
+    /**
+     * Get this field's ID.  When no ID is set on a DB field, we fall back
+     * to getControlName().
+     *
+     * @return string
+     */
+    public function getId()
+    {
+        return $this->id ?: $this->getControlName();
     }
 
     /**
@@ -256,28 +372,6 @@ class Field
     }
 
     /**
-     * Set a note that will be displayed alongside this field when it is used
-     * in a UI.
-     *
-     * @param string $note
-     * @return \Dewdrop\Db\Field
-     */
-    public function setNote($note)
-    {
-        $this->note = $note;
-    }
-
-    /**
-     * Get the note associated with this field.
-     *
-     * @return string
-     */
-    public function getNote()
-    {
-        return $this->note;
-    }
-
-    /**
      * Manually override the default control name for this field.
      *
      * This can be useful and necessary if you are using multiple instances of
@@ -291,6 +385,10 @@ class Field
     {
         $this->controlName = $controlName;
 
+        if ($this->inputFilter) {
+            $this->inputFilter->setName($this->controlName);
+        }
+
         return $this;
     }
 
@@ -303,10 +401,50 @@ class Field
     public function getControlName()
     {
         if (null === $this->controlName) {
-            $this->controlName = $this->table->getTableName() . ':' . $this->name;
+            $this->controlName = $this->getGroupName() . ':' . $this->name;
         }
 
         return $this->controlName;
+    }
+
+    /**
+     * Set an alternative group name for this field.  Typically, DB fields are
+     * by their table name, but if you have fields from multiple instances of the
+     * same model on a single request, that might cause conflicts.  In those cases,
+     * altnative group names can be used to resolve the naming conflict.
+     *
+     * @param string $groupName
+     * @return Field
+     */
+    public function setGroupName($groupName)
+    {
+        $this->groupName = $groupName;
+
+        return $this;
+    }
+
+    /**
+     * Get the group name for this field, typically the table name, unless an
+     * alternative has been set.
+     *
+     * @return string
+     */
+    public function getGroupName()
+    {
+        return $this->groupName ?: $this->table->getTableName();
+    }
+
+    /**
+     * Override the default HTML ID for this field.
+     *
+     * @param string $htmlId
+     * @return $this
+     */
+    public function setHtmlId($htmlId)
+    {
+        $this->htmlId = $htmlId;
+
+        return $this;
     }
 
     /**
@@ -317,7 +455,18 @@ class Field
      */
     public function getHtmlId()
     {
-        return str_replace(':', '_', $this->getControlName());
+        return $this->htmlId ?: str_replace(':', '_', $this->getControlName());
+    }
+
+    /**
+     * Get a version of the control name using "+" for the model/field separator
+     * to be more friendly to query strings.
+     *
+     * @return string
+     */
+    public function getQueryStringId()
+    {
+        return str_replace(':', '-', $this->getControlName());
     }
 
     /**
@@ -325,17 +474,40 @@ class Field
      * object allows us to easily filter and validate values assigned to the
      * field.
      *
-     * @return \Zend\InputFilter\Filter
+     * @return \Zend\InputFilter\Input
      */
     public function getInputFilter()
     {
         if (null === $this->inputFilter) {
-            $this->inputFilter = new Input($this->getControlName());
-
-            $this->addFiltersAndValidatorsUsingMetadata($this->inputFilter);
+            $this->inputFilter = $this->getInputFilterBuilder()->createInputForField($this, $this->metadata);
         }
 
         return $this->inputFilter;
+    }
+
+    /**
+     * Provide an alternative input filter build, if you'd like to use different
+     * validators and filters for your field objects by default.
+     *
+     * @param InputFilterBuilder $inputFilterBuilder
+     * @return $this
+     */
+    public function setInputFilterBuilder(InputFilterBuilder $inputFilterBuilder)
+    {
+        $this->inputFilterBuilder = $inputFilterBuilder;
+
+        return $this;
+    }
+
+    /**
+     * Get the InputFilterBuilder that can be used to create default validators
+     * and filters for the field.
+     *
+     * @return InputFilterBuilder
+     */
+    public function getInputFilterBuilder()
+    {
+        return $this->inputFilterBuilder ?: Pimple::getResource('db.field.input-filter-builder');
     }
 
     /**
@@ -349,19 +521,57 @@ class Field
         if (null === $this->optionPairs) {
             $this->optionPairs = new OptionPairs($this->table->getAdapter());
 
-            $ref = $this->table->getMetadata('references', $this->name);
+            $ref = $this->getOptionPairsReference();
 
             if ($ref) {
                 $this->optionPairs->setOptions(
-                    array(
+                    [
                         'tableName'   => $ref['table'],
                         'valueColumn' => $ref['column']
-                    )
+                    ]
                 );
             }
         }
 
         return $this->optionPairs;
+    }
+
+    /**
+     * Get an OptionGroups object for this field.  Allows you to easily
+     * fetch key-value option pairs for foreign keys.
+     *
+     * @return \Dewdrop\Fields\OptionGroups
+     */
+    public function getOptionGroups()
+    {
+        if (null === $this->optionGroups) {
+            $this->optionGroups = new OptionGroups($this->table->getAdapter());
+
+            $ref = $this->getOptionPairsReference();
+
+            if ($ref) {
+                $this->optionGroups->setOptions(
+                    [
+                        'tableName'   => $ref['table'],
+                        'valueColumn' => $ref['column'],
+                        'optionPairs' => $this->getOptionPairs()
+                    ]
+                );
+            }
+        }
+
+        return $this->optionGroups;
+    }
+
+    /**
+     * Get the reference that can be used to retrieve option pairs.  How we retrieve
+     * this will vary for one-to-many vs many-to-many contexts.
+     *
+     * @return array
+     */
+    protected function getOptionPairsReference()
+    {
+        return $this->table->getMetadata('references', $this->name);
     }
 
     /**
@@ -408,53 +618,6 @@ class Field
     }
 
     /**
-     * Create some basic filters and validators using the DB metadata.
-     *
-     * The following filters and validators are added:
-     *
-     * <ul>
-     *     <li>For required fields, a NotEmpty validator is added.</li>
-     *     <li>For text-based fields, a length validator and trim filter are added.</li>
-     *     <li>For integers, an integer validator is added.</li>
-     *     <li>For all floating point types, a float validator is added.</li>
-     * </ul>
-     *
-     * @param Input $inputFilter
-     * @return void
-     */
-    protected function addFiltersAndValidatorsUsingMetadata(Input $inputFilter)
-    {
-        $validators = $inputFilter->getValidatorChain();
-        $filters    = $inputFilter->getFilterChain();
-        $metadata   = $this->metadata;
-
-        if ($this->isRequired() && !$this->isType('tinyint')) {
-            $inputFilter->setAllowEmpty(false);
-        } else {
-            $inputFilter->setAllowEmpty(true);
-        }
-
-        if ($this->isType('string')) {
-            if ($metadata['LENGTH']) {
-                $validators->addValidator(new Validator\StringLength(0, $metadata['LENGTH']));
-            }
-
-            $filters->attach(new Filter\StringTrim());
-            $filters->attach(new Filter\Null(Filter\Null::TYPE_STRING));
-        } elseif ($this->isType('date')) {
-            $validators->addValidator(new Validator\Date());
-        } elseif ($this->isType('boolean')) {
-            $filters->attach(new Filter\Int());
-        } elseif ($this->isType('integer')) {
-            $filters->attach(new Filter\Digits());
-            $validators->addValidator(new \Zend\I18n\Validator\Int());
-        } elseif ($this->isType('float')) {
-            $filters->attach(new Filter\Digits());
-            $validators->addValidator(new \Zend\I18n\Validator\Float());
-        }
-    }
-
-    /**
      * Check whether the field is of the specified type.  One or more
      * types can be provided as individual arguments to this method.
      * If the field matches any of the supplied types, this method
@@ -464,9 +627,9 @@ class Field
      */
     public function isType()
     {
-        $args = func_get_args();
+        $args = array_map('strtolower', func_get_args());
 
-        if (in_array($this->metadata['DATA_TYPE'], $args)) {
+        if (in_array($this->metadata['GENERIC_TYPE'], $args) || in_array($this->metadata['DATA_TYPE'], $args)) {
             return true;
         }
 
@@ -491,18 +654,6 @@ class Field
     protected function isTypeString()
     {
         return $this->isType('varchar', 'char', 'text');
-    }
-
-    /**
-     * Convenience method for checking for large, variable-length text data
-     * types in MySQL.  You can call isType('clob') to check to see if your
-     * field is a "character large object".
-     *
-     * @return boolean
-     */
-    protected function isTypeClob()
-    {
-        return $this->isType('text', 'mediumtext', 'longtext');
     }
 
     /**
@@ -536,8 +687,7 @@ class Field
      */
     protected function isTypeInteger()
     {
-        return 'integer' === $this->metadata['DATA_TYPE'] ||
-            $this->isType('int', 'mediumint', 'smallint', 'bigint');
+        return 'integer' === $this->metadata['GENERIC_TYPE'];
     }
 
     /**
@@ -548,8 +698,7 @@ class Field
      */
     protected function isTypeFloat()
     {
-        return 'float' === $this->metadata['DATA_TYPE'] ||
-            $this->isType('dec', 'decimal', 'double', 'double precision', 'fixed');
+        return 'float' === $this->metadata['GENERIC_TYPE'];
     }
 
     /**
@@ -569,7 +718,7 @@ class Field
      *
      * @return boolean
      */
-    protected function isTypeManyToMany()
+    protected function isTypeManytomany()
     {
         return false;
     }

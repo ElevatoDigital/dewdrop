@@ -15,7 +15,7 @@ namespace Dewdrop\View\Helper;
  *
  * Example usage:
  *
- * <code>
+ * <pre>
  * echo $this->editForm()->open('Add New Animal');
  *
  * echo $this->wpEditRow()->open($this->fields->get('animal:latin_name'));
@@ -23,7 +23,7 @@ namespace Dewdrop\View\Helper;
  * echo $this->wpEditRow()->close();
  *
  * echo $this->editForm()->close();
- * </code>
+ * </pre>
  */
 class EditForm extends AbstractHelper
 {
@@ -70,4 +70,4 @@ class EditForm extends AbstractHelper
             )
         );
     }
-} 
+}

@@ -1,0 +1,143 @@
+<script type="text/javascript" src="/bower_components/jquery/dist/jquery.min.js"></script>
+<script type="text/javascript" src="/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+<link rel="stylesheet" type="text/css" href="/bower_components/bootstrap/dist/css/bootstrap.min.css" />
+
+<style type="text/css">
+    body,
+    table {
+        font-size: 13px;
+    }
+
+    .dewdrop-exception-wrapper {
+        background: #a90329; /* Old browsers */
+        background: linear-gradient(to bottom, #a90329 0%,#8f0222 44%,#6d0019 100%); /* W3C */
+        box-sizing: border-box;
+        height: 100%;
+        left: 0;
+        padding: 15px;
+        position: fixed;
+        top: 0;
+        width: 100%;
+    }
+
+    .dewdrop-exception-content {
+        background: #fff;
+        box-shadow: 0 0 25px #333;
+        box-sizing: border-box;
+        height: 100%;
+        margin: 0 auto;
+        padding: 15px;
+        overflow: auto;
+    }
+
+    #dewdrop-exception-close-button {
+        color: #333;
+        position: absolute;
+        right: 20px;
+        top: 20px;
+    }
+
+    .popover {
+        max-width: 600px;
+    }
+</style>
+
+<div class="dewdrop-exception-wrapper">
+
+    <div class="dewdrop-exception-content">
+        <div class="page-header">
+            <h3>
+                <?php echo $this->escapeHtml($this->exceptionClass);?><br />
+                <small><?php echo $this->escapeHtml($this->message);?></small>
+            </h3>
+        </div>
+
+        <?php if ($this->isGenericException):?>
+        <div class="alert alert-info">
+            <a href="https://github.com/DeltaSystems/dewdrop/wiki/Providing-documentation-and-examples-for-error-messages"
+                target="_blank" class="btn btn-default pull-right">
+                <span class="glyphicon glyphicon-question-sign"></span> Help Improve Dewdrop
+            </a>
+            <strong>Help us improve Dewdrop's error messages!</strong><br />
+            We're working to provide better background information and examples along with our error messages, but
+            you've unfortunately encountered an error without any documentation.
+        </div>
+        <?php endif;?>
+
+        <div>
+            <?php
+            $tabs = [
+                'Summary'   => $this->summary,
+                'Backtrace' => $this->trace($this->trace),
+                'Examples'  => $this->examples
+            ];
+            ?>
+            <ul class="nav nav-tabs" role="tablist">
+                <?php
+                $displayed = 0;
+
+                foreach ($tabs as $title => $content) {
+                    if ($content) {
+                        printf(
+                            '<li role="presentation" class="%s">',
+                            (0 === $displayed ? 'active' : '')
+                        );
+
+                        printf(
+                            '<a href="#dewdrop-exception-%s" aria-controls="home" role="tab" data-toggle="tab">%s</a>',
+                            $this->escapeHtmlAttr(strtolower($title)),
+                            $this->escapeHtmlAttr($title)
+                        );
+
+                        echo '</li>';
+
+                        $displayed += 1;
+                    }
+                }
+                ?>
+            </ul>
+            <div class="tab-content">
+                <?php
+                $displayed = 0;
+
+                foreach ($tabs as $title => $content) {
+                    if ($content) {
+                        printf(
+                            '<div role="tabpanel" class="tab-pane%s" id="dewdrop-exception-%s">',
+                            (0 === $displayed ? ' active' : ''),
+                            $this->escapeHtmlAttr(strtolower($title))
+                        );
+
+                        echo $content;
+                        echo '</div>';
+
+                        $displayed += 1;
+                    }
+                }
+                ?>
+                <?php if ($this->summary):?>
+                <?php endif;?>
+                <div role="tabpanel" class="tab-pane" id="dewdrop-exception-trace">
+                    <?php echo $this->trace($this->trace);?>
+                </div>
+                <?php if ($this->summary):?>
+                    <div role="tabpanel" class="tab-pane" id="dewdrop-exception-examples"><?php echo $this->examples;?></div>
+                <?php endif;?>
+            </div>
+        </div>
+    </div>
+</div>
+
+<a href="#" id="dewdrop-exception-close-button"><span class="glyphicon glyphicon-remove"></span></a>
+
+<script type="text/javascript">
+    $('#dewdrop-exception-close-button').on(
+        'click',
+        function (e) {
+            e.preventDefault();
+            $('.dewdrop-exception-wrapper').remove();
+        }
+    );
+
+    $('[data-toggle="popover"]').popover();
+</script>

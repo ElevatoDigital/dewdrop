@@ -12,11 +12,13 @@ namespace Dewdrop\Admin\Page;
 
 use Dewdrop\Exception;
 use Dewdrop\Request;
-use Dewdrop\Admin\ComponentAbstract;
+use Dewdrop\Admin\Component\ComponentAbstract;
 use Dewdrop\Fields\Edit as EditFields;
 use Zend\InputFilter\InputFilter;
 
 /**
+ * DEPRECATED!  Look at \Dewdrop\Fields\RowEditor instead.
+ *
  * An abstract page controller to make the standard edit page workflow easier
  * to implement.  When extending this class, the normal page controller workflow
  * is altered in the following ways:
@@ -47,7 +49,7 @@ use Zend\InputFilter\InputFilter;
  *
  * The following is a simple example of applying the described tasks:
  *
- * <code>
+ * <pre>
  *
  * namespace Admin\MyComponent;
  *
@@ -71,7 +73,10 @@ use Zend\InputFilter\InputFilter;
  *     // ... your render method
  * }
  *
- * </code>
+ * </pre>
+ *
+ * @deprecated
+ * @see \Dewdrop\Fields\RowEditor
  */
 abstract class EditAbstract extends PageAbstract
 {
@@ -225,7 +230,7 @@ abstract class EditAbstract extends PageAbstract
     public function fieldHasError($name)
     {
         if (!$this->fields->has($name)) {
-            throw new Exception("Checking for errors on unknown field \"{$field}\"");
+            throw new Exception("Checking for errors on unknown field \"{$name}\"");
         }
 
         return in_array($name, $this->fieldsWithErrors);

@@ -11,6 +11,8 @@
 namespace Dewdrop\Admin\ResponseHelper;
 
 use Dewdrop\Admin\Page\PageAbstract;
+use Dewdrop\Pimple;
+use Dewdrop\Session;
 
 /**
  * The response helper object gets injected into a page's process() method
@@ -56,19 +58,41 @@ class Standard
     /**
      * Callbacks to run as part of executing the response
      *
-     * @param array
+     * @var array
      */
     private $callbacks = array();
+
+    /**
+     * A callable that can be used to execute the queued redirect.
+     * Redirecting varies quite a bit between WP and Silex.  In WP, it's just
+     * a normal function.  In Silex, the redirect method returns a response,
+     * which must then be returned from the controller.
+     *
+     * @var callable
+     */
+    private $redirector;
+
+    /**
+     * A Dewdrop\Session object that can be used to store success messages
+     * across redirects.
+     *
+     * @var Session
+     */
+    private $session;
 
     /**
      * Create a new ResponseHelper, generally kicked off by a page class in
      * its createResponseHelper() method.
      *
-     * @param PageAbstract
+     * @param PageAbstract $page
+     * @param callable $redirector
+     * @param Session $session
      */
-    public function __construct(PageAbstract $page)
+    public function __construct(PageAbstract $page, callable $redirector, Session $session = null)
     {
-        $this->page = $page;
+        $this->page       = $page;
+        $this->redirector = $redirector;
+        $this->session    = ($session ?: Pimple::getResource('session'));
     }
 
     /**
@@ -103,25 +127,39 @@ class Standard
     }
 
     /**
+     * Redirect to an arbitrary URL rather than a page in the same admin component.
+     *
+     * @param string $url
+     * @return $this
+     */
+    public function redirectToUrl($url)
+    {
+        $this->redirectUrl = $url;
+
+        return $this;
+    }
+
+    /**
      * Perform any actions that have been setup by the page's process()
      * method.  In a testing environment, you'd likely skip this method to
      * avoid "exit" following redirects, etc.
      *
-     * @return void
+     * @return bool
      */
     public function execute()
     {
-        $this
-            ->executeCallbacks();
+        $redirectResult = false;
+
+        $this->executeCallbacks();
 
         // Don't execute header modifying actions when on CLI
         if ('cli' !== php_sapi_name()) {
-            $this
-                ->executeSuccessMessage()
-                ->executeRedirect();
+            $this->executeSuccessMessage();
+
+            $redirectResult = $this->executeRedirect();
         }
 
-        return $this;
+        return $redirectResult;
     }
 
     /**
@@ -129,7 +167,7 @@ class Standard
      * execute() method, but sometimes in testing, you may want to selectively
      * execute portions of the response payload.
      *
-     * @return \Dewdrop\Admin\ResopnseHelper\Standard
+     * @return \Dewdrop\Admin\ResponseHelper\Standard
      */
     public function executeCallbacks()
     {
@@ -143,16 +181,12 @@ class Standard
     /**
      * Set the success message, if one has been assigned.
      *
-     * @return \Dewdrop\Admin\ResopnseHelper\Standard
+     * @return \Dewdrop\Admin\ResponseHelper\Standard
      */
     public function executeSuccessMessage()
     {
         if ($this->successMessage) {
-            // No sessions in WP, so we're using a cookie for this for now
-            setcookie(
-                'dewdrop_admin_success_notice',
-                $this->successMessage
-            );
+            $this->session->set('successMessage', $this->successMessage);
         }
 
         return $this;
@@ -161,16 +195,15 @@ class Standard
     /**
      * Execute the assigned redirect.
      *
-     * @return \Dewdrop\Admin\ResopnseHelper\Standard
+     * @return \Dewdrop\Admin\ResponseHelper\Standard
      */
     public function executeRedirect()
     {
         if ($this->redirectUrl) {
-            wp_safe_redirect($this->redirectUrl);
-            exit;
+            return call_user_func($this->redirector, $this->redirectUrl);
         }
 
-        return $this;
+        return false;
     }
 
     /**

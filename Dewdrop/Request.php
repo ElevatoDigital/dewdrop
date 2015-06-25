@@ -58,7 +58,48 @@ class Request
     {
         $this->post   = ($post ?: $_POST);
         $this->query  = ($query ?: $_GET);
-        $this->method = ($method ?: $_SERVER['REQUEST_METHOD']);
+
+        if (null !== $method) {
+            $this->method = $method;
+        } elseif (isset($_SERVER['REQUEST_METHOD'])) {
+            $this->method = $_SERVER['REQUEST_METHOD'];
+        } else {
+            $this->method = 'GET';
+        }
+    }
+
+    /**
+     * Assemble a URL based upon the current Request information.
+     *
+     * @return string
+     */
+    public function getUrl()
+    {
+        $url = preg_replace('/\?.+$/', '', $_SERVER['REQUEST_URI']);
+
+        if (0 < count($this->query)) {
+            $url .= '?';
+            $needsAmpersand = false;
+            foreach ($this->query as $name => $value) {
+                $url .= ($needsAmpersand ? '&' : '') . sprintf('%s=%s', rawurlencode($name), rawurlencode($value));
+                $needsAmpersand = true;
+            }
+        }
+
+        return $url;
+    }
+
+    /**
+     * Just a simple utility method to check whether the request is an AJAX
+     * call by looking for the HTTP_X_REQUESTED_WITH header, which should be
+     * added by most (all?) major JS libraries.
+     *
+     * @return boolean
+     */
+    public function isAjax()
+    {
+        return isset($_SERVER['HTTP_X_REQUESTED_WITH']) &&
+            'xmlhttprequest' === strtolower($_SERVER['HTTP_X_REQUESTED_WITH']);
     }
 
     /**
@@ -84,11 +125,31 @@ class Request
      */
     public function getPost($name = null, $default = null)
     {
-        if (null === $name) {
-            return $this->post;
+        // WordPress seriously emulates magic_quotes_gpc.  Have to remove its dumbass slashes.
+        if (function_exists('stripslashes_deep')) {
+            if (null === $name) {
+                return stripslashes_deep($this->post);
+            } else {
+                return (isset($this->post[$name]) ? stripslashes_deep($this->post[$name]) : $default);
+            }
         } else {
-            return (isset($this->post[$name]) ? $this->post[$name] : $default);
+            if (null === $name) {
+                return $this->post;
+            } else {
+                return (isset($this->post[$name]) ? $this->post[$name] : $default);
+            }
         }
+    }
+
+    /**
+     * Get the contents of the body of a POST request.  Useful in RESTful
+     * API work.
+     *
+     * @return string
+     */
+    public function getPostBody()
+    {
+        return file_get_contents('php://input');
     }
 
     /**

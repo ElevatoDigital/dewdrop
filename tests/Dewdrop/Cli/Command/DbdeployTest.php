@@ -43,39 +43,6 @@ class DbdeployTest extends \PHPUnit_Framework_TestCase
         $command->execute();
     }
 
-    public function testChangelogTableIsCreatedSuccessfully()
-    {
-        $command = $this->getMockCommand(array('executeUpdate'));
-
-        $command
-            ->expects($this->once())
-            ->method('executeUpdate');
-
-        $command->parseArgs(array());
-        $command->execute();
-
-        $db = $this->runner->connectDb();
-
-        $this->assertContains('dewdrop_test_dbdeploy_changelog', $db->listTables());
-    }
-
-    public function testFailureToCreateChangelogAborts()
-    {
-        $command = $this->getMockCommand(array('createChangelog', 'abort', 'executeUpdate'));
-
-        $command
-            ->expects($this->once())
-            ->method('createChangelog')
-            ->will($this->returnValue(false));
-
-        $command
-            ->expects($this->once())
-            ->method('abort');
-
-        $command->parseArgs(array());
-        $command->execute();
-    }
-
     public function testRunningAllChangesetsAddsTwoTablesAndTwoLogEntries()
     {
         $command = $this->getMockCommand();
@@ -127,26 +94,22 @@ class DbdeployTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testBackfillWithoutRevisionCallsAbort()
+    /**
+     * @expectedException \Dewdrop\Db\Dbdeploy\Exception
+     */
+    public function testBackfillWithoutRevisionThrowsException()
     {
         $command = $this->getMockCommand();
-
-        $command
-            ->expects($this->once())
-            ->method('abort');
-
         $command->parseArgs(array('--action=backfill', '--changeset=plugin'));
         $command->execute();
     }
 
-    public function testBackfillWithoutChangesetCallsAbort()
+    /**
+     * @expectedException \Dewdrop\Db\Dbdeploy\Exception
+     */
+    public function testBackfillWithoutChangesetThrowsException()
     {
         $command = $this->getMockCommand();
-
-        $command
-            ->expects($this->once())
-            ->method('abort');
-
         $command->parseArgs(array('--action=backfill', '--revision=2'));
         $command->execute();
     }
@@ -194,7 +157,10 @@ class DbdeployTest extends \PHPUnit_Framework_TestCase
         $command->execute();
     }
 
-    public function testInvalidFileNameInBackfillAborts()
+    /**
+     * @expectedException Dewdrop\Db\Dbdeploy\Exception\InvalidFilename
+     */
+    public function testInvalidFileNameInBackfillThrowsException()
     {
         $command = $this->getMockCommand();
 
@@ -202,17 +168,15 @@ class DbdeployTest extends \PHPUnit_Framework_TestCase
             'plugin',
             $this->paths->getDewdropLib() . '/tests/Dewdrop/Cli/Command/dbdeploy-test/plugin-bad-filename'
         );
-
-        $command
-            ->expects($this->once())
-            ->method('abort')
-            ->will($this->returnValue(false));
 
         $command->parseArgs(array('--action=backfill', '--changeset=plugin', '--revision=1'));
         $this->assertFalse($command->execute());
     }
 
-    public function testInvalidFilenameInUpdateAborts()
+    /**
+     * @expectedException Dewdrop\Db\Dbdeploy\Exception\InvalidFilename
+     */
+    public function testInvalidFilenameInUpdateThrowsException()
     {
         $command = $this->getMockCommand();
 
@@ -220,17 +184,15 @@ class DbdeployTest extends \PHPUnit_Framework_TestCase
             'plugin',
             $this->paths->getDewdropLib() . '/tests/Dewdrop/Cli/Command/dbdeploy-test/plugin-bad-filename'
         );
-
-        $command
-            ->expects($this->once())
-            ->method('abort')
-            ->will($this->returnValue(false));
 
         $command->parseArgs(array());
         $this->assertFalse($command->execute());
     }
 
-    public function testInvalidFilenameInStatusAborts()
+    /**
+     * @expectedException Dewdrop\Db\Dbdeploy\Exception\InvalidFilename
+     */
+    public function testInvalidFilenameInStatusThrowsException()
     {
         $command = $this->getMockCommand();
 
@@ -239,15 +201,13 @@ class DbdeployTest extends \PHPUnit_Framework_TestCase
             $this->paths->getDewdropLib() . '/tests/Dewdrop/Cli/Command/dbdeploy-test/plugin-bad-filename'
         );
 
-        $command
-            ->expects($this->once())
-            ->method('abort')
-            ->will($this->returnValue(false));
-
         $command->parseArgs(array('--action=status'));
         $this->assertFalse($command->execute());
     }
 
+    /**
+     * @expectedException Dewdrop\Db\Dbdeploy\Exception\ScriptExecutionFailed
+     */
     public function testFailedSqlScriptRunAborts()
     {
         $command = $this->getMockCommand();
@@ -256,11 +216,6 @@ class DbdeployTest extends \PHPUnit_Framework_TestCase
             'plugin',
             $this->paths->getDewdropLib() . '/tests/Dewdrop/Cli/Command/dbdeploy-test/plugin-bad-sql-code'
         );
-
-        $command
-            ->expects($this->once())
-            ->method('abort')
-            ->will($this->returnValue(false));
 
         $command->parseArgs(array());
         $this->assertFalse($command->execute());
@@ -274,14 +229,20 @@ class DbdeployTest extends \PHPUnit_Framework_TestCase
             array($this->runner, $this->renderer)
         );
 
+        $dbTypeSuffix = 'pgsql';
+
+        if (defined('WPINC')) {
+            $dbTypeSuffix = 'mysql';
+        }
+
         $command->overrideChangesetPath(
             'plugin',
-            $this->paths->getDewdropLib() . '/tests/Dewdrop/Cli/Command/dbdeploy-test/plugin/'
+            $this->paths->getDewdropLib() . '/tests/Dewdrop/Cli/Command/dbdeploy-test/plugin/' . $dbTypeSuffix
         );
 
         $command->overrideChangesetPath(
             'dewdrop-test',
-            $this->paths->getDewdropLib() . '/tests/Dewdrop/Cli/Command/dbdeploy-test/dewdrop-test/'
+            $this->paths->getDewdropLib() . '/tests/Dewdrop/Cli/Command/dbdeploy-test/dewdrop-test/' . $dbTypeSuffix
         );
 
         $command->overrideChangesetPath(
@@ -302,19 +263,6 @@ class DbdeployTest extends \PHPUnit_Framework_TestCase
         $command = $this->getMockCommand();
 
         $command->overrideChangesetPath('fadfafafafafaf', '');
-    }
-
-    public function testCustomMysqlBinaryAffectsRunSqlScript()
-    {
-        $command = $this->getMockCommand(array('exec'));
-
-        $command
-            ->expects($this->once())
-            ->method('exec')
-            ->with(new \PHPUnit_Framework_Constraint_StringStartsWith('fafafafa'));
-
-        $command->parseArgs(array('--action=status', '--mysql=fafafafa'));
-        $command->execute();
     }
 
     public function testStatusRunOneUpdatedDbShowsExpectedMessage()
@@ -343,9 +291,11 @@ class DbdeployTest extends \PHPUnit_Framework_TestCase
     {
         $db = $this->runner->connectDb();
 
-        // Forcing reconnect because of quirky wpdb during testing with logs of queries
-        // @see http://core.trac.wordpress.org/ticket/23085
-        $db->getConnection()->db_connect();
+        if ($db->getConnection() instanceof \wpdb) {
+            // Forcing reconnect because of quirky wpdb during testing with lots of queries
+            // @see http://core.trac.wordpress.org/ticket/23085
+            $db->getConnection()->db_connect();
+        }
 
         $db->query('DROP TABLE IF EXISTS dewdrop_test_dbdeploy_changelog');
         $db->query('DROP TABLE IF EXISTS dewdrop_test_plugins');

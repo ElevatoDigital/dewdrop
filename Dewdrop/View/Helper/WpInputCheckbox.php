@@ -16,9 +16,9 @@ namespace Dewdrop\View\Helper;
  *
  * Example usage:
  *
- * <code>
+ * <pre>
  * echo $this->wpInputCheckbox($this->fields->get('animals:is_mammals'));
- * </code>
+ * </pre>
  *
  * @deprecated See \Dewdrop\View\Helper\InputCheckbox
  */

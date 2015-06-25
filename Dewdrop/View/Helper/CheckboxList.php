@@ -35,18 +35,19 @@ class CheckboxList extends AbstractHelper
      * Use a ManyToMany field to render the checkbox list.
      *
      * @param Field $field
+     * @param array $options
      * @return string
      */
-    protected function directField(Field $field)
+    protected function directField(Field $field, array $options = array())
     {
-        return $this->directArray(
-            array(
-                'name'    => $field->getControlName(),
-                'id'      => $field->getHtmlId(),
-                'value'   => $field->getValue(),
-                'options' => $field->getOptionPairs()->fetch()
-            )
+        $fieldDefaults = array(
+            'name'    => $field->getControlName(),
+            'id'      => $field->getHtmlId(),
+            'value'   => $field->getValue(),
+            'options' => $field->getOptionPairs()->fetch()
         );
+
+        return $this->directArray($fieldDefaults + $options);
     }
 
     /**
@@ -84,6 +85,8 @@ class CheckboxList extends AbstractHelper
             $value = array();
         }
 
+        $classes[] = 'checkbox-list';
+
         return $this->partial(
             'checkbox-list.phtml',
             array(
@@ -103,7 +106,7 @@ class CheckboxList extends AbstractHelper
      * @param array $options
      * @return array
      */
-    private function prepareOptionsArray(array $options)
+    protected function prepareOptionsArray(array $options)
     {
         $this
             ->checkRequired($options, array('name', 'options', 'value'))

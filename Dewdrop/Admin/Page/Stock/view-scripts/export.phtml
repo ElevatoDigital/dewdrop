@@ -1,0 +1,21 @@
+<?php
+
+// Don't render the layout
+$this->component->setShouldRenderLayout(false);
+
+$fields = $this->component->getFields()->getVisibleFields(
+    [
+        $this->component->getVisibilityFilter(),
+        $this->component->getFieldGroupsFilter()
+    ]
+);
+
+$this->component->getListing()->removeSelectModifierByName('selectpaginate');
+
+echo $this->csvExport()->render(
+    $fields,
+    $this->component->getListing()->fetchData($fields),
+    $this->csvCellRenderer()
+);
+
+echo $this->csvExport()->sendHeaders("{$this->component->getTitle()} Export.csv");

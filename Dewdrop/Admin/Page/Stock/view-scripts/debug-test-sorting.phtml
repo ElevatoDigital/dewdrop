@@ -1,0 +1,148 @@
+<ol class="breadcrumb">
+    <li><a href="<?php echo $this->escapeHtmlAttr($this->adminUrl('index'));?>"><?php echo $this->escapeHtml($this->component->getTitle());?></a></li>
+    <li class="active">Test Sorting</li>
+</ol>
+
+<div class="page-header">
+    <h1><span class="glyphicon glyphicon-wrench"></span> Test Sorting</h1>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <?php
+        $this->displayFields
+            ->add('field')
+                ->setLabel('Field')
+                ->setVisible(true)
+                ->assignHelperCallback(
+                    'TableCell.Content',
+                    function ($helper, array $rowData) {
+                        return $helper->getEscaper()->escapeHtml($rowData['label']);
+                    }
+                )
+            ->add('asc')
+                ->setLabel('Ascending')
+                ->setVisible(true)
+                ->assignHelperCallback(
+                    'TableCell.Content',
+                    function ($helper, array $rowData) {
+                        if ($rowData['ASC']['success']) {
+                            return '<span class="text-success glyphicon glyphicon-ok"></span>';
+                        } else {
+                            $icon = '<span class="text-danger glyphicon glyphicon-remove"></span>';
+
+                            $modal = $this->partial(
+                                'debug-test-sorting-errors.phtml',
+                                array(
+                                    'field'   => $rowData['field'],
+                                    'message' => $rowData['ASC']['message'],
+                                )
+                            );
+
+                            return $icon . ' ' . $modal;
+                        }
+                    }
+                )
+            ->add('desc')
+                ->setLabel('Descending')
+                ->setVisible(true)
+                ->assignHelperCallback(
+                    'TableCell.Content',
+                    function ($helper, array $rowData) {
+                        if ($rowData['DESC']['success']) {
+                            return '<span class="text-success glyphicon glyphicon-ok"></span>';
+                        } else {
+                            $icon = '<span class="text-danger glyphicon glyphicon-remove"></span>';
+
+                            $modal = $this->partial(
+                                'debug-test-sorting-errors.phtml',
+                                array(
+                                    'field'   => $rowData['field'],
+                                    'message' => $rowData['DESC']['message'],
+                                )
+                            );
+
+                            return $icon . ' ' . $modal;
+                        }
+                    }
+                )
+            ->add('sql')
+                ->setLabel('Generated SQL')
+                ->setVisible(true)
+                ->assignHelperCallback(
+                    'TableCell.Content',
+                    function ($helper, array $rowData) {
+                        return $this->partial(
+                            'debug-test-sorting-sql.phtml',
+                            array(
+                                'field' => $rowData['field'],
+                                'asc'   => $rowData['ASC']['sql'],
+                                'desc'  => $rowData['DESC']['sql']
+                            )
+                        );
+                    }
+                );
+
+        $data = array();
+
+        foreach ($this->componentFields->getSortableFields() as $field) {
+            foreach ($this->results as $id => $results) {
+                if ($id === $field->getId()) {
+                    $data[] = array(
+                        'id'    => $id,
+                        'field' => $field,
+                        'label' => $field->getLabel(),
+                        'ASC'   => $results['ASC'],
+                        'DESC'  => $results['DESC']
+                    );
+                }
+            }
+        }
+
+        echo $this->bootstrapTable($this->displayFields, $data);
+        ?>
+    </div>
+    <div class="col-md-4">
+        <p>
+            This tool runs all the sortable fields in your component against your
+            \Dewdrop\Fields\Listing object in both directions.  This is an easy
+            way to ensure that all the fields result in a functioning SQL query
+            without having to manually sort each field in the UI.
+        </p>
+        <p>
+            If any of the sorts fail, the exception message generated during the
+            test will be displayed as well.
+        </p>
+        <p>
+            You can also integrate this sorting tester with PHPUnit to allow you
+            to test the sorting of your Listing in a more automated fashion.
+        </p>
+        <p>
+            <button type="button" class="btn btn-default" data-container="body" data-toggle="modal" data-target="#sorting_test_phpunit">View PHPUnit Example</button>
+        </p>
+    </div>
+</div>
+
+<div class="modal fade" id="sorting_test_phpunit" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">Using PHPUnit to test sorting in your component</h4>
+            </div>
+            <div class="modal-body">
+                <?php
+                $exampleHtml = $this->partial(
+                    'debug-test-sorting-phpunit.phtml',
+                    array(
+                        'namespace' => $this->namespace,
+                        'component' => $this->component
+                    )
+                );
+
+                echo highlight_string('<?php ' . PHP_EOL . $exampleHtml, true);
+                ?>
+            </div>
+        </div>
+    </div>
+</div>

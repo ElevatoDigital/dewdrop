@@ -11,7 +11,6 @@
 namespace Dewdrop\Db\ManyToMany;
 
 use Dewdrop\Db\Field as BaseField;
-use Dewdrop\Fields\OptionPairs;
 use Zend\InputFilter\Input;
 
 /**
@@ -66,7 +65,7 @@ class Field extends BaseField
      * Set the ManyToMany relationship that is used by this field to manage
      * values and options for this field.
      *
-     * @param Relationship
+     * @param Relationship $manyToManyRelationship
      * @return \Dewdrop\Db\ManyToMany\Field
      */
     public function setManyToManyRelationship(Relationship $manyToManyRelationship)
@@ -89,57 +88,25 @@ class Field extends BaseField
     }
 
     /**
-     * When retrieving option pairs for a many-to-many relationship, we don't look
-     * for the reference on the source table, like with a one-to-many relationship.
-     * Instead, we look for the matching reference on the cross-reference table.
+     * Get the reference that can be used to retrieve option pairs.  How we retrieve
+     * this will vary for one-to-many vs many-to-many contexts.  In the case of
+     * many-to-many fields, we grab it from the relationship definition rather than
+     * the table metadata.
      *
-     * @return \Dewdrop\Fields\OptionPairs
+     * @return array
      */
-    public function getOptionPairs()
+    protected function getOptionPairsReference()
     {
-        if (null === $this->optionPairs) {
-            $this->optionPairs = new OptionPairs($this->table->getAdapter());
-
-            $ref = $this->manyToManyRelationship->getOptionPairsReference();
-
-            if ($ref) {
-                $this->optionPairs->setOptions(
-                    array(
-                        'tableName'   => $ref['table'],
-                        'valueColumn' => $ref['column']
-                    )
-                );
-            }
-        }
-
-        return $this->optionPairs;
+        return $this->manyToManyRelationship->getOptionPairsReference();
     }
 
     /**
-     * In the case of a ManyToMany field, we don't add any validators based on
-     * the data type and other metadata tied to a physical database column.
-     * The only input filter interaction we do is setting the allowEmpty property
-     * depending upon whether this field is marked as required.
-     *
-     * @param Input $inputFilter
-     * @return void
-     */
-    protected function addFiltersAndValidatorsUsingMetadata(Input $inputFilter)
-    {
-        if ($this->isRequired()) {
-            $inputFilter->setAllowEmpty(false);
-        } else {
-            $inputFilter->setAllowEmpty(true);
-        }
-    }
-
-    /**
-     * Override \Dewdrop\Db\Field's isTypeManyToMany() method to always return
+     * Override \Dewdrop\Db\Field's isTypeManytomany() method to always return
      * true for many-to-many fields.
      *
      * @return boolean
      */
-    protected function isTypeManyToMany()
+    protected function isTypeManytomany()
     {
         return true;
     }

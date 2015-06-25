@@ -22,8 +22,7 @@ class TableTest extends DbTestCase
 
         require_once __DIR__ . '/table/DewdropTestFruits.php';
 
-        $wpdb     = new \wpdb(DB_USER, DB_PASSWORD, DB_NAME, DB_HOST);
-        $this->db = new Adapter($wpdb);
+        $this->db = $GLOBALS['dewdrop_pimple']['db'];
 
         $this->table = new \DewdropTest\DewdropTestFruits($this->db);
     }
@@ -160,9 +159,9 @@ class TableTest extends DbTestCase
         $this->assertInstanceOf('\Dewdrop\Db\Adapter', $this->table->getAdapter());
     }
 
-    public function testInsertAddsToTableSuccessfullyAndReturnsCountOfRowsAffected()
+    public function testInsertReturnsLastInsertId()
     {
-        $affected = $this->table->insert(
+        $id = $this->table->insert(
             array(
                 'name'                   => 'Peach',
                 'is_delicious'           => 1,
@@ -170,9 +169,7 @@ class TableTest extends DbTestCase
             )
         );
 
-        $this->assertEquals(1, $affected);
-        $this->assertEquals(6, $this->db->lastInsertId());
-        $this->assertEquals(6, $this->db->fetchOne('SELECT COUNT(*) FROM dewdrop_test_fruits'));
+        $this->assertEquals(6, $id);
     }
 
     public function testUpdateSuccessfullySavesExistingRowAndReturnsRowsAffected()
@@ -208,8 +205,12 @@ class TableTest extends DbTestCase
 
         $this->assertNull($row->get('dewdrop_test_fruit_id'));
         $this->assertNull($row->get('name'));
-        $this->assertNull($row->get('is_delicious'));
-        $this->assertNull($row->get('level_of_deliciousness'));
+
+        // This field has a default value in the schema, so its an exception
+        $this->assertEquals(1, $row->get('is_delicious'));
+
+        // This field has a default value in the schema, so its an exception
+        $this->assertEquals(0, $row->get('level_of_deliciousness'));
     }
 
     public function testCreateRowWithInitialDataSetsFieldsCorrectly()

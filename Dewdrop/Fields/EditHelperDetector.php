@@ -10,8 +10,9 @@
 
 namespace Dewdrop\Fields;
 
-use Dewdrop\Db\Field;
+use Dewdrop\Db\Field as DbField;
 use Dewdrop\Db\Eav\Field as EavField;
+use Dewdrop\Fields\FieldInterface;
 use Dewdrop\Exception;
 
 /**
@@ -43,7 +44,7 @@ class EditHelperDetector
      */
     public function customizeField($field, $helperName)
     {
-        if ($field instanceof Field) {
+        if ($field instanceof FieldInterface) {
             $field = $field->getControlName();
         }
 
@@ -79,24 +80,30 @@ class EditHelperDetector
      * @param Field $field
      * @return string
      */
-    public function detect(Field $field)
+    public function detect(FieldInterface $field)
     {
         if (array_key_exists($field->getControlName(), $this->customHelpers)) {
             return $this->customHelpers[$field->getControlName()];
         } elseif ($field instanceof EavField) {
             return $field->getEditHelperName();
-        } elseif ($field->isType('boolean')) {
-            return 'wpInputCheckbox';
+        } elseif ($field->isType('boolean', 'boolean')) {
+            return 'inputCheckbox';
         } elseif ($field->isType('manytomany')) {
-            return 'wpCheckboxList';
+            return 'checkboxList';
         } elseif ($field->isType('reference')) {
-            return 'wpSelect';
-        } elseif ($field->isType('clob', 'string', 'numeric')) {
-            return 'wpInputText';
+            return 'select';
+        } elseif ($field->isType('clob')) {
+            return 'textarea';
+        } elseif ($field->isType('text', 'integer', 'float')) {
+            return 'inputText';
+        } elseif ($field->isType('date')) {
+            return 'inputDate';
+        } elseif ($field->isType('timestamp')) {
+            return 'inputTimestamp';
         }
 
         throw new Exception(
-            'Fields\EditHelperDetector: Could not find a suitaable view helper for field '
+            'Fields\EditHelperDetector: Could not find a suitable view helper for field '
             . $field->getControlName() . '.'
         );
     }

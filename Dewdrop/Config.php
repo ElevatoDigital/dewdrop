@@ -10,97 +10,141 @@
 
 namespace Dewdrop;
 
+use ArrayAccess;
+use Dewdrop\Paths;
+
 /**
- * This is a simple config singleton that wraps the dewdrop.json file.  It's a
- * singleton to make it easy to access from anywhere in the application, but its
- * use should be limited as much as possible.  The primary purpose of this config
- * class is informing Dewdrop about the environment it is running in (WP or other,
- * basically).
+ * This class manages the basic Dewdrop configuration needed to get
+ * things up and running.  For Dewdrop to run, it needs two pieces
+ * of information at a minimum:
+ *
+ * 1) The Bootstrap class that will provide the Pimple depedency
+ *    injection container.
+ *
+ * 2) The database configuration.
+ *
+ * In WP plugin projects, this information can be provided
+ * automatically using information from the WordPress environment
+ * itself.  In other projects, you'll have to provide a Bootstrap
+ * class yourself.
+ *
+ * Note that you can use array access semantics with this object.
  */
-class Config
+class Config implements ArrayAccess
 {
     /**
-     * The data obtained from parsing the dewdrop.json file.  We decode the JSON
-     * so that the data is represented as nested stdClass objects, rather than
-     * arrays.  That makes it easier to fluently reference nested values.
+     * The configuration data.
      *
-     * @var stdClass
+     * @var array
      */
-    private $data;
+    private $data = array();
 
     /**
-     * The instance for the configuration, retrieved by the static getInstance()
-     * method.
+     * Optionally point this class at a non-standard configuration file path.
      *
-     * @var \Dewdrop\Config
-     */
-    private static $instance;
-
-    /**
-     * Create a new \Dewdrop\Config object using the supplied file.
-     *
-     * @param string $file Path to the configuration file.
-     * @throws \Dewdrop\Exception
+     * @param string $file
      */
     public function __construct($file = null)
     {
-        if (self::$instance) {
-            throw new Exception('Config already instantiated');
-        }
+        $paths = new Paths();
 
-        if (null === $file) {
-            $file = getcwd() . '/dewdrop.json';
-        }
+        if (!$paths->isWp()) {
+            if (null === $file) {
+                $file  = $paths->getPluginRoot() . '/dewdrop-config.php';
+            }
 
-        if (!file_exists($file) || !is_readable($file)) {
-            throw new Exception(
-                'Could not find dewdrop.json configuration file'
+            if (file_exists($file) || is_readable($file)) {
+                $this->data = require $file;
+            }
+        } else {
+            $className = '\Dewdrop\Bootstrap\Wp';
+
+            if (defined('DEWDROP_BOOTSTRAP_CLASS')) {
+                $className = DEWDROP_BOOTSTRAP_CLASS;
+            }
+
+            $this->data = array(
+                'bootstrap' => $className,
+                'db' => array(
+                    'username' => DB_USER,
+                    'password' => DB_PASSWORD,
+                    'host'     => DB_HOST,
+                    'name'     => DB_NAME,
+                    'type'     => 'mysql'
+                )
             );
         }
-
-        $this->data = @json_decode(
-            file_get_contents($file)
-        );
-
-        if (!$this->data) {
-            throw new Exception('Could not parse dewdrop.json contents.');
-        }
     }
 
     /**
-     * Get a singleton instance of the app's configuration.
-     *
-     * @param string $file
-     * @return \Dewdrop\Config
-     */
-    public static function getInstance($file = null)
-    {
-        if (!self::$instance) {
-            self::$instance = new Config($file);
-        }
-
-        return self::$instance;
-    }
-
-    /**
-     * Retrieve the specified key from the config's data.
+     * Get the named section from the configuration.
      *
      * @param string $key
      * @return mixed
      */
     public function get($key)
     {
-        return $this->data->$key;
+        return $this->data[$key];
     }
 
     /**
-     * Check if the specified key is present in the config's data.
+     * Check to see if the named configuration section exists.
      *
      * @param string $key
      * @return boolean
      */
     public function has($key)
     {
-        return isset($this->data->$key);
+        return isset($this->data[$key]);
+    }
+
+    /**
+     * Set the value for the named configuration section.
+     *
+     * @param string $key
+     * @param mixed $value
+     * @return void
+     */
+    public function offsetSet($key, $value)
+    {
+        $this->data[$key] = $value;
+    }
+
+    /**
+     * Retrieve the named section from the configuration.
+     *
+     * @throws InvalidArgumentException
+     * @param string $key
+     * @return mixed
+     */
+    public function offsetGet($key)
+    {
+        if (!array_key_exists($key, $this->data)) {
+            throw new InvalidArgumentException(sprintf('Identifier "%s" is not defined.', $key));
+        }
+
+        return $this->data[$key];
+    }
+
+    /**
+     * Checks if a parameter or an object is set.
+     *
+     * @param string $key The unique identifier for the config section
+     *
+     * @return bool
+     */
+    public function offsetExists($key)
+    {
+        return array_key_exists($key, $this->data);
+    }
+
+    /**
+     * Unsets a parameter or an object.
+     *
+     * @param string $key The unique identifier for the parameter or object
+     */
+    public function offsetUnset($key)
+    {
+        unset($this->data[$key]);
     }
 }

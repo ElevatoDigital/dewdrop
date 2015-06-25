@@ -11,7 +11,6 @@
 namespace Dewdrop\View\Helper;
 
 use Dewdrop\Db\Field;
-use Dewdrop\Exception;
 
 /**
  * Render a checkbox node.  This helper can optionally leverage a
@@ -19,9 +18,9 @@ use Dewdrop\Exception;
  *
  * Example usage:
  *
- * <code>
+ * <pre>
  * echo $this->wpInputCheckbox($this->fields->get('animals:is_mammals'));
- * </code>
+ * </pre>
  */
 class InputCheckbox extends AbstractHelper
 {

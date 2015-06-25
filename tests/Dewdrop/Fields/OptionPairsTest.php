@@ -11,12 +11,13 @@ class OptionPairsTest extends BaseTestCase
 
     private $db;
 
+    private $idChar;
+
     public function setUp()
     {
-        $wpdb = new \wpdb(DB_USER, DB_PASSWORD, DB_NAME, DB_HOST);
-
-        $this->db    = new Adapter($wpdb);
-        $this->pairs = new OptionPairs($this->db);
+        $this->db     = $GLOBALS['dewdrop_pimple']['db'];
+        $this->pairs  = new OptionPairs($this->db);
+        $this->idChar = $this->db->getQuoteIdentifierSymbol();
     }
 
     private function withMockMetadata($file)
@@ -55,9 +56,9 @@ class OptionPairsTest extends BaseTestCase
 
         $stmt = (string) $this->pairs->getStmt();
 
-        $this->assertContains('`dewdrop_test_fruits`.`dewdrop_test_fruit_id`', $stmt);
-        $this->assertContains('`dewdrop_test_fruits`.`name`', $stmt);
-        $this->assertContains('ORDER BY `dewdrop_test_fruits`.`name`', $stmt);
+        $this->assertContains("{$this->idChar}dewdrop_test_fruits{$this->idChar}.{$this->idChar}dewdrop_test_fruit_id{$this->idChar}", $stmt);
+        $this->assertContains("{$this->idChar}dewdrop_test_fruits{$this->idChar}.{$this->idChar}name{$this->idChar}", $stmt);
+        $this->assertContains("ORDER BY {$this->idChar}dewdrop_test_fruits{$this->idChar}.{$this->idChar}name{$this->idChar}", $stmt);
     }
 
     /**
@@ -73,7 +74,7 @@ class OptionPairsTest extends BaseTestCase
         $pairs = $this->withMockMetadata('will_use_sort_index.php');
 
         $this->assertContains(
-            "ORDER BY `fafafafa`.`sort_index` ASC, `fafafafa`.`dewdrop_test_fruit_id` ASC",
+            "ORDER BY {$this->idChar}fafafafa{$this->idChar}.{$this->idChar}sort_index{$this->idChar} ASC, {$this->idChar}fafafafa{$this->idChar}.{$this->idChar}dewdrop_test_fruit_id{$this->idChar} ASC",
             (string) $pairs->getStmt()
         );
     }
@@ -83,7 +84,7 @@ class OptionPairsTest extends BaseTestCase
         $pairs = $this->withMockMetadata('will_use_sort_order.php');
 
         $this->assertContains(
-            "ORDER BY `fafafafa`.`sort_order` ASC, `fafafafa`.`dewdrop_test_fruit_id` ASC",
+            "ORDER BY {$this->idChar}fafafafa{$this->idChar}.{$this->idChar}sort_order{$this->idChar} ASC, {$this->idChar}fafafafa{$this->idChar}.{$this->idChar}dewdrop_test_fruit_id{$this->idChar} ASC",
             (string) $pairs->getStmt()
         );
     }
@@ -112,8 +113,8 @@ class OptionPairsTest extends BaseTestCase
 
         $stmt = (string) $this->pairs->getStmt();
 
-        $this->assertContains("`dewdrop_test_fruits`.`titleColumn` AS `title`", $stmt);
-        $this->assertContains("`dewdrop_test_fruits`.`valueColumn` AS `value`", $stmt);
+        $this->assertContains("{$this->idChar}dewdrop_test_fruits{$this->idChar}.{$this->idChar}titleColumn{$this->idChar} AS {$this->idChar}title{$this->idChar}", $stmt);
+        $this->assertContains("{$this->idChar}dewdrop_test_fruits{$this->idChar}.{$this->idChar}valueColumn{$this->idChar} AS {$this->idChar}value{$this->idChar}", $stmt);
     }
 
     public function testCanOverrideSqlWithCustomSelectObject()
@@ -136,14 +137,20 @@ class OptionPairsTest extends BaseTestCase
     {
         $pairs = $this->withMockMetadata('filter_by_active.php');
 
-        $this->assertContains('WHERE (`fafafafa`.`active` = true)', (string) $pairs->getStmt());
+        $this->assertContains(
+            "WHERE ({$this->idChar}fafafafa{$this->idChar}.{$this->idChar}active{$this->idChar} = true)",
+            (string) $pairs->getStmt()
+        );
     }
 
     public function testWillFilterByDeletedFieldIfAvailable()
     {
         $pairs = $this->withMockMetadata('filter_by_deleted.php');
 
-        $this->assertContains('WHERE (`fafafafa`.`deleted` = false)', (string) $pairs->getStmt());
+        $this->assertContains(
+            "WHERE ({$this->idChar}fafafafa{$this->idChar}.{$this->idChar}deleted{$this->idChar} = false)",
+            (string) $pairs->getStmt()
+        );
     }
 
     public function testWillGetReferenceToSameStmtObjectWithMultipleGetStmtCalls()
@@ -160,14 +167,17 @@ class OptionPairsTest extends BaseTestCase
     {
         $pairs = $this->withMockMetadata('column_named_title.php');
 
-        $this->assertContains('`fafafafa`.`title`', (string) $pairs->getStmt());
+        $this->assertContains("{$this->idChar}fafafafa{$this->idChar}.{$this->idChar}title{$this->idChar}", (string) $pairs->getStmt());
     }
 
     public function testWillFallBackToFirstCharColumnForTitle()
     {
         $pairs = $this->withMockMetadata('first_char_as_title.php');
 
-        $this->assertContains('`fafafafa`.`just_a_char` AS `title`', (string) $pairs->getStmt());
+        $this->assertContains(
+            "{$this->idChar}fafafafa{$this->idChar}.{$this->idChar}just_a_char{$this->idChar} AS {$this->idChar}title{$this->idChar}",
+            (string) $pairs->getStmt()
+        );
     }
 
     public function testCanUseExprObjectAsTitleColumn()
@@ -179,7 +189,10 @@ class OptionPairsTest extends BaseTestCase
             )
         );
 
-        $this->assertContains('UPPER(name) AS `title`', (string) $this->pairs->getStmt());
+        $this->assertContains(
+            "UPPER(name) AS {$this->idChar}title{$this->idChar}",
+            (string) $this->pairs->getStmt()
+        );
     }
 
     public function testWillFetchPairsWithKeyValuesAndValueTitles()

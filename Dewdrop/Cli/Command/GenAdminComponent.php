@@ -15,7 +15,7 @@ namespace Dewdrop\Cli\Command;
  *
  * Once generated, you should end up with something like this:
  *
- * <code>
+ * <pre>
  * |~admin/
  * | `~my-component/
  * |   |~view-scripts/
@@ -24,7 +24,7 @@ namespace Dewdrop\Cli\Command;
  * |   |-Component.php
  * |   |-Edit.php
  * |   `-Index.php
- * </code>
+ * </pre>
  */
 class GenAdminComponent extends CommandAbstract
 {

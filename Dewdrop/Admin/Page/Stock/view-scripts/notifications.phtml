@@ -1,0 +1,50 @@
+<ol class="breadcrumb">
+    <li><a href="<?php echo $this->escapeHtmlAttr($this->adminUrl('index'));?>"><?php echo $this->escapeHtml($this->component->getTitle());?></a></li>
+    <li class="active">Notifications</li>
+</ol>
+
+<div class="page-header">
+    <h1><span class="glyphicon glyphicon-envelope"></span> Notifications</h1>
+</div>
+
+<nav class="navbar navbar-default navbar-admin-index" role="navigation">
+    <div class="navbar-header">
+        <a class="navbar-btn btn btn-primary" href="<?php echo $this->escapeHtmlAttr('notification-edit');?>">Add Subscription</a>
+        &nbsp;&nbsp;&nbsp;
+        Subscribe to be notified by email whenever a new <?php echo $this->escapeHtml(strtolower($this->componentModel->getSingularTitle()));?> is added or edited.
+    </div>
+</nav>
+
+<?php
+$data = $this->listing->fetchData($this->fields);
+
+if (!count($data)) {
+    ?>
+    <div class="row">
+        <div class="col-md-2"></div>
+        <div class="col-md-8">
+            <div class="alert alert-warning">No subscriptions have been added for <?php echo $this->escapeHtml(strtolower($this->componentModel->getPluralTitle()));?>.</div>
+        </div>
+        <div class="col-md-2"></div>
+    </div>
+    <?php
+} else {
+    $renderer = $this->tableCellRenderer();
+
+    $this->bootstrapRowActions()->assignCallback(
+        array(
+            'renderer'  => $renderer,
+            'field'     => $this->fields->getIterator()->current(),
+            'title'     => 'Subscription',
+            'urlFields' => 'dewdrop_notification_subscription_id',
+            'edit'      => $this->adminUrl('notification-edit', array('dewdrop_notification_subscription_id' => '%s'))
+        )
+    );
+
+    echo $this->bootstrapTable(
+        $this->fields->getVisibleFields(),
+        $data,
+        $renderer
+    );
+}
+?>

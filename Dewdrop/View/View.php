@@ -11,12 +11,77 @@
 namespace Dewdrop\View;
 
 use Dewdrop\Exception;
+use Dewdrop\Pimple;
+use Dewdrop\Request;
+use Dewdrop\View\Helper\PageDelegateInterface;
 use Zend\Escaper\Escaper;
+
+// Solely for static analysis assistance
+use Dewdrop\Fields\Helper\TableCell;
+use Dewdrop\Fields\Listing\BulkActions;
+use Dewdrop\View\Helper;
+use Dewdrop\View\Helper\BulkActionCheckboxField;
 
 /**
  * A simple view implementation that allows for simple assignment of data,
  * escaping for common contexts (e.g. HTML, HTML attribute, JS, etc.),
  * and calling of helper objects for reusable view logic.
+ *
+ * Including method annotations here (http://www.phpdoc.org/docs/latest/references/phpdoc/tags/method.html)
+ * to assist static analysis in PHPStorm and Scrutinizer CI given the use
+ * of the __call() magic method in this class for view helpers.  Won't cover
+ * us on custom helpers necessarily, but it will help catch most bugs/typos.
+ *
+ * @method string adminComponentNav()
+ * @method string adminNotice()
+ * @method string adminUrl()
+ * @method string bootstrapColumnsModal()
+ * @method string bootstrapDetailsView()
+ * @method mixed bootstrapFilterForm()
+ * @method mixed bootstrapForm()
+ * @method string bootstrapInputText()
+ * @method Helper\BootstrapRowActions bootstrapRowActions()
+ * @method string bootstrapSelect()
+ * @method mixed bootstrapTable()
+ * @method string bootstrapTextarea()
+ * @method string bowerUrl(string $url, string $wwwPath = null, string $docRoot = null)
+ * @method Helper\BulkActionForm bulkActionForm()
+ * @method BulkActionCheckboxField bulkActionCheckboxField(BulkActions $bulkActions, TableCell $tableCellRenderer)
+ * @method string checkboxList()
+ * @method \Dewdrop\Fields\Helper\CsvCell csvCellRenderer()
+ * @method string csvExport()
+ * @method Helper\DetectEditHelper detectEditHelper()
+ * @method Helper\EditForm editForm()
+ * @method \Dewdrop\Fields\Helper\EditControl editControlRenderer()
+ * @method \Zend\View\Helper\HeadLink headLink()
+ * @method \Zend\View\Helper\HeadMeta headMeta()
+ * @method \Zend\View\Helper\HeadScript headScript()
+ * @method \Zend\View\Helper\HeadStyle headStyle()
+ * @method void inlineScript()
+ * @method string inputCheckbox()
+ * @method string inputText()
+ * @method string inputTimestamp()
+ * @method string pagination()
+ * @method string select()
+ * @method string summernote()
+ * @method mixed table()
+ * @method \Dewdrop\Fields\Helper\TableCell tableCellRenderer()
+ * @method Helper\TableSortHandle tableSortHandle()
+ * @method string textarea()
+ * @method mixed urlCachePrefix()
+ * @method string wpAdminNotice()
+ * @method string wpCheckboxList()
+ * @method string wpColorPicker()
+ * @method Helper\WpEditForm wpEditForm()
+ * @method string wpEditor()
+ * @method Helper\WpEditRow wpEditRow()
+ * @method string wpImagePicker()
+ * @method string wpInputCheckbox()
+ * @method string wpInputText()
+ * @method string wpSelect()
+ * @method mixed wpTable()
+ * @method Helper\WpWrap wpWrap()
+ * @method Helper\Wrap wrap()
  */
 class View
 {
@@ -27,7 +92,7 @@ class View
      *
      * @var array
      */
-    private $data = array();
+    private $internalViewData = array();
 
     /**
      * Helper instances created by calls to instantiateHelper().
@@ -44,36 +109,77 @@ class View
     private $scriptPath;
 
     /**
+     * The current HTTP request.
+     *
+     * @var \Dewdrop\Request
+     */
+    private $request;
+
+    /**
      * The available helper names and their associated classes.
      *
      * @var array
      */
     private $helperClasses = array(
-        'adminnotice'      => '\Dewdrop\View\Helper\AdminNotice',
-        'adminurl'         => '\Dewdrop\View\Helper\AdminUrl',
-        'checkboxlist'     => '\Dewdrop\View\Helper\CheckboxList',
-        'detectedithelper' => '\Dewdrop\View\Helper\DetectEditHelper',
-        'editform'         => '\Dewdrop\View\Helper\EditForm',
-        'headlink'         => '\Zend\View\Helper\HeadLink',
-        'headmeta'         => '\Zend\View\Helper\HeadMeta',
-        'headscript'       => '\Zend\View\Helper\HeadScript',
-        'headstyle'        => '\Zend\View\Helper\HeadStyle',
-        'inlinescript'     => '\Dewdrop\View\Helper\InlineScript',
-        'inputcheckbox'    => '\Dewdrop\View\Helper\InputCheckbox',
-        'inputtext'        => '\Dewdrop\View\Helper\InputText',
-        'select'           => '\Dewdrop\View\Helper\Select',
-        'textarea'         => '\Dewdrop\View\Helper\Textarea',
-        'wpadminnotice'    => '\Dewdrop\View\Helper\WpAdminNotice',
-        'wpcheckboxlist'   => '\Dewdrop\View\Helper\WpCheckboxList',
-        'wpcolorpicker'    => '\Dewdrop\View\Helper\WpColorPicker',
-        'wpeditform'       => '\Dewdrop\View\Helper\WpEditForm',
-        'wpeditor'         => '\Dewdrop\View\Helper\WpEditor',
-        'wpeditrow'        => '\Dewdrop\View\Helper\WpEditRow',
-        'wpinputcheckbox'  => '\Dewdrop\View\Helper\WpInputCheckbox',
-        'wpinputtext'      => '\Dewdrop\View\Helper\WpInputText',
-        'wpselect'         => '\Dewdrop\View\Helper\WpSelect',
-        'wpwrap'           => '\Dewdrop\View\Helper\WpWrap',
-        'wrap'             => '\Dewdrop\View\Helper\Wrap',
+        'admincomponentnav'        => '\Dewdrop\View\Helper\AdminComponentNav',
+        'adminfooter'              => '\Dewdrop\View\Helper\AdminFooter',
+        'adminnotice'              => '\Dewdrop\View\Helper\AdminNotice',
+        'admintitle'               => '\Dewdrop\View\Helper\AdminTitle',
+        'adminurl'                 => '\Dewdrop\View\Helper\AdminUrl',
+        'bootstraptable'           => '\Dewdrop\View\Helper\BootstrapTable',
+        'bootstrapbreadcrumbs'     => '\Dewdrop\View\Helper\BootstrapBreadcrumbs',
+        'bootstrapcolumnsmodal'    => '\Dewdrop\View\Helper\BootstrapColumnsModal',
+        'bootstrapdetailsview'     => '\Dewdrop\View\Helper\BootstrapDetailsView',
+        'bootstrapfilterform'      => '\Dewdrop\View\Helper\BootstrapFilterForm',
+        'bootstrapform'            => '\Dewdrop\View\Helper\BootstrapForm',
+        'bootstrapinputtext'       => '\Dewdrop\View\Helper\BootstrapInputText',
+        'bootstraprowactions'      => '\Dewdrop\View\Helper\BootstrapRowActions',
+        'bootstrapselect'          => '\Dewdrop\View\Helper\BootstrapSelect',
+        'bootstraptextarea'        => '\Dewdrop\View\Helper\BootstrapTextarea',
+        'bowerurl'                 => '\Dewdrop\View\Helper\BowerUrl',
+        'bulkactionform'           => '\Dewdrop\View\Helper\BulkActionForm',
+        'bulkactioncheckboxfield'  => '\Dewdrop\View\Helper\BulkActionCheckboxField',
+        'cascadeselect'            => '\Dewdrop\View\Helper\CascadeSelect',
+        'checkboxlist'             => '\Dewdrop\View\Helper\CheckboxList',
+        'csvcellrenderer'          => '\Dewdrop\View\Helper\CsvCellRenderer',
+        'csvexport'                => '\Dewdrop\View\Helper\CsvExport',
+        'detectedithelper'         => '\Dewdrop\View\Helper\DetectEditHelper',
+        'editform'                 => '\Dewdrop\View\Helper\EditForm',
+        'editcontrolrenderer'      => '\Dewdrop\View\Helper\EditControlRenderer',
+        'headlink'                 => '\Zend\View\Helper\HeadLink',
+        'headmeta'                 => '\Zend\View\Helper\HeadMeta',
+        'headscript'               => '\Zend\View\Helper\HeadScript',
+        'headstyle'                => '\Zend\View\Helper\HeadStyle',
+        'inlinescript'             => '\Dewdrop\View\Helper\InlineScript',
+        'inputcheckbox'            => '\Dewdrop\View\Helper\InputCheckbox',
+        'inputdate'                => '\Dewdrop\View\Helper\InputDate',
+        'inputtext'                => '\Dewdrop\View\Helper\InputText',
+        'inputtimestamp'           => '\Dewdrop\View\Helper\InputTimestamp',
+        'optioninputdecorator'     => '\Dewdrop\View\Helper\OptionInputDecorator',
+        'pagination'               => '\Dewdrop\View\Helper\Pagination',
+        'rowcollectioninputtable'  => '\Dewdrop\View\Helper\RowCollectionInputTable',
+        'rowcollectioncellcontent' => '\Dewdrop\View\Helper\RowCollectionCellContent',
+        'select'                   => '\Dewdrop\View\Helper\Select',
+        'summernote'               => '\Dewdrop\View\Helper\Summernote',
+        'table'                    => '\Dewdrop\View\Helper\Table',
+        'tablecellrenderer'        => '\Dewdrop\View\Helper\TableCellRenderer',
+        'tablesorthandle'          => '\Dewdrop\View\Helper\TableSortHandle',
+        'textarea'                 => '\Dewdrop\View\Helper\Textarea',
+        'url'                      => '\Dewdrop\View\Helper\Url',
+        'urlcacheprefix'           => '\Dewdrop\View\Helper\UrlCachePrefix',
+        'wpadminnotice'            => '\Dewdrop\View\Helper\WpAdminNotice',
+        'wpcheckboxlist'           => '\Dewdrop\View\Helper\WpCheckboxList',
+        'wpcolorpicker'            => '\Dewdrop\View\Helper\WpColorPicker',
+        'wpeditform'               => '\Dewdrop\View\Helper\WpEditForm',
+        'wpeditor'                 => '\Dewdrop\View\Helper\WpEditor',
+        'wpeditrow'                => '\Dewdrop\View\Helper\WpEditRow',
+        'wpimagepicker'            => '\Dewdrop\View\Helper\WpImagePicker',
+        'wpinputcheckbox'          => '\Dewdrop\View\Helper\WpInputCheckbox',
+        'wpinputtext'              => '\Dewdrop\View\Helper\WpInputText',
+        'wpselect'                 => '\Dewdrop\View\Helper\WpSelect',
+        'wptable'                  => '\Dewdrop\View\Helper\WpTable',
+        'wpwrap'                   => '\Dewdrop\View\Helper\WpWrap',
+        'wrap'                     => '\Dewdrop\View\Helper\Wrap',
     );
 
     /**
@@ -81,10 +187,24 @@ class View
      * in sanitizing output in various contexts.
      *
      * @param Escaper $escaper
+     * @param Request $request
      */
-    public function __construct(Escaper $escaper = null)
+    public function __construct(Escaper $escaper = null, Request $request = null)
     {
         $this->escaper = ($escaper ?: new Escaper());
+        $this->request = ($request ?: Pimple::getResource('dewdrop-request'));
+
+        $this->init();
+    }
+
+    /**
+     * This method can be used by sub-classes to setup additional helpers, etc.
+     *
+     * @return void
+     */
+    public function init()
+    {
+
     }
 
     /**
@@ -103,19 +223,53 @@ class View
      *     )
      * );
      *
-     * @param string $name
+     * @param string|array $name
      * @param mixed $value
      * @return \Dewdrop\View\View
      */
     public function assign($name, $value = null)
     {
         if (!is_array($name)) {
-            $this->data[$name] = $value;
+            $this->internalViewData[$name] = $value;
         } else {
             foreach ($name as $index => $value) {
                 $this->assign($index, $value);
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * Assign a helper instance to the supplied name, rather than requiring
+     * that it be instantiated when the helper is accessed.  Typically used
+     * to share helper instances with partials generated by a parent view,
+     * which reduces resource usage and allows things like CSS and JS added
+     * by partials to propagate intuitively.
+     *
+     * @param string $name
+     * @param object $instance
+     * @return $this
+     */
+    public function assignInstance($name, $instance)
+    {
+        $this->helpers[strtolower($name)] = $instance;
+
+        return $this;
+    }
+
+    /**
+     * Register a new helper name and class name.  This can be used to replace
+     * a default helper implementation or to introduce a project-specific
+     * helper.
+     *
+     * @param string $name
+     * @param string $className The full class name/namespace.
+     * @return \Dewdrop\View\View
+     */
+    public function registerHelper($name, $className)
+    {
+        $this->helperClasses[strtolower($name)] = $className;
 
         return $this;
     }
@@ -131,8 +285,8 @@ class View
      */
     public function __get($name)
     {
-        if (isset($this->data[$name])) {
-            return $this->data[$name];
+        if (isset($this->internalViewData[$name])) {
+            return $this->internalViewData[$name];
         } else {
             return null;
         }
@@ -160,7 +314,7 @@ class View
      */
     public function __isset($name)
     {
-        return array_key_exists($name, $this->data);
+        return array_key_exists($name, $this->internalViewData);
     }
 
     /**
@@ -218,17 +372,46 @@ class View
      *
      * @param string $template
      * @param array $data
+     * @param string $scriptPath
      * @return string
      */
-    public function partial($template, array $data)
+    public function partial($template, array $data, $scriptPath = null)
     {
         $partial = new View($this->escaper);
 
+        $partial->assignInstance('headscript', $this->headScript());
+        $partial->assignInstance('headlink', $this->headLink());
+
+        // Pass along any custom helper class assignments to the newly created partial
+        foreach ($this->helperClasses as $name => $className) {
+            $partial->registerHelper($name, $className);
+        }
+
+        foreach ($this->helpers as $name => $helper) {
+            if ($helper instanceof PageDelegateInterface) {
+                /* @var $partialHelper PageDelegateInterface */
+                $partialHelper = $partial->helper($name);
+
+                $partialHelper->setPage($helper->getPage());
+            }
+        }
+
         $partial
-            ->setScriptPath($this->scriptPath)
+            ->setScriptPath($scriptPath ?: $this->scriptPath)
             ->assign($data);
 
         return $partial->render($template);
+    }
+
+    /**
+     * Get the current Request object for access to GET or POST data
+     * from helpers.
+     *
+     * @return \Dewdrop\Request
+     */
+    public function getRequest()
+    {
+        return $this->request;
     }
 
     /**
@@ -269,7 +452,9 @@ class View
     public function render($template)
     {
         ob_start();
+
         require $this->scriptPath . '/' . basename($template);
+
         return ob_get_clean();
     }
 

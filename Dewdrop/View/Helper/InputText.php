@@ -18,9 +18,9 @@ use Dewdrop\Db\Field;
  *
  * Example usage:
  *
- * <code>
+ * <pre>
  * echo $this->wpInputText($this->fields->get('animals:latin_name'));
- * </code>
+ * </pre>
  */
 class InputText extends AbstractHelper
 {
@@ -42,17 +42,18 @@ class InputText extends AbstractHelper
      * and then render the input.
      *
      * @param Field $field
+     * @param array $options
      * @return string
      */
-    protected function directField(Field $field)
+    protected function directField(Field $field, array $options = array())
     {
-        return $this->directArray(
-            array(
-                'name'  => $field->getControlName(),
-                'id'    => $field->getHtmlId(),
-                'value' => $field->getValue()
-            )
+        $fieldDefaults = array(
+            'name'  => $field->getControlName(),
+            'id'    => $field->getHtmlId(),
+            'value' => $field->getValue()
         );
+
+        return $this->directArray($fieldDefaults + $options);
     }
 
     /**
@@ -61,16 +62,20 @@ class InputText extends AbstractHelper
      *
      * @param string $name
      * @param boolean $value
-     * @param string $class
+     * @param mixed $classes
      * @return string
      */
-    protected function directExplicit($name, $value, $class = null)
+    protected function directExplicit($name, $value, $classes = null)
     {
+        if (null !== $classes && !is_array($classes)) {
+            $classes = array($classes);
+        }
+
         return $this->directArray(
             array(
                 'name'    => $name,
                 'value'   => $value,
-                'classes' => ($class ? array($class) : null)
+                'classes' => $classes
             )
         );
     }
@@ -94,13 +99,20 @@ class InputText extends AbstractHelper
             $id = $name;
         }
 
+        if (!$type) {
+            $type = 'text';
+        }
+
         return $this->partial(
             'input-text.phtml',
             array(
-                'name'    => $name,
-                'id'      => $id,
-                'value'   => $value,
-                'classes' => $classes
+                'name'        => $name,
+                'id'          => $id,
+                'value'       => $value,
+                'classes'     => $classes,
+                'type'        => $type,
+                'autofocus'   => $autofocus,
+                'placeholder' => $placeholder
             )
         );
     }
@@ -118,7 +130,7 @@ class InputText extends AbstractHelper
     {
         $this
             ->checkRequired($options, array('name', 'value'))
-            ->ensurePresent($options, array('classes', 'id'))
+            ->ensurePresent($options, array('classes', 'id', 'autofocus', 'placeholder', 'type'))
             ->ensureArray($options, array('classes'));
 
         return $options;

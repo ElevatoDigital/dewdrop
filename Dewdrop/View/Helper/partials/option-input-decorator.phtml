@@ -1,0 +1,41 @@
+<?php
+$title = $this->escapeHtml($this->optionComponent->getPrimaryModel()->getSingularTitle());
+?>
+<div class="option-input-decorator"
+    data-render-url="<?php echo $this->escapeHtmlAttr($this->controlComponent->url('render-edit-control'));?>"
+    data-save-action="<?php echo $this->escapeHtmlAttr($this->optionComponent->url('edit'));?>"
+    data-field-id="<?php echo $this->escapeHtmlAttr($this->field->getControlName());?>">
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="option-input-original-control">
+                <?php echo $this->originalControlHtml;?>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <?php if ($this->optionComponent->getPermissions()->can('create')):?>
+            <span class="text-muted option-input-decorator-or"> or </span>
+            <a class="btn btn-link btn-add-option">create a new <?php echo $title;?></a>
+            <?php endif;?>
+        </div>
+    </div>
+
+    <?php if ($this->optionComponent->getPermissions()->can('create')):?>
+    <div class="well">
+        <h4>Create a new <?php echo $title;?></h4>
+        <div class="option-input-form">
+            <?php
+            $this->optionComponent->getRowEditor()->link();
+
+            echo $this->bootstrapForm()->renderContent(
+                $this->optionComponent->getFields()->getEditableFields(
+                    $this->optionComponent->getFieldGroupsFilter()
+                ),
+                $this->optionComponent->getRowEditor()->getInputFilter(),
+                $this->editControlRenderer()
+            );
+            ?>
+            <button class="btn btn-default btn-submit-option">Save <?php echo $title;?></button>
+        </div>
+    </div>
+    <?php endif;?>
+</div>

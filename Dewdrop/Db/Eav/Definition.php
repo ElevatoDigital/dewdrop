@@ -11,6 +11,7 @@
 namespace Dewdrop\Db\Eav;
 
 use Dewdrop\Db\Row;
+use Dewdrop\Db\Select;
 use Dewdrop\Db\Table;
 use Dewdrop\Exception;
 
@@ -37,6 +38,7 @@ use Dewdrop\Exception;
  * widgets_eav_values_datetime
  * widgets_eav_values_decimal
  * widgets_eav_values_int
+ * widgets_eav_values_boolean
  * </pre>
  *
  * You can modify the "_eav_values_" portion of the value table names by
@@ -101,6 +103,14 @@ class Definition
      * @var array
      */
     private $attributes;
+
+    /**
+     * The index in the attribute definition that determines whether the field
+     * is required.
+     *
+     * @var string
+     */
+    private $requiredIndex = 'is_required';
 
     /**
      * Register a new EAV definition to supplied table and set any additional
@@ -211,6 +221,34 @@ class Definition
     }
 
     /**
+     * Set the index of the column in the attributes table that will be used to
+     * determine if an attribute is required or not.  Useful if you require
+     * an attribute in some contexts but not others (e.g. you have a column
+     * called "is_required_public" and another called "is_required_admin" and
+     * need to consult a different column depending upon who is logged in).
+     *
+     * @param string $requiredIndex
+     * @return $this
+     */
+    public function setRequiredIndex($requiredIndex)
+    {
+        $this->requiredIndex = $requiredIndex;
+
+        return $this;
+    }
+
+    /**
+     * Get the index/name of the column in the attribute definition that tells us
+     * if a value is required.
+     *
+     * @return string
+     */
+    public function getRequiredIndex()
+    {
+        return $this->requiredIndex;
+    }
+
+    /**
      * Get a \Dewdrop\Db\Adapter::describeTable() compatible metadata definition.
      * This allows EAV field's to integrate nicely with the standard Field API.
      *
@@ -221,6 +259,14 @@ class Definition
     {
         $attribute = $this->getAttribute($name);
 
+        if (!isset($attribute[$this->requiredIndex])) {
+            throw new Exception(
+                "The attribute definition does not contain a(n) '{$this->requiredIndex} column to
+                indicate whether it is required.  If you're using a different column for that purpose,
+                call setRequiredIndex()."
+            );
+        }
+
         // @todo Write test that guarantees keys here are equal to keys in describeTable()
         return array(
             'SCHEMA_NAME'      => null,
@@ -228,8 +274,9 @@ class Definition
             'COLUMN_NAME'      => $name,
             'COLUMN_POSITION'  => null,
             'DATA_TYPE'        => $attribute['backend_type'],
+            'GENERIC_TYPE'     => $this->detectGenericType($attribute['backend_type']),
             'DEFAULT'          => $attribute['default_value'],
-            'NULLABLE'         => !($attribute['is_required']),
+            'NULLABLE'         => true,
             'LENGTH'           => null,
             'SCALE'            => null,
             'PRECISION'        => null,
@@ -284,13 +331,21 @@ class Definition
         $valueQuoted = $db->quoteIdentifier($valueTable);
 
         $where = $this->table->assembleFindWhere($pkeyValues);
-        $sql   = "SELECT true FROM {$valueQuoted} WHERE $where";
+
+        $sql = $db->quoteInto(
+            "SELECT true FROM {$valueQuoted} WHERE $where AND attribute_id = ?",
+            $attribute['attribute_id']
+        );
+
+        if (is_bool($value)) {
+            $value = (int) $value;
+        }
 
         if ($db->fetchOne($sql)) {
             $db->update(
                 $valueTable,
                 array('value' => $value),
-                $db->quoteInto("{$where} AND attribute_id = ?", $value)
+                $db->quoteInto("{$where} AND attribute_id = ?", $attribute['attribute_id'])
             );
         } else {
             $data = array(
@@ -382,5 +437,68 @@ class Definition
         }
 
         return $this->attributes;
+    }
+
+    /**
+     * Determine a generic data type appropriate for the supplied EAV type.
+     * The EAV backend value tables are named after the data types in the DB,
+     * so they don't directly match generic types from our PHP API.  This
+     * method maps the two domains together so that we can check an EAV
+     * field's generic type in our application code.
+     *
+     * @param string $eavType
+     * @return string
+     * @throws Exception
+     */
+    private function detectGenericType($eavType)
+    {
+        switch ($eavType) {
+            case 'datetime':
+                return 'timestamp';
+            case 'decimal':
+                return 'float';
+            case 'int':
+                return 'integer';
+            case 'text':
+                return 'clob';
+            case 'varchar':
+                return 'text';
+            case 'boolean':
+                return 'boolean';
+        }
+
+        throw new Exception("Could not map generic type for EAV backend: {$eavType}.");
+    }
+
+    /**
+     * Augment the provided Select object with all the EAV attribute values from this
+     * definition.
+     *
+     * @param Select $select
+     * @return Select
+     * @throws Select
+     */
+    public function augmentSelect(Select $select)
+    {
+        $db = $this->table->getAdapter();
+        $id = current($this->table->getPrimaryKey());
+
+        $rootTableAlias = $select->quoteWithAlias($this->table->getTableName(), $id);
+
+        foreach ($this->getAttributes() as $attribute) {
+            $alias  = 'eav_' . $attribute['attribute_id'];
+            $table  = $this->table->getTableName() . $this->valueTablePrefix . $attribute['backend_type'];
+
+            $select->joinLeft(
+                [$alias => $table],
+                $db->quoteInto(
+                    "{$alias}.{$id} = {$rootTableAlias} AND {$alias}.attribute_id = ?",
+                    $attribute['attribute_id']
+                ),
+                [$alias => 'value']
+            );
+        }
+
+        return $select;
     }
 }

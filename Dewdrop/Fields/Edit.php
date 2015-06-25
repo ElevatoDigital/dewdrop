@@ -49,6 +49,9 @@ use Zend\InputFilter\InputFilter;
  *         fields whose control names _do_ appear in the supplied values hash.
  *     </li>
  * </ol>
+ *
+ * @deprecated
+ * @see \Dewdrop\Fields\RowEditor
  */
 class Edit implements Countable, Iterator
 {
@@ -161,7 +164,7 @@ class Edit implements Countable, Iterator
         // When not checked, checkboxes are excluded from POST in full.
         // This loop works around that quirk.
         foreach ($this->fields as $field) {
-            if ($field->isType('tinyint') && !array_key_exists($field->getControlName(), $values)) {
+            if ($field->isType('tinyint', 'bool') && !array_key_exists($field->getControlName(), $values)) {
                 $field->setValue(0);
             }
         }

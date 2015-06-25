@@ -41,6 +41,6 @@ class Wrap extends AbstractHelper
      */
     public function close()
     {
-        return '</div>';
+        return '</div></div>';
     }
-} 
+}

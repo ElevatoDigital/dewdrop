@@ -2,6 +2,7 @@
 
 namespace Dewdrop\Db;
 
+use Dewdrop\Db\Adapter;
 use Dewdrop\Test\DbTestCase;
 
 class AdapterTest extends DbTestCase
@@ -15,8 +16,7 @@ class AdapterTest extends DbTestCase
     {
         parent::setUp();
 
-        $wpdb = new \wpdb(DB_USER, DB_PASSWORD, DB_NAME, DB_HOST);
-        $this->db = new Adapter($wpdb);
+        $this->db = $GLOBALS['dewdrop_pimple']['db'];
     }
 
     public function tearDown()
@@ -34,7 +34,7 @@ class AdapterTest extends DbTestCase
     public function testFetchAllAssocReturnsArrayOfRowsWithNoNumericKeys()
     {
         $sql = 'SELECT * FROM dewdrop_test_fruits';
-        $rs  = $this->db->fetchAll($sql, array(), ARRAY_A);
+        $rs  = $this->db->fetchAll($sql, array(), Adapter::ARRAY_A);
         $row = current($rs);
 
         $this->assertTrue(is_array($row));
@@ -178,7 +178,7 @@ class AdapterTest extends DbTestCase
     public function testFetchRowReturnsAssociatedArrayWithColumnsAsKeys()
     {
         $sql = 'SELECT * FROM dewdrop_test_fruits WHERE dewdrop_test_fruit_id = 1';
-        $row = $this->db->fetchRow($sql, array(), ARRAY_A);
+        $row = $this->db->fetchRow($sql, array(), Adapter::ARRAY_A);
 
         $this->assertTrue(is_array($row));
 
@@ -253,6 +253,10 @@ class AdapterTest extends DbTestCase
 
     public function testGetConnectionReturnsWpdbInstance()
     {
+        if (!defined('WPINC')) {
+            $this->markTestSkipped('Not running in WP plugin context');
+        }
+
         $this->assertInstanceOf('\wpdb', $this->db->getConnection());
     }
 
@@ -306,7 +310,7 @@ class AdapterTest extends DbTestCase
      */
     public function testBadFetchOneThrowsException()
     {
-        $this->db->fetchCol('not even close to valid sql');
+        $this->db->fetchOne('not even close to valid sql');
     }
 
     /**
@@ -315,5 +319,10 @@ class AdapterTest extends DbTestCase
     public function testBadFetchQueryThrowsException()
     {
         $this->db->query('not even close to valid sql');
+    }
+
+    public function testGetDriver()
+    {
+        $this->assertInstanceOf('\Dewdrop\Db\Driver\DriverInterface', $this->db->getDriver());
     }
 }

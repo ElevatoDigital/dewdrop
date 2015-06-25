@@ -18,6 +18,19 @@ class ViewTest extends BaseTestCase
         $this->assertTrue($this->view->getEscaper() instanceof \Zend\Escaper\Escaper);
     }
 
+    public function testConstructorCallsInitMethod()
+    {
+        $view = $this->getMockBuilder('\Dewdrop\View\View')
+            ->setMethods(array('init'))
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $view->expects($this->once())
+            ->method('init');
+
+        $view->__construct();
+    }
+
     public function testImplicitAssignAndRetrieveViaMagicMethods()
     {
         $this->view->var = 'test';

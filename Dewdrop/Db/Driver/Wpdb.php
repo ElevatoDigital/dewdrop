@@ -11,6 +11,7 @@
 namespace Dewdrop\Db\Driver;
 
 use Dewdrop\Db\Adapter;
+use Dewdrop\Db\Select;
 use Dewdrop\Exception;
 use wpdb as RawWpdb;
 
@@ -105,7 +106,7 @@ class Wpdb implements DriverInterface
      * Fetch a single scalar value from the results of the supplied SQL
      * statement.
      *
-     * @param string|\Dewdrop\Db\Select
+     * @param string|\Dewdrop\Db\Select $sql
      * @param array $bind
      * @return mixed
      */
@@ -118,7 +119,7 @@ class Wpdb implements DriverInterface
      * Run the supplied query, binding the supplied data to the statement
      * prior to execution.
      *
-     * @param string|\Dewdrop\Db\Select
+     * @param string|\Dewdrop\Db\Select $sql
      * @param array $bind
      * @return mixed
      */
@@ -164,14 +165,14 @@ class Wpdb implements DriverInterface
      *
      * The array has the following format:
      *
-     * <code>
+     * <pre>
      * array(
      *     'column_name' => array(
      *         'table'  => 'foreign_table',
      *         'column' => 'foreign_column'
      *     )
      * )
-     * </code>
+     * </pre>
      *
      * @param string $tableName
      * @return array
@@ -208,13 +209,13 @@ class Wpdb implements DriverInterface
      *
      * The array has the following format:
      *
-     * <code>
+     * <pre>
      * array(
      *     'key_name' => array(
      *         sequence_in_index => 'column_name'
      *     )
      * )
-     * </code>
+     * </pre>
      *
      * @param string $tableName
      * @return array
@@ -315,7 +316,7 @@ class Wpdb implements DriverInterface
                 ++$p;
             }
             $desc[$this->adapter->foldCase($row['Field'])] = array(
-                'SCHEMA_NAME'      => null, // @todo
+                'SCHEMA_NAME'      => null,
                 'TABLE_NAME'       => $this->adapter->foldCase($tableName),
                 'COLUMN_NAME'      => $this->adapter->foldCase($row['Field']),
                 'COLUMN_POSITION'  => $i,
@@ -324,6 +325,7 @@ class Wpdb implements DriverInterface
                 'NULLABLE'         => (bool) ($row['Null'] == 'YES'),
                 'LENGTH'           => $row['Length'],
                 'SCALE'            => $row['Scale'],
+                'GENERIC_TYPE'     => $this->mapNativeTypeToGenericType($row['Type'], $row['Length']),
                 'PRECISION'        => $row['Precision'],
                 'UNSIGNED'         => $row['Unsigned'],
                 'PRIMARY'          => $row['Primary'],
@@ -352,5 +354,175 @@ class Wpdb implements DriverInterface
         }
 
         return $wpdbResult;
+    }
+
+    /**
+     * Pick an appropriate generic data type for the supplied MySQL native
+     * data type.
+     *
+     * @param string $nativeType
+     * @param mixed $length
+     * @return string
+     * @throws Exception
+     */
+    public function mapNativeTypeToGenericType($nativeType, $length)
+    {
+        switch ($nativeType) {
+            case 'tinyint':
+                $type = 'integer';
+
+                if (4 >= $length) {
+                    $type = 'boolean';
+                }
+                break;
+            case 'smallint':
+            case 'mediumint':
+            case 'int':
+            case 'bigint':
+            case 'integer':
+                $type = 'integer';
+                break;
+            case 'tinytext':
+            case 'mediumtext':
+            case 'longtext':
+            case 'text':
+            case 'varchar':
+            case 'string':
+            case 'char':
+                $type = 'text';
+                if ($length == '1') {
+                    $type = 'boolean';
+                } elseif (strstr($nativeType, 'text')) {
+                    $type = 'clob';
+                }
+                break;
+            case 'enum':
+                $type   = 'text';
+                $length = 0;
+                break;
+            case 'date':
+                $type = 'date';
+                break;
+            case 'datetime':
+            case 'timestamp':
+                $type = 'timestamp';
+                break;
+            case 'time':
+                $type = 'time';
+                break;
+            case 'float':
+            case 'double':
+            case 'real':
+            case 'unknown':
+            case 'decimal':
+            case 'numeric':
+                $type = 'float';
+                break;
+            case 'tinyblob':
+            case 'mediumblob':
+            case 'longblob':
+            case 'blob':
+                $type = 'blob';
+                $length = null;
+                break;
+            case 'binary':
+            case 'varbinary':
+                $type = 'blob';
+                break;
+        }
+
+        if (false !== stripos($nativeType, 'enum')) {
+            $type = 'text';
+        }
+
+        if (!isset($type) || !$type) {
+            throw new Exception("Data type {$nativeType} not supported.");
+        }
+
+        return $type;
+    }
+
+    /**
+     * With the legacy mysql extension, which most WP installs still use, this
+     * is the only decent way to do transactions.
+     *
+     * @return void
+     */
+    public function beginTransaction()
+    {
+        $this->query('SET AUTOCOMMIT=0');
+        $this->query('START TRANSACTION');
+    }
+
+    /**
+     * Commit the current transaction.
+     *
+     * @return void
+     */
+    public function commit()
+    {
+        $this->query('COMMIT');
+        return $this->query('SET AUTOCOMMIT=1');
+    }
+
+    /**
+     * Use the SQL_CALC_FOUND_ROWS facility in MySQL to calculate the total
+     * number of rows that would have been returned from a query if no LIMIT
+     * had been applied.
+     *
+     * @param Select $select
+     * @return void
+     */
+    public function prepareSelectForTotalRowCalculation(Select $select)
+    {
+        $select->preColumnsOption('SQL_CALC_FOUND_ROWS');
+    }
+
+    /**
+     * Use MySQL's FOUND_ROWS() facility to retrieve the total number of rows
+     * that would have been fetched on the previous statement if no LIMIT was
+     * applied.
+     *
+     * @param array $resultSet
+     * @return integer
+     */
+    public function fetchTotalRowCount(array $resultSet)
+    {
+        return $this->adapter->fetchOne('SELECT FOUND_ROWS()');
+    }
+
+    /**
+     * Return the operator that can be used for case-insensitive LIKE
+     * comparisons.
+     *
+     * @return string
+     */
+    public function getCaseInsensitiveLikeOperator()
+    {
+        return 'LIKE';
+    }
+
+    /**
+     * Use the functions available in the RDBMS to truncate the provided timestamp
+     * column to a date.
+     *
+     * @param string $timestamp
+     * @return string
+     */
+    public function truncateTimeStampToDate($timestamp)
+    {
+        return "DATE({$timestamp})";
+    }
+
+    /**
+     * Quote the supplied input using mysql_real_escape_string() because WordPress
+     * is really gross.
+     *
+     * @param string $input
+     * @return string
+     */
+    public function quoteInternal($input)
+    {
+        return "'" . $this->wpdb->escape($input) . "'";
     }
 }

@@ -1,0 +1,18 @@
+<ol class="breadcrumb">
+    <li><a href="<?php echo $this->escapeHtmlAttr($this->adminUrl('index'));?>"><?php echo $this->escapeHtml($this->component->getTitle());?></a></li>
+    <li class="active">Sort and Group Fields</li>
+</ol>
+
+<form id="sort-form" class="form" action="" method="POST">
+    <div id="groups-wrapper"></div>
+    <input type="hidden" name="sorted_fields" id="sorted-fields" value="" />
+    <input id="sort-submit" type="submit" value="Save Changes" class="btn btn-primary" />
+    <span id="add-group-wrapper"><button id="add-group" class="btn btn-default">Add Group</button></span>
+</form>
+
+<script type="text/javascript">
+    var initialFieldGroupsConfig = <?php echo $this->encodeJsonHtmlSafe($this->fieldGroups);?>
+</script>
+
+<?php
+$this->headScript()->appendFile($this->bowerUrl('/dewdrop/www/js/sort-fields/main.js'));

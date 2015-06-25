@@ -14,9 +14,14 @@ class PathsTest extends BaseTestCase
 
     public function setUp()
     {
-        $this->paths      = new Paths();
-        $this->root       = rtrim(ABSPATH, '/');
         $this->pluginRoot = realpath(__DIR__ . '/../../../../..');
+        $this->paths      = new Paths();
+
+        if (defined('ABSPATH')) {
+            $this->root = rtrim(ABSPATH, '/');
+        } else {
+            $this->root = $this->pluginRoot;
+        }
     }
 
     public function testRoot()

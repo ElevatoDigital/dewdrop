@@ -11,6 +11,7 @@
 namespace Dewdrop\Db\FieldProvider;
 
 use Dewdrop\Db\Eav\Field;
+use Dewdrop\Db\Select;
 use Dewdrop\Db\Table;
 
 /**
@@ -57,10 +58,17 @@ class Eav implements ProviderInterface
      */
     public function instantiate($name)
     {
-        $def   = $this->table->getEav();
-        $field = new Field($this->table, $name, $def->getFieldMetadata($name));
+        $definition = $this->table->getEav();
+        $metadata   = $definition->getFieldMetadata($name);
+        $attribute  = $definition->getAttribute($name);
 
-        $field->setDefinition($def);
+        $field = new Field($this->table, $name, $metadata);
+
+        $field->setDefinition($definition);
+
+        if ($attribute[$definition->getRequiredIndex()]) {
+            $field->setRequired(true);
+        }
 
         return $field;
     }
@@ -77,5 +85,20 @@ class Eav implements ProviderInterface
         }
 
         return array_keys($this->table->getEav()->getAttributes());
+    }
+
+    /**
+     * Add the EAV values for all attributes to the provided Select.
+     *
+     * @param Select $select
+     * @return Select
+     */
+    public function augmentSelect(Select $select)
+    {
+        if ($this->table->hasEav()) {
+            $this->table->getEav()->augmentSelect($select);
+        }
+
+        return $select;
     }
 }

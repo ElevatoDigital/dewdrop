@@ -11,6 +11,7 @@
 namespace Dewdrop\Db\Driver;
 
 use Dewdrop\Db\Adapter;
+use Dewdrop\Db\Select;
 
 /**
  * A mock DB adpater driver for use during testing.  You can certainly
@@ -29,7 +30,7 @@ class Mock implements DriverInterface
     /**
      * Create new instance with the supplied adapter.
      *
-     * @param \Dewdrop\Db\Adapter
+     * @param \Dewdrop\Db\Adapter $adapter
      */
     public function __construct(Adapter $adapter)
     {
@@ -75,7 +76,7 @@ class Mock implements DriverInterface
      * Fetch a single scalar value from the results of the supplied SQL
      * statement.
      *
-     * @param string|\Dewdrop\Db\Select
+     * @param string|\Dewdrop\Db\Select $sql
      * @param array $bind
      * @return mixed
      */
@@ -88,7 +89,7 @@ class Mock implements DriverInterface
      * Run the supplied query, binding the supplied data to the statement
      * prior to execution.
      *
-     * @param string|\Dewdrop\Db\Select
+     * @param string|\Dewdrop\Db\Select $sql
      * @param array $bind
      * @return mixed
      */
@@ -134,14 +135,14 @@ class Mock implements DriverInterface
      *
      * The array has the following format:
      *
-     * <code>
+     * <pre>
      * array(
      *     'column_name' => array(
      *         'table'  => 'foreign_table',
      *         'column' => 'foreign_column'
      *     )
      * )
-     * </code>
+     * </pre>
      *
      * @param string $tableName
      * @return array
@@ -156,13 +157,13 @@ class Mock implements DriverInterface
      *
      * The array has the following format:
      *
-     * <code>
+     * <pre>
      * array(
      *     'key_name' => array(
      *         sequence_in_index => 'column_name'
      *     )
      * )
-     * </code>
+     * </pre>
      *
      * @param string $tableName
      * @return array
@@ -202,5 +203,111 @@ class Mock implements DriverInterface
     public function describeTable($tableName)
     {
         return array();
+    }
+
+    /**
+     * Start a new transaction.
+     */
+    public function beginTransaction()
+    {
+
+    }
+
+    /**
+     * Commit the current transaction.
+     */
+    public function commit()
+    {
+
+    }
+
+    /**
+     * Given the supplied native data type, return a generic data type that can
+     * be used in Dewdrop to make decisions about columns/fields:
+     *
+     * 1) boolean - A true/false value.
+     * 2) integer - Whole number.
+     * 3) float - Floating point number.
+     * 4) text - Fixed-length, shorter text value.
+     * 5) clob - Character large object.  Large text field.
+     * 6) timestamp - Date and time combined.
+     * 7) date - Just a date.
+     * 8) time - Just the time.
+     * 9) money - Get money, get paid.
+     * 10) blob - Binary large object.
+     *
+     * @param string $nativeType
+     * @param mixed $length
+     * @return string
+     */
+    public function mapNativeTypeToGenericType($nativeType, $length)
+    {
+        return '';
+    }
+
+    /**
+     * Modify a \Dewdrop\Db\Select object so that the RDBMS can calculate the
+     * total number of rows that would have been returned if no LIMIT was
+     * present.
+     *
+     * @param Select $select
+     * @return void
+     */
+    public function prepareSelectForTotalRowCalculation(Select $select)
+    {
+
+    }
+
+    /**
+     * Fetch the number of rows that would have been fetched had no LIMIT
+     * clause been applied to a statement.  The result set is supplied here
+     * for RDBMS types (e.g. Postgres) where the total count is embedded in
+     * the result set.  However, some systems (e.g. MySQL) will not need
+     * to reference it.
+     *
+     * @param array $resultSet
+     * @return integer
+     */
+    public function fetchTotalRowCount(array $resultSet)
+    {
+        return 0;
+    }
+
+    /**
+     * Return the operator that can be used for case-insensitive LIKE
+     * comparisons.
+     *
+     * @return string
+     */
+    public function getCaseInsensitiveLikeOperator()
+    {
+        return 'LIKE';
+    }
+
+    /**
+     * Use the functions available in the RDBMS to truncate the provided timestamp
+     * column to a date.
+     *
+     * @param string $timestamp
+     * @return string
+     */
+    public function truncateTimeStampToDate($timestamp)
+    {
+
+    }
+
+    /**
+     * Quote the supplied input using the appropriate method for your database
+     * platform/driver.  We're using addslashes() in the Mock driver because it
+     * allows us to test that quoteInternal() is being called during tests without
+     * using MySQL or Postgres functions directly.  addslashes() in production
+     * would be inappropriate.
+     *
+     * @param string $input
+     * @return string
+     */
+    public function quoteInternal($input)
+    {
+        return "'" . addslashes($input) . "'";
     }
 }

@@ -11,8 +11,8 @@
 namespace Dewdrop\Cli\Command;
 
 /**
- * Generate API documentation for all Drewdrop libraries with
- * phpdoc (a.k.a. phpDocumentor2).
+ * Generate API documentation for all Dewdrop libraries with
+ * phpdoc (a.k.a. phpDocumentor 2).
  */
 class DewdropDoc extends CommandAbstract
 {
@@ -79,7 +79,7 @@ class DewdropDoc extends CommandAbstract
         $cmd = sprintf(
             "%s --sourcecode --defaultpackagename=Dewdrop --title=Dewdrop --ignore=*.phtml -d %s %s",
             $this->phpdoc,
-            escapeshellarg($this->paths->getDewdropLib()),
+            escapeshellarg($this->paths->getDewdropLib() . '/Dewdrop'),
             $this->getFallbackArgString()
         );
 

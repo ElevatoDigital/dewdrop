@@ -11,6 +11,10 @@ class WpColorPickerTest extends BaseTestCase
 
     public function setUp()
     {
+        if (!defined('WPINC')) {
+            $this->markTestSkipped('Not running in WP plugin context');
+        }
+
         $this->view = new View();
     }
 

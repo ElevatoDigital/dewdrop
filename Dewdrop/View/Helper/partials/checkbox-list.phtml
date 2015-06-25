@@ -1,7 +1,13 @@
-<ul>
+<ul class="<?php echo $this->escapeHtmlAttr(implode(' ', $this->classes));?>">
     <?php
     foreach ($this->options as $value => $title) {
         echo '<li>';
+
+        printf(
+            '<label for="%s_%s">',
+            $this->escapeHtmlAttr($this->name),
+            $this->escapeHtmlAttr($value)
+        );
 
         printf(
             '<input type="checkbox" name="%s[]" id="%s_%s" value="%s" %s />',
@@ -12,12 +18,9 @@
             (in_array($value, $this->value) ? 'checked="checked"' : '')
         );
 
-        printf(
-            '<label for="%s_%s"> %s</label>',
-            $this->escapeHtmlAttr($this->name),
-            $this->escapeHtmlAttr($value),
-            $this->escapeHtml($title)
-        );
+        echo ' ';
+        echo $this->escapeHtml($title);
+        echo '</label>';
 
         echo '</li>';
     }

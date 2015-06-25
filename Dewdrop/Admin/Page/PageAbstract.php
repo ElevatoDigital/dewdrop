@@ -10,10 +10,10 @@
 
 namespace Dewdrop\Admin\Page;
 
-use Dewdrop\Admin\ComponentAbstract;
+use Dewdrop\Admin\Component\ComponentAbstract;
 use Dewdrop\Admin\ResponseHelper\Standard as ResponseHelper;
+use Dewdrop\Pimple;
 use Dewdrop\Request;
-use Dewdrop\View\View;
 
 /**
  * This is the base page controller class for admin component's in Dewdrop.
@@ -44,7 +44,7 @@ abstract class PageAbstract
     /**
      * The component the page is part of
      *
-     * @var \Dewdrop\Admin\ComponentAbstract
+     * @var ComponentAbstract
      */
     protected $component;
 
@@ -75,23 +75,49 @@ abstract class PageAbstract
      *
      * @param ComponentAbstract $component
      * @param Request $request
-     * @param string $pageFile
+     * @param string $viewScriptPath
      */
-    public function __construct(ComponentAbstract $component, Request $request, $pageFile)
+    public function __construct(ComponentAbstract $component, Request $request, $viewScriptPath = null)
     {
-        $this->component = $component;
-        $this->view      = new View();
-        $this->request   = ($request ?: new Request());
+        $this->component   = $component;
+        $this->view        = Pimple::getResource('view');
+        $this->request     = ($request ?: $this->application['dewdrop-request']);
+
+        if (null === $viewScriptPath) {
+            $viewScriptPath = $this->component->getPath() . '/view-scripts';
+        }
 
         $this->view
-            ->setScriptPath(dirname($pageFile) . '/view-scripts')
+            ->setScriptPath($viewScriptPath)
             ->helper('AdminUrl')
                 ->setPage($this);
+    }
+
+    public function createStockPage($name)
+    {
+        /* @var $inflector \Dewdrop\Inflector */
+        $inflector = Pimple::getResource('inflector');
+        $className = '\Dewdrop\Admin\Page\Stock\\' . $inflector->camelize($name);
+
+        /* @var $page PageAbstract */
+        $page = new $className(
+            $this->component,
+            $this->request,
+            __DIR__ . '/Stock/view-scripts'
+        );
+
+        $page->getView()
+            ->assignInstance('headlink', $this->view->headLink())
+            ->assignInstance('headscript', $this->view->headScript());
+
+        return $page;
     }
 
     /**
      * Create any resources that need to be accessible both for processing
      * and rendering.
+     *
+     * @return void
      */
     public function init()
     {
@@ -126,6 +152,8 @@ abstract class PageAbstract
 
     /**
      * Assign variables to your page's view and render the output.
+     *
+     * @return mixed
      */
     public function render()
     {
@@ -134,8 +162,10 @@ abstract class PageAbstract
 
     /**
      * You can call renderView() directly from your render() method.  Or, if
-     * your render method produce no output itself, the component will call
+     * your render method produces no output itself, the component will call
      * this method itself to automatically render your view script.
+     *
+     * @return string
      */
     public function renderView()
     {
@@ -165,11 +195,12 @@ abstract class PageAbstract
      * method and the helper will be injected into the page's process()
      * method rather than the standard helper created in PageAbstract.
      *
+     * @param callable $redirector
      * @return \Dewdrop\Admin\ResponseHelper\Standard
      */
-    public function createResponseHelper()
+    public function createResponseHelper($redirector)
     {
-        return new ResponseHelper($this);
+        return new ResponseHelper($this, $redirector);
     }
 
     /**
@@ -187,11 +218,11 @@ abstract class PageAbstract
      * class name to all lower case with the words separated by hyphens.
      * For example, the following class name:
      *
-     * <code>Admin\MyComponent\Index</code>
+     * <pre>Admin\MyComponent\Index</pre>
      *
      * Would become:
      *
-     * <code>index.phtml</code>
+     * <pre>index.phtml</pre>
      *
      * @return string
      */

@@ -1,0 +1,25 @@
+
+namespace <?php echo $this->namespace;?>;
+
+use Dewdrop\Pimple;
+use Dewdrop\Fields\Test\ListingSort as ListingSortTest;
+use PHPUnit_Framework_TestCase;
+
+class ComponentTest extends PHPUnit_Framework_TestCase
+{
+    public function setUp()
+    {
+        require_once Pimple::getResource('paths')->getAdmin() . '/<?php echo $this->component->getName();?>/Component.php';
+        $this->component = new Component();
+    }
+
+    public function testAllSortableFieldsGenerateFunctioningSql()
+    {
+        $tester = new ListingSortTest(
+            $this->component->getFields(),
+            $this->component->getListing()
+        );
+
+        $tester->runInPhpUnit($this);
+    }
+}

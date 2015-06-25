@@ -21,11 +21,18 @@ use Dewdrop\Db\Driver\Mock as MockDriver;
  */
 class Mock extends WpdbAdapter
 {
+    /**
+     * The driver used by this adapter to talk directly to the RDBMS.
+     *
+     * @var \Dewdrop\Db\Driver\DriverInterface
+     */
     protected $driver;
 
     /**
      * Override default adapter constructor because we no longer need to accept
      * $wpdb when just using a mock adapter for testing.
+     *
+     * @param MockDriver $driver
      */
     public function __construct($driver = null)
     {

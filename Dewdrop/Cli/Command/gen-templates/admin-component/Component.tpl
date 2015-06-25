@@ -2,7 +2,7 @@
 
 namespace Admin\{{namespace}};
 
-use Dewdrop\Admin\ComponentAbstract;
+use Dewdrop\Admin\Component\ComponentAbstract;
 
 class Component extends ComponentAbstract
 {

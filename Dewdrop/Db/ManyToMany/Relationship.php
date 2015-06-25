@@ -11,10 +11,11 @@
 namespace Dewdrop\Db\ManyToMany;
 
 use Dewdrop\Db\Adapter as DbAdapter;
+use Dewdrop\Db\Expr;
 use Dewdrop\Db\Row;
+use Dewdrop\Db\Select;
 use Dewdrop\Db\Table;
 use Dewdrop\Exception;
-use Dewdrop\Paths;
 
 /**
  * This class configures and offers utilities for managing many-to-many
@@ -100,6 +101,15 @@ class Relationship
     private $xrefMetadata;
 
     /**
+     * Title column names or Expr objects that can be used to represent cross-reference
+     * values.  If the reference table has a "name" or "title" column that will be used
+     * automatically, but you can use setReferenceTitleColumn() to override that behavior.
+     *
+     * @var string|Expr
+     */
+    private $referenceTitleColumn;
+
+    /**
      * Create relationship using the supplied source table and cross-reference
      * table name.
      *
@@ -148,6 +158,16 @@ class Relationship
         $this->sourceTable = $sourceTable;
 
         return $this;
+    }
+
+    /**
+     * Get the source table this relationship is associated with.
+     *
+     * @return Table
+     */
+    public function getSourceTable()
+    {
+        return $this->sourceTable;
     }
 
     /**
@@ -233,7 +253,7 @@ class Relationship
      * points back to the source table.
      *
      * @throws \Dewdrop\Exception
-     * @return string.
+     * @return string
      */
     public function getXrefAnchorColumnName()
     {
@@ -376,6 +396,51 @@ class Relationship
     }
 
     /**
+     * Set the name of the column (or an Expr) that should be used when building
+     * the list of values to add to a Select in augmentSelect().
+     *
+     * @param string|Expr $titleColumn
+     * @return $this
+     */
+    public function setReferenceTitleColumn($titleColumn)
+    {
+        $this->referenceTitleColumn = $titleColumn;
+
+        return $this;
+    }
+
+    /**
+     * Augment the provided Select object with a comma-separated list of values for this
+     * many-to-many relationship, using the name parameter as the name of the value in
+     * the resultset.
+     *
+     * @param Select $select
+     * @param string $name
+     * @return Select
+     */
+    public function augmentSelect(Select $select, $name)
+    {
+        $anchorColumn = $select->quoteWithAlias($this->sourceTable->getTableName(), $this->getSourceColumnName());
+        $titleColumn  = $this->findReferenceTitleColumn();
+
+        $expr = new Expr(
+            "ARRAY_TO_STRING(
+                ARRAY(
+                    SELECT {$titleColumn}
+                    FROM {$this->getReferenceTableName()} ref
+                    JOIN {$this->xrefTableName} xref
+                        ON xref.{$this->xrefReferenceColumnName} = ref.{$this->getReferenceColumnName()}
+                    WHERE xref.{$this->xrefAnchorColumnName} = {$anchorColumn}
+                    ORDER BY {$titleColumn}
+                ),
+                ', '
+            )"
+        );
+
+        return $select->columns([$name => $expr]);
+    }
+
+    /**
      * Using the supplied source table row, retrieve the initial value for
      * this relationship.  This is typically called by \Dewdrop\Db\Row when
      * get() is first called for this relationship.
@@ -449,6 +514,31 @@ class Relationship
     }
 
     /**
+     * Get a subquery that can be used when filtering by a many-to-many field.
+     * Basically gets all the anchor column values that are associated with the
+     * selected reference column value in the cross-reference table.
+     *
+     * @param integer $value
+     * @return string
+     */
+    public function getFilterSubquery($value)
+    {
+        $db = $this->sourceTable->getAdapter();
+
+        $sql = "SELECT {$db->quoteIdentifier($this->xrefTableName . '.' . $this->xrefAnchorColumnName)}
+            FROM {$db->quoteIdentifier($this->xrefTableName)} ";
+
+        if ($value) {
+            $sql .= $db->quoteInto(
+                "WHERE {$db->quoteIdentifier($this->xrefTableName . '.' . $this->xrefReferenceColumnName)} = ?",
+                $value
+            );
+        }
+
+        return $sql;
+    }
+
+    /**
      * Save new values for this relationship.  This is typically called from
      * \Dewdrop\Db\Table when running insert() or update().
      *
@@ -498,6 +588,20 @@ class Relationship
     }
 
     /**
+     * Load the cross-reference table metadata.
+     *
+     * @return array
+     */
+    protected function loadXrefTableMetadata()
+    {
+        if (!$this->xrefMetadata) {
+            $this->xrefMetadata = $this->sourceTable->getAdapter()->getTableMetadata($this->xrefTableName);
+        }
+
+        return $this->xrefMetadata;
+    }
+
+    /**
      * Build a WHERE clause for use in deleting cross-reference values while
      * saving.  If we have no cross-reference values, we delete all cross-reference
      * rows with the given anchor value.  Otherwise, we only delete those rows
@@ -531,16 +635,29 @@ class Relationship
     }
 
     /**
-     * Load the cross-reference table metadata.
+     * Attempt to get a reasonable reference title column for many-to-many
+     * values retrieved in augmentSelect().  Will use name or title, if available,
+     * and then fall back to the first column in the reference table.  You can
+     * override this behavior with setReferenceTitleColumn().
      *
-     * @return array
+     * @return Expr|string
+     * @throws Exception
      */
-    protected function loadXrefTableMetadata()
+    private function findReferenceTitleColumn()
     {
-        if (!$this->xrefMetadata) {
-            $this->xrefMetadata = $this->sourceTable->getAdapter()->getTableMetadata($this->xrefTableName);
+        if ($this->referenceTitleColumn) {
+            return $this->referenceTitleColumn;
         }
 
-        return $this->xrefMetadata;
+        $metadata = $this->sourceTable->getAdapter()->getTableMetadata($this->getReferenceTableName());
+        $columns  = array_keys($metadata['columns']);
+
+        if (in_array('name', $columns)) {
+            return 'name';
+        } elseif (in_array('title', $columns)) {
+            return 'title';
+        } else {
+            return array_shift($columns);
+        }
     }
 }

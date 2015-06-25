@@ -1,0 +1,95 @@
+<?php
+
+$callbackIndex = 0;
+
+foreach ($this->callbacks as $helperName => $callable) {
+    $sourceInfo = null;
+
+    // @todo I bet this could be refactored.  A bit.  Ugh.
+    try {
+        if (!is_array($callable) && !$callable instanceof Closure) {
+            $reflection = new ReflectionFunction($callable);
+        } elseif (is_array($callable)) {
+            $reflection = new ReflectionMethod($callable[0], $callable[1]);
+        } else {
+            $reflection = new ReflectionFunction($callable);
+        }
+
+        if (!$reflection->getFileName()) {
+            $output = '<div class="alert alert-danger">Could not get source code for callback</div>';
+        } else {
+            $fileContents = file($reflection->getFileName());
+            $spliceLine   = $reflection->getStartLine() - 1;
+
+            $source = array_splice(
+                $fileContents,
+                $spliceLine,
+                $reflection->getEndLine() - $spliceLine
+            );
+
+            $firstLineLen = strlen($source[0]);
+            $source[0]    = ltrim($source[0]);
+            $indentation  = $firstLineLen - strlen($source[0]);
+
+            foreach ($source as &$line) {
+                $line = preg_replace("/^\s{{$indentation}}/", '', $line);
+            }
+
+            $output = '<div class="well">' . str_replace('&lt;?php<br />', '', highlight_string('<?php' . PHP_EOL . implode('', $source), true)) . '</div>';
+            $root   = \Dewdrop\Pimple::getResource('paths')->getRoot() . '/';
+
+            $sourceInfo = array(
+                'file'  => str_replace($root, '', $reflection->getFileName()),
+                'start' => $reflection->getStartLine(),
+                'end'   => $reflection->getEndLine(),
+            );
+        }
+    } catch (Exception $e) {
+        $output = '<div class="alert alert-danger">Exception thrown trying to get source code for callback</div>';
+    }
+
+    $modalId = 'callback-modal-' . $this->fieldIndex . '-' . $callbackIndex;
+
+    printf(
+        '<button type="button" class="btn btn-xs btn-default"  data-container="body" data-toggle="modal" data-target="#%s">%s</button>',
+        $this->escapeHtmlAttr($modalId),
+        $this->escapeHtml($helperName)
+    );
+
+    printf(
+        '<div class="modal fade" id="%s" tabindex="-1" role="dialog" aria-hidden="true">',
+        $this->escapeHtmlAttr($modalId)
+    );
+
+    ?>
+
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">Callback for <strong><?php echo $this->escapeHtml($helperName);?></strong> helper on <strong><?php echo $this->escapeHtml($this->fieldId);?></strong> field</h4>
+                </div>
+                <div class="modal-body">
+                    <?php echo $output;?>
+                    <?php if ($sourceInfo):?>
+                    <p>
+                        <small>
+                            <?php
+                            printf(
+                                '%s (Lines %d-%d)',
+                                $this->escapeHtml($sourceInfo['file']),
+                                $this->escapeHtml($sourceInfo['start']),
+                                $this->escapeHtml($sourceInfo['end'])
+                            );
+                            ?>
+                        </small>
+                    </p>
+                    <?php endif;?>
+                </div>
+            </div>
+        </div>
+    </div>
+    <?php
+    $callbackIndex += 1;
+}
+

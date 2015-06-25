@@ -12,6 +12,7 @@ namespace Dewdrop\Db;
 
 use ArrayAccess;
 use Dewdrop\Exception;
+use Dewdrop\SaveHandlerInterface;
 
 /**
  * The Row class provides a simple way to manipulate the values associated
@@ -19,25 +20,25 @@ use Dewdrop\Exception;
  *
  * You can set values on the row using the set() method like this:
  *
- * <code>
+ * <pre>
  * $row->set('column_name', $value);
- * </code>
+ * </pre>
  *
  * Or, you can set multiple values at once like this:
  *
- * <code>
+ * <pre>
  * $row->set(
  *     array(
  *         'column_name'   => $value,
  *         'second_column' => $anotherValue
  *     )
  * );
- * </code>
+ * </pre>
  *
  * Setting and retrieving values can also be done via direct object or array-style
  * use of the object:
  *
- * <code>
+ * <pre>
  * // Access a column's value with object syntax
  * echo $row->column_name;
  *
@@ -49,7 +50,7 @@ use Dewdrop\Exception;
  *
  * // Set a column's value with array syntax
  * $row['column_name'] = 'Value';
- * </code>
+ * </pre>
  *
  * Once the columns have been assigned the desired values, you can call save(),
  * which will either update or insert the row depending upon whether it already
@@ -61,29 +62,22 @@ use Dewdrop\Exception;
  * Additionally, you can retrieve field objects representing columns in this
  * row by calling its field() method:
  *
- * <code>
+ * <pre>
  * $row->field('column_name');
- * </code>
+ * </pre>
  *
  * The field object allows you to easily integrate with other Dewdrop
  * APIs, leveraging the database metadata to add validators, retrieve lists
  * of options, etc.
  */
-class Row implements ArrayAccess
+class Row implements ArrayAccess, SaveHandlerInterface
 {
     /**
      * The data represented by this row.
      *
      * @var array
      */
-    private $data;
-
-    /**
-     * The table this row is associated with.
-     *
-     * @var \Dewdrop\Db\Table
-     */
-    private $table;
+    protected $data;
 
     /**
      * The columns available to this row as defined by the associated table's
@@ -91,7 +85,14 @@ class Row implements ArrayAccess
      *
      * @var array
      */
-    private $columns;
+    protected $columns;
+
+    /**
+     * The table this row is associated with.
+     *
+     * @var \Dewdrop\Db\Table
+     */
+    private $table;
 
     /**
      * A map of many-to-many and EAV fieldsthat tracks whether their initial
@@ -115,6 +116,17 @@ class Row implements ArrayAccess
         $this->data    = $data;
         $this->columns = $this->table->getRowColumns();
 
+        // Apply defaults for new rows
+        if (!count($this->data)) {
+            foreach ($this->columns as $column) {
+                $default = $this->table->getMetadata('columns', $column)['DEFAULT'];
+
+                if (null !== $default) {
+                    $this->data[$column] = $default;
+                }
+            }
+        }
+
         // Unset any data values not present in the columns array
         foreach ($this->data as $column => $value) {
             if (!in_array($column, $this->columns)) {
@@ -128,12 +140,32 @@ class Row implements ArrayAccess
             }
         }
 
-        // Ensure each column is represented in the data array, even if null
-        foreach ($this->columns as $column) {
-            if (!array_key_exists($column, $this->data)) {
-                $this->data[$column] = null;
-            }
-        }
+        $this->init();
+    }
+
+    /**
+     * This method can be used by sub-classes to store initial values (for comparison
+     * during saving, for example).
+     *
+     * @return void
+     */
+    public function init()
+    {
+
+    }
+
+    /**
+     * Provide a new table instance for the row.  Mostly useful if you're
+     * implementing a __wakeup() method.
+     *
+     * @param Table $table
+     * @return Row
+     */
+    public function setTable(Table $table)
+    {
+        $this->table = $table;
+
+        return $this;
     }
 
     /**
@@ -163,9 +195,9 @@ class Row implements ArrayAccess
      * Allow setting of data properties on this row via direct object property
      * syntax:
      *
-     * <code>
+     * <pre>
      * $row->property_id = $value;
-     * </code>
+     * </pre>
      *
      * @param string $key
      * @param mixed $value
@@ -179,9 +211,9 @@ class Row implements ArrayAccess
     /**
      * Allow setting of data properties on this row via direct array syntax:
      *
-     * <code>
+     * <pre>
      * $row['property_id'] = $value;
-     * </code>
+     * </pre>
      *
      * This is part of the ArrayAccess interface built into PHP.
      *
@@ -203,7 +235,8 @@ class Row implements ArrayAccess
      *
      * @param string|array $column
      * @param mixed $value
-     * @return \Dewdrop\Db\Row
+     * @return Row
+     * @throws Exception
      */
     public function set($column, $value = null)
     {
@@ -219,6 +252,10 @@ class Row implements ArrayAccess
             throw new Exception("Setting value on invalid  column \"{$column}\"");
         }
 
+        if ($this->table->hasEav() && $this->table->getEav()->hasAttribute($column)) {
+            $this->virtualFieldsInitialized[] = $column;
+        }
+
         if (is_bool($value)) {
             $value = (int) $value;
         }
@@ -231,9 +268,9 @@ class Row implements ArrayAccess
     /**
      * Allow retrieval of data values via direct object property access:
      *
-     * <code>
+     * <pre>
      * echo $row->property_id;
-     * </code>
+     * </pre>
      *
      * @param string $key
      * @return mixed
@@ -246,9 +283,9 @@ class Row implements ArrayAccess
     /**
      * Allow retrieval of data values via direct array access:
      *
-     * <code>
+     * <pre>
      * echo $row['property_id'];
-     * </code>
+     * </pre>
      *
      * This method is part of the ArrayAccess interface built into PHP.
      *
@@ -265,6 +302,7 @@ class Row implements ArrayAccess
      *
      * @param string $name
      * @return mixed
+     * @throws Exception
      */
     public function get($name)
     {
@@ -274,6 +312,7 @@ class Row implements ArrayAccess
 
         if ($this->table->hasManyToManyRelationship($name)
             && !in_array($name, $this->virtualFieldsInitialized)
+            && !isset($this->data[$name])
         ) {
             $relationship = $this->table->getManyToManyRelationship($name);
 
@@ -291,15 +330,15 @@ class Row implements ArrayAccess
             $this->data[$name] = $this->table->getEav()->loadInitialValue($this, $name);
         }
 
-        return $this->data[$name];
+        return (isset($this->data[$name]) ? $this->data[$name] : null);
     }
 
     /**
      * Test to see if a given column exists on this row using object syntax:
      *
-     * <code>
+     * <pre>
      * isset($row->column_name);
-     * </code>
+     * </pre>
      *
      * @param string $key
      * @return boolean
@@ -312,9 +351,9 @@ class Row implements ArrayAccess
     /**
      * Test to see if a given column exists on this row using array syntax:
      *
-     * <code>
+     * <pre>
      * isset($row['column_name']);
-     * </code>
+     * </pre>
      *
      * This method is part of the ArrayAccess interface built into PHP.
      *
@@ -334,7 +373,7 @@ class Row implements ArrayAccess
      */
     public function has($name)
     {
-        return array_key_exists($name, $this->data);
+        return in_array($name, $this->columns);
     }
 
     /**
@@ -372,13 +411,14 @@ class Row implements ArrayAccess
 
             $this->table->update($updateData, $this->assembleUpdateWhereClause());
         } else {
-            $this->table->insert($this->data);
+            $id = $this->table->insert($this->data);
 
             // Set value of auto-incrementing primary key, if available
-            foreach ($this->table->getMetadata('columns') as $column => $metadata) {
-                if ($metadata['IDENTITY'] && $metadata['PRIMARY']) {
-                    $this->set($column, $this->getTable()->getAdapter()->lastInsertId());
-                }
+            if ($id) {
+                $this->set(
+                    current($this->table->getPrimaryKey()),
+                    $id
+                );
             }
         }
 
@@ -398,7 +438,7 @@ class Row implements ArrayAccess
         $pkey = $this->table->getPrimaryKey();
 
         foreach ($pkey as $column) {
-            if ($this->data[$column]) {
+            if (isset($this->data[$column]) && $this->data[$column]) {
                 return false;
             }
         }
@@ -429,6 +469,26 @@ class Row implements ArrayAccess
         );
 
         return $result;
+    }
+
+    /**
+     * Returns the row data.
+     *
+     * @return array
+     */
+    public function getData()
+    {
+        return $this->data;
+    }
+
+    /**
+     * Returns an array representation of the row data.
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        return $this->getData();
     }
 
     /**

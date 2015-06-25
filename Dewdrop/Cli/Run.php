@@ -6,18 +6,25 @@
  * @link      https://github.com/DeltaSystems/dewdrop
  * @copyright Delta Systems (http://deltasys.com)
  * @license   https://github.com/DeltaSystems/dewdrop/LICENSE
- *
- * @category   Dewdrop
- * @package    Cli
  */
 
 namespace Dewdrop\Cli;
 
 use Dewdrop\Paths;
 use Dewdrop\Db\Adapter;
+use Dewdrop\Pimple as DewdropPimple;
+use Pimple;
 
 /**
  * This class is responsible for handling execution of CLI commands.
+ *
+ * If you need to add CLI commands that are not provided by Dewdrop out of
+ * the box, provide an array of command classnames in a Pimple resource
+ * called "cli-commands".  We use this special Pimple resource for custom
+ * command injection because it's not possible to define a custom Run
+ * instance in Pimple altogether, like we do for custom view helpers for
+ * example.  Run is a "root" class in the sense that it is responsible
+ * for finding and kicking off the bootstrap directly.
  */
 class Run
 {
@@ -29,16 +36,19 @@ class Run
     private $commandClasses = array(
         'Help',
         'WpInit',
+        'BuildMetadata',
         'Dbdeploy',
         'DbMetadata',
+        'AuthHashPassword',
         'Lint',
         'GenAdminComponent',
         'GenDbTable',
         'GenEav',
         'Sniff',
-        'DewdropTest',
-        'DewdropDoc',
         'DewdropDev',
+        'DewdropDoc',
+        'DewdropSniff',
+        'DewdropTest',
     );
 
     /**
@@ -88,6 +98,14 @@ class Run
     private $paths;
 
     /**
+     * The Pimple DI container associated with this application.  Found
+     * via the application's bootstrap class.
+     *
+     * @var Pimple
+     */
+    private $pimple;
+
+    /**
      * Create the CLI runner, giving users the ability to inject non-default
      * args, command name, and renderer (primarily for testing purposes).
      *
@@ -97,15 +115,26 @@ class Run
      */
     public function __construct(array $args = null, $command = null, $renderer = null)
     {
+        $this->pimple   = DewdropPimple::getInstance();
         $this->args     = ($args ?: array_slice($_SERVER['argv'], 2));
         $this->renderer = ($renderer ?: new Renderer\Markdown());
-        $this->paths    = new Paths();
+        $this->paths    = (isset($this->pimple['paths']) ? $this->pimple['paths'] : new Paths());
 
         if ($command) {
             $this->command = $command;
         } elseif (isset($_SERVER['argv'][1])) {
             $this->command = $_SERVER['argv'][1];
         }
+    }
+
+    /**
+     * Grab the Pimple DI container associated with this application.
+     *
+     * @return Pimple
+     */
+    public function getPimple()
+    {
+        return $this->pimple;
     }
 
     /**
@@ -196,12 +225,7 @@ class Run
     public function connectDb()
     {
         if (!$this->dbAdapter) {
-            require_once $this->paths->getRoot() . '/wp-config.php';
-            require_once $this->paths->getRoot() . '/wp-includes/wp-db.php';
-
-            global $wpdb;
-
-            $this->dbAdapter = new Adapter($wpdb);
+            $this->dbAdapter = $this->pimple['db'];
         }
 
         return $this->dbAdapter;
@@ -217,10 +241,16 @@ class Run
     protected function instantiateCommands()
     {
         foreach ($this->commandClasses as $commandClass) {
-            require_once __DIR__ . '/Command/' . $commandClass . '.php';
             $fullClassName = '\Dewdrop\Cli\Command\\' . $commandClass;
 
             $this->commands[$commandClass] = new $fullClassName($this, $this->renderer);
+        }
+
+        // Add any custom commands defined in Pimple's "cli-commands" resource
+        if (isset($this->pimple['cli-commands'])) {
+            foreach ($this->pimple['cli-commands'] as $className) {
+                $this->commands[$className] = new $className($this, $this->renderer);
+            }
         }
     }
 }

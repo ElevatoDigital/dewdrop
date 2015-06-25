@@ -28,8 +28,38 @@ class TruncateOperation extends \PHPUnit_Extensions_Database_Operation_Truncate
         \PHPUnit_Extensions_Database_DB_IDatabaseConnection $connection,
         \PHPUnit_Extensions_Database_DataSet_IDataSet $dataSet
     ) {
-        $connection->getConnection()->query("SET foreign_key_checks = 0");
-        parent::execute($connection, $dataSet);
-        $connection->getConnection()->query("SET foreign_key_checks = 1");
+        if (defined('WPINC')) {
+            $connection->getConnection()->query("SET foreign_key_checks = 0");
+        }
+
+        foreach ($dataSet->getReverseIterator() as $table) {
+            /* @var $table PHPUnit_Extensions_Database_DataSet_ITable */
+            $query = "
+                {$connection->getTruncateCommand()}
+                {$connection->quoteSchemaObject($table->getTableMetaData()->getTableName())}
+            ";
+
+            if (defined('WPINC')) {
+                $query .= "";
+            } else {
+                $query .= " RESTART IDENTITY CASCADE";
+            }
+
+            try {
+                $connection->getConnection()->query($query);
+            } catch (PDOException $e) {
+                throw new PHPUnit_Extensions_Database_Operation_Exception(
+                    'TRUNCATE',
+                    $query,
+                    array(),
+                    $table,
+                    $e->getMessage()
+                );
+            }
+        }
+
+        if (defined('WPINC')) {
+            $connection->getConnection()->query("SET foreign_key_checks = 1");
+        }
     }
 }

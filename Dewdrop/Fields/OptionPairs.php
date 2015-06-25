@@ -13,7 +13,8 @@ namespace Dewdrop\Fields;
 use Dewdrop\Db\Adapter;
 use Dewdrop\Db\Expr;
 use Dewdrop\Db\Select;
-use Dewdrop\Exception;
+use Dewdrop\Exception as DewdropException;
+use Dewdrop\Fields\OptionPairs\TitleColumnNotDetectedException;
 
 /**
  * The OptionPairs class makes it easy to retrieve a list of key-value pairs
@@ -56,7 +57,7 @@ class OptionPairs
      *
      * @var \Dewdrop\Db\Select
      */
-    private $stmt;
+    protected $stmt;
 
     /**
      * Create new OptionPairs object using supplied DB adapter.
@@ -85,7 +86,7 @@ class OptionPairs
             if (method_exists($this, $setter)) {
                 $this->$setter($value);
             } else {
-                throw new Exception("OptionPairs: Unknown option \"{$key}\"");
+                throw new DewdropException("OptionPairs: Unknown option \"{$key}\"");
             }
         }
 
@@ -135,6 +136,27 @@ class OptionPairs
     }
 
     /**
+     * An alias for getStmt().
+     *
+     * @return Select
+     */
+    public function getSelect()
+    {
+        return $this->getStmt();
+    }
+
+    /**
+     * An alias for setStmt().
+     *
+     * @param Select $select
+     * @return OptionPairs
+     */
+    public function setSelect(Select $select)
+    {
+        return $this->setStmt($select);
+    }
+
+    /**
      * Get the \Dewdrop\Db\Select that will be used for retrieving options.  If
      * one isn't already available, it will be generated using the other
      * properties on this object.  You can call this method to get a good
@@ -178,6 +200,37 @@ class OptionPairs
     }
 
     /**
+     * Fetch the option pairs and wrap them in an array that will preserve their
+     * sort order when passed by to the client in JSON.  If you just use a normal
+     * key-value array here, like you'd get from fetch(), the options will be
+     * sorted by their numeric key value in JSON/JavaScript rather than by the
+     * sort order defined in the option Select statement.
+     *
+     * Returns an array where each element is another associated array containing
+     * "value" and "title" keys.
+     *
+     * @return array
+     */
+    public function fetchJsonWrapper()
+    {
+        return $this->formatJsonWrapper($this->fetch());
+    }
+
+    protected function formatJsonWrapper(array $options)
+    {
+        $output  = [];
+
+        foreach ($options as $value => $title) {
+            $output[] = [
+                'value' => $value,
+                'title' => $title
+            ];
+        }
+
+        return $output;
+    }
+
+    /**
      * Generate a \Dewdrop\Db\Select object for retrieving options using the
      * metadata of the option table.  Prior to this method being called, at
      * least the $tableName property must be set.  We will attempt to guess
@@ -200,19 +253,40 @@ class OptionPairs
             $this->valueColumn = $this->findValueColumnFromMetadata($columns);
         }
 
-        $stmt
-            ->from(
-                $this->tableName,
-                array(
-                    'value' => $this->valueColumn,
-                    'title' => $this->titleColumn
-                )
-            );
+        $stmt->from($this->tableName, $this->getSelectColumns());
 
         $this->filterStmt($columns, $stmt);
         $this->orderStmt($columns, $stmt);
 
         return $stmt;
+    }
+
+    protected function getSelectColumns()
+    {
+        return [
+            'value' => $this->valueColumn,
+            'title' => $this->titleColumn
+        ];
+    }
+
+    /**
+     * Check to see if a title column has been set.
+     *
+     * @return boolean
+     */
+    protected function hasTitleColumn()
+    {
+        return null !== $this->titleColumn;
+    }
+
+    /**
+     * Get the title column.
+     *
+     * @return string|Expr
+     */
+    protected function getTitleColumn()
+    {
+        return $this->titleColumn;
     }
 
     /**
@@ -223,7 +297,7 @@ class OptionPairs
      * not found a suitable candidate, an exception will be thrown telling
      * the developer to manually specify the title column.
      *
-     * @throws \Dewdrop\Exception
+     * @throws TitleColumnNotDetectedException
      * @param array $columns The "columns" portion of the table metadata.
      * @return string
      */
@@ -238,12 +312,16 @@ class OptionPairs
         }
 
         foreach ($columns as $column => $meta) {
-            if (false !== stripos($meta['DATA_TYPE'], 'char')) {
+            if ('text' === $meta['GENERIC_TYPE']) {
                 return $column;
             }
         }
 
-        throw new Exception('OptionPairs: Title column could not be auto-detected.  Please specify manually.');
+        $exception = new TitleColumnNotDetectedException('Title column could not be auto-detected.');
+        $exception
+            ->setTableName($this->tableName)
+            ->setColumns($columns);
+        throw $exception;
     }
 
     /**
@@ -266,7 +344,7 @@ class OptionPairs
             }
         }
 
-        throw new Exception('OptionPairs: Could not auto-detect value column.  Please specify manually.');
+        throw new DewdropException('OptionPairs: Could not auto-detect value column.  Please specify manually.');
     }
 
     /**
@@ -349,7 +427,7 @@ class OptionPairs
     protected function loadTableMetadata()
     {
         if (!$this->tableName) {
-            throw new Exception('Table name must be set prior to loading metadata.');
+            throw new DewdropException('Table name must be set prior to loading metadata.');
         }
 
         return $this->dbAdapter->getTableMetadata($this->tableName);
