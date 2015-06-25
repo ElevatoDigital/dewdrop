@@ -118,14 +118,17 @@ class OptionGroups extends OptionPairs
     protected function getSelectColumns()
     {
         if (!$this->groupColumn) {
-            $e    = new GroupColumnNotSetException('You must call setGroupColumn() before fetching from OptionGroups.');
             $meta = $this->loadTableMetadata();
 
-            $e
+            $exception = new GroupColumnNotSetException(
+                'You must call setGroupColumn() before fetching from OptionGroups.'
+            );
+
+            $exception
                 ->setTableName($this->tableName)
                 ->setColumns($meta['columns']);
 
-            throw $e;
+            throw $exception;
         }
 
         return [
@@ -148,8 +151,8 @@ class OptionGroups extends OptionPairs
      */
     protected function findTitleColumnFromMetadata(array $columns)
     {
-        if ($this->optionPairs) {
-            return $this->optionPairs->findTitleColumnFromMetadata($columns);
+        if ($this->optionPairs->hasTitleColumn()) {
+            return $this->optionPairs->getTitleColumn();
         } else {
             return parent::findTitleColumnFromMetadata($columns);
         }

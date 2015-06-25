@@ -270,6 +270,26 @@ class OptionPairs
     }
 
     /**
+     * Check to see if a title column has been set.
+     *
+     * @return boolean
+     */
+    protected function hasTitleColumn()
+    {
+        return null !== $this->titleColumn;
+    }
+
+    /**
+     * Get the title column.
+     *
+     * @return string|Expr
+     */
+    protected function getTitleColumn()
+    {
+        return $this->titleColumn;
+    }
+
+    /**
      * This method is called when no title column has been set prior to the
      * generateStmt() method being called.  If the options table has a "name"
      * or "title" column, those will be used.  If not, we'll use the first
