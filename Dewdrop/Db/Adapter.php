@@ -284,7 +284,7 @@ class Adapter
                 $validationRow = get_object_vars($validationRow);
             }
 
-            if (is_array($validationRow) && !isset($row[$groupKey])) {
+            if (is_array($validationRow) && !isset($validationRow[$groupKey])) {
                 $exception = new GroupKeyNotPresentInResultsetException("'{$groupKey}' was not present in results.");
                 $exception
                     ->setGroupKey($groupKey)
