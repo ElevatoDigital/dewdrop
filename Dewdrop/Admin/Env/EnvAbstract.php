@@ -109,14 +109,14 @@ abstract class EnvAbstract implements EnvInterface
      * @param string $key The key of the value you want to put a dependency after.
      * @return $this
      */
-    public function addClientSideDependencyAfterKey($type, $name, $path, $key) 
+    public function addClientSideDependencyAfterKey($type, $name, $path, $key)
     {
         $this->validateClientSideDependencyType($type);
 
         $dependenciesOfType = $this->coreClientSideDependencies[$type];
 
         $offset = array_search($key, array_keys($dependenciesOfType)) + 1;
-        $lastIndex = count($dependenciesOfType) - 1; 
+        $lastIndex = count($dependenciesOfType) - 1;
 
         $this->coreClientSideDependencies[$type] = array_slice($dependenciesOfType, 0, $offset, true)
                                                     + [$name => $path]
@@ -125,6 +125,11 @@ abstract class EnvAbstract implements EnvInterface
         return $this;
     }
 
+    /**
+     * Validate that a type is either "css" or "js".
+     *
+     * @param string $type Either "css" or "js".
+     */
     private function validateClientSideDependencyType($type)
     {
         if (!array_key_exists($type, $this->coreClientSideDependencies)) {
