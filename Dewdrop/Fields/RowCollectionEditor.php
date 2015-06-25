@@ -535,7 +535,7 @@ class RowCollectionEditor implements SaveHandlerInterface
                 function () use ($editor) {
                     if ($editor->isNew()) {
                         $out = '<button data-is-new="1" class="btn btn-danger btn-delete">';
-                    } else if ($editor->hasDeleteField())  {
+                    } elseif ($editor->hasDeleteField()) {
                         $out = '<button data-is-new="0" class="btn btn-danger btn-delete">';
                     } else {
                         $out = '<button data-is-new="0" class="btn btn-danger btn-delete disabled">';

@@ -179,7 +179,7 @@ class Edit extends PageAbstract
     {
         if (!$this->request->isPost()) {
             return ['result' => 'error', 'message' => 'AJAX edit requests must be POST'];
-        } else if (!$this->invalidSubmission) {
+        } elseif (!$this->invalidSubmission) {
             return ['result' => 'success', 'id' => $this->component->getListing()->getPrimaryKey()->getValue()];
         } else {
             $messages = [];

@@ -29,5 +29,4 @@ interface CellRendererInterface
      * @return \Dewdrop\Fields\Helper\CellRenderer\HeaderHelperInterface
      */
     public function getHeaderRenderer();
-
 }

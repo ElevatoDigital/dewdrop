@@ -98,8 +98,16 @@ class OptionInputDecorator extends AbstractHelper
         CrudInterface $optionComponent,
         callable $originalHtmlCallback = null
     ) {
-        return function (EditControl $helper, View $view, $fieldPosition)
-            use ($field, $controlComponent, $optionComponent, $originalHtmlCallback) {
+        return function (
+            EditControl $helper,
+            View $view,
+            $fieldPosition
+        ) use (
+            $field,
+            $controlComponent,
+            $optionComponent,
+            $originalHtmlCallback
+        ) {
 
             if (null === $originalHtmlCallback) {
                 $originalHtmlCallback = $helper->detectCallableForField($field);
