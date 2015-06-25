@@ -23,7 +23,8 @@ class CascadeSelect extends AbstractHelper
                     'data-cascade-from'    => '#' . $cascadeFrom->getHtmlId(),
                     'data-cascade-title'   => "Choose a {$cascadeFrom->getLabel()}...",
                     'data-show-blank'      => true,
-                    'data-blank-title'     => ''
+                    'data-blank-title'     => '',
+                    'data-value'           => $field->getValue()
                 ]
             ]
         );

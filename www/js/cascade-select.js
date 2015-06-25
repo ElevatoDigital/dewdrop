@@ -45,4 +45,18 @@
             }
         );
     };
+
+    // Render based upon initial parent widget states
+    $('[data-cascade-from]').each(
+        function (index, select) {
+            var parentNode;
+
+            select     = $(select);
+            parentNode = $(select.data('cascade-from'));
+
+            renderChildOptions(select, parentNode.val());
+
+            select.val(select.data('value'));
+        }
+    );
 }());
