@@ -10,6 +10,7 @@
 
 namespace Dewdrop\Db;
 
+use Dewdrop\Db\Adapter\GroupKeyNotPresentInResultsetException;
 use Dewdrop\Db\Driver\DriverInterface;
 use Dewdrop\Db\Driver\Wpdb as WpdbDriver;
 use Dewdrop\Exception;
@@ -233,6 +234,80 @@ class Adapter
     public function fetchAll($sql, $bind = array(), $fetchMode = null)
     {
         return $this->driver->fetchAll($sql, $bind, $fetchMode);
+    }
+
+    /**
+     * Fetch all results for the supplied SQL statement and group them into
+     * a nested array using the supplied $groupKey.
+     *
+     * For exapmle, if you had a resultset containing these three rows:
+     *
+     * <pre>
+     * name | family_id
+     * ----------------
+     * Bob  | 1
+     * Tim  | 1
+     * Ken  | 2
+     * </pre>
+     *
+     * And you called fetchAllGroupedByKey() with a $groupKey of 'family_id',
+     * you'd get the following array in return:
+     *
+     * <pre>
+     * [
+     *     1 => [
+     *         ['name' => 'Bob', 'family_id' => 1],
+     *         ['name' => 'Tim', 'family_id' => 1],
+     *     ],
+     *     2 => [
+     *         ['name' => 'Ken', 'family_id' => 2],
+     *     ]
+     * ]
+     * </pre>
+     *
+     * @param string|\Dewdrop\Db\Select $sql
+     * @param string $groupKey
+     * @param array $bind
+     * @param string $fetchMode
+     * @return array
+     */
+    public function fetchAllGroupedByKey($sql, $groupKey, $bind = array(), $fetchMode = null)
+    {
+        $rows = $this->fetchAll($sql, $bind, $fetchMode);
+        $out  = [];
+
+        if (count($rows)) {
+            $validationRow = current($rows);
+
+            // Convert validation row to array from stdClass in case fetchMode returned an object
+            if (is_object($validationRow)) {
+                $validationRow = get_object_vars($validationRow);
+            }
+
+            if (is_array($validationRow) && !isset($row[$groupKey])) {
+                $exception = new GroupKeyNotPresentInResultsetException("'{$groupKey}' was not present in results.");
+                $exception
+                    ->setGroupKey($groupKey)
+                    ->setValidationRow($validationRow);
+                throw $exception;
+            }
+        }
+
+        foreach ($rows as $row) {
+            if (is_array($row)) {
+                $groupValue = $row[$groupKey];
+            } else {
+                $groupValue = $row->$groupKey;
+            }
+
+            if (!array_key_exists($groupKey, $out)) {
+                $out[$groupKey] = [];
+            }
+
+            $out[$groupValue][] = $row;
+        }
+
+        return $out;
     }
 
     /**

@@ -1,0 +1,20 @@
+<h4>Background</h4>
+
+<p>
+    The fetchAllGroupedByKey() method on \Dewdrop\Db\Adapter fetches all the results for an SQL query and then uses one
+    of the keys in the results to group the rows into nested arrays.  In your case, you supplied a $groupKey parameter
+    to the method that wasn't actually present in the results, causing this exception to be thrown.
+</p>
+
+<h4>Your Code</h4>
+
+<p>
+    You passed in a $groupKey of <code><?php echo $this->escapeHtml($this->groupKey);?></code>, but it wasn't present
+    in the results returned from the DB.  Here are the columns that were returned in the resultset:
+</p>
+
+<ul class="list-group">
+    <?php foreach (array_keys($this->validationRow) as $key):?>
+    <li class="list-group-item"><?php echo $this->escapeHtml($key);?></li>
+    <?php endforeach;?>
+</ul>

@@ -231,9 +231,9 @@ class Content extends HelperAbstract implements ContentHelperInterface
             $callable = $this->getFieldAssignment($field);
         }
 
-        $output = call_user_func($callable, $rowData, $rowIndex, $columnIndex);
+        $output = trim(call_user_func($callable, $rowData, $rowIndex, $columnIndex));
 
-        if (!trim($output)) {
+        if ('' === $output) {
             return $this->nullContentPlaceholder;
         } else {
             return $output;

@@ -139,6 +139,7 @@ class View
         'bowerurl'                 => '\Dewdrop\View\Helper\BowerUrl',
         'bulkactionform'           => '\Dewdrop\View\Helper\BulkActionForm',
         'bulkactioncheckboxfield'  => '\Dewdrop\View\Helper\BulkActionCheckboxField',
+        'cascadeselect'            => '\Dewdrop\View\Helper\CascadeSelect',
         'checkboxlist'             => '\Dewdrop\View\Helper\CheckboxList',
         'csvcellrenderer'          => '\Dewdrop\View\Helper\CsvCellRenderer',
         'csvexport'                => '\Dewdrop\View\Helper\CsvExport',

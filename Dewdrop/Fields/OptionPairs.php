@@ -57,7 +57,7 @@ class OptionPairs
      *
      * @var \Dewdrop\Db\Select
      */
-    private $stmt;
+    protected $stmt;
 
     /**
      * Create new OptionPairs object using supplied DB adapter.
@@ -213,7 +213,11 @@ class OptionPairs
      */
     public function fetchJsonWrapper()
     {
-        $options = $this->fetch();
+        return $this->formatJsonWrapper($this->fetch());
+    }
+
+    protected function formatJsonWrapper(array $options)
+    {
         $output  = [];
 
         foreach ($options as $value => $title) {
@@ -249,19 +253,20 @@ class OptionPairs
             $this->valueColumn = $this->findValueColumnFromMetadata($columns);
         }
 
-        $stmt
-            ->from(
-                $this->tableName,
-                array(
-                    'value' => $this->valueColumn,
-                    'title' => $this->titleColumn
-                )
-            );
+        $stmt->from($this->tableName, $this->getSelectColumns());
 
         $this->filterStmt($columns, $stmt);
         $this->orderStmt($columns, $stmt);
 
         return $stmt;
+    }
+
+    protected function getSelectColumns()
+    {
+        return [
+            'value' => $this->valueColumn,
+            'title' => $this->titleColumn
+        ];
     }
 
     /**

@@ -120,6 +120,12 @@ class FieldFactory
                 }
             )
             ->assignHelperCallback(
+                'EditControl.Label',
+                function () {
+                    return null;
+                }
+            )
+            ->assignHelperCallback(
                 'InputFilter',
                 function () {
                     return $this->getInputFilterFactory()->createInstance();
