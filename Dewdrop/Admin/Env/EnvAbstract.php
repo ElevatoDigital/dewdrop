@@ -73,9 +73,7 @@ abstract class EnvAbstract implements EnvInterface
      */
     public function prependClientSideDependency($type, $name, $path)
     {
-        if (!array_key_exists($type, $this->coreClientSideDependencies)) {
-            throw new Exception('Client-side dependencies must be of type "css" or "js".');
-        }
+        $this->validateClientSideDependencyType($type);
 
         $this->coreClientSideDependencies[$type] = array_merge(
             array($name => $path),
@@ -95,13 +93,48 @@ abstract class EnvAbstract implements EnvInterface
      */
     public function appendClientSideDependency($type, $name, $path)
     {
-        if (!array_key_exists($type, $this->coreClientSideDependencies)) {
-            throw new Exception('Client-side dependencies must be of type "css" or "js".');
-        }
+        $this->validateClientSideDependencyType($type);
 
         $this->coreClientSideDependencies[$type][$name] = $path;
 
         return $this;
+    }
+
+    /**
+     * Add a client-side dependency you'd like to use throughout the admin environment.
+     *
+     * @param string $type Either "css" or "js".
+     * @param string $name An identifier for the dependency.
+     * @param string $path The path (in your bower_components folder) to the dependency.
+     * @param string $key The key of the value you want to put a dependency after.
+     * @return $this
+     */
+    public function addClientSideDependencyAfterKey($type, $name, $path, $key)
+    {
+        $this->validateClientSideDependencyType($type);
+
+        $dependenciesOfType = $this->coreClientSideDependencies[$type];
+
+        $offset = array_search($key, array_keys($dependenciesOfType)) + 1;
+        $lastIndex = count($dependenciesOfType) - 1;
+
+        $this->coreClientSideDependencies[$type] = array_slice($dependenciesOfType, 0, $offset, true)
+                                                    + [$name => $path]
+                                                    + array_slice($dependenciesOfType, $offset, $lastIndex, true);
+
+        return $this;
+    }
+
+    /**
+     * Validate that a type is either "css" or "js".
+     *
+     * @param string $type Either "css" or "js".
+     */
+    private function validateClientSideDependencyType($type)
+    {
+        if (!array_key_exists($type, $this->coreClientSideDependencies)) {
+            throw new Exception('Client-side dependencies must be of type "css" or "js".');
+        }
     }
 
     /**
