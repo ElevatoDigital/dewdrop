@@ -3,12 +3,7 @@
 // Don't render the layout
 $this->component->setShouldRenderLayout(false);
 
-$fields = $this->component->getFields()->getVisibleFields(
-    [
-        $this->component->getVisibilityFilter(),
-        $this->component->getFieldGroupsFilter()
-    ]
-);
+$fields = $this->component->getFields()->getVisibleFields($this->filters);
 
 $this->component->getListing()->removeSelectModifierByName('selectpaginate');
 
