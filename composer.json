@@ -15,6 +15,7 @@
         "nielsradstake/php-codesniffer": "1.*",
         "php": ">=5.4.0",
         "phpdocumentor/phpdocumentor": "2.7.*",
+        "phpoffice/phpexcel": "1.8.*",
         "phpunit/dbunit": "1.*",
         "phpunit/phpunit": "3.*",
         "phpunit/phpunit-mock-objects": "1.*",
