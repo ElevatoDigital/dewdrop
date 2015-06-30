@@ -17,6 +17,10 @@
         <a href="<?php echo $this->escapeHtmlAttr($this->adminUrl('export', array('format' => 'csv')));?>" class="btn btn-link btn-link-first navbar-btn">Export</a>
         <?php endif;?>
 
+        <?php if ($this->permissions->can('import')) :?>
+            <a href="<?php echo $this->escapeHtmlAttr($this->adminUrl('import'));?>" class="btn btn-link btn-link-first navbar-btn">Import</a>
+        <?php endif;?>
+
         <?php if ($this->permissions->can('count-fields')) :?>
         <a href="<?php echo $this->escapeHtmlAttr($this->adminUrl('counts'));?>" class="btn btn-link navbar-btn">Count <?php echo $this->escapeHtml($this->pluralTitle);?></a>
         <?php endif;?>

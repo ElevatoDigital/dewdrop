@@ -1,0 +1,22 @@
+<?php
+
+echo $this->bootstrapBreadcrumbs(
+    [
+        ['title' => $this->title, 'href' => $this->adminUrl('index')],
+        ['title' => 'Import', 'active' => true]
+    ]
+);
+
+?>
+
+<form class="form" action="" method="POST" enctype="multipart/form-data">
+    <div class="form-group">
+        <label class="control-label" for="file">Spreadsheet File</label>
+        <input type="file" name="file" />
+        <p class="help-block">
+            Upload an Excel or CSV file containing <?php echo $this->escapeHtml($this->singularTitle);?> records to
+            import.
+        </p>
+    </div>
+    <button type="submit" class="btn btn-primary">Upload File</button>
+</form>
