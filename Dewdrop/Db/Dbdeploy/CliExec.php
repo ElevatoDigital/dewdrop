@@ -175,7 +175,8 @@ class CliExec
     {
         if ('pgsql' === $this->dbType) {
             return sprintf(
-                '%s -v ON_ERROR_STOP=1 -U %s -h %s %s < %s 2>&1',
+                'PGPASSWORD=%s %s -v ON_ERROR_STOP=1 -U %s -h %s %s < %s 2>&1',
+                escapeshellarg($this->password),
                 $this->detectExecutable(),
                 escapeshellarg($this->username),
                 escapeshellarg($this->hostname),
