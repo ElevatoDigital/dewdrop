@@ -27,6 +27,20 @@ class Files implements PageFactoryInterface
     private $inflector;
 
     /**
+     * The path where we'll look for files.
+     *
+     * @var string
+     */
+    private $path;
+
+    /**
+     * The namespace of the component that will be used when instantiating pages.
+     *
+     * @var string
+     */
+    private $componentNamespace;
+
+    /**
      * Provide the component for which the pages will be created.
      *
      * @param ComponentAbstract $component
@@ -35,6 +49,62 @@ class Files implements PageFactoryInterface
     {
         $this->component = $component;
         $this->inflector = $component->getInflector();
+    }
+
+    /**
+     * Set the path used when looking for page files.
+     *
+     * @param string $path
+     * @return $this
+     */
+    public function setPath($path)
+    {
+        $this->path = $path;
+
+        return $this;
+    }
+
+    /**
+     * Get the path used when looking for page files.
+     *
+     * @return string
+     */
+    public function getPath()
+    {
+        if (!$this->path) {
+            $this->path = $this->component->getPath();
+        }
+
+        return $this->path;
+    }
+
+    /**
+     * Override the component namepsace that will be used when instantiating pages.
+     *
+     * @param string $componentNamespace
+     * @return $this
+     */
+    public function setComponentNamespace($componentNamespace)
+    {
+        $this->componentNamespace = $componentNamespace;
+
+        return $this;
+    }
+
+    /**
+     * Get the namespace of the component so that we can determine the
+     * appropriate class name for pages we're instantiating.
+     *
+     * @return string
+     */
+    public function getComponentNamespace()
+    {
+        if (!$this->componentNamespace) {
+            $reflectedClass = new ReflectionClass($this->component);
+            $this->componentNamespace = $reflectedClass->getNamespaceName();
+        }
+
+        return $this->componentNamespace;
     }
 
     /**
@@ -49,14 +119,18 @@ class Files implements PageFactoryInterface
     public function createPage($name)
     {
         $inflectedName = $this->inflector->camelize($name);
-        $fullPath      = $this->component->getPath() . '/' . $inflectedName . '.php';
+        $fullPath      = $this->getPath() . '/' . $inflectedName . '.php';
 
         if ('component' !== $name && file_exists($fullPath)) {
             $pageClass = $this->getComponentNamespace() . '\\' . $inflectedName;
 
             require_once $fullPath;
 
-            return new $pageClass($this->component, $this->component->getRequest());
+            return new $pageClass(
+                $this->component,
+                $this->component->getRequest(),
+                $this->getPath() . '/view-scripts'
+            );
         }
 
         return false;
@@ -72,7 +146,7 @@ class Files implements PageFactoryInterface
     public function listAvailablePages()
     {
         $pages = array();
-        $files = glob($this->component->getPath() . '/*.php');
+        $files = glob($this->getPath() . '/*.php');
 
         $namespace = $this->getComponentNamespace();
 
@@ -87,17 +161,5 @@ class Files implements PageFactoryInterface
 
         return $pages;
     }
-
-    /**
-     * Get the namespace of the component so that we can determine the
-     * appropriate class name for pages we're instantiating.
-     *
-     * @return string
-     */
-    private function getComponentNamespace()
-    {
-        $reflectedClass = new ReflectionClass($this->component);
-
-        return $reflectedClass->getNamespaceName();
-    }
 }
+
