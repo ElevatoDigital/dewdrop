@@ -300,8 +300,8 @@ class Adapter
                 $groupValue = $row->$groupKey;
             }
 
-            if (!array_key_exists($groupKey, $out)) {
-                $out[$groupKey] = [];
+            if (!array_key_exists($groupValue, $out)) {
+                $out[$groupValue] = [];
             }
 
             $out[$groupValue][] = $row;
