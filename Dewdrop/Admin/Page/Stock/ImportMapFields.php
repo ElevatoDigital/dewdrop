@@ -68,7 +68,6 @@ class ImportMapFields extends PageAbstract
 
     public function init()
     {
-        $this->getFields()->get('students:last_name')->setRequired(true);
         $this->getRowEditor()->link();
 
         $this->importGateway = $this->getImportGateway();
