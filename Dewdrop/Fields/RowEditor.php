@@ -198,6 +198,17 @@ class RowEditor implements SaveHandlerInterface
     }
 
     /**
+     * Clear out the row objects on this editor.  Useful if you're using the same editor
+     * @return $this
+     */
+    public function reset()
+    {
+        $this->rowsByName = [];
+
+        return $this;
+    }
+
+    /**
      * Just a shortcut/alias for linkRowsToFields().  Easier to remember.
      *
      * @return RowEditor

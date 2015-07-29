@@ -1,0 +1,85 @@
+<?php
+
+$this->headLink()->appendStylesheet($this->bowerUrl('/dewdrop/www/css/import-map-fields.css'));
+
+echo $this->bootstrapBreadcrumbs(
+    [
+        ['title' => $this->title, 'href' => $this->adminUrl('index')],
+        ['title' => 'Upload Import File', 'href' => $this->adminUrl('import')],
+        ['title' => 'Complete Import', 'active' => true]
+    ]
+);
+
+?>
+
+<?php if (count($this->importErrors)):?>
+<div class="alert alert-danger alert-import-errors">
+    <p>Some errors were found in your import file.  Please correct it and try again or adjust your selections below.</p>
+
+    <table class="table table-bordered table-responsive">
+        <thead>
+            <tr class="active">
+                <th>#</th>
+                <?php foreach ($this->importFile->getHeaders() as $header):?>
+                <th><?php echo $this->escapeHtml($header);?></th>
+                <?php endforeach;?>
+            </tr>
+        </thead>
+        <tbody>
+            <?php
+            foreach ($this->importErrors as $error) {
+                echo '<tr>';
+
+                echo '<th scope="row" class="active">' . $this->escapeHtml($error['rowNumber']) . '</th>';
+
+                foreach ($error['data'] as $index => $column) {
+                    echo '<td>';
+
+                    if (isset($error['errors'][$index])) {
+                        echo '<div class="alert alert-danger">';
+                    }
+
+                    if ($column) {
+                        echo $this->escapeHtml($column);
+                    } else {
+                        echo '<span class="text-muted">&lt;none&gt;</span>';
+                    }
+
+                    if (isset($error['errors'][$index])) {
+                        foreach ($error['errors'][$index] as $message) {
+                            printf('<div>%s</div>', $this->escapeHtml($message));
+                        }
+
+                        echo '</div>';
+                    }
+
+                    echo '</td>';
+                }
+
+                echo '</tr>';
+            }
+            ?>
+        </tbody>
+    </table>
+</div>
+<?php endif;?>
+
+<div class="alert alert-info">
+    Assign columns or enter values for each field below to finish importing
+    <strong><?php echo count($this->importFile->getData());?> <?php echo $this->escapeHtml($this->pluralTitle);?></strong>.
+</div>
+
+<?php
+
+echo $this->bootstrapForm()->open();
+
+echo $this->bootstrapForm()->renderFields(
+    $this->fields->getEditableFields($this->fieldGroupsFilter),
+    $this->rowEditor->getInputFilter(),
+    $this->renderer
+);
+
+echo $this->bootstrapForm()->renderSubmitButton('Complete Import');
+
+echo $this->bootstrapForm()->close();
+

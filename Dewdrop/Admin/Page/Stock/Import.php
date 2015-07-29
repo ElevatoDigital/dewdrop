@@ -6,11 +6,11 @@ use Dewdrop\Admin\Component\ComponentAbstract;
 use Dewdrop\Admin\Component\CrudInterface;
 use Dewdrop\Admin\Page\PageAbstract;
 use Dewdrop\Admin\ResponseHelper\Standard as ResponseHelper;
+use Dewdrop\Exception;
+use Dewdrop\Import\DbGateway;
+use Dewdrop\Import\File as ImportFile;
+use Dewdrop\Import\InputFilterFactory as ImportInputFilterFactory;
 use Dewdrop\Pimple;
-use Zend\InputFilter\Input;
-use Zend\InputFilter\InputFilter;
-use Zend\Validator\File\MimeType;
-use Zend\Validator\File\UploadFile;
 
 class Import extends PageAbstract
 {
@@ -29,17 +29,50 @@ class Import extends PageAbstract
      */
     private $singularTitle;
 
+    /**
+     * @var string
+     */
+    private $uploadPath;
+
+    /**
+     * @var array
+     */
+    private $validationMessages = [];
+
+    public function init()
+    {
+        $this->component->getPermissions()->haltIfNotAllowed('import');
+    }
+
     public function process(ResponseHelper $helper)
     {
         if ($this->request->isPost()) {
-            $inputFilter = $this->buildInputFilter();
+            $inputFilter = ImportInputFilterFactory::createInstance();
 
             $inputFilter->setData($_FILES);
 
-            if ($inputFilter->isValid()) {
+            if (!$inputFilter->isValid() || !is_uploaded_file($_FILES['file']['tmp_name'])) {
+                $this->validationMessages = $inputFilter->getMessages();
             } else {
-                var_dump($inputFilter->getMessages());
-                exit;
+                $file = ImportFile::fromUploadedFile(
+                    $_FILES['file'],
+                    $this->getUploadPath(),
+                    $this->request->getPost('first_row_is_headers')
+                );
+
+                $gateway = new DbGateway();
+
+                $id = $gateway->insert(
+                    [
+                        'component'            => $this->component->getFullyQualifiedName(),
+                        'full_path'            => $file->getFullPath(),
+                        'first_row_is_headers' => (int) $this->request->getPost('first_row_is_headers')
+                    ]
+                );
+
+                $helper
+                    ->setSuccessMessage('Import file successfully uploaded.')
+                    ->redirectToAdminPage('import-map-fields', ['id' => $id]);
             }
         }
     }
@@ -48,8 +81,9 @@ class Import extends PageAbstract
     {
         $this->getView()->assign(
             [
-                'title'         => $this->getTitle(),
-                'singularTitle' => $this->getSingularTitle()
+                'title'              => $this->getTitle(),
+                'singularTitle'      => $this->getSingularTitle(),
+                'validationMessages' => $this->validationMessages
             ]
         );
     }
@@ -86,28 +120,24 @@ class Import extends PageAbstract
         return $this;
     }
 
-    private function buildInputFilter()
+    public function getUploadPath()
     {
-        $inputFilter = new InputFilter();
+        if (!$this->uploadPath) {
+            /* @var $paths \Dewdrop\Paths */
+            $paths = Pimple::getResource('paths');
+            $root  = $paths->getAppRoot();
 
-        $input = new Input('file');
-        $inputFilter->add($input);
+            $this->uploadPath = $root . '/private-uploads/dewdrop-import/'
+                . str_replace('/', '__', $this->component->getFullyQualifiedName());
+        }
 
-        $mimeType = new MimeType();
+        return $this->uploadPath;
+    }
 
-        $mimeType->setMimeType(
-            [
-                'text/csv',
-                'application/vmd.ms-excel',
-                'application/vnd.ms-office',
-                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-            ]
-        );
+    public function setUploadPath($uploadPath)
+    {
+        $this->uploadPath = $uploadPath;
 
-        $input->getValidatorChain()
-            ->attach(new UploadFile())
-            ->attach($mimeType);
-
-        return $inputFilter;
+        return $this;
     }
 }

@@ -150,6 +150,7 @@ class View
         'headmeta'                 => '\Zend\View\Helper\HeadMeta',
         'headscript'               => '\Zend\View\Helper\HeadScript',
         'headstyle'                => '\Zend\View\Helper\HeadStyle',
+        'importeditcontrol'        => '\Dewdrop\View\Helper\ImportEditControl',
         'inlinescript'             => '\Dewdrop\View\Helper\InlineScript',
         'inputcheckbox'            => '\Dewdrop\View\Helper\InputCheckbox',
         'inputdate'                => '\Dewdrop\View\Helper\InputDate',
