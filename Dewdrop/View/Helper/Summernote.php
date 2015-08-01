@@ -26,7 +26,7 @@ class Summernote extends BootstrapTextarea
     public function directArray(array $options)
     {
         $this->view->headLink()
-            ->appendStylesheet($this->view->bowerUrl('/fontawesome/css/font-awesome.min.css'))
+            ->appendStylesheet($this->view->bowerUrl('/font-awesome/css/font-awesome.min.css'))
             ->appendStylesheet($this->view->bowerUrl('/summernote/dist/summernote.css'));
 
         $this->view->headScript()->appendFile($this->view->bowerUrl('/dewdrop/www/js/summernote.js'));
