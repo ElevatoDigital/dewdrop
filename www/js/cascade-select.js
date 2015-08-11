@@ -6,7 +6,7 @@
         ':input',
         function (e) {
             var parent   = $(this),
-                children = $('[data-cascade-from="#' + parent.attr('id') + '"');
+                children = $('[data-cascade-from="#' + parent.attr('id') + '"]');
 
             children.each(
                 function (index, child) {
