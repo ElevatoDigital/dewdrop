@@ -333,7 +333,7 @@ class ImportMapFields extends PageAbstract
         return $isValid;
     }
 
-    private function save(array $inputRows)
+    protected function save(array $inputRows)
     {
         $rowEditor = $this->getRowEditor();
 
