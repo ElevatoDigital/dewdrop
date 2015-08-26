@@ -153,15 +153,9 @@ class Edit extends PageAbstract
         $responseHelper->redirectToAdminPage('index', $params);
     }
 
-    /**
-     * Pass a bunch of stuff to the view.  Duh.
-     */
-    public function render()
+    public function assignDefaultViewArguments()
     {
-        if ($this->request->isAjax()) {
-            return $this->renderAjaxResponse();
-        } else {
-            $this->view->assign([
+        $this->view->assign([
                 'component'         => $this->component,
                 'isNew'             => $this->isNew,
                 'fields'            => $this->fields->getEditableFields($this->component->getFieldGroupsFilter()),
@@ -170,7 +164,17 @@ class Edit extends PageAbstract
                 'request'           => $this->request,
                 'invalidSubmission' => $this->invalidSubmission
             ]);
+    }
 
+    /**
+     * Pass a bunch of stuff to the view.  Duh.
+     */
+    public function render()
+    {
+        if ($this->request->isAjax()) {
+            return $this->renderAjaxResponse();
+        } else {
+            $this->assignDefaultViewArguments();
             return $this->renderView();
         }
     }
@@ -199,17 +203,9 @@ class Edit extends PageAbstract
 
     public function renderAjaxForm()
     {
-        $this->view->assign([
-            'component'         => $this->component,
-            'isNew'             => $this->isNew,
-            'fields'            => $this->fields->getEditableFields($this->component->getFieldGroupsFilter()),
-            'model'             => $this->model,
-            'rowEditor'         => $this->rowEditor,
-            'request'           => $this->request,
-            'invalidSubmission' => $this->invalidSubmission
-        ]);
+        $this->assignDefaultViewArguments();
         $this->component->setShouldRenderLayout(false);
 
-        return $this->view->render('edit-fields.phtml');
+        return $this->view->render('edit-fields-for-ajax.phtml');
     }
 }
