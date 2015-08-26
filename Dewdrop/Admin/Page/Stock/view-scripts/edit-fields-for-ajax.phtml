@@ -1,0 +1,9 @@
+<?php
+echo $this->bootstrapForm()->open();
+echo
+    $this->bootstrapForm()->renderContent(
+        $this->fields,
+        $this->rowEditor->getInputFilter(),
+        $this->editControlRenderer()
+    );
+echo $this->bootstrapForm()->close();

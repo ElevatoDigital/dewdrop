@@ -153,15 +153,9 @@ class Edit extends PageAbstract
         $responseHelper->redirectToAdminPage('index', $params);
     }
 
-    /**
-     * Pass a bunch of stuff to the view.  Duh.
-     */
-    public function render()
+    public function assignDefaultViewArguments()
     {
-        if ($this->request->isAjax()) {
-            return $this->renderAjaxResponse();
-        } else {
-            $this->view->assign([
+        $this->view->assign([
                 'component'         => $this->component,
                 'isNew'             => $this->isNew,
                 'fields'            => $this->fields->getEditableFields($this->component->getFieldGroupsFilter()),
@@ -170,17 +164,29 @@ class Edit extends PageAbstract
                 'request'           => $this->request,
                 'invalidSubmission' => $this->invalidSubmission
             ]);
+    }
 
+    /**
+     * Pass a bunch of stuff to the view.  Duh.
+     */
+    public function render()
+    {
+        if ($this->request->isAjax()) {
+            return $this->renderAjaxResponse();
+        } else {
+            $this->assignDefaultViewArguments();
             return $this->renderView();
         }
     }
 
     public function renderAjaxResponse()
     {
-        if (!$this->request->isPost()) {
-            return ['result' => 'error', 'message' => 'AJAX edit requests must be POST'];
-        } elseif (!$this->invalidSubmission) {
+        if (!$this->request->isPost() && !$this->request->isGet()) {
+            return ['result' => 'error', 'message' => 'AJAX edit requests must be POST or GET'];
+        } elseif ($this->request->isPost() && !$this->invalidSubmission) {
             return ['result' => 'success', 'id' => $this->component->getListing()->getPrimaryKey()->getValue()];
+        } elseif ($this->request->isGet()) {
+            return $this->renderAjaxForm();
         } else {
             $messages = [];
 
@@ -193,5 +199,13 @@ class Edit extends PageAbstract
                 'messages' => $messages
             ];
         }
+    }
+
+    public function renderAjaxForm()
+    {
+        $this->assignDefaultViewArguments();
+        $this->component->setShouldRenderLayout(false);
+
+        return $this->view->render('edit-fields-for-ajax.phtml');
     }
 }
