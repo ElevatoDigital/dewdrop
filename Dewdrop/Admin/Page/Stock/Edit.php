@@ -177,10 +177,12 @@ class Edit extends PageAbstract
 
     public function renderAjaxResponse()
     {
-        if (!$this->request->isPost()) {
-            return ['result' => 'error', 'message' => 'AJAX edit requests must be POST'];
-        } elseif (!$this->invalidSubmission) {
+        if (!$this->request->isPost() && !$this->request->isGet()) {
+            return ['result' => 'error', 'message' => 'AJAX edit requests must be POST or GET'];
+        } elseif ($this->request->isPost() && !$this->invalidSubmission) {
             return ['result' => 'success', 'id' => $this->component->getListing()->getPrimaryKey()->getValue()];
+        } elseif ($this->request->isGet()) {
+            return $this->renderAjaxForm();
         } else {
             $messages = [];
 
@@ -193,5 +195,21 @@ class Edit extends PageAbstract
                 'messages' => $messages
             ];
         }
+    }
+
+    public function renderAjaxForm()
+    {
+        $this->view->assign([
+            'component'         => $this->component,
+            'isNew'             => $this->isNew,
+            'fields'            => $this->fields->getEditableFields($this->component->getFieldGroupsFilter()),
+            'model'             => $this->model,
+            'rowEditor'         => $this->rowEditor,
+            'request'           => $this->request,
+            'invalidSubmission' => $this->invalidSubmission
+        ]);
+        $this->component->setShouldRenderLayout(false);
+
+        return $this->view->render('edit-fields.phtml');
     }
 }
