@@ -111,6 +111,16 @@ class Request
     {
         return 'POST' === $this->method;
     }
+    
+    /**
+     * Whether the request is a GET.
+     *
+     * @return boolean
+     */
+    public function isGet()
+    {
+        return 'GET' === $this->method;
+    }
 
     /**
      * Get either a single POST variable (by passing a string to the name $name
