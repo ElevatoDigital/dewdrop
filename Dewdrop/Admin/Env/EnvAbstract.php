@@ -258,7 +258,7 @@ abstract class EnvAbstract implements EnvInterface
      * @param string $separator
      * @return string
      */
-    protected function assembleQueryString(array $params, $separator)
+    public function assembleQueryString(array $params, $separator)
     {
         $segments = array();
 
