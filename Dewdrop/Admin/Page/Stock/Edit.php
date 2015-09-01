@@ -129,10 +129,12 @@ class Edit extends PageAbstract
             if (!$this->invalidSubmission) {
                 $title = strtolower($this->model->getSingularTitle());
 
-                if ($this->isNew) {
-                    $responseHelper->setSuccessMessage("Successfully saved new {$title}.");
-                } else {
-                    $responseHelper->setSuccessMessage("Successfully saved changes to {$title}.");
+                if (!$this->request->isAjax()) {
+                    if ($this->isNew) {
+                        $responseHelper->setSuccessMessage("Successfully saved new {$title}.");
+                    } else {
+                        $responseHelper->setSuccessMessage("Successfully saved changes to {$title}.");
+                    }
                 }
 
                 $this->rowEditor->save();
