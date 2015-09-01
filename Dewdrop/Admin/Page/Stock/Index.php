@@ -46,7 +46,7 @@ class Index extends PageAbstract
      *
      * @var string
      */
-    private $bulkActionFailureMessage = '';
+    protected $bulkActionFailureMessage = '';
 
     /**
      * Session storage for remembering query params for redirects.
