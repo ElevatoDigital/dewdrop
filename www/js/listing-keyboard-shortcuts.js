@@ -70,10 +70,11 @@
         }
     };
     
-    key('j', nextRow);
-    key('k', previousRow);
-    key('e', edit);
-    key('v', view);
-    key('c', add);
-    key('/', filter);
+    key.setScope('listing');
+    key('j', 'listing', nextRow);
+    key('k', 'listing', previousRow);
+    key('e', 'listing', edit);
+    key('v', 'listing', view);
+    key('c', 'listing', add);
+    key('/', 'listing', filter);
 }(jQuery));
