@@ -66,6 +66,8 @@ $ ./vendor/bin/dewdrop dewdrop-test  # Run the Dewdrop test suite to ensure ever
 Dewdrop may also be used as a standalone application, outside the context of a WordPress instance. To do so requires an
 additional dependency on [Silex](http://silex.sensiolabs.org/), a PHP micro-framework.
 
+1. Add a `.gitignore` file in your project root directory that includes the `/vendor` directory, since we'll use
+    [Composer](https://getcomposer.org/) to install Dewdrop and its dependencies. 
 1. Add a `composer.json` file similar to the example below:
 
     ```json
