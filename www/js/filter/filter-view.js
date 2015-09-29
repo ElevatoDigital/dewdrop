@@ -50,8 +50,7 @@ define(
 
                     this.$el.find('.filter-control-wrapper').html(
                         typeFactory(
-                            // Temporarily disabling numeric filter type
-                            ('numeric' === selectedField.get('type') ? 'text' : selectedField.get('type')),
+                            selectedField.get('type'),
                             selectedField.get('options'),
                             this.model,
                             this.index
