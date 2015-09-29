@@ -184,9 +184,7 @@ class SelectModifier extends HelperAbstract implements SelectModifierInterface
             } elseif ($field->isType('date', 'timestamp')) {
                 $type = 'Date';
             } elseif ($field->isType('integer', 'float')) {
-                // Temporarily disabling numeric filter type and using Text instead
-                //$type = 'Numeric';
-                $type = 'Text';
+                $type = 'Numeric';
             } elseif ($field->isType('clob', 'text')) {
                 $type = 'Text';
             } else {
