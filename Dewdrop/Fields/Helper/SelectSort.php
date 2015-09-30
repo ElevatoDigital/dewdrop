@@ -309,7 +309,7 @@ class SelectSort extends HelperAbstract implements SelectModifierInterface
         $titleColumn = $optionPairs->getTitleColumn();
 
         if ($titleColumn instanceof Expr) {
-            $orderSpec = $titleColumn;
+            $orderSpec = "{$titleColumn} {$direction}";
         } else {
             $orderSpec = new Expr("{$select->quoteWithAlias($tableName, $titleColumn)} $direction");
         }
