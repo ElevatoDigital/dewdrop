@@ -298,17 +298,23 @@ class SelectSort extends HelperAbstract implements SelectModifierInterface
      *
      * @param DbField $field
      * @param Select $select
-     * @param $direction
+     * @param string $direction
      * @return Select
      * @throws Select\SelectException
      */
     public function sortDbReference(DbField $field, Select $select, $direction)
     {
-        return $select->order(
-            new Expr(
-                "{$select->quoteWithAlias($field->getTable()->getTableName(), $field->getName())} $direction"
-            )
-        );
+        $optionPairs = $field->getOptionPairs();
+        $tableName   = $optionPairs->getTableName();
+        $titleColumn = $optionPairs->getTitleColumn();
+
+        if ($titleColumn instanceof Expr) {
+            $orderSpec = $titleColumn;
+        } else {
+            $orderSpec = new Expr("{$select->quoteWithAlias($tableName, $titleColumn)} $direction");
+        }
+
+        return $select->order($orderSpec);
     }
 
     /**

@@ -48,7 +48,7 @@ class OptionPairs
      * A \Dewdrop\Db\Expr can also be used for the title column, if you'd
      * like to concatenate multiple columns or format them.
      *
-     * @var mixed
+     * @var Expr|string
      */
     protected $titleColumn;
 
@@ -67,6 +67,26 @@ class OptionPairs
     public function __construct(Adapter $dbAdapter)
     {
         $this->dbAdapter = $dbAdapter;
+    }
+
+    /**
+     * Get the table name.
+     *
+     * @return string
+     */
+    public function getTableName()
+    {
+        return $this->tableName;
+    }
+
+    /**
+     * Get the title column.
+     *
+     * @return Expr|string
+     */
+    public function getTitleColumn()
+    {
+        return $this->titleColumn;
     }
 
     /**
@@ -125,7 +145,7 @@ class OptionPairs
      * option.  You can also use a \Dewdrop\Db\Expr here, if you'd like to
      * do any special formatting or concatenate multiple columns.
      *
-     * @param string $titleColumn
+     * @param Expr|string $titleColumn
      * @return \Dewdrop\Fields\OptionPairs
      */
     public function setTitleColumn($titleColumn)
@@ -277,16 +297,6 @@ class OptionPairs
     protected function hasTitleColumn()
     {
         return null !== $this->titleColumn;
-    }
-
-    /**
-     * Get the title column.
-     *
-     * @return string|Expr
-     */
-    protected function getTitleColumn()
-    {
-        return $this->titleColumn;
     }
 
     /**
