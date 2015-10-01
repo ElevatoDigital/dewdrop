@@ -39,22 +39,27 @@ class Numeric extends AbstractFilter
      */
     public function apply(Select $select, $conditionSetName, array $queryVars)
     {
-        $this->validateQueryVars($queryVars);
+        $this->ensurePresenceOfRequiredQueryVars($queryVars);
 
-        $quotedAlias = $select->quoteWithAlias($this->tableName, $this->columnName);
+        if ($this->isExpr()) {
+            $expression = (string) $this->expr;
+        } else {
+            $expression = $select->quoteWithAlias($this->tableName, $this->columnName);
+        }
+
+        $op1 = trim($queryVars['operand1']);
+        $op2 = trim($queryVars['operand2']);
 
         switch ($queryVars['comp']) {
             case static::OP_IS:
-                return $select->whereConditionSet($conditionSetName, "{$quotedAlias} = ?", $queryVars['operand1']);
+                return $select->whereConditionSet($conditionSetName, "{$expression} = ?", $op1);
             case static::OP_IS_BETWEEN:
-                $op1 = trim($queryVars['operand1']);
-                $op2 = trim($queryVars['operand2']);
                 if ('' === $op1 && '' === $op2) {
                     return $select;
                 } elseif ('' === $op1) {
-                    return $select->whereConditionSet($conditionSetName, "{$quotedAlias} <= ?", $queryVars['operand2']);
+                    return $select->whereConditionSet($conditionSetName, "{$expression} <= ?", $op2);
                 } elseif ('' === $op2) {
-                    return $select->whereConditionSet($conditionSetName, "{$quotedAlias} >= ?", $queryVars['operand1']);
+                    return $select->whereConditionSet($conditionSetName, "{$expression} >= ?", $op1);
                 } else {
                     if ($op1 > $op2) {
                         $op1Temp = $op1;
@@ -65,16 +70,16 @@ class Numeric extends AbstractFilter
                     return $select->whereConditionSet(
                         $conditionSetName,
                         sprintf(
-                            "{$quotedAlias} BETWEEN %s AND %s",
+                            "{$expression} BETWEEN %s AND %s",
                             $db->quote($op1),
                             $db->quote($op2)
                         )
                     );
                 }
             case static::OP_IS_LESS_THAN:
-                return $select->whereConditionSet($conditionSetName, "{$quotedAlias} < ?", $queryVars['operand1']);
+                return $select->whereConditionSet($conditionSetName, "{$expression} < ?", $queryVars['operand1']);
             case static::OP_IS_MORE_THAN:
-                return $select->whereConditionSet($conditionSetName, "{$quotedAlias} > ?", $queryVars['operand1']);
+                return $select->whereConditionSet($conditionSetName, "{$expression} > ?", $queryVars['operand1']);
             default:
                 throw new InvalidOperator("{$queryVars['comp']} is not a valid operator for numeric filters.");
         }
@@ -88,18 +93,12 @@ class Numeric extends AbstractFilter
      * @param array $queryVars
      * @throws MissingQueryVar
      */
-    protected function validateQueryVars(array $queryVars)
+    protected function ensurePresenceOfRequiredQueryVars(array $queryVars)
     {
-        if (!isset($queryVars['comp'])) {
-            throw new MissingQueryVar('"comp" variable expected.');
-        }
-
-        if (!isset($queryVars['operand1'])) {
-            throw new MissingQueryVar('"operand1" variable expected.');
-        }
-
-        if (!isset($queryVars['operand2'])) {
-            throw new MissingQueryVar('"operand2" variable expected.');
+        foreach (['comp', 'operand1', 'operand2'] as $varName) {
+            if (!isset($queryVars[$varName])) {
+                throw new MissingQueryVar("\"{$varName}\" variable expected.");
+            }
         }
     }
 }

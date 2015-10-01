@@ -18,14 +18,6 @@ use Dewdrop\Db\Select;
 interface FilterInterface
 {
     /**
-     * Provide the table and column names that will be filtered by this object.
-     *
-     * @param string $tableName
-     * @param string $columnName
-     */
-    public function __construct($tableName, $columnName);
-
-    /**
      * Apply the filter to the supplied Select object.
      *
      * @param Select $select
