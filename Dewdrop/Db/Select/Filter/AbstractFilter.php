@@ -10,6 +10,8 @@
 
 namespace Dewdrop\Db\Select\Filter;
 
+use Dewdrop\Db\Expr;
+
 /**
  * Abstract filter class
  */
@@ -23,6 +25,11 @@ abstract class AbstractFilter implements FilterInterface
     protected $columnName;
 
     /**
+     * @var Expr
+     */
+    protected $expr;
+
+    /**
      * The name of the table in which the filtered column is present.
      *
      * @var string
@@ -30,14 +37,42 @@ abstract class AbstractFilter implements FilterInterface
     protected $tableName;
 
     /**
-     * Provide the table and column names that will be filtered by this object.
+     * This filter implementation can be instantiated in one of two ways:
      *
-     * @param string $tableName
-     * @param string $columnName
+     * 1) By passing the table and column names, respectively
+     * 2) By passing an arbitrary SQL expression as an instance of \Dewdrop\Db\Expr
+     *
+     * @throws Exception
      */
-    public function __construct($tableName, $columnName)
+    public function __construct()
     {
-        $this->tableName  = $tableName;
-        $this->columnName = $columnName;
+        $args      = func_get_args();
+        $argsCount = count($args);
+
+        switch ($argsCount) {
+            case 1: // Arbitrary SQL expression
+                if (!$args[0] instanceof Expr) {
+                    throw new Exception(
+                        'You must either pass the table and column names, respectively, or pass an instance of ' .
+                            '\Dewdrop\Db\Expr'
+                    );
+                }
+                $this->expr = $args[0];
+                break;
+            case 2: // Table and column names, respectively
+                $this->tableName  = (string) $args[0];
+                $this->columnName = (string) $args[1];
+                break;
+            default:
+                throw new Exception("Invalid number of arguments: {$argsCount}");
+        }
+    }
+
+    /**
+     * @return bool
+     */
+    protected function isExpr()
+    {
+        return $this->expr instanceof Expr;
     }
 }
