@@ -52,6 +52,9 @@ class Numeric extends AbstractFilter
 
         switch ($queryVars['comp']) {
             case static::OP_IS:
+                if ('' === $op1) {
+                    return $select;
+                }
                 return $select->whereConditionSet($conditionSetName, "{$expression} = ?", $op1);
             case static::OP_IS_BETWEEN:
                 if ('' === $op1 && '' === $op2) {
@@ -77,9 +80,15 @@ class Numeric extends AbstractFilter
                     );
                 }
             case static::OP_IS_LESS_THAN:
-                return $select->whereConditionSet($conditionSetName, "{$expression} < ?", $queryVars['operand1']);
+                if ('' === $op1) {
+                    return $select;
+                }
+                return $select->whereConditionSet($conditionSetName, "{$expression} < ?", $op1);
             case static::OP_IS_MORE_THAN:
-                return $select->whereConditionSet($conditionSetName, "{$expression} > ?", $queryVars['operand1']);
+                if ('' === $op1) {
+                    return $select;
+                }
+                return $select->whereConditionSet($conditionSetName, "{$expression} > ?", $op1);
             default:
                 throw new InvalidOperator("{$queryVars['comp']} is not a valid operator for numeric filters.");
         }
