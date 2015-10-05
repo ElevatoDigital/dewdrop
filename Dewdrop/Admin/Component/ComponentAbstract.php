@@ -82,6 +82,14 @@ abstract class ComponentAbstract
     private $pageFactories = array();
 
     /**
+     * A page factory to allow overriding of page classes that come from other
+     * factories.
+     *
+     * @var \Dewdrop\Admin\PageFactory\Custom
+     */
+    private $customPageFactory;
+
+    /**
      * The permissions for this component.
      *
      * @var Permissions
@@ -162,6 +170,10 @@ abstract class ComponentAbstract
         $this->path = dirname($reflectionClass->getFileName());
         $this->name = basename($this->path);
 
+        $this->customPageFactory = $this->pimple['custom-page-factory'];
+        $this->customPageFactory->setComponent($this);
+        $this->addPageFactory($this->customPageFactory);
+
         // Setup the default page factory, which looks for files in the component's folder
         $this->addPageFactory(new PageFilesFactory($this));
 
@@ -220,6 +232,16 @@ abstract class ComponentAbstract
     public function getPageFactories()
     {
         return $this->pageFactories;
+    }
+
+    /**
+     * Get the custom page factory for this component.
+     *
+     * @return \Dewdrop\Admin\PageFactory\Custom
+     */
+    public function getCustomPageFactory()
+    {
+        return $this->customPageFactory;
     }
 
     /**

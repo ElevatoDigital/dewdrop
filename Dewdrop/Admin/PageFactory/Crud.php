@@ -12,7 +12,6 @@ namespace Dewdrop\Admin\PageFactory;
 
 use Dewdrop\Admin\Component\ComponentAbstract;
 use Dewdrop\Admin\Component\CrudInterface;
-use ReflectionClass;
 
 /**
  * Page factory for CRUD-capable components.  Provides a lot of CRUD functionality
@@ -20,7 +19,7 @@ use ReflectionClass;
  * pages by adding a file to your component (see Files page factory) and can disable
  * some of the provided functionality via your component's permissions.
  */
-class Crud implements PageFactoryInterface
+class Crud extends AbstractClassMapFactory
 {
     /**
      * The component the pages will be provided for.
@@ -64,48 +63,5 @@ class Crud implements PageFactoryInterface
     public function __construct(CrudInterface $component)
     {
         $this->component = $component;
-    }
-
-    /**
-     * Returns a page instance for the given name or false on failure
-     *
-     * @param string $name
-     * @return \Dewdrop\Admin\Page\PageAbstract|false
-     */
-    public function createPage($name)
-    {
-        // Remain compatible with WP style naming
-        $name = $this->component->getInflector()->hyphenize($name);
-
-        if (array_key_exists($name, $this->pageClassMap)) {
-            $pageClass      = $this->pageClassMap[$name];
-            $reflectedClass = new ReflectionClass($pageClass);
-
-            return new $pageClass(
-                $this->component,
-                $this->component->getRequest(),
-                dirname($reflectedClass->getFileName()) . '/view-scripts'
-            );
-        }
-
-        return false;
-    }
-
-    /**
-     * List the pages this factory is capable of producing.
-     *
-     * @return array
-     */
-    public function listAvailablePages()
-    {
-        $pages = [];
-
-        foreach ($this->pageClassMap as $urlName => $className) {
-            $reflectedClass = new ReflectionClass($className);
-
-            $pages[] = new Page($urlName, $reflectedClass->getFileName(), $className);
-        }
-
-        return $pages;
     }
 }

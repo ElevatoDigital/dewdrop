@@ -10,6 +10,7 @@
 
 namespace Dewdrop\Bootstrap;
 
+use Dewdrop\Admin\PageFactory\Custom as CustomPageFactory;
 use Dewdrop\Auth\Db\UsersTableGateway;
 use Dewdrop\Config;
 use Dewdrop\Db\Adapter as DbAdapter;
@@ -136,6 +137,12 @@ class Detector
                     }
                 }
             );
+        }
+
+        if (!isset($pimple['custom-page-factory'])) {
+            $pimple['custom-page-factory'] = function () {
+                return new CustomPageFactory();
+            };
         }
 
         if (!isset($pimple['dewdrop-build'])) {
