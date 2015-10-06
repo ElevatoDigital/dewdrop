@@ -13,6 +13,7 @@ namespace Dewdrop\Admin\ResponseHelper;
 use Dewdrop\Admin\Page\PageAbstract;
 use Dewdrop\Pimple;
 use Dewdrop\Session;
+use WP_Session;
 
 /**
  * The response helper object gets injected into a page's process() method
@@ -186,7 +187,11 @@ class Standard
     public function executeSuccessMessage()
     {
         if ($this->successMessage) {
-            $this->session->set('successMessage', $this->successMessage);
+            if ($this->session instanceof WP_Session) {
+                $this->session['successMessage'] = $this->successMessage;
+            } else {
+                $this->session->set('successMessage', $this->successMessage);
+            }
         }
 
         return $this;

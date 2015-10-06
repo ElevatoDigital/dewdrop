@@ -152,6 +152,10 @@ class Edit extends PageAbstract
         $index   = $this->component->getListingQueryParamsSessionName();
         $params  = (isset($session[$index]) ? $session[$index] : []);
 
+        if (!is_array($params)) {
+            $params = (array) $params;
+        }
+
         $responseHelper->redirectToAdminPage('index', $params);
     }
 
