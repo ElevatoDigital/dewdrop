@@ -170,12 +170,12 @@ abstract class ComponentAbstract
         $this->path = dirname($reflectionClass->getFileName());
         $this->name = basename($this->path);
 
+        // Setup the default page factory, which looks for files in the component's folder
+        $this->addPageFactory(new PageFilesFactory($this));
+
         $this->customPageFactory = $this->pimple['custom-page-factory'];
         $this->customPageFactory->setComponent($this);
         $this->addPageFactory($this->customPageFactory);
-
-        // Setup the default page factory, which looks for files in the component's folder
-        $this->addPageFactory(new PageFilesFactory($this));
 
         $this->init();
 
