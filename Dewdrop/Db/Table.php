@@ -810,6 +810,8 @@ abstract class Table
             $data['date_updated'] = date('Y-m-d G:i:s');
         } elseif ($this->getMetadata('columns', 'datetime_updated')) {
             $data['datetime_updated'] = date('Y-m-d G:i:s');
+        } elseif ($this->getMetadata('columns', 'updated_at')) {
+            $data['updated_at'] = date('Y-m-d H:i:s');
         }
 
         return $data;
