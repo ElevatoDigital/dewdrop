@@ -806,12 +806,19 @@ abstract class Table
      */
     private function augmentUpdatedDataArrayWithDateFields(array $data)
     {
+        // When
         if ($this->getMetadata('columns', 'date_updated')) {
             $data['date_updated'] = date('Y-m-d G:i:s');
         } elseif ($this->getMetadata('columns', 'datetime_updated')) {
             $data['datetime_updated'] = date('Y-m-d G:i:s');
         } elseif ($this->getMetadata('columns', 'updated_at')) {
             $data['updated_at'] = date('Y-m-d H:i:s');
+        }
+
+        // By whom
+        if ($this->getMetadata('columns', 'updated_by_user_id') && Pimple::hasResource('user') &&
+            ($user = Pimple::getResource('user')) && isset($user['user_id']) && 0 < $user['user_id']) {
+            $data['updated_by_user_id'] = $user['user_id'];
         }
 
         return $data;
