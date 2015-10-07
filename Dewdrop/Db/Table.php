@@ -613,7 +613,7 @@ abstract class Table
     {
         $this->db->insert(
             $this->tableName,
-            $this->augmentInsertedDataArrayWithDateFields(
+            $this->augmentInsertedDataArrayWithWhenAndByWhom(
                 $this->filterDataArrayForPhysicalColumns($data)
             )
         );
@@ -649,7 +649,7 @@ abstract class Table
     {
         $result = 0;
 
-        $updateData = $this->augmentUpdatedDataArrayWithDateFields(
+        $updateData = $this->augmentUpdatedDataArrayWithWhenAndByWhom(
             $this->filterDataArrayForPhysicalColumns($data)
         );
 
@@ -781,30 +781,39 @@ abstract class Table
 
     /**
      * If this table has date_created or datetime_created columns, supply a
-     * value for them automatically during insert().
+     * value for them automatically during insert(). It also will assign
+     * the current user ID as the creator if possible.
      *
      * @param array $data
      * @return array
      */
-    private function augmentInsertedDataArrayWithDateFields(array $data)
+    private function augmentInsertedDataArrayWithWhenAndByWhom(array $data)
     {
+        // When
         if ($this->getMetadata('columns', 'date_created')) {
             $data['date_created'] = date('Y-m-d G:i:s');
         } elseif ($this->getMetadata('columns', 'datetime_created')) {
             $data['datetime_created'] = date('Y-m-d G:i:s');
         }
 
-        return $this->augmentUpdatedDataArrayWithDateFields($data);
+        // By whom
+        if ($this->getMetadata('columns', 'created_by_user_id') && Pimple::hasResource('user') &&
+            ($user = Pimple::getResource('user')) && isset($user['user_id']) && 0 < $user['user_id']) {
+            $data['created_by_user_id'] = $user['user_id'];
+        }
+
+        return $this->augmentUpdatedDataArrayWithWhenAndByWhom($data);
     }
 
     /**
      * If this table has date_updated or datetime_updated columns, supply a
-     * value for them automatically during update().
+     * value for them automatically during update(). It also will assign
+     * the current user ID as the updater if possible.
      *
      * @param array $data
      * @return array
      */
-    private function augmentUpdatedDataArrayWithDateFields(array $data)
+    private function augmentUpdatedDataArrayWithWhenAndByWhom(array $data)
     {
         // When
         if ($this->getMetadata('columns', 'date_updated')) {
