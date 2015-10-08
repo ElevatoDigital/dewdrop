@@ -218,10 +218,7 @@ how to get your development environment running smoothly:
 
 <https://github.com/DeltaSystems/dewdrop/wiki/Contributing>
 
-### Current contributors
-
-* Brad Griffith, Delta Systems
-* Darby Felton, Delta Systems
+### [Current contributors](https://github.com/DeltaSystems/dewdrop/graphs/contributors)
 
 
 API docs and test reports
