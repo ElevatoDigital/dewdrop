@@ -694,11 +694,13 @@ abstract class ComponentAbstract
         if (!$this->shouldRenderLayout) {
             return $output;
         } else {
-            return $this->env->renderLayout(
-                $output,
-                $page->getView()->headScript(),
-                $page->getView()->headLink()
-            );
+            return $this->env
+                ->setActiveComponent($this)
+                ->renderLayout(
+                    $output,
+                    $page->getView()->headScript(),
+                    $page->getView()->headLink()
+                );
         }
     }
 

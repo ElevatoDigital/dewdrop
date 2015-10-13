@@ -37,6 +37,12 @@ abstract class EnvAbstract implements EnvInterface
     protected $session;
 
     /**
+     * The registered active component object.
+     * @var ComponentAbstract
+     */
+    protected $activeComponent;
+
+    /**
      * The core client-side dependencies we expect to be loaded in the admin.
      * These should all be sent through the bowerUrl() view helper so that their
      * paths point to the bower_components folder for the current environment.
@@ -160,6 +166,29 @@ abstract class EnvAbstract implements EnvInterface
         $this->session = $session;
 
         return $this;
+    }
+
+    /**
+     * Set a reference to the active component.
+     *
+     * @param ComponentAbstract $component
+     * @return $this
+     */
+    public function setActiveComponent(ComponentAbstract $component)
+    {
+        $this->activeComponent = $component;
+
+        return $this;
+    }
+
+    /**
+     * Get a reference to the active component.
+     *
+     * @return ComponentAbstract
+     */
+    public function getActiveComponent()
+    {
+        return $this->activeComponent;
     }
 
     /**
