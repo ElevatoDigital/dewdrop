@@ -53,6 +53,15 @@
 <div class="footer">
     <input type="submit" class="btn btn-success btn-sm" value="Apply Filters" />
     <a class="btn btn-link btn-sm" href="?">Clear Filters</a>
+
+    <?php
+    /* @var $request \Dewdrop\Request */
+    $request = clone($this->request);
+    $url     = $request->setQuery('disable-pagination', 1)->getUrl();
+    ?>
+    <a class="btn btn-link btn-sm" href="<?php echo $this->escapeHtmlAttr($url);?>">
+        Display Matching <?php echo $this->escapeHtml($this->title ?: 'Records');?> on Single Page
+    </a>
 </div>
 <?php endif;?>
 
