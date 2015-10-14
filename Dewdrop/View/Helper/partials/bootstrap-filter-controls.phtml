@@ -57,10 +57,10 @@
     <?php
     /* @var $request \Dewdrop\Request */
     $request = clone($this->request);
-    $url     = $request->setQuery('disable-pagination', 1)->getUrl();
+    $url     = $request->setQuery($this->paramPrefix . '-disable-pagination', 1)->getUrl();
     ?>
     <a class="btn btn-link btn-sm" href="<?php echo $this->escapeHtmlAttr($url);?>">
-        Display Matching <?php echo $this->escapeHtml($this->title ?: 'Records');?> on Single Page
+        Display All Matching <?php echo $this->escapeHtml($this->title ?: 'Records');?> on Single Page
     </a>
 </div>
 <?php endif;?>

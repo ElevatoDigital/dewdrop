@@ -94,6 +94,16 @@ class SelectPaginate extends HelperAbstract implements SelectModifierInterface
     }
 
     /**
+     * Check to see if this helper is enabled.
+     *
+     * @return bool
+     */
+    public function isEnabled()
+    {
+        return $this->enabled;
+    }
+
+    /**
      * Enable this modifier.
      *
      * @return $this
@@ -187,6 +197,10 @@ class SelectPaginate extends HelperAbstract implements SelectModifierInterface
      */
     public function modifySelect(Fields $fields, Select $select)
     {
+        if ($this->request->getQuery($this->prefix . '-disable-pagination')) {
+            $this->disable();
+        }
+
         $driver = $select->getAdapter()->getDriver();
 
         $this->page = (int) $this->request->getQuery($this->prefix . 'listing-page', 1);

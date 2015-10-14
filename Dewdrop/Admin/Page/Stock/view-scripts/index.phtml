@@ -97,13 +97,14 @@ if ($this->isSortable) {
     echo $this->tableSortHandle()->close();
 }
 
+/* @var $paginationHelper \Dewdrop\Fields\Helper\SelectPaginate */
 $paginationHelper = $this->listing->getSelectModifierByName('SelectPaginate');
 
 if ($this->bulkActions) {
     echo $this->bulkActionForm()->close(
         $this->bulkActions,
         $totalRowCount,
-        $paginationHelper->getPageSize(),
+        ($paginationHelper->isEnabled() ? $paginationHelper->getPageSize() : $totalRowCount),
         $this->pluralTitle
     );
 }

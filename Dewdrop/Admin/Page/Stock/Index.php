@@ -97,12 +97,6 @@ class Index extends PageAbstract
      */
     public function render()
     {
-        if ($this->request->getQuery('disable-pagination')) {
-            /* @var $paginate \Dewdrop\Fields\Helper\SelectPaginate */
-            $paginate = $this->component->getListing()->getSelectModifierByName('SelectPaginate');
-            $paginate->disable();
-        }
-
         $fields  = $this->component->getFields();
         $listing = $this->component->getListing();
         $filter  = $this->component->getVisibilityFilter();
