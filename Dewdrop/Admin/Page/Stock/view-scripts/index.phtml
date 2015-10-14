@@ -111,7 +111,7 @@ if ($this->bulkActions) {
 
 echo $this->pagination(
     $totalRowCount,
-    $paginationHelper->getPageSize(),
+    ($paginationHelper->isEnabled() ? $paginationHelper->getPageSize() : $totalRowCount),
     $paginationHelper->getPage(),
     (1 === $totalRowCount ? $this->singularTitle : $this->pluralTitle)
 );

@@ -197,7 +197,7 @@ class SelectPaginate extends HelperAbstract implements SelectModifierInterface
      */
     public function modifySelect(Fields $fields, Select $select)
     {
-        if ($this->request->getQuery($this->prefix . '-disable-pagination')) {
+        if ($this->request->getQuery($this->prefix . 'disable-pagination')) {
             $this->disable();
         }
 
