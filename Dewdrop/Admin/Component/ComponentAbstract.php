@@ -173,9 +173,11 @@ abstract class ComponentAbstract
         // Setup the default page factory, which looks for files in the component's folder
         $this->addPageFactory(new PageFilesFactory($this));
 
-        $this->customPageFactory = $this->pimple['custom-page-factory'];
-        $this->customPageFactory->setComponent($this);
-        $this->addPageFactory($this->customPageFactory);
+        if (isset($pimple['custom-page-factory'])) {
+            $this->customPageFactory = $this->pimple['custom-page-factory'];
+            $this->customPageFactory->setComponent($this);
+            $this->addPageFactory($this->customPageFactory);
+        }
 
         $this->init();
 
