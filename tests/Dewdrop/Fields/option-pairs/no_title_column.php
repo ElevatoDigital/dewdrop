@@ -22,6 +22,7 @@ return array(
     'PRIMARY' => true,
     'PRIMARY_POSITION' => 1,
     'IDENTITY' => true,
+    'GENERIC_TYPE' => 'integer',
   ),
   'just_an_int' =>
   array (
@@ -39,6 +40,7 @@ return array(
     'PRIMARY' => false,
     'PRIMARY_POSITION' => NULL,
     'IDENTITY' => false,
+    'GENERIC_TYPE' => 'integer',
   ),
   'is_delicious' =>
   array (
@@ -56,6 +58,7 @@ return array(
     'PRIMARY' => false,
     'PRIMARY_POSITION' => NULL,
     'IDENTITY' => false,
+    'GENERIC_TYPE' => 'boolean',
   ),
   'level_of_deliciousness' =>
   array (
@@ -73,6 +76,7 @@ return array(
     'PRIMARY' => false,
     'PRIMARY_POSITION' => NULL,
     'IDENTITY' => false,
+    'GENERIC_TYPE' => 'integer',
   ),
 ),
     'references' => array (
