@@ -56,6 +56,41 @@ class Index extends PageAbstract
     private $session;
 
     /**
+     * The URL to use for the create button.
+     *
+     * @var string
+     */
+    private $createUrl;
+
+    /**
+     * Override the default URL used on the create button.
+     *
+     * @param string $createUrl
+     * @return $this
+     */
+    public function setCreateUrl($createUrl)
+    {
+        $this->createUrl = $createUrl;
+
+        return $this;
+    }
+
+    /**
+     * Get the URL that should be used for the create button.  By default,
+     * this uses the stock edit page class.
+     *
+     * @return string
+     */
+    public function getCreateUrl()
+    {
+        if (!$this->createUrl) {
+            $this->createUrl = $this->getView()->adminUrl('edit');
+        }
+
+        return $this->createUrl;
+    }
+
+    /**
      * Ensure the user is allowed to view the listing in this component.
      */
     public function init()
@@ -112,7 +147,8 @@ class Index extends PageAbstract
             'fields'           => $fields,
             'debug'            => Pimple::getResource('debug'),
             'isSortable'       => ($this->component instanceof SortableListingInterface),
-            'page'             => $this
+            'page'             => $this,
+            'createUrl'        => $this->getCreateUrl()
         ]);
 
         if ($this->component instanceof BulkActionProcessorInterface) {

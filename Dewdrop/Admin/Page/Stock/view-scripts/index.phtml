@@ -12,7 +12,13 @@ if ($this->bulkActionFailureMessage) {
     );
 }
 
-echo $this->adminComponentNav($this->component);
+echo $this->adminComponentNav(
+    $this->component,
+    [
+        'createUrl' => $this->createUrl
+    ]
+);
+
 echo $this->bootstrapFilterForm()->adminPanel($this->component);
 ?>
 

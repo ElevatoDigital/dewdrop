@@ -11,7 +11,14 @@ echo $this->bootstrapBreadcrumbs([
 ]);
 ?>
 
-<?php if (!$this->rowEditor->isNew() && $this->rowEditor->hasDeleteField()):?>
+<?php echo $this->bootstrapForm()->open();?>
+
+<?php
+$displayDelete  = (!$this->rowEditor->isNew() && $this->rowEditor->hasDeleteField());
+$displayTopSave = ($this->saveButtonPosition & \Dewdrop\Admin\Page\Stock\Edit::SAVE_BUTTON_TOP);
+?>
+
+<?php if ($displayDelete || $displayTopSave):?>
 
 <?php
 $params = [];
@@ -21,18 +28,35 @@ foreach ($this->model->getPrimaryKey() as $field) {
 }
 ?>
 
-<div class="navbar navbar-default" role="navigation">
+<div class="navbar navbar-default navbar-edit" role="navigation">
+    <?php if ($displayTopSave): ?>
+    <div class="navbar-header">
+        <?php echo $this->bootstrapForm()->renderSubmitButton();?>
+    </div>
+    <?php endif;?>
+
+    <?php if ($displayDelete):?>
     <div class="navbar-right navbar-right-btn-group">
         <a class="navbar-btn btn btn-danger btn-delete" data-message="Are you sure you want to delete this <?php echo $this->escapeHtmlAttr(strtolower($this->model->getSingularTitle()));?>?" data-href="<?php echo $this->escapeHtmlAttr($this->adminUrl('delete', $params));?>" data-redirect="<?php echo $this->escapeHtmlAttr($this->adminUrl('index'));?>">Delete This <?php echo $this->escapeHtml($this->model->getSingularTitle());?></a>
     </div>
+    <?php endif;?>
 </div>
 <?php $this->headScript()->appendFile($this->bowerUrl('/dewdrop/www/js/delete-button.js'));?>
 
 <?php endif;?>
 
 <?php
-echo $this->bootstrapForm(
+echo $this->bootstrapForm()->renderContent(
     $this->fields,
-    $this->rowEditor->getInputFilter()
+    $this->rowEditor->getInputFilter(),
+    $this->editControlRenderer()
 );
+?>
+
+<?php
+if ($this->saveButtonPosition & \Dewdrop\Admin\Page\Stock\Edit::SAVE_BUTTON_BOTTOM) {
+    echo $this->bootstrapForm()->renderSubmitButton();
+}
+
+echo $this->bootstrapForm()->close();
 ?>

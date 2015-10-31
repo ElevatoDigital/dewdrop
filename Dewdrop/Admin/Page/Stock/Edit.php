@@ -24,6 +24,27 @@ use Dewdrop\Session;
 class Edit extends PageAbstract
 {
     /**
+     * Display the save button at the top of the page.
+     *
+     * @const
+     */
+    const SAVE_BUTTON_TOP = 1;
+
+    /**
+     * Display the save button at the bottom of the page.
+     *
+     * @const
+     */
+    const SAVE_BUTTON_BOTTOM = 2;
+
+    /**
+     * Display save button in both top and bottom positions.
+     *
+     * @const
+     */
+    const SAVE_BUTTON_BOTH = 3;
+
+    /**
      * The CRUD component.
      *
      * @var CrudInterface|ComponentAbstract
@@ -66,6 +87,13 @@ class Edit extends PageAbstract
     protected $fields;
 
     /**
+     * Where to display the save button.
+     *
+     * @var string
+     */
+    protected $saveButtonPosition = self::SAVE_BUTTON_BOTTOM;
+
+    /**
      * Setup the row editor and check component permissions.
      */
     public function init()
@@ -83,6 +111,21 @@ class Edit extends PageAbstract
         $this->isNew = $this->rowEditor->isNew();
 
         $this->checkPermissions();
+    }
+
+    /**
+     * Set the save button position.  You can use the SAVE_BUTTON_BOTTOM,
+     * SAVE_BUTTON_TOP and SAVE_BUTTON_BOTH class constants with this
+     * method.
+     *
+     * @param int $saveButtonPosition
+     * @return $this
+     */
+    public function setSaveButtonPosition($saveButtonPosition)
+    {
+        $this->saveButtonPosition = $saveButtonPosition;
+
+        return $this;
     }
 
     protected function getRowEditor()
@@ -161,15 +204,18 @@ class Edit extends PageAbstract
 
     public function assignDefaultViewArguments()
     {
-        $this->view->assign([
-                'component'         => $this->component,
-                'isNew'             => $this->isNew,
-                'fields'            => $this->fields->getEditableFields($this->component->getFieldGroupsFilter()),
-                'model'             => $this->model,
-                'rowEditor'         => $this->rowEditor,
-                'request'           => $this->request,
-                'invalidSubmission' => $this->invalidSubmission
-            ]);
+        $this->view->assign(
+            [
+                'component'          => $this->component,
+                'isNew'              => $this->isNew,
+                'fields'             => $this->fields->getEditableFields($this->component->getFieldGroupsFilter()),
+                'model'              => $this->model,
+                'rowEditor'          => $this->rowEditor,
+                'request'            => $this->request,
+                'invalidSubmission'  => $this->invalidSubmission,
+                'saveButtonPosition' => $this->saveButtonPosition
+            ]
+        );
     }
 
     /**

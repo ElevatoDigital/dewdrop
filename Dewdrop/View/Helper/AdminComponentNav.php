@@ -26,7 +26,7 @@ class AdminComponentNav extends AbstractHelper
      * @param ComponentAbstract $component
      * @return string
      */
-    public function direct(ComponentAbstract $component)
+    public function direct(ComponentAbstract $component, array $options = [])
     {
         if ($component instanceof CrudInterface) {
             $singularTitle = $component->getPrimaryModel()->getSingularTitle();
@@ -40,12 +40,17 @@ class AdminComponentNav extends AbstractHelper
             $pluralTitle = $component->getTitle();
         }
 
+        if (!isset($options['createUrl'])) {
+            $options['createUrl'] = null;
+        }
+
         return $this->partial(
             'admin-component-nav.phtml',
             array(
                 'permissions'   => $component->getPermissions(),
                 'singularTitle' => $singularTitle,
-                'pluralTitle'   => $pluralTitle
+                'pluralTitle'   => $pluralTitle,
+                'createUrl'     => $options['createUrl']
             )
         );
     }

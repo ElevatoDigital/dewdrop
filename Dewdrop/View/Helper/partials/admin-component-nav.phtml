@@ -1,7 +1,7 @@
 <nav class="navbar navbar-default navbar-admin-index" role="navigation">
     <div class="navbar-header">
         <?php if ($this->permissions->can('create')) :?>
-        <a data-keyboard-role="create" href="<?php echo $this->escapeHtmlAttr($this->adminUrl('edit'));?>" class="btn btn-primary navbar-btn">Add <?php echo $this->escapeHtml($this->singularTitle);?></a>
+        <a data-keyboard-role="create" href="<?php echo $this->escapeHtmlAttr($this->createUrl ?: $this->adminUrl('edit'));?>" class="btn btn-primary navbar-btn">Add <?php echo $this->escapeHtml($this->singularTitle);?></a>
         <?php endif;?>
 
         <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#admin-index-collapse">
