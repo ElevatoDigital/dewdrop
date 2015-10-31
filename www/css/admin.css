@@ -167,6 +167,17 @@ tr:hover .row-actions {
     font-weight: normal;
 }
 
+.navbar-edit .navbar-header .btn {
+    left: 8px;
+    position: relative;
+    top: 8px;
+}
+
+.navbar-edit .navbar-right .btn {
+    left: -8px;
+    position: relative;
+}
+
 @media (max-width: 767px) {
     .row-actions {
         visibility: visible;
