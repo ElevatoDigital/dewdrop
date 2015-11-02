@@ -1,37 +1,24 @@
-require.config({
-    baseUrl: DEWDROP.bowerUrl('/dewdrop/www/js/filter'),
+var dewdropSortFields = require.config({
+    baseUrl: DEWDROP.bowerUrl('/dewdrop/www/js/sort-fields'),
     paths: {
-        text: DEWDROP.bowerUrl('/requirejs-text/text')
+        text:        DEWDROP.bowerUrl('/requirejs-text/text'),
+        "jquery-ui": DEWDROP.bowerUrl('/jquery-ui/jquery-ui.min')
     }
 });
 
-require(
-    ['jquery', 'fields-collection', 'filters-collection', 'filters-view'],
-    function ($, FieldsCollection, FiltersCollection, FiltersView) {
-        'use strict';
+dewdropSortFields(
+    ['jquery', 'groups-collection', 'groups-view', 'add-group-popover-view'],
+    function ($, GroupsCollection, GroupsView, Popover) {
+        var collection = new GroupsCollection(),
+            popover    = new Popover({collection: collection}),
+            groups     = new GroupsView({collection: collection});
 
-        $('.filter-form').each(
-            function (index, form) {
-                var prefix = $(form).data('prefix'),
-                    fields = new FieldsCollection(),
-                    collection,
-                    view;
+        collection.initializeWithGlobalVariable();
 
-                fields.loadConfigFromGlobalVariable(prefix);
-
-                collection = new FiltersCollection();
-                collection.loadValuesFromGlobalVariable(prefix);
-
-                if (!collection.length) {
-                    collection.add({});
-                }
-
-                view = new FiltersView({
-                    fields:     fields,
-                    collection: collection
-                });
-
-                $(form).find('fieldset').first().append(view.render().el);
+        $('#sort-form').on(
+            'submit',
+            function (e) {
+                $('#sorted-fields').val(JSON.stringify(collection.toJSON()));
             }
         );
     }
