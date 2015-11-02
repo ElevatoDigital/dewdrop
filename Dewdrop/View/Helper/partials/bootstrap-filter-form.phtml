@@ -1,4 +1,16 @@
 <form class="filter-form" data-prefix="<?php echo $this->escapeHtmlAttr($this->paramPrefix);?>" action="" method="<?php echo $this->escapeHtmlAttr($this->method);?>">
+    <?php
+    foreach ($this->getRequest()->getQuery() as $param => $value) {
+        if (0 !== strpos($param, $this->paramPrefix . 'ftr-')) {
+            printf(
+                '<input type="hidden" name="%s" value="%s" />',
+                $this->escapeHtmlAttr($param),
+                $this->escapeHtmlAttr($value)
+            );
+        }
+    }
+    ?>
+
     <?php echo $this->controls;?>
 </form>
 

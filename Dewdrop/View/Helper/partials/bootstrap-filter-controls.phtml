@@ -52,16 +52,18 @@
 <?php if ($this->showButtons):?>
 <div class="footer">
     <input type="submit" class="btn btn-success btn-sm" value="Apply Filters" />
-    <a class="btn btn-link btn-sm" href="?">Clear Filters</a>
-
     <?php
-    /* @var $request \Dewdrop\Request */
-    $request = clone($this->request);
-    $url     = $request->setQuery($this->paramPrefix . 'disable-pagination', 1)->getUrl();
+    $params = [];
+
+    foreach ($this->getRequest()->getQuery() as $param => $value) {
+        if (0 !== strpos($param, $this->paramPrefix . 'ftr-')) {
+            $params[$param] = $value;
+        }
+    }
+
+    $queryString = http_build_query($params);
     ?>
-    <a class="btn btn-link btn-sm" href="<?php echo $this->escapeHtmlAttr($url);?>">
-        Display All Matching <?php echo $this->escapeHtml($this->title ?: 'Records');?> on Single Page
-    </a>
+    <a class="btn btn-link btn-sm" href="?<?php echo $this->escapeHtmlAttr($queryString);?>">Clear Filters</a>
 </div>
 <?php endif;?>
 
