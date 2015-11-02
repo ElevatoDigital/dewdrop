@@ -1,4 +1,4 @@
-(function () {
+(function ($) {
     'use strict';
 
     $('.btn-delete').on(
@@ -26,4 +26,4 @@
             }
         }
     );
-}());
+}(jQuery));
