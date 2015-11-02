@@ -1,4 +1,4 @@
-require.config({
+var dewdropSortFields = require.config({
     baseUrl: DEWDROP.bowerUrl('/dewdrop/www/js/sort-fields'),
     paths: {
         text:        DEWDROP.bowerUrl('/requirejs-text/text'),
@@ -6,7 +6,7 @@ require.config({
     }
 });
 
-require(
+dewdropSortFields(
     ['jquery', 'groups-collection', 'groups-view', 'add-group-popover-view'],
     function ($, GroupsCollection, GroupsView, Popover) {
         var collection = new GroupsCollection(),
