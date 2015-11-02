@@ -45,6 +45,8 @@ class Wp extends EnvAbstract
      */
     public function renderLayout($content, HeadScript $headScript = null, HeadLink $headLink = null)
     {
+        global $wp_version;
+
         $view = new View();
 
         $output  = $view->wpWrap()->open();
@@ -55,7 +57,10 @@ class Wp extends EnvAbstract
             // We're prefixing the name here so we don't conflict with WP names
             wp_enqueue_script(
                 'dewdrop-' . basename($script->attributes['src'], '.js'),
-                $script->attributes['src']
+                $script->attributes['src'],
+                [],
+                $wp_version,
+                true
             );
         }
 
@@ -220,6 +225,8 @@ class Wp extends EnvAbstract
      */
     protected function enqueueClientSideDependencies(View $view)
     {
+        global $wp_version;
+
         // Use jQuery and Backbone from WP core
         wp_enqueue_script('jquery-core');
         wp_enqueue_script('wp-backbone');
@@ -229,7 +236,7 @@ class Wp extends EnvAbstract
         // Enqueue non-WP core scripts
         foreach ($this->coreClientSideDependencies['js'] as $name => $script) {
             if (!in_array($name, $wpCoreScripts)) {
-                wp_enqueue_script($name, $view->bowerUrl($script), array('jquery', 'wp-backbone'));
+                wp_enqueue_script($name, $view->bowerUrl($script), ['jquery', 'wp-backbone'], $wp_version, true);
             }
         }
 
