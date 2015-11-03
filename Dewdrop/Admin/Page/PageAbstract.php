@@ -67,6 +67,13 @@ abstract class PageAbstract
     protected $request;
 
     /**
+     * The name used in the URL to route to this page.
+     *
+     * @var string
+     */
+    private $name;
+
+    /**
      * Create a new page with a reference to its component and the file in which
      * it is defined.
      *
@@ -211,6 +218,29 @@ abstract class PageAbstract
     public function getView()
     {
         return $this->view;
+    }
+
+    /**
+     * Set the name used in the URL to route to this page.
+     *
+     * @param string $name
+     * @return $this
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * Set the name used in the URL to route to this page.
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
     }
 
     /**

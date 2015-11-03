@@ -11,11 +11,13 @@
 namespace Dewdrop\Admin\Component;
 
 use Dewdrop\Admin\Env\EnvInterface;
+use Dewdrop\Admin\Page\PageAbstract;
 use Dewdrop\Admin\PageFactory\Files as PageFilesFactory;
 use Dewdrop\Admin\PageFactory\PageFactoryInterface;
 use Dewdrop\Admin\Permissions;
 use Dewdrop\Admin\Response;
 use Dewdrop\Exception;
+use Dewdrop\Inflector;
 use Dewdrop\Pimple as DewdropPimple;
 use Pimple;
 use ReflectionClass;
@@ -364,6 +366,7 @@ abstract class ComponentAbstract
             $page = $factory->createPage($name);
 
             if ($page) {
+                $page->setName($name);
                 break;
             }
         }
@@ -645,15 +648,10 @@ abstract class ComponentAbstract
         }
 
         if (is_string($page)) {
-            $name = $page;
             $page = $this->createPageObject($page);
-
-            if (array_key_exists($name, $this->pageDispatchCallbacks)) {
-                foreach ($this->pageDispatchCallbacks[$name] as $callback) {
-                    call_user_func($callback, $page);
-                }
-            }
         }
+
+        $this->executePageDispatchCallbacks($page);
 
         if (null === $response) {
             $response = new Response($page, array($this->env, 'redirect'));
@@ -707,6 +705,23 @@ abstract class ComponentAbstract
     }
 
     /**
+     * Get WP slug for this component.
+     *
+     * We use the component name, with namespace back slashes replaced with
+     * URL-friendly front slashes, as the slug.
+     *
+     * @return string
+     */
+    public function getSlug()
+    {
+        $fullClass = str_replace('\\', '/', get_class($this));
+        $segments  = explode('/', $fullClass);
+        $nameIndex = count($segments) - 2;
+
+        return $segments[$nameIndex];
+    }
+
+    /**
      * Render the supplied output as a JSON response.  This method is mostly
      * in place to allow mocking (and thus dodging the exit statement) during
      * testing.
@@ -722,19 +737,27 @@ abstract class ComponentAbstract
     }
 
     /**
-     * Get WP slug for this component.
+     * Run any page dispatch callbacks assigned to the provided page.  We support
+     * both the WP and hyphen-separated versions of the page names in this method
+     * to make it easier to reuse page dispatch code across different environments.
      *
-     * We use the component name, with namespace back slashes replaced with
-     * URL-friendly front slashes, as the slug.
-     *
-     * @return string
+     * @param PageAbstract $page
+     * @return $this
      */
-    public function getSlug()
+    private function executePageDispatchCallbacks(PageAbstract $page)
     {
-        $fullClass = str_replace('\\', '/', get_class($this));
-        $segments  = explode('/', $fullClass);
-        $nameIndex = count($segments) - 2;
+        /* @var $inflector Inflector */
+        $inflector = (isset($this->pimple['inflector']) ? $this->pimple['inflector'] : new Inflector());
+        $names     = [$page->getName(), $inflector->hyphenize($page->getName())];
 
-        return $segments[$nameIndex];
+        foreach ($names as $name) {
+            if (array_key_exists($name, $this->pageDispatchCallbacks)) {
+                foreach ($this->pageDispatchCallbacks[$name] as $callback) {
+                    call_user_func($callback, $page);
+                }
+            }
+        }
+
+        return $this;
     }
 }
