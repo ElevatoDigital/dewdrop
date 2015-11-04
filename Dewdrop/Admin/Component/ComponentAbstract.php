@@ -755,6 +755,7 @@ abstract class ComponentAbstract
                 foreach ($this->pageDispatchCallbacks[$name] as $callback) {
                     call_user_func($callback, $page);
                 }
+                break;
             }
         }
 
