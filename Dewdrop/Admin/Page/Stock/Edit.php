@@ -89,7 +89,7 @@ class Edit extends PageAbstract
     /**
      * Where to display the save button.
      *
-     * @var string
+     * @var int
      */
     protected $saveButtonPosition = self::SAVE_BUTTON_BOTTOM;
 
