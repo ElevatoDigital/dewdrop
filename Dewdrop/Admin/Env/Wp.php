@@ -263,17 +263,7 @@ class Wp extends EnvAbstract
     {
         $slug = $component->getSlug();
 
-        $this->addObjectPage(
-            $component->getTitle(),
-            $component->getTitle(),
-            'add_users',
-            $component->getSlug(),
-            function () use ($component) {
-                $this->renderOutputIntoShell($component);
-            },
-            $component->getIcon(),
-            $component->getMenuPosition()
-        );
+        $this->registerComponentHandlingCallback($component);
 
         if (count($component->getSubmenuPages())) {
             global $submenu_file;
@@ -301,6 +291,46 @@ class Wp extends EnvAbstract
                     }
                 );
             }
+        }
+    }
+
+    /**
+     * Registering a component in WordPress means registering a handler
+     * for a hook.  Typically, add_object_page is used, but that implies
+     * an entry in the top-level admin menu.  Because we want to support
+     * components that don't appear in the menu, we check the display-menu
+     * permission here and then use add_submenu_page() with no slug to
+     * get our callback over to WP without displaying anything in the
+     * menu.
+     *
+     * @param ComponentAbstract $component
+     * @throws \Dewdrop\Exception
+     */
+    protected function registerComponentHandlingCallback(ComponentAbstract $component)
+    {
+        if ($component->getPermissions()->can('display-menu')) {
+            $this->addObjectPage(
+                $component->getTitle(),
+                $component->getTitle(),
+                'add_users',
+                $component->getSlug(),
+                function () use ($component) {
+                    $this->renderOutputIntoShell($component);
+                },
+                $component->getIcon(),
+                $component->getMenuPosition()
+            );
+        } else {
+            $this->addSubmenuPage(
+                null,
+                $component->getTitle(),
+                $component->getTitle(),
+                'add_users',
+                $component->getSlug(),
+                function () use ($component) {
+                    $this->renderOutputIntoShell($component);
+                }
+            );
         }
     }
 
