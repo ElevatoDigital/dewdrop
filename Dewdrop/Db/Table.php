@@ -797,9 +797,17 @@ abstract class Table
         }
 
         // By whom
-        if ($this->getMetadata('columns', 'created_by_user_id') && Pimple::hasResource('user') &&
-            ($user = Pimple::getResource('user')) && isset($user['user_id']) && 0 < $user['user_id']) {
-            $data['created_by_user_id'] = $user['user_id'];
+        /* @var \Dewdrop\Pimple $pimple */
+        $pimple = Pimple::getInstance();
+        /* @var \Dewdrop\Paths $paths */
+        $paths = $pimple['paths'];
+        if ($this->getMetadata('columns', 'created_by_user_id')) {
+            if ($paths->isWp()) {
+                $data['created_by_user_id'] = get_current_user_id();
+            } elseif (Pimple::hasResource('user') && ($user = Pimple::getResource('user')) && isset($user['user_id'])
+                && 0 < $user['user_id']) {
+                $data['created_by_user_id'] = $user['user_id'];
+            }
         }
 
         return $this->augmentUpdatedDataArrayWithWhenAndByWhom($data);
@@ -825,9 +833,17 @@ abstract class Table
         }
 
         // By whom
-        if ($this->getMetadata('columns', 'updated_by_user_id') && Pimple::hasResource('user') &&
-            ($user = Pimple::getResource('user')) && isset($user['user_id']) && 0 < $user['user_id']) {
-            $data['updated_by_user_id'] = $user['user_id'];
+        /* @var \Dewdrop\Pimple $pimple */
+        $pimple = Pimple::getInstance();
+        /* @var \Dewdrop\Paths $paths */
+        $paths = $pimple['paths'];
+        if ($this->getMetadata('columns', 'updated_by_user_id')) {
+            if ($paths->isWp()) {
+                $data['updated_by_user_id'] = get_current_user_id();
+            } elseif (Pimple::hasResource('user') && ($user = Pimple::getResource('user')) && isset($user['user_id'])
+                && 0 < $user['user_id']) {
+                $data['updated_by_user_id'] = $user['user_id'];
+            }
         }
 
         return $data;
