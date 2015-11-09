@@ -53,7 +53,7 @@ class InputText extends AbstractHelper
             'value' => $field->getValue()
         );
 
-        return $this->directArray($fieldDefaults + $options);
+        return $this->directArray(array_merge($fieldDefaults, $options));
     }
 
     /**
