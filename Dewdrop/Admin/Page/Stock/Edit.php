@@ -128,7 +128,10 @@ class Edit extends PageAbstract
         return $this;
     }
 
-    protected function getRowEditor()
+    /**
+     * @return \Dewdrop\Fields\RowEditor
+     */
+    public function getRowEditor()
     {
         return $this->component->getRowEditor();
     }
