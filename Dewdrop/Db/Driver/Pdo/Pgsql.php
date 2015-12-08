@@ -554,6 +554,7 @@ class Pgsql implements DriverInterface
                 break;
             case 'datetime':
             case 'timestamp':
+            case 'timestamptz':
                 $genericType = 'timestamp';
                 break;
             case 'time':
