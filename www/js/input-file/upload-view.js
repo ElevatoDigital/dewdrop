@@ -31,6 +31,12 @@ define(
                 return this;
             },
 
+            setActionUrl: function(actionUrl) {
+                this.actionUrl = actionUrl;
+
+                return this;
+            },
+
             render: function () {
                 this.$el.html(
                     uploadTemplate(
@@ -130,7 +136,7 @@ define(
                 this.renderProgressBar();
 
                 $.ajax({
-                    url: '/event-1/admin/web-content/upload',
+                    url: this.actionUrl,
                     type: 'POST',
                     data: data,
                     cache: false,

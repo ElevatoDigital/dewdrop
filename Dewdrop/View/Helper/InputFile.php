@@ -34,7 +34,8 @@ class InputFile extends AbstractHelper
                 'classes'       => $options['classes'],
                 'value'         => $options['value'],
                 'buttonTitle'   => $options['buttonTitle'],
-                'fileInputName' => $options['fileInputName']
+                'fileInputName' => $options['fileInputName'],
+                'actionUrl'     => $options['actionUrl']
             ]
         );
     }
@@ -51,7 +52,7 @@ class InputFile extends AbstractHelper
     private function prepareOptionsArray(array $options)
     {
         $this
-            ->checkRequired($options, array('name', 'value', 'fileInputName'))
+            ->checkRequired($options, array('name', 'value', 'fileInputName', 'actionUrl'))
             ->ensurePresent($options, array('classes', 'id', 'buttonTitle'))
             ->ensureArray($options, array('classes'));
 

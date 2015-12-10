@@ -21,7 +21,8 @@ dewdropInputFile(
 
                 view
                     .setValueInput($(button.data('value-input')))
-                    .setFileInputName(button.data('file-input-name'));
+                    .setFileInputName(button.data('file-input-name'))
+                    .setActionUrl(button.data('action-url'));
 
                 document.body.appendChild(view.render().el);
             }
