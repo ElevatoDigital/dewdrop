@@ -1,0 +1,14 @@
+<div class="<?php echo $this->escapeHtmlAttr(implode(' ', $this->classes));?>">
+    <input type="hidden"
+        name="<?php echo $this->escapeHtmlAttr($this->name);?>"
+        id="<?php echo $this->escapeHtmlAttr($this->id);?>"
+        value="<?php echo $this->escapeHtmlAttr($this->value);?>"/>
+
+    <button
+        data-value-input="#<?php echo $this->escapeHtmlAttr($this->id);?>"
+        data-file-input-name="<?php echo $this->escapeHtmlAttr($this->fileInputName);?>"
+        type="button"
+        class="btn btn-default btn-input-file">
+        <?php echo $this->escapeHtml($this->buttonTitle);?>
+    </button>
+</div>

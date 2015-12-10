@@ -154,6 +154,8 @@ class View
         'inlinescript'             => '\Dewdrop\View\Helper\InlineScript',
         'inputcheckbox'            => '\Dewdrop\View\Helper\InputCheckbox',
         'inputdate'                => '\Dewdrop\View\Helper\InputDate',
+        'inputfile'                => '\Dewdrop\View\Helper\InputFile',
+        'inputimage'               => '\Dewdrop\View\Helper\InputImage',
         'inputtext'                => '\Dewdrop\View\Helper\InputText',
         'inputtimestamp'           => '\Dewdrop\View\Helper\InputTimestamp',
         'optioninputdecorator'     => '\Dewdrop\View\Helper\OptionInputDecorator',
