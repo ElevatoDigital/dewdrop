@@ -10,6 +10,24 @@ dewdropInputFile(
     function ($, UploadView) {
         'use strict';
 
+        // Render initial input state
+        $('.btn-input-file').each(
+            function (index, button) {
+                var input,
+                    view = new UploadView();
+
+                button = $(button);
+                input  = $(button.data('value-input'));
+
+                if (input.val()) {
+                    view
+                        .setValueInput(input)
+                        .renderFileValue(input.val());
+                }
+            }
+        );
+
+        // Handle attempt to upload a file
         $(document).on(
             'click',
             '.btn-input-file',
