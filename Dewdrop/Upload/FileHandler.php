@@ -3,6 +3,7 @@
 namespace Dewdrop\Upload;
 
 use Dewdrop\SetOptionsTrait;
+use Zend\Filter\FilterChain;
 use Zend\Validator\File\MimeType as MimeTypeValidator;
 use Zend\Validator\File\UploadFile as UploadFileValidator;
 use Zend\Validator\ValidatorChain;
@@ -26,7 +27,15 @@ class FileHandler
      */
     private $allowedMimeTypes = [];
 
+    /**
+     * @var ValidatorChain
+     */
     private $validatorChain;
+
+    /**
+     * @var FilterChain
+     */
+    private $filterChain;
 
     public function __construct($name, array $options = array())
     {
@@ -101,6 +110,15 @@ class FileHandler
         return $this->validatorChain;
     }
 
+    public function getFilterChain()
+    {
+        if (!$this->filterChain) {
+            $this->filterChain = new FilterChain();
+        }
+
+        return $this->filterChain;
+    }
+
     public function moveUploadedFile(array $fileInfo)
     {
         $pathInfo = pathinfo($fileInfo['name']);
@@ -125,6 +143,8 @@ class FileHandler
         if (!move_uploaded_file($fileInfo['tmp_name'], $destination)) {
             return false;
         } else {
+            $destination = $this->getFilterChain()->filter($destination);
+
             return new UploadedFile($destination);
         }
     }
