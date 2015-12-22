@@ -96,9 +96,11 @@
                                     if (isset($page['isDivider']) && $page['isDivider']) {
                                         echo '<li class="divider"></li>';
                                     } else {
+                                        $url = empty($page['url']) ? $page['route'] : $page['url'];
+                                        
                                         printf(
                                             '<li><a href="%s">%s</a></li>',
-                                            $this->escapeHtmlAttr($this->url($page['url'])),
+                                            $this->escapeHtmlAttr($url),
                                             $this->escapeHtml($page['title'])
                                         );
                                     }
