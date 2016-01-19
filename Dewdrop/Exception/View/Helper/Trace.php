@@ -70,9 +70,9 @@ class Trace extends AbstractHelper
 
                         foreach ($rowData['args'] as $arg) {
                             if (is_array($arg)) {
-                                $argStrings[] = $this->renderArray($arg);
+                                $argStrings[] = 'Array';
                             } elseif (is_object($arg)) {
-                                $argStrings[] = $this->renderObject($arg);
+                                $argStrings[] = get_class($arg);
                             } else {
                                 $argStrings[] = var_export($arg, true);
                             }
@@ -86,30 +86,5 @@ class Trace extends AbstractHelper
                 );
 
         return $fields;
-    }
-
-    private function renderArray(array $array)
-    {
-        ob_start();
-        var_dump($array);
-        return $this->renderPopover('Array', ob_get_clean());
-    }
-
-    private function renderObject($object)
-    {
-        ob_start();
-        var_dump($object);
-        return $this->renderPopover(get_class($object), ob_get_clean());
-    }
-
-    private function renderPopover($title, $content)
-    {
-        return sprintf(
-            '<a href="#" title="%s" class="btn btn-default btn-xs" data-toggle="popover" data-html="true" '
-            . ' data-container="body" data-placement="left" data-trigger="focus" data-content="%s">%s</a>',
-            $this->view->escapeHtmlAttr($title),
-            $this->view->escapeHtmlAttr($content),
-            $this->view->escapeHtml($title)
-        );
     }
 }
