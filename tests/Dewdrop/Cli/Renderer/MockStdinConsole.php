@@ -66,4 +66,12 @@ class MockStdinConsole extends AbstractAdapter
     {
         // No-op during testing
     }
+
+    /**
+     * Clear line at cursor position
+     */
+    public function clearLine()
+    {
+        // No-op during testing
+    }
 }
