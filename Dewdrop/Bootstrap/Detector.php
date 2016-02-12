@@ -170,7 +170,7 @@ class Detector
                         if (class_exists('WP_Session')) {
                             return WP_Session::get_instance();
                         } else {
-                            return ArrayObject();
+                            return new ArrayObject();
                         }
                     }
                 );
