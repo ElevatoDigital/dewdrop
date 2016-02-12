@@ -166,7 +166,11 @@ class Detector
             if ($paths->isWp()) {
                 $pimple['session'] = $pimple->share(
                     function () {
-                        return WP_Session::get_instance();
+                        if (class_exists('WP_Session')) {
+                            return WP_Session::get_instance();
+                        } else {
+                            return ArrayObject();
+                        }
                     }
                 );
             } elseif ($pimple instanceof Application) {
