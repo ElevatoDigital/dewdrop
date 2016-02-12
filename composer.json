@@ -10,10 +10,10 @@
         }
     },
     "require": {
+        "php": ">=5.5.0",
         "ircmaxell/password-compat": "1.0.*",
         "jdorn/sql-formatter": "1.2.*",
         "squizlabs/php_codesniffer": "1.*",
-        "php": ">=5.4.0",
         "phpdocumentor/phpdocumentor": "2.7.*",
         "phpoffice/phpexcel": "1.8.*",
         "phpunit/dbunit": "2.*",
