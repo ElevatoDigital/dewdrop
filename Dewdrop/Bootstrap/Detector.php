@@ -10,6 +10,7 @@
 
 namespace Dewdrop\Bootstrap;
 
+use ArrayObject;
 use Dewdrop\Admin\PageFactory\Custom as CustomPageFactory;
 use Dewdrop\Auth\Db\UsersTableGateway;
 use Dewdrop\Config;
