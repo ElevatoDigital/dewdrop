@@ -147,6 +147,16 @@ class Paths
     }
 
     /**
+     * The folder where custom CLI commands are located.
+     *
+     * @return string
+     */
+    public function getCommands()
+    {
+        return $this->pluginRoot . '/commands';
+    }
+
+    /**
      * The folder housing your dbdeploy deltas
      *
      * @return string

@@ -10,8 +10,10 @@
 
 namespace Dewdrop\Cli;
 
-use Dewdrop\Paths;
+use Dewdrop\Cli\Command\CommandAbstract;
+use Dewdrop\Cli\Renderer\RendererInterface;
 use Dewdrop\Db\Adapter;
+use Dewdrop\Paths;
 use Dewdrop\Pimple as DewdropPimple;
 use Pimple;
 
@@ -161,6 +163,7 @@ class Run
     {
         $this->instantiateCommands();
 
+        /* @var $command CommandAbstract */
         foreach ($this->commands as $name => $command) {
             if ($command->isSelected($this->command)) {
                 $this->executeCommand($name);
@@ -194,6 +197,7 @@ class Run
      */
     public function executeCommand($name)
     {
+        /* @var $command CommandAbstract */
         $command       = $this->commands[$name];
         $shouldExecute = $command->parseArgs($this->args);
 
@@ -244,6 +248,19 @@ class Run
             $fullClassName = '\Dewdrop\Cli\Command\\' . $commandClass;
 
             $this->commands[$commandClass] = new $fullClassName($this, $this->renderer);
+        }
+
+        // Add any commands found in the project's commands folder
+        $commandPath = $this->paths->getCommands();
+
+        if (is_dir($commandPath)) {
+            $commands = glob($commandPath . '/*.php');
+
+            foreach ($commands as $command) {
+                $className = '\\Command\\' . basename($command, '.php');
+
+                $this->commands[$className] = new $className($this, $this->renderer);
+            }
         }
 
         // Add any custom commands defined in Pimple's "cli-commands" resource
