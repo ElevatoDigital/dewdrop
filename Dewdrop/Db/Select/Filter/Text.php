@@ -44,7 +44,7 @@ class Text
         }
 
         // Don't attempt to filter if no value is available
-        if (!$value) {
+        if ('' === (string) $value) {
             return $select;
         }
 
