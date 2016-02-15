@@ -73,6 +73,13 @@ use Dewdrop\SaveHandlerInterface;
 class Row implements ArrayAccess, SaveHandlerInterface
 {
     /**
+     * The data represented by this row before applying any changes.
+     *
+     * @var array
+     */
+    protected $initialData;
+
+    /**
      * The data represented by this row.
      *
      * @var array
@@ -95,7 +102,7 @@ class Row implements ArrayAccess, SaveHandlerInterface
     private $table;
 
     /**
-     * A map of many-to-many and EAV fieldsthat tracks whether their initial
+     * A map of many-to-many and EAV fields that tracks whether their initial
      * value has been loaded yet.  If not, the first time get() is called on
      * this row for the field, the value will be loaded from the database.
      *
@@ -139,6 +146,8 @@ class Row implements ArrayAccess, SaveHandlerInterface
                 $this->virtualFieldsInitialized[] = $column;
             }
         }
+
+        $this->initialData = $this->data;
 
         $this->init();
     }
@@ -407,9 +416,11 @@ class Row implements ArrayAccess, SaveHandlerInterface
     public function save()
     {
         if (!$this->isNew()) {
-            $updateData = $this->data;
+            $updateData = $this->getUpdatedData();
 
-            $this->table->update($updateData, $this->assembleUpdateWhereClause());
+            if (!empty($updateData)) {
+                $this->table->update($updateData, $this->assembleUpdateWhereClause());
+            }
         } else {
             $id = $this->table->insert($this->data);
 
@@ -425,6 +436,24 @@ class Row implements ArrayAccess, SaveHandlerInterface
         $this->refresh();
 
         return $this;
+    }
+
+    /**
+     * Get array of db values that would be changed by a save.
+     * @return array
+     */
+    public function getUpdatedData()
+    {
+        $updateData = $this->table->augmentUpdatedDataArrayWithWhenAndByWhom(
+            $this->table->filterDataArrayForPhysicalColumns($this->data)
+        );
+
+        if ($updateData === $this->initialData) {
+            return [];
+        }
+        else {
+            return array_diff_assoc($updateData, $this->initialData);
+        }
     }
 
     /**
