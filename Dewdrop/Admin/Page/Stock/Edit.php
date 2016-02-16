@@ -199,7 +199,11 @@ class Edit extends PageAbstract
         $params  = (isset($session[$index]) ? $session[$index] : []);
 
         if (!is_array($params)) {
-            $params = (array) $params;
+            if (is_object($params) && method_exists($params, 'toArray')) {
+                $params = $params->toArray();
+            } else {
+                $params = [];
+            }
         }
 
         $responseHelper->redirectToAdminPage('index', $params);
