@@ -47,6 +47,7 @@ class Run
         'GenDbTable',
         'GenEav',
         'Sniff',
+        'Tinker',
         'DewdropDev',
         'DewdropDoc',
         'DewdropSniff',
