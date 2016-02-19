@@ -11,6 +11,7 @@
 namespace Dewdrop\Db\Select\Filter;
 
 use Dewdrop\Db\Expr;
+use Dewdrop\Db\Select;
 
 /**
  * Abstract filter class
@@ -25,16 +26,16 @@ abstract class AbstractFilter implements FilterInterface
     protected $columnName;
 
     /**
-     * @var Expr
-     */
-    protected $expr;
-
-    /**
      * The name of the table in which the filtered column is present.
      *
      * @var string
      */
     protected $tableName;
+
+    /**
+     * @var Expr
+     */
+    protected $expr;
 
     /**
      * This filter implementation can be instantiated in one of two ways:
@@ -65,6 +66,15 @@ abstract class AbstractFilter implements FilterInterface
                 break;
             default:
                 throw new Exception("Invalid number of arguments: {$argsCount}");
+        }
+    }
+
+    protected function getComparisonExpression(Select $select)
+    {
+        if ($this->isExpr()) {
+            return (string) $this->expr;
+        } else {
+            return $select->quoteWithAlias($this->tableName, $this->columnName);
         }
     }
 

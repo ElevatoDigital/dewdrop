@@ -6,7 +6,7 @@ use Dewdrop\Db\Select;
 use Dewdrop\Db\Select\Filter\Exception\InvalidOperator;
 use Dewdrop\Db\Select\Filter\Exception\MissingQueryVar;
 
-class Text
+class Text extends AbstractFilter
 {
     const OP_CONTAINS = 'contains';
 
@@ -15,16 +15,6 @@ class Text
     const OP_STARTS_WITH = 'starts-with';
 
     const OP_ENDS_WITH = 'ends-with';
-
-    private $tableName;
-
-    private $columnName;
-
-    public function __construct($tableName, $columnName)
-    {
-        $this->tableName  = $tableName;
-        $this->columnName = $columnName;
-    }
 
     public function apply(Select $select, $conditionSetName, array $queryVars)
     {
@@ -62,51 +52,48 @@ class Text
 
     private function filterContains(Select $select, $conditionSetName, $value)
     {
-        $quotedAlias = $select->quoteWithAlias($this->tableName, $this->columnName);
-        $operator    = $select->getAdapter()->getDriver()->getCaseInsensitiveLikeOperator();
+        $expression = $this->getComparisonExpression($select);
+        $operator   = $select->getAdapter()->getDriver()->getCaseInsensitiveLikeOperator();
 
         return $select->whereConditionSet(
             $conditionSetName,
-            "{$quotedAlias} {$operator} ?",
+            "{$expression} {$operator} ?",
             '%' . $value . '%'
         );
     }
 
     private function filterNotContains(Select $select, $conditionSetName, $value)
     {
-        $quotedAlias = $select->quoteWithAlias($this->tableName, $this->columnName);
-        $operator    = $select->getAdapter()->getDriver()->getCaseInsensitiveLikeOperator();
+        $expression = $this->getComparisonExpression($select);
+        $operator   = $select->getAdapter()->getDriver()->getCaseInsensitiveLikeOperator();
 
         return $select->whereConditionSet(
             $conditionSetName,
-            "{$quotedAlias} NOT {$operator} ?",
+            "{$expression} NOT {$operator} ?",
             '%' . $value . '%'
         );
     }
 
     private function filterStartsWith(Select $select, $conditionSetName, $value)
     {
-        $quotedAlias = $select->quoteWithAlias($this->tableName, $this->columnName);
-        $operator    = $select->getAdapter()->getDriver()->getCaseInsensitiveLikeOperator();
+        $expression = $this->getComparisonExpression($select);
+        $operator   = $select->getAdapter()->getDriver()->getCaseInsensitiveLikeOperator();
 
         return $select->whereConditionSet(
             $conditionSetName,
-            "{$quotedAlias} {$operator} ?",
+            "{$expression} {$operator} ?",
             $value . '%'
         );
     }
 
-    /**
-     * @todo Could use REVERSE() trick here, but we'd need to require at least PG 9.1.
-     */
     private function filterEndsWith(Select $select, $conditionSetName, $value)
     {
-        $quotedAlias = $select->quoteWithAlias($this->tableName, $this->columnName);
-        $operator    = $select->getAdapter()->getDriver()->getCaseInsensitiveLikeOperator();
+        $expression = $this->getComparisonExpression($select);
+        $operator   = $select->getAdapter()->getDriver()->getCaseInsensitiveLikeOperator();
 
         return $select->whereConditionSet(
             $conditionSetName,
-            "{$quotedAlias} {$operator} ?",
+            "{$expression} {$operator} ?",
             '%' . $value
         );
     }

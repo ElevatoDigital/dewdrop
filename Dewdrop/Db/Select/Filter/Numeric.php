@@ -41,11 +41,7 @@ class Numeric extends AbstractFilter
     {
         $this->ensurePresenceOfRequiredQueryVars($queryVars);
 
-        if ($this->isExpr()) {
-            $expression = (string) $this->expr;
-        } else {
-            $expression = $select->quoteWithAlias($this->tableName, $this->columnName);
-        }
+        $expression = $this->getComparisonExpression($select);
 
         $op1 = trim($queryVars['operand1']);
         $op2 = trim($queryVars['operand2']);
