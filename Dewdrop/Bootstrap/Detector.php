@@ -44,7 +44,8 @@ class Detector
         $config = new Config();
 
         if (!$config->has('bootstrap')) {
-            throw new Exception('Please define a bootstrap class in your dewdrop-config.php.');
+            $bootstrap = new Standalone();
+            return $bootstrap->getPimple();
         } else {
             $bootstrapClass = $config->get('bootstrap');
 

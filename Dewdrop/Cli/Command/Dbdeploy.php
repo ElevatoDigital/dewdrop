@@ -114,12 +114,6 @@ class Dbdeploy extends CommandAbstract
      */
     public function init()
     {
-        $this->dbType = $this->runner->getPimple()['config']['db']['type'];
-
-        $this->changesets['plugin']       = $this->paths->getPluginRoot() . '/db';
-        $this->changesets['dewdrop-core'] = $this->paths->getDewdropLib() . '/db/' . $this->dbType;
-        $this->changesets['dewdrop-test'] = $this->paths->getDewdropLib() . '/tests/db/' . $this->dbType;
-
         $this
             ->setDescription('Update database schema using dbdeploy')
             ->setCommand('dbdeploy')
@@ -252,6 +246,12 @@ class Dbdeploy extends CommandAbstract
      */
     public function execute()
     {
+        $this->dbType = $this->runner->getPimple()['config']['db']['type'];
+
+        $this->changesets['plugin']       = $this->paths->getPluginRoot() . '/db';
+        $this->changesets['dewdrop-core'] = $this->paths->getDewdropLib() . '/db/' . $this->dbType;
+        $this->changesets['dewdrop-test'] = $this->paths->getDewdropLib() . '/tests/db/' . $this->dbType;
+
         if (null === $this->action) {
             $this->action = 'update';
         }
