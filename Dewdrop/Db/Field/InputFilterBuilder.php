@@ -12,6 +12,7 @@ namespace Dewdrop\Db\Field;
 
 use Dewdrop\Db\Field;
 use Dewdrop\Filter\IsoDate as IsoDateFilter;
+use Dewdrop\Filter\IsoDate as IsoTimestampFilter;
 use Dewdrop\Filter\NullableDbBoolean as NullableDbBooleanFilter;
 use Dewdrop\Filter\NullableDbInteger as NullableDbIntegerFilter;
 use Dewdrop\Filter\NullableDbFloat as NullableDbFloatFilter;
@@ -33,6 +34,7 @@ class InputFilterBuilder
     protected $types = [
         'ManyToMany',
         'String',
+        'Timestamp',
         'Date',
         'Boolean',
         'Integer',
@@ -121,6 +123,20 @@ class InputFilterBuilder
 
         $input->getFilterChain()->attach(new Filter\StringTrim());
         $input->getFilterChain()->attach(new Filter\ToNull(Filter\ToNull::TYPE_STRING));
+
+        return $input;
+    }
+
+    /**
+     * Attach validator for timestamp fields.
+     *
+     * @param Input $input
+     * @return Input
+     */
+    protected function attachForTimestamp(Input $input)
+    {
+        $input->getFilterChain()->attach(new IsoTimestampFilter());
+        $input->getValidatorChain()->attach(new Validator\Date());
 
         return $input;
     }
