@@ -136,7 +136,7 @@ class InputFilterBuilder
     protected function attachForTimestamp(Input $input)
     {
         $input->getFilterChain()->attach(new IsoTimestampFilter());
-        $input->getValidatorChain()->attach(new Validator\Date());
+        $input->getValidatorChain()->attach(new Validator\Date(['format' => 'Y-m-d H:i:s']));
 
         return $input;
     }
