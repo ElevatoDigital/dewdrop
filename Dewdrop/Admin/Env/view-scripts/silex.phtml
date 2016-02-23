@@ -1,3 +1,7 @@
+<?php
+use \Dewdrop\Pimple;
+?>
+
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -23,8 +27,8 @@
 
         <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
         <!--[if lt IE 9]>
-          <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-          <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
         <![endif]-->
     </head>
 
@@ -52,7 +56,7 @@
                 <div class="collapse navbar-collapse" id="admin-nav-collapse">
                     <ul class="nav navbar-nav">
                         <?php
-                        /* @var $component \Dewdrop\Admin|Component\ComponentAbstract */
+                        /* @var $component \Dewdrop\Admin\Component\ComponentAbstract */
                         foreach ($this->components as $component) {
                             if (!$component->getPermissions()->can('access') || !$component->getPermissions()->can('display-menu')) {
                                 continue;
@@ -97,7 +101,13 @@
                                         echo '<li class="divider"></li>';
                                     } else {
                                         $url = empty($page['url']) ? $page['route'] : $page['url'];
-                                        
+
+                                        if (Pimple::hasResource('url-filter')) {
+                                            /* @var $filter callable */
+                                            $filter = Pimple::getResource('url-filter');
+                                            $url    = $filter($url);
+                                        }
+
                                         printf(
                                             '<li><a href="%s">%s</a></li>',
                                             $this->escapeHtmlAttr($url),
