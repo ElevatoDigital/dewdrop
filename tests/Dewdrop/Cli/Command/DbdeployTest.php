@@ -6,10 +6,19 @@ use Dewdrop\Paths;
 
 class DbdeployTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var \Dewdrop\Cli\Renderer\Mock
+     */
     private $renderer;
 
+    /**
+     * @var \Dewdrop\Cli\Run
+     */
     private $runner;
 
+    /**
+     * @var \Dewdrop\Paths
+     */
     private $paths;
 
     public function setUp()
@@ -158,7 +167,7 @@ class DbdeployTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Dewdrop\Db\Dbdeploy\Exception\InvalidFilename
+     * @expectedException \Dewdrop\Db\Dbdeploy\Exception\InvalidFilename
      */
     public function testInvalidFileNameInBackfillThrowsException()
     {
@@ -174,7 +183,7 @@ class DbdeployTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Dewdrop\Db\Dbdeploy\Exception\InvalidFilename
+     * @expectedException \Dewdrop\Db\Dbdeploy\Exception\InvalidFilename
      */
     public function testInvalidFilenameInUpdateThrowsException()
     {
@@ -190,7 +199,7 @@ class DbdeployTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Dewdrop\Db\Dbdeploy\Exception\InvalidFilename
+     * @expectedException \Dewdrop\Db\Dbdeploy\Exception\InvalidFilename
      */
     public function testInvalidFilenameInStatusThrowsException()
     {
@@ -206,7 +215,7 @@ class DbdeployTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Dewdrop\Db\Dbdeploy\Exception\ScriptExecutionFailed
+     * @expectedException \Dewdrop\Db\Dbdeploy\Exception\ScriptExecutionFailed
      */
     public function testFailedSqlScriptRunAborts()
     {
@@ -221,8 +230,13 @@ class DbdeployTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($command->execute());
     }
 
+    /**
+     * @param array $methodsToMock
+     * @return \PHPUnit_Framework_MockObject_MockObject|\Dewdrop\Cli\Command\Dbdeploy
+     */
     private function getMockCommand(array $methodsToMock = array())
     {
+        /* @var $command \PHPUnit_Framework_MockObject_MockObject|\Dewdrop\Cli\Command\Dbdeploy */
         $command = $this->getMock(
             '\Dewdrop\Cli\Command\Dbdeploy',
             (count($methodsToMock) ? $methodsToMock : array('abort')),
