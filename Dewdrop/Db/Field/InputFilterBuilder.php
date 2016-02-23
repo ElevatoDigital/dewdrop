@@ -12,7 +12,7 @@ namespace Dewdrop\Db\Field;
 
 use Dewdrop\Db\Field;
 use Dewdrop\Filter\IsoDate as IsoDateFilter;
-use Dewdrop\Filter\IsoDate as IsoTimestampFilter;
+use Dewdrop\Filter\IsoTimestamp as IsoTimestampFilter;
 use Dewdrop\Filter\NullableDbBoolean as NullableDbBooleanFilter;
 use Dewdrop\Filter\NullableDbInteger as NullableDbIntegerFilter;
 use Dewdrop\Filter\NullableDbFloat as NullableDbFloatFilter;
