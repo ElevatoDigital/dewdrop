@@ -246,11 +246,7 @@ class Dbdeploy extends CommandAbstract
      */
     public function execute()
     {
-        $this->dbType = $this->runner->getPimple()['config']['db']['type'];
-
-        $this->changesets['plugin']       = $this->paths->getPluginRoot() . '/db';
-        $this->changesets['dewdrop-core'] = $this->paths->getDewdropLib() . '/db/' . $this->dbType;
-        $this->changesets['dewdrop-test'] = $this->paths->getDewdropLib() . '/tests/db/' . $this->dbType;
+        $this->initChangesets();
 
         if (null === $this->action) {
             $this->action = 'update';
@@ -508,6 +504,30 @@ class Dbdeploy extends CommandAbstract
     }
 
     /**
+     * Setup the default changesets.  If a changeset has already been configured with a given
+     * name, the default will not be applied.  This is done primarily to allow the
+     * overrideChangesetPath() method to swap out the default paths during testing.
+     *
+     * @return void
+     */
+    private function initChangesets()
+    {
+        $this->dbType = $this->runner->getPimple()['config']['db']['type'];
+
+        $defaultChangesets = [
+            'plugin'       => $this->paths->getPluginRoot() . '/db',
+            'dewdrop-core' => $this->paths->getDewdropLib() . '/db/' . $this->dbType,
+            'dewdrop-test' => $this->paths->getDewdropLib() . '/tests/db/' . $this->dbType
+        ];
+
+        foreach ($defaultChangesets as $name => $path) {
+            if (!array_key_exists($name, $this->changesets)) {
+                $this->changesets[$name] = $path;
+            }
+        }
+    }
+
+    /**
      * Override the default changelog table name.
      *
      * This is really only intended for testing purposes.  You'll notice that
@@ -540,10 +560,6 @@ class Dbdeploy extends CommandAbstract
      */
     public function overrideChangesetPath($changeset, $path)
     {
-        if (!array_key_exists($changeset, $this->changesets)) {
-            throw new Exception("No changeset found with name \"{$changeset}\"");
-        }
-
         $this->changesets[$changeset] = $path;
 
         return $this;

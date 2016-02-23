@@ -255,16 +255,6 @@ class DbdeployTest extends \PHPUnit_Framework_TestCase
         return $command;
     }
 
-    /**
-     * @expectedException \Dewdrop\Exception
-     */
-    public function testOverridingNonExistentChangesetThrowsException()
-    {
-        $command = $this->getMockCommand();
-
-        $command->overrideChangesetPath('fadfafafafafaf', '');
-    }
-
     public function testStatusRunOneUpdatedDbShowsExpectedMessage()
     {
         // Run all scripts
