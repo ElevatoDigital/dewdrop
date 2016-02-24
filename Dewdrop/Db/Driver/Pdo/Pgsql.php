@@ -614,6 +614,16 @@ class Pgsql implements DriverInterface
     }
 
     /**
+     * Rollback the current transaction.
+     *
+     * @return void
+     */
+    public function rollback()
+    {
+        $this->query('ROLLBACK');
+    }
+
+    /**
      * Use the OVER() window function to store a count of the total number
      * of rows that would have been retrieved if no LIMIT clause was applied
      * on the supplied Select object.  The total row count will be added
