@@ -197,6 +197,13 @@ interface DriverInterface
     public function commit();
 
     /**
+     * Rollback the current transaction.
+     *
+     * @return void
+     */
+    public function rollback();
+
+    /**
      * Modify a \Dewdrop\Db\Select object so that the RDBMS can calculate the
      * total number of rows that would have been returned if no LIMIT was
      * present.
