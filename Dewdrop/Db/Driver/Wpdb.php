@@ -466,6 +466,16 @@ class Wpdb implements DriverInterface
     }
 
     /**
+     * Rollback the current transaction.
+     *
+     * @return void
+     */
+    public function rollback()
+    {
+        $this->query('ROLLBACK');
+    }
+
+    /**
      * Use the SQL_CALC_FOUND_ROWS facility in MySQL to calculate the total
      * number of rows that would have been returned from a query if no LIMIT
      * had been applied.
