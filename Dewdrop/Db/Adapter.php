@@ -917,6 +917,16 @@ class Adapter
     }
 
     /**
+     * Rollback the current transaction.
+     *
+     * @return void
+     */
+    public function rollback()
+    {
+        $this->driver->rollback();
+    }
+
+    /**
      * Helper method to change the case of the strings used
      * when returning result sets in FETCH_ASSOC and FETCH_BOTH
      * modes.
