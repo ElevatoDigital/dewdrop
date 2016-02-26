@@ -87,6 +87,8 @@ class Session implements ArrayAccess
     {
         if ($this->container instanceof WP_Session) {
             $value = $this->container->offsetGet($name);
+        } else if ($this->container instanceof \Zend_Session_Namespace) {
+            $value = $this->container->$name;
         } else {
             $value = $this->container->get($name);
         }
@@ -104,6 +106,8 @@ class Session implements ArrayAccess
     {
         if ($this->container instanceof WP_Session) {
             $result = $this->container->offsetExists($name);
+        } else if ($this->container instanceof \Zend_Session_Namespace) {
+            $result = isset($this->container->$name);
         } else {
             $result = $this->container->has($name);
         }
@@ -180,6 +184,8 @@ class Session implements ArrayAccess
     {
         if ($this->container instanceof WP_Session) {
             $this->container->offsetUnset($name);
+        } else if ($this->container instanceof \Zend_Session_Namespace) {
+            unset($this->container->$name);
         } else {
             $this->container->remove($name);
         }
@@ -196,6 +202,8 @@ class Session implements ArrayAccess
     {
         if ($this->container instanceof WP_Session) {
             $this->container->offsetSet($name, $value);
+        } elseif ($this->container instanceof \Zend_Session_Namespace) {
+            $this->container->$name = $value;
         } else {
             $this->container->set($name, $value);
         }
