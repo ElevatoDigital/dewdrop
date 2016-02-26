@@ -15,6 +15,7 @@ use Dewdrop\Db\Driver\DriverInterface;
 use Dewdrop\Db\Driver\Wpdb as WpdbDriver;
 use Dewdrop\Exception;
 use Dewdrop\Paths;
+use Dewdrop\Pimple;
 use wpdb;
 
 /**
@@ -193,7 +194,8 @@ class Adapter
     public function getTableMetadataPath()
     {
         if (null === $this->tableMetadataPath) {
-            $paths                   = new Paths();
+            /* @var $paths Paths */
+            $paths = Pimple::getResource('paths');
             $this->tableMetadataPath = $paths->getModels() . '/metadata';
         }
 
