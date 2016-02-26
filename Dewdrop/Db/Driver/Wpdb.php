@@ -290,12 +290,20 @@ class Wpdb implements DriverInterface
             if (preg_match('/^((?:var)?char)\((\d+)\)/', $row['Type'], $matches)) {
                 $row['Type'] = $matches[1];
                 $row['Length'] = $matches[2];
+            }
+            if (preg_match('/^((?:var)?binary)\((\d+)\)/', $row['Type'], $matches)) {
+                $row['Type'] = $matches[1];
+                $row['Length'] = $matches[2];
             } elseif (preg_match('/^decimal\((\d+),(\d+)\)/', $row['Type'], $matches)) {
                 $row['Type'] = 'decimal';
                 $row['Precision'] = $matches[1];
                 $row['Scale'] = $matches[2];
             } elseif (preg_match('/^float\((\d+),(\d+)\)/', $row['Type'], $matches)) {
                 $row['Type'] = 'float';
+                $row['Precision'] = $matches[1];
+                $row['Scale'] = $matches[2];
+            } elseif (preg_match('/^double\((\d+),(\d+)\)/', $row['Type'], $matches)) {
+                $row['Type'] = 'double';
                 $row['Precision'] = $matches[1];
                 $row['Scale'] = $matches[2];
             } elseif (preg_match('/^((?:big|medium|small|tiny)?int)\((\d+)\)/', $row['Type'], $matches)) {
