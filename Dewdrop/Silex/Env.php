@@ -14,6 +14,7 @@ use Dewdrop\Env\EnvInterface;
 use Dewdrop\Exception as DewdropException;
 use Dewdrop\Paths;
 use Exception as PhpException;
+use Pimple;
 use Silex\Application;
 use Silex\Provider\SessionServiceProvider;
 use Symfony\Component\HttpFoundation\Response;
