@@ -21,11 +21,19 @@ class Standalone implements PimpleProviderInterface
     /**
      * @var Pimple
      */
-    private $pimple;
+    protected $pimple;
 
     public function __construct()
     {
         $this->pimple = new Pimple();
+        $this->pimple['debug'] = false;
+
+        $this->init();
+    }
+
+    public function init()
+    {
+
     }
 
     /**
