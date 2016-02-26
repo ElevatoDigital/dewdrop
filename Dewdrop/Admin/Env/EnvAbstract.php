@@ -10,7 +10,7 @@
 
 namespace Dewdrop\Admin\Env;
 
-use Dewdrop\Admin\Component\ComponentAbstract;
+use Dewdrop\Admin\Component\ComponentInterface;
 use Dewdrop\Exception;
 use Dewdrop\Pimple;
 use Dewdrop\Session;
@@ -38,7 +38,7 @@ abstract class EnvAbstract implements EnvInterface
 
     /**
      * The registered active component object.
-     * @var ComponentAbstract
+     * @var ComponentInterface
      */
     protected $activeComponent;
 
@@ -171,10 +171,10 @@ abstract class EnvAbstract implements EnvInterface
     /**
      * Set a reference to the active component.
      *
-     * @param ComponentAbstract $component
+     * @param ComponentInterface $component
      * @return $this
      */
-    public function setActiveComponent(ComponentAbstract $component)
+    public function setActiveComponent(ComponentInterface $component)
     {
         $this->activeComponent = $component;
 
@@ -184,7 +184,7 @@ abstract class EnvAbstract implements EnvInterface
     /**
      * Get a reference to the active component.
      *
-     * @return ComponentAbstract
+     * @return ComponentInterface
      */
     public function getActiveComponent()
     {
@@ -250,10 +250,10 @@ abstract class EnvAbstract implements EnvInterface
     /**
      * Register an already instantiated component.
      *
-     * @param ComponentAbstract $component
+     * @param ComponentInterface $component
      * @return EnvAbstract
      */
-    public function registerComponent(ComponentAbstract $component)
+    public function registerComponent(ComponentInterface $component)
     {
         $this->initComponent($component);
 
@@ -266,11 +266,11 @@ abstract class EnvAbstract implements EnvInterface
      * Retrieve a component by name.
      *
      * @param string $name
-     * @return ComponentAbstract
+     * @return ComponentInterface
      */
     public function getComponent($name)
     {
-        /* @var $component ComponentAbstract */
+        /* @var $component ComponentInterface */
         foreach ($this->components as $component) {
             if ($name === $component->getName()) {
                 return $component;

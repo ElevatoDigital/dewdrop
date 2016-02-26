@@ -189,6 +189,8 @@ class Standard
         if ($this->successMessage) {
             if ($this->session instanceof WP_Session) {
                 $this->session['successMessage'] = $this->successMessage;
+            } else if ($this->session instanceof \Zend_Session_Namespace) {
+                $this->session->successMessage = $this->successMessage;
             } else {
                 $this->session->set('successMessage', $this->successMessage);
             }
