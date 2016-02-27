@@ -221,6 +221,11 @@ class Mock implements DriverInterface
 
     }
 
+    public function rollback()
+    {
+
+    }
+
     /**
      * Given the supplied native data type, return a generic data type that can
      * be used in Dewdrop to make decisions about columns/fields:
