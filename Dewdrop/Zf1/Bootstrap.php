@@ -17,8 +17,16 @@ use Dewdrop\Db\Driver\Pdo\Pgsql as PgsqlDriver;
 use Dewdrop\View\View;
 use Zend_Db_Table_Abstract;
 
+/**
+ * A simple bootstrap for Zend Framework 1 applications.  Grabs the PDO connection
+ * from Zend_Db for use in Dewdrop's DB adapter.
+ */
 class Bootstrap extends Standalone
 {
+    /**
+     * Provide some Pimple resources on top of what's available in the Standalone
+     * bootstrap.
+     */
     public function init()
     {
         $this->pimple['debug'] = $this->pimple->share(

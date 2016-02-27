@@ -16,7 +16,12 @@ use Dewdrop\Session\SessionStorageInterface;
 use Pimple as PimpleProper;
 
 /**
- * A simple facade to session data
+ * A simple facade to session data.  You can use \Dewdrop\Session regardless of the
+ * environment you're running in (i.e. WP, Silex, Zend Framework, etc).  It allows you
+ * to manipulate session data using object properties, array access or explicit method
+ * calls.  This makes it particularly important for Dewdrop core because you can write
+ * your session code against \Dewdrop\Session and not worry about whether it will work
+ * in the other supported environments.
  */
 class Session implements ArrayAccess
 {
