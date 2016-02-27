@@ -14,7 +14,6 @@ use Dewdrop\Admin\Component\ComponentAbstract;
 use Dewdrop\Admin\Component\CrudInterface;
 use Dewdrop\Admin\Page\PageAbstract;
 use Dewdrop\Admin\ResponseHelper\Standard as ResponseHelper;
-use Dewdrop\Pimple;
 use Dewdrop\Session;
 
 /**
@@ -194,17 +193,9 @@ class Edit extends PageAbstract
 
     protected function redirect(ResponseHelper $responseHelper)
     {
-        $session = new Session(Pimple::getInstance());
+        $session = new Session();
         $index   = $this->component->getListingQueryParamsSessionName();
         $params  = (isset($session[$index]) ? $session[$index] : []);
-
-        if (!is_array($params)) {
-            if (is_object($params) && method_exists($params, 'toArray')) {
-                $params = $params->toArray();
-            } else {
-                $params = [];
-            }
-        }
 
         $responseHelper->redirectToAdminPage('index', $params);
     }

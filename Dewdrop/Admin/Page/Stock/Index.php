@@ -97,7 +97,7 @@ class Index extends PageAbstract
     {
         $this->component->getPermissions()->haltIfNotAllowed('view-listing');
 
-        $this->session = new Session(Pimple::getInstance());
+        $this->session = new Session();
         $this->session->set($this->component->getListingQueryParamsSessionName(), $this->request->getQuery());
     }
 

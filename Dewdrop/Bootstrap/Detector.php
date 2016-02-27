@@ -130,8 +130,8 @@ class Detector
         if (!isset($pimple['session'])) {
             $env->providePimpleSessionResource($pimple);
 
-            if (!isset($pimple['session'])) {
-                throw new Exception('Environment must provide a session resource for Pimple.');
+            if (!isset($pimple['session']) || !isset($pimple['session.storage'])) {
+                throw new Exception('Environment must provide session and session.storage resources for Pimple.');
             }
         }
 

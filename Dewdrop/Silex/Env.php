@@ -13,6 +13,7 @@ namespace Dewdrop\Silex;
 use Dewdrop\Env\EnvInterface;
 use Dewdrop\Exception as DewdropException;
 use Dewdrop\Paths;
+use Dewdrop\Silex\Session\Storage as SessionStorage;
 use Exception as PhpException;
 use Pimple;
 use Silex\Application;
@@ -85,5 +86,11 @@ class Env implements EnvInterface
         }
 
         $pimple->register(new SessionServiceProvider());
+
+        $pimple['session.storage'] = $pimple->share(
+            function () use ($pimple) {
+                return new SessionStorage($pimple['session']);
+            }
+        );
     }
 }

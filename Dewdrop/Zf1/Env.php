@@ -13,7 +13,8 @@ namespace Dewdrop\Zf1;
 use Dewdrop\Env\EnvInterface;
 use Dewdrop\Paths;
 use Dewdrop\Zf1\Controller\Front;
-use Dewdrop\ZF1\Paths as Zf1Paths;
+use Dewdrop\Zf1\Paths as Zf1Paths;
+use Dewdrop\Zf1\Session\Storage as SessionStorage;
 use Pimple;
 use ReflectionClass;
 use Zend_Controller_Front;
@@ -130,6 +131,12 @@ class Env implements EnvInterface
         $pimple['session'] = $pimple->share(
             function () {
                 return new Zend_Session_Namespace('dewdrop');
+            }
+        );
+
+        $pimple['session.storage'] = $pimple->share(
+            function () use ($pimple) {
+                return new SessionStorage($pimple['session']);
             }
         );
     }
