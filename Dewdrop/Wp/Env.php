@@ -14,7 +14,7 @@ use ArrayObject;
 use Dewdrop\Bootstrap\Wp as WpBootstrap;
 use Dewdrop\Env\EnvInterface;
 use Dewdrop\Paths;
-use Dewdrop\Wp\Session\Storage as SessionStorage;
+use Dewdrop\Wp\Session\Access as SessionAccess;
 use Pimple;
 use WP_Session;
 
@@ -91,7 +91,7 @@ class Env implements EnvInterface
 
         $pimple['session.storage'] = $pimple->share(
             function () use ($pimple) {
-                return new SessionStorage($pimple['session']);
+                return new SessionAccess($pimple['session']);
             }
         );
     }

@@ -12,7 +12,7 @@ namespace Dewdrop;
 
 use ArrayAccess;
 use Dewdrop\Exception;
-use Dewdrop\Session\SessionStorageInterface;
+use Dewdrop\Session\SessionAccessInterface;
 use Pimple as PimpleProper;
 
 /**
@@ -28,30 +28,30 @@ class Session implements ArrayAccess
     /**
      * The session data storage container appropriate for the current environment.
      *
-     * @var SessionStorageInterface
+     * @var SessionAccessInterface
      */
-    protected $storage;
+    protected $access;
 
     /**
      * Provide a Pimple container for retrieval of session storage.
      *
      * @param mixed $container
      */
-    public function __construct($storage = null)
+    public function __construct($access = null)
     {
-        if ($storage instanceof PimpleProper) {
-            $storage = $storage['session.storage'];
+        if ($access instanceof PimpleProper) {
+            $access = $access['session.access'];
         }
 
-        if (null === $storage) {
-            $storage = Pimple::getResource('session.storage');
+        if (null === $access) {
+            $access = Pimple::getResource('session.access');
         }
 
-        if (!$storage instanceof SessionStorageInterface) {
-            throw new Exception('Must provide a SessionStorageInterface object.');
+        if (!$access instanceof SessionAccessInterface) {
+            throw new Exception('Must provide a SessionAccessInterface object.');
         }
 
-        $this->storage = $storage;
+        $this->access = $access;
     }
 
     /**
@@ -62,7 +62,7 @@ class Session implements ArrayAccess
      */
     public function get($name)
     {
-        return $this->storage->get($name);
+        return $this->access->get($name);
     }
 
     /**
@@ -73,7 +73,7 @@ class Session implements ArrayAccess
      */
     public function has($name)
     {
-        return $this->storage->has($name);
+        return $this->access->has($name);
     }
 
     /**
@@ -83,7 +83,7 @@ class Session implements ArrayAccess
      */
     public function regenerateId()
     {
-        $this->storage->regenerateId();
+        $this->access->regenerateId();
     }
 
     /**
@@ -94,7 +94,7 @@ class Session implements ArrayAccess
      */
     public function remove($name)
     {
-        $this->storage->remove($name);
+        $this->access->remove($name);
 
         return $this;
     }
@@ -108,7 +108,7 @@ class Session implements ArrayAccess
      */
     public function set($name, $value)
     {
-        $this->storage->set($name, $value);
+        $this->access->set($name, $value);
 
         return $this;
     }
@@ -206,10 +206,10 @@ class Session implements ArrayAccess
     /**
      * Mostly provided to allow checking of storage setup during testing.
      *
-     * @return SessionStorageInterface
+     * @return SessionAccessInterface
      */
-    public function getStorage()
+    public function getAccessObject()
     {
-        return $this->storage;
+        return $this->access;
     }
 }

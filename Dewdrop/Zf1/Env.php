@@ -14,7 +14,7 @@ use Dewdrop\Env\EnvInterface;
 use Dewdrop\Paths;
 use Dewdrop\Zf1\Controller\Front;
 use Dewdrop\Zf1\Paths as Zf1Paths;
-use Dewdrop\Zf1\Session\Storage as SessionStorage;
+use Dewdrop\Zf1\Session\Access as SessionAccess;
 use Pimple;
 use ReflectionClass;
 use Zend_Controller_Front;
@@ -181,7 +181,7 @@ class Env implements EnvInterface
     /**
      * Provide the required session and session.storage resources for \Dewdrop\Session
      * integration.
-     * 
+     *
      * @param Pimple $pimple
      */
     public function providePimpleSessionResource(Pimple $pimple)
@@ -192,9 +192,9 @@ class Env implements EnvInterface
             }
         );
 
-        $pimple['session.storage'] = $pimple->share(
+        $pimple['session.access'] = $pimple->share(
             function () use ($pimple) {
-                return new SessionStorage($pimple['session']);
+                return new SessionAccess($pimple['session']);
             }
         );
     }

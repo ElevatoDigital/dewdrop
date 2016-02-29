@@ -13,18 +13,18 @@ namespace Dewdrop;
 use ArrayObject;
 use Dewdrop\Env;
 use Dewdrop\Zf1\Env as ZfEnv;
-use Dewdrop\Session\SessionStorageInterface;
+use Dewdrop\Session\SessionAccessInterface;
 use PHPUnit_Framework_TestCase;
-use Dewdrop\Wp\Session\Storage as WpSessionStorage;
+use Dewdrop\Wp\Session\Access as WpSessionAccess;
 use Pimple as PimpleProper;
 use Zend_Session;
 
 class SessionTest extends PHPUnit_Framework_TestCase
 {
     /**
-     * @var SessionStorageInterface
+     * @var SessionAccessInterface
      */
-    private $storage;
+    private $access;
 
     /**
      * @var Session
@@ -33,13 +33,13 @@ class SessionTest extends PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->storage = new WpSessionStorage(new ArrayObject());
-        $this->session = new Session($this->storage);
+        $this->access  = new WpSessionAccess(new ArrayObject());
+        $this->session = new Session($this->access);
     }
 
     public function testCanInstantiateWithAStorageImplementor()
     {
-        $storage = new WpSessionStorage(new ArrayObject());
+        $storage = new WpSessionAccess(new ArrayObject());
         $session = new Session($storage);
 
         $session->set('var', 'value');
@@ -50,74 +50,74 @@ class SessionTest extends PHPUnit_Framework_TestCase
     public function testCanSetUsingArrayAccess()
     {
         $this->session['setArrayAccess'] = true;
-        $this->assertTrue($this->storage->get('setArrayAccess'));
+        $this->assertTrue($this->access->get('setArrayAccess'));
     }
 
     public function testCanSetWithMethodCall()
     {
         $this->session->set('setMethodCall', true);
-        $this->assertTrue($this->storage->get('setMethodCall'));
+        $this->assertTrue($this->access->get('setMethodCall'));
     }
 
     public function testCanSetUsingMagicProperty()
     {
         $this->session->testMagicProperty = true;
-        $this->assertTrue($this->storage->get('testMagicProperty'));
+        $this->assertTrue($this->access->get('testMagicProperty'));
     }
 
     public function testCanGetUsingArrayAccess()
     {
-        $this->storage->set('getArrayAccess', true);
+        $this->access->set('getArrayAccess', true);
         $this->assertTrue($this->session['getArrayAccess']);
     }
 
     public function testCanGetUsingMagicProperty()
     {
-        $this->storage->set('getMagicProperty', true);
+        $this->access->set('getMagicProperty', true);
         $this->assertTrue($this->session->getMagicProperty);
     }
 
     public function testCanGetUsingMethodCall()
     {
-        $this->storage->set('getMethodCall', true);
+        $this->access->set('getMethodCall', true);
         $this->assertTrue($this->session->get('getMethodCall'));
     }
 
     public function testCanCheckPresenceWithArrayAccess()
     {
-        $this->storage->set('arrayAccess', true);
+        $this->access->set('arrayAccess', true);
         $this->assertTrue(isset($this->session['arrayAccess']));
     }
 
     public function testCanCheckPresenceWithMagicProperty()
     {
-        $this->storage->set('magicProperty', true);
+        $this->access->set('magicProperty', true);
         $this->assertTrue(isset($this->session->magicProperty));
     }
 
     public function testCanCheckPresenceWithMethodCall()
     {
-        $this->storage->set('methodCall', true);
+        $this->access->set('methodCall', true);
         $this->assertTrue($this->session->has('methodCall'));
     }
 
     public function testCanUnsetWithArrayAccess()
     {
-        $this->storage->set('arrayAccess', true);
+        $this->access->set('arrayAccess', true);
         unset($this->session['arrayAccess']);
         $this->assertFalse($this->session->has('arrayAccess'));
     }
 
     public function testCanUnsetWithMagicProperty()
     {
-        $this->storage->set('magicProperty', true);
+        $this->access->set('magicProperty', true);
         unset($this->session->magicProperty);
         $this->assertFalse($this->session->has('magicProperty'));
     }
 
     public function testCanUnsetWithMethodCall()
     {
-        $this->storage->set('methodCall', true);
+        $this->access->set('methodCall', true);
         $this->session->remove('methodCall');
         $this->assertFalse($this->session->has('methodCall'));
     }
@@ -125,7 +125,7 @@ class SessionTest extends PHPUnit_Framework_TestCase
     public function testCanRegenerateId()
     {
         $storage = $this->getMock(
-            '\Dewdrop\Session\SessionStorageInterface'
+            '\Dewdrop\Session\SessionAccessInterface'
         );
 
         $storage
@@ -136,7 +136,7 @@ class SessionTest extends PHPUnit_Framework_TestCase
         $session->regenerateId();
     }
 
-    public function testCanInstantiateWithNoArgsAndUseGlobalStorageResource()
+    public function testCanInstantiateWithNoArgsAndUseGlobalAccessResource()
     {
         $env = Env::getInstance();
 
@@ -145,30 +145,30 @@ class SessionTest extends PHPUnit_Framework_TestCase
         }
 
         $session = new Session();
-        $globalStorage = Pimple::getResource('session.storage');
-        $this->assertEquals($session->getStorage(), $globalStorage);
+        $globalStorage = Pimple::getResource('session.access');
+        $this->assertEquals($session->getAccessObject(), $globalStorage);
     }
 
     /**
      * @expectedException \Dewdrop\Exception
      */
-    public function testExceptionIsThrownWhenNoStorageInterfaceIsAvailable()
+    public function testExceptionIsThrownWhenNoAccessInterfaceIsAvailable()
     {
         new Session(new \stdClass());
     }
 
-    public function testCanProvideAPimpleObjectWithSessionStorageResource()
+    public function testCanProvideAPimpleObjectWithSessionAccessResource()
     {
         $pimple = new PimpleProper();
 
-        $pimple['session.storage'] = $pimple->share(
+        $pimple['session.access'] = $pimple->share(
             function () {
-                return new WpSessionStorage(new ArrayObject());
+                return new WpSessionAccess(new ArrayObject());
             }
         );
 
         $session = new Session($pimple);
 
-        $this->assertEquals($pimple['session.storage'], $session->getStorage());
+        $this->assertEquals($pimple['session.access'], $session->getAccessObject());
     }
 }
