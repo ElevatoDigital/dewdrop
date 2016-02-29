@@ -18,6 +18,7 @@ use Dewdrop\Db\Dbdeploy\Command\Status;
 use Dewdrop\Db\Dbdeploy\Command\Apply;
 use Dewdrop\Env;
 use Dewdrop\Exception;
+use Dewdrop\Pimple;
 
 /**
  * Apply update to your database schema in a controlled and repeatable manner.
@@ -522,6 +523,10 @@ class Dbdeploy extends CommandAbstract
             'dewdrop-core'     => $this->paths->getDewdropLib() . '/db/' . $this->dbType,
             'dewdrop-test'     => $this->paths->getDewdropLib() . '/tests/db/' . $this->dbType
         ];
+
+        if (Pimple::hasResource('dbdeploy.changesets')) {
+            $defaultChangesets = array_merge($defaultChangesets, Pimple::getResource('dbdeploy.changesets'));
+        }
 
         foreach ($defaultChangesets as $name => $path) {
             if (!array_key_exists($name, $this->changesets)) {

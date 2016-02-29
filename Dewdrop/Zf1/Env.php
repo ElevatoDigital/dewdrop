@@ -25,6 +25,14 @@ use Zend_Session_Namespace;
  */
 class Env implements EnvInterface
 {
+    /**
+     * @var DewdropOptions
+     */
+    private $dewdropOptions;
+
+    /**
+     * @var array
+     */
     private $configData;
 
     /**
@@ -52,9 +60,11 @@ class Env implements EnvInterface
             $bootstrap = Front::getInstance()->getParam('bootstrap');
             $zfConfig  = $bootstrap->getOptions();
 
+            $this->dewdropOptions = new DewdropOptions($zfConfig);
+
             $config = [
                 'bootstrap' => $this->getBootstrapClass(),
-                'debug'     => (isset($zfConfig['debug']) && $zfConfig['debug']),
+                'debug'     => $debug,
                 'db'        => []
             ];
 
@@ -176,6 +186,8 @@ class Env implements EnvInterface
                 return new Zf1Paths();
             }
         );
+
+        $this->dewdropOptions->addPimpleResources($pimple);
     }
 
     /**
