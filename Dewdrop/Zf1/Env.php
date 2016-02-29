@@ -198,4 +198,9 @@ class Env implements EnvInterface
             }
         );
     }
+
+    public function getProjectNoun()
+    {
+        return 'app';
+    }
 }

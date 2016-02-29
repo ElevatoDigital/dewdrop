@@ -16,6 +16,7 @@ use Dewdrop\Db\Dbdeploy\CliExec;
 use Dewdrop\Db\Dbdeploy\Command\Backfill;
 use Dewdrop\Db\Dbdeploy\Command\Status;
 use Dewdrop\Db\Dbdeploy\Command\Apply;
+use Dewdrop\Env;
 use Dewdrop\Exception;
 
 /**
@@ -514,10 +515,12 @@ class Dbdeploy extends CommandAbstract
     {
         $this->dbType = $this->runner->getPimple()['config']['db']['type'];
 
+        $mainChangesetName = Env::getInstance()->getProjectNoun();
+
         $defaultChangesets = [
-            'plugin'       => $this->paths->getPluginRoot() . '/db',
-            'dewdrop-core' => $this->paths->getDewdropLib() . '/db/' . $this->dbType,
-            'dewdrop-test' => $this->paths->getDewdropLib() . '/tests/db/' . $this->dbType
+            $mainChangesetName => $this->paths->getPluginRoot() . '/db',
+            'dewdrop-core'     => $this->paths->getDewdropLib() . '/db/' . $this->dbType,
+            'dewdrop-test'     => $this->paths->getDewdropLib() . '/tests/db/' . $this->dbType
         ];
 
         foreach ($defaultChangesets as $name => $path) {

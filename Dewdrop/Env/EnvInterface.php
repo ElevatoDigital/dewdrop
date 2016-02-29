@@ -29,6 +29,14 @@ interface EnvInterface
     public function isInUse();
 
     /**
+     * Return a string that can be used to describe projects in this environment.  Typically
+     * either app or plugin depending upon how Dewdrop is typically used.
+     *
+     * @return string
+     */
+    public function getProjectNoun();
+
+    /**
      * Get the configuration data Dewdrop needs to operate.  Should be of this shape:
      *
      * [
