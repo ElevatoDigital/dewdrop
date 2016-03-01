@@ -220,6 +220,16 @@ class Mock implements DriverInterface
     {
 
     }
+    
+    /**
+     * Rollback the current transaction.
+     *
+     * @return void
+     */
+    public function rollback()
+    {
+        
+    }
 
     /**
      * Given the supplied native data type, return a generic data type that can
