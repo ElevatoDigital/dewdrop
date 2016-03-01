@@ -211,7 +211,7 @@ class InputFilterBuilder
             $input->getFilterChain()->attach(new NullableDbFloatFilter());
         } else {
             $input->getFilterChain()->attach(new Filter\Callback(function ($value) {
-                return preg_replace('/[^0-9.]/', '', $value);
+                return preg_replace('/[^0-9.-]/', '', $value);
             }));
             $input->getValidatorChain()->attach(new \Zend\I18n\Validator\IsFloat());
         }
