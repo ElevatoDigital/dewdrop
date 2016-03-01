@@ -1,4 +1,4 @@
-(function () {
+(function ($) {
     $(document).on(
         'click',
         '.option-input-decorator .btn-add-option',
@@ -134,9 +134,19 @@
     };
 
     var reRenderControl = function (decorator, newOptionValue) {
+        var url = decorator.data('render-url');
+
+        if (-1 !== url.indexOf('?')) {
+            url += '&';
+        } else {
+            url += '?';
+        }
+
+        url += 'value=' + newOptionValue + '&field=' + decorator.data('field-id');
+
         $.ajax(
-            decorator.data('render-url') + '?value=' + newOptionValue + '&field=' + decorator.data('field-id'),
             {
+                url: url,
                 type: 'GET',
                 success: function (response) {
                     decorator.find('.option-input-original-control:first').html(
@@ -148,4 +158,4 @@
             }
         );
     };
-}());
+}(jQuery));
