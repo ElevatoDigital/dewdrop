@@ -68,6 +68,8 @@ jQuery(function ($) {
                             }
 
                             that.refreshVisibility();
+
+                            that.table.trigger('rowDeleted');
                         }
                     }
                 );
