@@ -46,7 +46,7 @@ class SelectTest extends BaseTestCase
             )
         );
 
-        $this->assertMatchesDomQuery('select[name="my_select"]', $out);
+        $this->assertMatchesDomQuery('select[name="my_select[]"]', $out);
         $this->assertMatchesDomQuery('option[value="1"]', $out);
         $this->assertMatchesDomQuery('option[value="2"]', $out);
 
