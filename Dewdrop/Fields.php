@@ -157,6 +157,40 @@ class Fields implements ArrayAccess, IteratorAggregate, Countable
     }
 
     /**
+     * Add the supplied field to this collection after another specified field already in the collection. Can be a
+     * FieldInterface object or a string, in which case a new custom field will be added with the supplied string as its
+     * ID.
+     *
+     * The newly added FieldInterface object is returned from this method so that it can be further customized
+     * immediately, using method chaining. Once you've completed calling methods on the FieldInterface object itself,
+     * you can call any \Dewdrop\Fields methods to return execution to that context.
+     *
+     * @param FieldInterface|string $field
+     * @param FieldInterface|string $after
+     * @param string $modelName
+     * @throws Exception
+     * @return FieldInterface
+     */
+    public function insertAfter($field, $after, $modelName = null)
+    {
+        if ($after instanceof FieldInterface) {
+            $afterId = $after->getId();
+        } else {
+            $afterId = (string) $after;
+        }
+
+        if (!$this->has($afterId, $afterPosition)) {
+            throw new Exception("Field with ID \"{$afterId}\" does not exist in this collection");
+        }
+
+        $field = $this->prepareFieldForAdding($field, $modelName);
+
+        array_splice($this->fields, $afterPosition + 1, 0, [$field]);
+
+        return $field;
+    }
+
+    /**
      * Count the number of fields in this collection.
      *
      * @return integer
@@ -273,16 +307,21 @@ class Fields implements ArrayAccess, IteratorAggregate, Countable
     }
 
     /**
-     * Check to see if a field with the given ID exists in this collection.
+     * Check to see if a field with the given ID exists in this collection. If the identified field does exist, then the
+     * $position output parameter is populated with the position of the field in the collection, starting at 0.
      *
      * @param string $id
+     * @param int $position
      * @return boolean
      */
-    public function has($id)
+    public function has($id, &$position = null)
     {
+        $position = null;
+
         /* @var $field FieldInterface */
-        foreach ($this->fields as $field) {
+        foreach ($this->fields as $key => $field) {
             if ($field->getId() === $id) {
+                $position = $key;
                 return true;
             }
         }
