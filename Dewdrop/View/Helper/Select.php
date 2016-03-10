@@ -99,6 +99,10 @@ class Select extends AbstractHelper
 
         $value = (array) $value;
 
+        if (count($value) > 1) {
+            $name .= '[]';
+        }
+
         return $this->partial(
             'select.phtml',
             [
