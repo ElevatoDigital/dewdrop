@@ -12,7 +12,7 @@ namespace Dewdrop\Fields;
 
 use Countable;
 use Iterator;
-use Dewdrop\Db\Field;
+use Dewdrop\Db\Field as DbField;
 use Dewdrop\Exception;
 use Zend\InputFilter\InputFilter;
 
@@ -91,11 +91,11 @@ class Edit implements Countable, Iterator
      * Add a field, optionally changing its control name to disambiguate it
      * from other fields with the same control name on this page.
      *
-     * @param Field $field
+     * @param DbField $field
      * @param string $groupName
      * @return \Dewdrop\Fields\Edit
      */
-    public function add(Field $field, $groupName = null)
+    public function add(DbField $field, $groupName = null)
     {
         if (null === $groupName) {
             $this->fields[$field->getControlName()] = $field;
