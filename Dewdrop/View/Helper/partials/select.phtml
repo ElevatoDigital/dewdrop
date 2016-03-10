@@ -17,7 +17,7 @@
         printf(
             '<option value="%s"%s>%s</option>',
             $this->escapeHtmlAttr($value),
-            ($this->value === (string) $value ? ' selected="selected"' : ''),
+            (in_array((string) $value, $this->value) ? ' selected="selected"' : ''),
             $this->escapeHtml($title)
         );
     }
