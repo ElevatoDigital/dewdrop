@@ -1,0 +1,34 @@
+{
+    "name": "Dewdrop",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/DeltaSystems/dewdrop"
+    },
+    "license": "GPL",
+    "devDependencies": {
+        "babel-core": "^6.0.15",
+        "babel-preset-es2015": "^6.0.15",
+        "del": "^2.0.2",
+        "eslint-config-google": "^0.3.0",
+        "gulp": "^3.9.0",
+        "gulp-autoprefixer": "^3.1.0",
+        "gulp-babel": "^6.0.0",
+        "gulp-cache": "0.2.2",
+        "gulp-concat": "^2.5.2",
+        "gulp-cssnano": "^2.0.0",
+        "gulp-eslint": "^1.0.0",
+        "gulp-htmlmin": "^1.3.0",
+        "gulp-if": "^2.0.0",
+        "gulp-imagemin": "^2.0.0",
+        "gulp-load-plugins": "^1.0.0",
+        "gulp-newer": "^1.0.0",
+        "gulp-sass": "^2.0.0",
+        "gulp-size": "^2.0.0",
+        "gulp-sourcemaps": "^1.3.0",
+        "gulp-uglify": "^1.0.1",
+        "gulp-uncss": "^1.0.0",
+        "gulp-useref": "^3.0.0",
+        "run-sequence": "^1.0.1"
+    },
+    "private": true
+}
