@@ -61,7 +61,8 @@ abstract class EnvAbstract implements EnvInterface
             'underscore'   => '/underscore/underscore.js',
             'backbone'     => '/backbone/backbone.js',
             'requirejs'    => '/requirejs/require.js',
-            'dewdrop-core' => '/dewdrop/www/js/core.js'
+            'dewdrop-core' => '/dewdrop/www/js/core.js',
+            'dewdrop-form' => '/dewdrop/www/js/form.js',
         ],
         'css' => [
             'bootstrap'     => '/bootstrap/dist/css/bootstrap.min.css',
