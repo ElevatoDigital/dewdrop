@@ -3,9 +3,10 @@ define(
         'text!upload-template.html',
         'text!value-template.html',
         'text!progress-template.html',
-        'text!error-messages-template.html'
+        'text!error-messages-template.html',
+        'jquery'
     ],
-    function (templateHtml, valueTemplateHtml, progressTemplateHtml, errorMessagesTemplateHtml) {
+    function (templateHtml, valueTemplateHtml, progressTemplateHtml, errorMessagesTemplateHtml, $) {
         'use strict';
 
         var uploadTemplate        = _.template(templateHtml),
@@ -55,14 +56,15 @@ define(
                 return this;
             },
 
-            renderFileValue: function (url) {
+            renderFileValue: function (url, thumbnail) {
                 this.clearStatusUi();
 
                 // @todo Refactor value UI into a sub-view so we can use Backbone event delegation for the buttons
-                this.$wrapper.append(
+                this.$wrapper.find('.value-wrapper').append(
                     valueTemplate(
                         {
-                            url: url
+                            url: url,
+                            thumbnail: thumbnail
                         }
                     )
                 );
@@ -108,7 +110,7 @@ define(
             renderProgressBar: function () {
                 this.clearStatusUi();
 
-                this.$wrapper.append(
+                this.$wrapper.find('.value-wrapper').append(
                     progressTemplate(
                         {
 
@@ -148,9 +150,9 @@ define(
                             if (!response || 'success' !== response.result) {
                                 this.renderErrorMessages(response.messages);
                             } else {
-                                this.$valueInput.val(response.url);
+                                this.$valueInput.val(response.value);
 
-                                this.renderFileValue(response.url);
+                                this.renderFileValue(response.url, response.thumbnail);
                             }
                         },
                         this

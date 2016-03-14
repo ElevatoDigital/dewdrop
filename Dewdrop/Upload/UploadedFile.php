@@ -16,23 +16,32 @@ class UploadedFile
 
     public function getUrl()
     {
-        // @todo Ensure filesystem path is in document root.
+        return $this->convertFilesystemPathToUrl($this->filesystemPath);
+    }
 
-        $path = str_replace(
-            $_SERVER['DOCUMENT_ROOT'],
-            '',
-            $this->filesystemPath
-        );
+    public function getFilesystemPath()
+    {
+        return $this->filesystemPath;
+    }
+
+    public function getValue()
+    {
+        return $this->getUrl();
+    }
+
+    public function getThumbnail()
+    {
+        return null;
+    }
+
+    protected function convertFilesystemPathToUrl($filesystemPath)
+    {
+        $path = str_replace($_SERVER['DOCUMENT_ROOT'], '', $filesystemPath);
 
         return sprintf(
             '//%s/%s',
             $_SERVER['HTTP_HOST'],
             ltrim($path, '/')
         );
-    }
-
-    public function getFilesystemPath()
-    {
-        return $this->filesystemPath;
     }
 }

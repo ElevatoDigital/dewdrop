@@ -56,6 +56,10 @@ class FileHandler
         return $this->name;
     }
 
+    /**
+     * @param $uploadPath
+     * @return $this
+     */
     public function setUploadPath($uploadPath)
     {
         $this->uploadPath = $uploadPath;

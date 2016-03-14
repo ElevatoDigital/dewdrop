@@ -4,12 +4,18 @@
         id="<?php echo $this->escapeHtmlAttr($this->id);?>"
         value="<?php echo $this->escapeHtmlAttr($this->value);?>"/>
 
-    <button
-        data-value-input="#<?php echo $this->escapeHtmlAttr($this->id);?>"
-        data-file-input-name="<?php echo $this->escapeHtmlAttr($this->fileInputName);?>"
-        data-action-url="<?php echo $this->escapeHtmlAttr($this->actionUrl);?>"
-        type="button"
-        class="btn btn-default btn-input-file">
-        <?php echo $this->escapeHtml($this->buttonTitle);?>
-    </button>
+    <div class="button-wrapper">
+        <button
+            data-value-input="#<?php echo $this->escapeHtmlAttr($this->id);?>"
+            data-file-input-name="<?php echo $this->escapeHtmlAttr($this->fileInputName);?>"
+            data-action-url="<?php echo $this->escapeHtmlAttr($this->actionUrl);?>"
+            type="button"
+            class="btn btn-default btn-input-file">
+            <?php echo $this->escapeHtml($this->buttonTitle);?>
+        </button>
+    </div>
+
+    <div class="value-wrapper"></div>
+
+    <div class="clear"></div>
 </div>

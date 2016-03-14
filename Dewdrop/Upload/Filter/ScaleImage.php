@@ -14,6 +14,8 @@ class ScaleImage implements FilterInterface
 
     private $width;
 
+    private $path;
+
     public function __construct(array $options = [])
     {
         $this->setOptions($options);
@@ -33,6 +35,13 @@ class ScaleImage implements FilterInterface
         return $this;
     }
 
+    public function setPath($path)
+    {
+        $this->path = $path;
+
+        return $this;
+    }
+
     public function filter($value)
     {
         $image = new Imagick($value);
@@ -42,7 +51,12 @@ class ScaleImage implements FilterInterface
 
         // If the original image is smaller than the thumbnail size, don't scale
         if ($originalWidth <= $this->width && $originalHeight < $this->height) {
-            return $value;
+            if (null !== $this->path) {
+                copy($value, $this->path);
+                return $this->path;
+            } else {
+                return $value;
+            }
         }
 
         if ($originalWidth > $originalHeight) {
@@ -53,7 +67,13 @@ class ScaleImage implements FilterInterface
             $image->scaleImage($this->width, $this->height);
         }
 
-        $image->writeImage($value);
+        if (null === $this->path) {
+            $path = $value;
+        } else {
+            $path = $this->path;
+        }
+
+        $image->writeImage($path);
 
         return $value;
     }

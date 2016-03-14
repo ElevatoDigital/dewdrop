@@ -27,8 +27,20 @@
     position: relative;
 }
 
+.input-file .button-wrapper {
+    float: left;
+    margin-right: 15px;
+}
+
 .input-file .input-file-status-ui {
-    position: absolute;
-    left: 140px;
-    top: 0;
+    float: left;
+}
+
+.input-file .thumbnail {
+    margin: 0 auto 10px auto;
+    max-width: 120px;
+}
+
+.input-file .panel {
+    text-align: center;
 }

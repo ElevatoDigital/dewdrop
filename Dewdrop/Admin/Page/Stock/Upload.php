@@ -95,8 +95,10 @@ class Upload extends PageAbstract
             return ['result' => 'error', 'messages' => $this->error];
         } else {
             return [
-                'result' => 'success',
-                'url'    => $this->uploadedFile->getUrl()
+                'result'    => 'success',
+                'url'       => $this->uploadedFile->getUrl(),
+                'value'     => $this->uploadedFile->getValue(),
+                'thumbnail' => $this->uploadedFile->getThumbnail()
             ];
         }
     }
