@@ -790,10 +790,18 @@ abstract class Table
     private function augmentInsertedDataArrayWithWhenAndByWhom(array $data)
     {
         // When
-        if ($this->getMetadata('columns', 'date_created')) {
-            $data['date_created'] = date('Y-m-d G:i:s');
-        } elseif ($this->getMetadata('columns', 'datetime_created')) {
-            $data['datetime_created'] = date('Y-m-d G:i:s');
+        static $whenColumnCandidates = [
+            'date_created',
+            'datetime_created',
+        ];
+        foreach ($whenColumnCandidates as $whenColumnCandidate) {
+            if ($this->getMetadata('columns', $whenColumnCandidate)) {
+                $whenColumn = $whenColumnCandidate;
+                break;
+            }
+        }
+        if (isset($whenColumn) && (!array_key_exists($whenColumn, $data) || !$data[$whenColumn])) {
+            $data[$whenColumn] = date('Y-m-d H:i:s');
         }
 
         // By whom
