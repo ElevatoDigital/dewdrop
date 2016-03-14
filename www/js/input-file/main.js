@@ -20,9 +20,16 @@ dewdropInputFile(
                 input  = $(button.data('value-input'));
 
                 if (input.val()) {
+                    var url = input.val();
+                    if (button.data('file-url')) {
+                        url = button.data('file-url');
+                    }
+
                     view
                         .setValueInput(input)
-                        .renderFileValue(input.val());
+                        .setFileThumbnail(button.data('file-thumbnail'))
+                        .setFileUrl(button.data('file-url'))
+                        .renderFileValue(url, button.data('file-thumbnail'));
                 }
             }
         );

@@ -32,6 +32,16 @@ define(
                 return this;
             },
 
+            setFileThumbnail: function (fileThumbnail) {
+                this.fileThumbnail = fileThumbnail;
+                return this;
+            },
+
+            setFileUrl: function (fileUrl) {
+                this.fileUrl = fileUrl;
+                return this;
+            },
+
             setActionUrl: function(actionUrl) {
                 this.actionUrl = actionUrl;
 
@@ -50,7 +60,12 @@ define(
                 this.$el.find('input').click();
 
                 if (this.$valueInput.val()) {
-                    this.renderFileValue(this.$valueInput.val());
+                    var url = this.$valueInput.val();
+                    if (this.fileUrl) {
+                        url = this.fileUrl;
+                    }
+
+                    this.renderFileValue(url, this.fileThumbnail);
                 }
 
                 return this;
