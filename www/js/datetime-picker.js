@@ -15,6 +15,11 @@ require(
         // Restore Bootstrap tooltip plugin
         jQuery.fn.tooltip = bsTooltip;
 
+        // Used to append popovers.  Avoids WP and Bootstrap CSS conflicts.
+        var styleWrapper = $('<div class="bootstrap-wrapper"></div>');
+
+        $(document.body).append(styleWrapper);
+
         var renderInputs = function ($input, dateValue, timeValue) {
             var $row   = $('<div class="row"></div>'),
                 $left  = $('<div class="col-xs-6"></div>'),
@@ -87,7 +92,7 @@ require(
                     content += '</div>';
 
                     $input.popover({
-                        container: 'body',
+                        container: styleWrapper,
                         placement: 'bottom',
                         trigger:   'manual',
                         content:   content,
