@@ -119,9 +119,11 @@ class Row implements ArrayAccess, SaveHandlerInterface
         // Apply defaults for new rows
         if (!count($this->data)) {
             foreach ($this->columns as $column) {
-                $default = $this->table->getMetadata('columns', $column)['DEFAULT'];
+                $columnMetadata = $this->table->getMetadata('columns', $column);
+                $default        = $columnMetadata['DEFAULT'];
 
-                if (null !== $default) {
+                // We skip temporal fields to avoid problems with certain defaults (e.g., CURRENT_TIMESTAMP, NOW())
+                if (!in_array($columnMetadata['GENERIC_TYPE'], ['date', 'time', 'timestamp']) && null !== $default) {
                     $this->data[$column] = $default;
                 }
             }
