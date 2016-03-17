@@ -119,7 +119,7 @@ require(
                             var options = {
                                 changeMonth: true,
                                 changeYear:  true,
-                                defaultDate: moment($input.val()).toDate(),
+                                defaultDate: moment($input.val(), 'MM/DD/YYYY').toDate(),
                                 onSelect: function (e) {
                                     var selected = $popover.datepicker('getDate');
 
