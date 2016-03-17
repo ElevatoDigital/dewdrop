@@ -10,6 +10,7 @@
 
 namespace Dewdrop\Filter;
 
+use DateTimeZone;
 use Zend\Filter\AbstractFilter;
 
 /**
@@ -34,10 +35,15 @@ class IsoTimestamp extends AbstractFilter
 
             // Reverse WordPress GMT offset when filtering date input
             if (function_exists('get_option')) {
-                $gmtOffset = get_option('gmt_offset');
+                $timezoneString = get_option('timezone_string');
+                $isoValue       = date('Y-m-d H:i:s', strtotime($value));
+
+                if ($timezoneString) {
+                    $gmtOffset = timezone_offset_get(new DateTimeZone($timezoneString), date_create($isoValue));
+                }
             }
 
-            $out = date('Y-m-d H:i:s', strtotime($value) + ($gmtOffset * -1 * 3600));
+            $out = date('Y-m-d H:i:s', strtotime($value) + ($gmtOffset * -1));
         }
 
         return $out;

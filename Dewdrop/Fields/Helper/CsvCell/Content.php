@@ -10,6 +10,7 @@
 
 namespace Dewdrop\Fields\Helper\CsvCell;
 
+use DateTimeZone;
 use Dewdrop\Db\Field as DbField;
 use Dewdrop\Fields\FieldInterface;
 use Dewdrop\Fields\Helper\HelperAbstract;
@@ -252,7 +253,12 @@ class Content extends HelperAbstract implements ContentHelperInterface
 
         // Hack for handling GMT offsets in WordPress.
         if (function_exists('get_option')) {
-            $timestamp += (get_option('gmt_offset') * 3600);
+            $timezoneString = get_option('timezone_string');
+
+            if ($timezoneString) {
+                $offset = timezone_offset_get(new DateTimeZone($timezoneString), date_create($value));
+                $timestamp += $offset;
+            }
         }
 
         if ($timestamp) {
@@ -278,7 +284,12 @@ class Content extends HelperAbstract implements ContentHelperInterface
 
         // Hack for handling GMT offsets in WordPress.
         if (function_exists('get_option')) {
-            $timestamp += (get_option('gmt_offset') * 3600);
+            $timezoneString = get_option('timezone_string');
+
+            if ($timezoneString) {
+                $offset = timezone_offset_get(new DateTimeZone($timezoneString), date_create($value));
+                $timestamp += $offset;
+            }
         }
 
         if ($timestamp) {
