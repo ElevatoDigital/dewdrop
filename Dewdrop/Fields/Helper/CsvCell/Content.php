@@ -250,6 +250,11 @@ class Content extends HelperAbstract implements ContentHelperInterface
         $value     = $rowData[$field->getName()];
         $timestamp = strtotime($value);
 
+        // Hack for handling GMT offsets in WordPress.
+        if (function_exists('get_option')) {
+            $timestamp += (get_option('gmt_offset') * 3600);
+        }
+
         if ($timestamp) {
             return date($this->dateFormat, $timestamp);
         } else {
@@ -270,6 +275,11 @@ class Content extends HelperAbstract implements ContentHelperInterface
     {
         $value     = $rowData[$field->getName()];
         $timestamp = strtotime($value);
+
+        // Hack for handling GMT offsets in WordPress.
+        if (function_exists('get_option')) {
+            $timestamp += (get_option('gmt_offset') * 3600);
+        }
 
         if ($timestamp) {
             return date($this->dateFormat . ' ' . $this->timeFormat, $timestamp);
