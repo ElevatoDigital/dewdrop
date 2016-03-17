@@ -84,6 +84,8 @@ jQuery(function ($) {
 
         tbody.prepend(html);
 
+        this.table.trigger('rowAdded');
+
         row = tbody.find('tr:first');
 
         // Forcing visibility here because the row isn't actually shown until Velocity is done
