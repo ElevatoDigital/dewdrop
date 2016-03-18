@@ -13,6 +13,7 @@ namespace Dewdrop\View\Helper;
 use Dewdrop\Admin\Component\CrudInterface;
 use Dewdrop\Fields;
 use Dewdrop\Fields\Helper\SelectFilter;
+use HtmlNode\Node;
 
 /**
  * Render a form that allows the user to filter by one or more fields.  The form
@@ -76,12 +77,17 @@ class BootstrapFilterForm extends AbstractHelper
      */
     public function directWithArgs(Fields $fields, SelectFilter $selectFilter, $title, $method = 'GET')
     {
-        return $this->partial(
-            'bootstrap-filter-form.phtml',
-            [
-                'controls' => $this->inline($fields, $selectFilter, $title, $method, true)
-            ]
-        );
+        return Node::create('form')
+            ->addClass('filter-form')
+            ->setAttribute('data-prefix', $selectFilter->getPrefix())
+            ->setAttribute('action', '')
+            ->setAttribute('method', $method)
+            ->setHtml(
+                $this->partial(
+                    'bootstrap-filter-form.phtml',
+                    ['controls' => $this->inline($fields, $selectFilter, $title, $method, true)]
+                )
+            );
     }
 
     /**

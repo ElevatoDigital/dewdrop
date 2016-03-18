@@ -2,35 +2,32 @@
 use Dewdrop\Fields\Helper\SelectFilter;
 ?>
 
-<form class="filter-form" data-prefix="<?php echo $this->escapeHtmlAttr($this->paramPrefix);?>" action="" method="<?php echo $this->escapeHtmlAttr($this->method);?>">
-    <?php
-    foreach ($this->getRequest()->getQuery() as $param => $value) {
-        if (SelectFilter::isQueryStringParamNotRelatedToFiltering($param, $this->paramPrefix)) {
-            printf(
-                '<input type="hidden" name="%s" value="%s" />',
-                $this->escapeHtmlAttr($param),
-                $this->escapeHtmlAttr($value)
-            );
-        }
-    }
-    ?>
-
-    <?php
-    if ($this->request->getQuery($this->prefix . 'sort')) {
+<?php
+foreach ($this->getRequest()->getQuery() as $param => $value) {
+    if (SelectFilter::isQueryStringParamNotRelatedToFiltering($param, $this->paramPrefix)) {
         printf(
             '<input type="hidden" name="%s" value="%s" />',
-            $this->escapeHtmlAttr($this->prefix . 'sort'),
-            $this->escapeHtmlAttr($this->request->getQuery($this->prefix . 'sort'))
-        );
-
-        printf(
-            '<input type="hidden" name="%s" value="%s" />',
-            $this->escapeHtmlAttr($this->prefix . 'dir'),
-            $this->escapeHtmlAttr($this->request->getQuery($this->prefix . 'dir'))
+            $this->escapeHtmlAttr($param),
+            $this->escapeHtmlAttr($value)
         );
     }
-    ?>
+}
+?>
 
-    <?php echo $this->controls;?>
-</form>
+<?php
+if ($this->request->getQuery($this->prefix . 'sort')) {
+    printf(
+        '<input type="hidden" name="%s" value="%s" />',
+        $this->escapeHtmlAttr($this->prefix . 'sort'),
+        $this->escapeHtmlAttr($this->request->getQuery($this->prefix . 'sort'))
+    );
 
+    printf(
+        '<input type="hidden" name="%s" value="%s" />',
+        $this->escapeHtmlAttr($this->prefix . 'dir'),
+        $this->escapeHtmlAttr($this->request->getQuery($this->prefix . 'dir'))
+    );
+}
+?>
+
+<?php echo $this->controls;?>

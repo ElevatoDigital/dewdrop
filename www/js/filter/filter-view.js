@@ -3,13 +3,14 @@ define(
     function (typeFactory, templateHtml) {
         'use strict';
 
-        var template = _.template(templateHtml);
+        var customHtml = $('#filter-template').text(),
+            template   = _.template(customHtml ? customHtml : templateHtml);
 
         return Backbone.View.extend({
             events: {
                 'change .filter-field': 'selectField',
-                'click .btn-add':       'addFilter',
-                'click .btn-remove':    'removeFilter'
+                'click .js-add':       'addFilter',
+                'click .js-remove':    'removeFilter'
             },
 
             className: 'filter-row',
