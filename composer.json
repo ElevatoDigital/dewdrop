@@ -11,6 +11,7 @@
     },
     "require": {
         "php": ">=5.5.0",
+        "griffbrad/html-node": "1.*",
         "ircmaxell/password-compat": "1.0.*",
         "jdorn/sql-formatter": "1.2.*",
         "squizlabs/php_codesniffer": "2.*",
