@@ -33,6 +33,11 @@ class SelectFilter implements SelectModifierInterface
         $this->defaultVarsHelper = new DefaultVars($request);
     }
 
+    public static function isQueryStringParamNotRelatedToFiltering($paramName, $paramPrefix)
+    {
+        return 0 !== strpos($paramName, $paramPrefix . 'ftr-') && $paramPrefix . 'listing-page' !== $paramName;
+    }
+
     public function setPrefix($prefix)
     {
         $this->prefix = $prefix;

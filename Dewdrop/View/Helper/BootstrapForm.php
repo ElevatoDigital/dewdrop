@@ -328,23 +328,21 @@ class BootstrapForm extends AbstractHelper
     }
 
     /**
-     * Render a simple submit button at the footer of the form, with optional classes on that submit button. If the
-     * $disableOnSubmit argument is false, the button will not be disabled upon form submission.
+     * Render a simple submit button at the footer of the form,
+     * with optional classes on that submit button.
      *
      * @param string $title
      * @param string $classes optional
-     * @param bool $disableOnSubmit
      * @return string
      */
-    public function renderSubmitButton($title = 'Save Changes', $classes = '', $disableOnSubmit = true)
+    public function renderSubmitButton($title = 'Save Changes', $classes = '')
     {
         return sprintf(
             '<div class="form-group">
-                <input type="submit" value="%s" class="%s btn btn-primary dewdrop-submit %s" />
+                <input type="submit" value="%s" class="%s btn btn-primary" />
             </div>',
             $this->view->escapeHtmlAttr($title),
-            $this->view->escapeHtmlAttr($classes),
-            $disableOnSubmit ? 'disable-on-submit' : ''
+            $this->view->escapeHtmlAttr($classes)
         );
     }
 
