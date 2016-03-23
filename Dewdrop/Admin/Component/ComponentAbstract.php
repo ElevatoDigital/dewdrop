@@ -372,7 +372,7 @@ abstract class ComponentAbstract
         }
 
         if (!$page) {
-            throw new Exception('Could not find page');
+            throw new Exception("Could not find page by name \"{$name}\"");
         }
 
         return $page;
