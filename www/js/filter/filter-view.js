@@ -3,7 +3,8 @@ define(
     function (typeFactory, templateHtml) {
         'use strict';
 
-        var customHtml = $('#filter-template').text(),
+        var $          = $ || jQuery,
+            customHtml = $('#filter-template').text(),
             template   = _.template(customHtml ? customHtml : templateHtml);
 
         return Backbone.View.extend({
