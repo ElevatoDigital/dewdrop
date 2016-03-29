@@ -89,6 +89,16 @@ class OptionPairs
         return $this->titleColumn;
     }
 
+    public function detectTitleColumn()
+    {
+        if ($this->titleColumn) {
+            return $this->titleColumn;
+        } else {
+            $metadata = $this->loadTableMetadata();
+            return $this->findTitleColumnFromMetadata($metadata['columns']);
+        }
+    }
+
     /**
      * Set one more options on this object.  If a setter is not available
      * for the option designated by keys in your options array, an
@@ -408,6 +418,8 @@ class OptionPairs
         }
 
         if ($sortColumn) {
+            $primaryKey = null;
+
             foreach ($columns as $column => $meta) {
                 if ($meta['PRIMARY']) {
                     $primaryKey = $column;

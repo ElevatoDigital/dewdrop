@@ -15,6 +15,7 @@ use Dewdrop\Db\Field as DbField;
 use Dewdrop\Db\Select;
 use Dewdrop\Fields;
 use Dewdrop\Fields\Exception;
+use Dewdrop\Fields\OptionPairs\TitleColumnNotDetectedException;
 use Dewdrop\Fields\FieldInterface;
 use Dewdrop\Request;
 
@@ -306,7 +307,12 @@ class SelectSort extends HelperAbstract implements SelectModifierInterface
     {
         $optionPairs = $field->getOptionPairs();
         $tableName   = $optionPairs->getTableName();
-        $titleColumn = $optionPairs->getTitleColumn();
+
+        try {
+            $titleColumn = $optionPairs->detectTitleColumn();
+        } catch (TitleColumnNotDetectedException $e) {
+            $titleColumn = $field->getName();
+        }
 
         if ($titleColumn instanceof Expr) {
             $orderSpec = "{$titleColumn} {$direction}";
