@@ -12,7 +12,6 @@ namespace Dewdrop\Admin\Page\Stock;
 
 use Dewdrop\Admin\Component\ComponentAbstract;
 use Dewdrop\Admin\Component\CrudInterface;
-use Dewdrop\Admin\Page\PageAbstract;
 
 /**
  * This page, typically rendered in a modal rather than as an independent
@@ -22,7 +21,7 @@ use Dewdrop\Admin\Page\PageAbstract;
  * too.  It just shows _all_ available visible fields rather than only those
  * that pass the component's visibility filter.
  */
-class View extends PageAbstract
+class View extends StockPageAbstract
 {
     /**
      * The CRUD component.

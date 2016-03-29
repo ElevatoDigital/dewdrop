@@ -2,14 +2,13 @@
 
 namespace Dewdrop\Admin\Page\Stock;
 
-use Dewdrop\Admin\Page\PageAbstract;
 use Dewdrop\Fields\Listing\Counter;
 
 /**
  * This page takes the selected field from the Counts page and uses it to fetch
  * data from a Dewdrop\Fields\Listing\Counter object and export it to CSV.
  */
-class CountsExport extends PageAbstract
+class CountsExport extends StockPageAbstract
 {
     /**
      * @var \Dewdrop\Admin\Component\CrudInterface|\Dewdrop\Admin\Component\ComponentAbstract

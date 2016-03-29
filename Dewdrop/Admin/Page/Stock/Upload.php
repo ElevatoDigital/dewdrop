@@ -2,12 +2,11 @@
 
 namespace Dewdrop\Admin\Page\Stock;
 
-use Dewdrop\Admin\Page\PageAbstract;
 use Dewdrop\Upload\Exception as UploadException;
 use Dewdrop\Upload\FileHandler;
 use Dewdrop\Upload\UploadedFile;
 
-class Upload extends PageAbstract
+class Upload extends StockPageAbstract
 {
     /**
      * @var array

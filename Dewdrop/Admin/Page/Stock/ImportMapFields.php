@@ -4,7 +4,6 @@ namespace Dewdrop\Admin\Page\Stock;
 
 use Dewdrop\Admin\Component\ComponentAbstract;
 use Dewdrop\Admin\Component\CrudInterface;
-use Dewdrop\Admin\Page\PageAbstract;
 use Dewdrop\Admin\ResponseHelper\Standard as ResponseHelper;
 use Dewdrop\Fields;
 use Dewdrop\Fields\FieldInterface;
@@ -14,7 +13,7 @@ use Dewdrop\Fields\RowEditor;
 use Dewdrop\Import\DbGateway as ImportGateway;
 use Dewdrop\Import\File as ImportFile;
 
-class ImportMapFields extends PageAbstract
+class ImportMapFields extends StockPageAbstract
 {
     /**
      * @var ComponentAbstract|CrudInterface

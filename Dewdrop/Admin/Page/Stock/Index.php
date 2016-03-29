@@ -15,7 +15,6 @@ use Dewdrop\Admin\Component\ComponentAbstract;
 use Dewdrop\Admin\Component\CrudInterface;
 use Dewdrop\Admin\Component\SortableListingInterface;
 use Dewdrop\Admin\ResponseHelper\Standard as ResponseHelper;
-use Dewdrop\Admin\Page\PageAbstract;
 use Dewdrop\Bootstrap;
 use Dewdrop\Pimple;
 use Dewdrop\Session;
@@ -31,7 +30,7 @@ use Dewdrop\Session;
  * 2) BulkActionProcessInterface: Enables checkboxes on the listing rows to
  *    allow selection of records and application of actions to them in bulk.
  */
-class Index extends PageAbstract
+class Index extends StockPageAbstract
 {
     /**
      * The CRUD component.

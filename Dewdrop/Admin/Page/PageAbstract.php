@@ -67,6 +67,13 @@ abstract class PageAbstract
     protected $request;
 
     /**
+     * The path where this page's view script should be found.
+     *
+     * @var string
+     */
+    protected $viewScriptPath;
+
+    /**
      * The name used in the URL to route to this page.
      *
      * @var string
@@ -94,8 +101,10 @@ abstract class PageAbstract
             $viewScriptPath = $this->component->getPath() . '/view-scripts';
         }
 
+        $this->viewScriptPath = $viewScriptPath;
+
         $this->view
-            ->setScriptPath($viewScriptPath)
+            ->setScriptPath($this->viewScriptPath)
             ->helper('AdminUrl')
                 ->setPage($this);
     }
@@ -256,7 +265,7 @@ abstract class PageAbstract
      *
      * @return string
      */
-    private function inflectViewScriptName()
+    protected function inflectViewScriptName()
     {
         $className = get_class($this);
         $pageName  = substr($className, strrpos($className, '\\') + 1);

@@ -12,13 +12,12 @@ namespace Dewdrop\Admin\Page\Stock;
 
 use Dewdrop\Admin\Component\ComponentAbstract;
 use Dewdrop\Admin\Component\CrudInterface;
-use Dewdrop\Admin\Page\PageAbstract;
 use Dewdrop\Fields\Filter\Visibility as VisibilityFilter;
 
 /**
  * Generate a CSV export for a CRUD component's Listing.
  */
-class Export extends PageAbstract
+class Export extends StockPageAbstract
 {
     /**
      * The CRUD component.

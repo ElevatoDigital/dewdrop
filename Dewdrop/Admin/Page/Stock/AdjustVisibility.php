@@ -12,7 +12,6 @@ namespace Dewdrop\Admin\Page\Stock;
 
 use Dewdrop\Admin\Component\ComponentAbstract;
 use Dewdrop\Admin\Component\CrudInterface;
-use Dewdrop\Admin\Page\PageAbstract;
 use Dewdrop\Fields\Filter\Visibility as VisibilityFilter;
 use Dewdrop\Admin\ResponseHelper\Standard as ResponseHelper;
 
@@ -21,7 +20,7 @@ use Dewdrop\Admin\ResponseHelper\Standard as ResponseHelper;
  * saving the user's selections back to a visibility filter so that they
  * can decide which columns should be visible on a listing.
  */
-class AdjustVisibility extends PageAbstract
+class AdjustVisibility extends StockPageAbstract
 {
     /**
      * The CRUD component providing the visibility filter.

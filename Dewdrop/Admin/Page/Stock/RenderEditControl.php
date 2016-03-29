@@ -4,10 +4,9 @@ namespace Dewdrop\Admin\Page\Stock;
 
 use Dewdrop\Admin\Component\ComponentAbstract;
 use Dewdrop\Admin\Component\CrudInterface;
-use Dewdrop\Admin\Page\PageAbstract;
 use Dewdrop\Db\ManyToMany\Field as ManyToManyField;
 
-class RenderEditControl extends PageAbstract
+class RenderEditControl extends StockPageAbstract
 {
     /**
      * @var CrudInterface|ComponentAbstract

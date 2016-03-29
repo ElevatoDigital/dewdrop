@@ -12,7 +12,6 @@ namespace Dewdrop\Admin\Page\Stock;
 
 use Dewdrop\Admin\Component\ComponentAbstract;
 use Dewdrop\Admin\Component\CrudInterface;
-use Dewdrop\Admin\Page\PageAbstract;
 use Dewdrop\Fields;
 use Dewdrop\Fields\Test\ListingSort as ListingSortTest;
 use ReflectionClass;
@@ -22,7 +21,7 @@ use ReflectionClass;
  * listing to ensure each field can be sorted in both ASC and DESC order
  * without causing an error.
  */
-class DebugTestSorting extends PageAbstract
+class DebugTestSorting extends StockPageAbstract
 {
     /**
      * The CRUD component.

@@ -10,7 +10,6 @@
 
 namespace Dewdrop\Admin\Page\Stock;
 
-use Dewdrop\Admin\Page\PageAbstract;
 use Dewdrop\Fields\Listing\Counter;
 
 /**
@@ -20,7 +19,7 @@ use Dewdrop\Fields\Listing\Counter;
  * size" field, this page would render a row for each size along with the number
  * of people who had selected that size.
  */
-class Counts extends PageAbstract
+class Counts extends StockPageAbstract
 {
     /**
      * @var \Dewdrop\Admin\Component\CrudInterface|\Dewdrop\Admin\Component\ComponentAbstract

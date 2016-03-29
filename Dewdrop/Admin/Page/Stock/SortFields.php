@@ -12,7 +12,6 @@ namespace Dewdrop\Admin\Page\Stock;
 
 use Dewdrop\Admin\Component\ComponentAbstract;
 use Dewdrop\Admin\Component\CrudInterface;
-use Dewdrop\Admin\Page\PageAbstract;
 use Dewdrop\Admin\ResponseHelper\Standard as ResponseHelper;
 use Dewdrop\Fields\Filter\Groups as GroupsFilter;
 
@@ -22,7 +21,7 @@ use Dewdrop\Fields\Filter\Groups as GroupsFilter;
  * to re-order the fields and put them into groups (usually a tab control),
  * allowing the user to make a large number of fields easier to comprehend.
  */
-class SortFields extends PageAbstract
+class SortFields extends StockPageAbstract
 {
     /**
      * The CRUD component.

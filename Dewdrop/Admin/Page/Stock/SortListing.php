@@ -13,7 +13,6 @@ namespace Dewdrop\Admin\Page\Stock;
 use Dewdrop\Admin\Component\ComponentAbstract;
 use Dewdrop\Admin\Component\CrudInterface;
 use Dewdrop\Admin\Component\SortableListingInterface;
-use Dewdrop\Admin\Page\PageAbstract;
 use Dewdrop\Admin\ResponseHelper\Standard as ResponseHelper;
 use Dewdrop\Exception;
 
@@ -21,7 +20,7 @@ use Dewdrop\Exception;
  * This page handles the saving of new sort order values for a component that
  * implements the SortableListingInterface.
  */
-class SortListing extends PageAbstract
+class SortListing extends StockPageAbstract
 {
     /**
      * The CRUD component.

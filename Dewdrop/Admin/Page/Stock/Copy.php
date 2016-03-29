@@ -5,9 +5,8 @@ namespace Dewdrop\Admin\Page\Stock;
 use Dewdrop\Admin\Component\ComponentAbstract;
 use Dewdrop\Admin\Component\CrudInterface;
 use Dewdrop\Admin\Component\DataCopierInterface;
-use Dewdrop\Admin\Page\PageAbstract;
 
-class Copy extends PageAbstract
+class Copy extends StockPageAbstract
 {
     /**
      * @var ComponentAbstract|CrudInterface|DataCopierInterface

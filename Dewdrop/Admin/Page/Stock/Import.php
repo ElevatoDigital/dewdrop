@@ -4,7 +4,6 @@ namespace Dewdrop\Admin\Page\Stock;
 
 use Dewdrop\Admin\Component\ComponentAbstract;
 use Dewdrop\Admin\Component\CrudInterface;
-use Dewdrop\Admin\Page\PageAbstract;
 use Dewdrop\Admin\ResponseHelper\Standard as ResponseHelper;
 use Dewdrop\Exception;
 use Dewdrop\Import\DbGateway;
@@ -12,7 +11,7 @@ use Dewdrop\Import\File as ImportFile;
 use Dewdrop\Import\InputFilterFactory as ImportInputFilterFactory;
 use Dewdrop\Pimple;
 
-class Import extends PageAbstract
+class Import extends StockPageAbstract
 {
     /**
      * @var ComponentAbstract|CrudInterface

@@ -12,7 +12,6 @@ namespace Dewdrop\Admin\Page\Stock;
 
 use Dewdrop\Admin\Component\ComponentAbstract;
 use Dewdrop\Admin\Component\CrudInterface;
-use Dewdrop\Admin\Page\PageAbstract;
 use Dewdrop\Admin\ResponseHelper\Standard as ResponseHelper;
 use Dewdrop\Pimple;
 use Dewdrop\Session;
@@ -21,7 +20,7 @@ use Dewdrop\Session;
  * This page uses a RowEditor and a couple view helpers (primarily bootstrapForm())
  * to provide input validation and saving capabilities to a CRUD component.
  */
-class Edit extends PageAbstract
+class Edit extends StockPageAbstract
 {
     /**
      * Display the save button at the top of the page.
