@@ -54,28 +54,28 @@ class Content extends HelperAbstract implements ContentHelperInterface
      *
      * @var array
      */
-    private $callbacksByColumnPosition = array();
+    protected $callbacksByColumnPosition = array();
 
     /**
      * This content will be returned if any field's callback generates no output.
      *
      * @var string
      */
-    private $nullContentPlaceholder = 'None';
+    protected $nullContentPlaceholder = '';
 
     /**
      * The default format for rendering dates.  Uses PHP's date() syntax.
      *
      * @var string
      */
-    private $dateFormat = 'M j, Y';
+    protected $dateFormat = 'M j, Y';
 
     /**
      * The default format for rendering time.  Uses PHP's date() syntax.
      *
      * @var string
      */
-    private $timeFormat = 'g:iA';
+    protected $timeFormat = 'g:iA';
 
     /**
      * Set the content that should be returned if a field's callback returns no
@@ -136,7 +136,7 @@ class Content extends HelperAbstract implements ContentHelperInterface
 
         $output = call_user_func($callable, $rowData, $rowIndex, $columnIndex);
 
-        if (!trim($output)) {
+        if (null === $output) {
             return $this->nullContentPlaceholder;
         } else {
             return $output;
