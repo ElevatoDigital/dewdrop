@@ -82,6 +82,56 @@ class Pgsql implements DriverInterface
     }
 
     /**
+     * Fetch all results for the supplied SQL query using a PHP generator.
+     *
+     * This approach uses less memory, but the result set has a forward-only cursor.
+     *
+     * The SQL query can be a simple string or a Select object.  The bind array
+     * should supply values for all the parameters, either named or numeric, in
+     * the query.  And the fetch mode should match one of these 4 class constants
+     * from \Dewdrop\Db\Adapter: ARRAY_A, ARRAY_N, OBJECT, or OBJECT_K.
+     *
+     * @param string|Select $sql
+     * @param array $bind
+     * @param string $fetchMode
+     * @return \Generator
+     * @throws Exception
+     */
+    public function fetchAllWithGenerator($sql, $bind = [], $fetchMode = null)
+    {
+        if (null === $fetchMode) {
+            $fetchMode = Adapter::ARRAY_A;
+        }
+
+        $sql = $this->adapter->prepare($sql, $bind);
+
+        /* @var PDO $pdo */
+        $pdo = $this->getConnection();
+
+        $pdoFetchClass = null;
+        switch ($fetchMode) {
+            case Adapter::ARRAY_A:
+                $pdoFetchMode = PDO::FETCH_ASSOC;
+                break;
+            case Adapter::ARRAY_N:
+                $pdoFetchMode = PDO::FETCH_NUM;
+                break;
+            case Adapter::OBJECT: // intentional fall-through
+            case Adapter::OBJECT_K:
+                $pdoFetchMode = PDO::FETCH_OBJ;
+                break;
+            default:
+                throw new Exception("Unsupported fetch mode '{$fetchMode}'");
+        }
+
+        $statement = $pdo->query($sql, $pdoFetchMode);
+
+        while (false !== ($row = $statement->fetch())) {
+            yield $row;
+        }
+    }
+
+    /**
      * Fetch a single column of the results from the supplied SQL statement.
      *
      * @param string|\Dewdrop\Db\Select $sql

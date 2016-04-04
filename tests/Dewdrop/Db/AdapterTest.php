@@ -51,6 +51,20 @@ class AdapterTest extends DbTestCase
         $this->assertFalse($int);
     }
 
+    public function testFetchAllWithGeneratorAssocReturnsGeneratorOfRowsWithNoNumericKeys()
+    {
+        $sql = 'SELECT * FROM dewdrop_test_fruits';
+
+        foreach ($this->db->fetchAllWithGenerator($sql, [], Adapter::ARRAY_A) as $row) {
+            $this->assertInternalType('array', $row);
+            $rowKeys = array_keys($row);
+            $this->assertSame('dewdrop_test_fruit_id', current($rowKeys));
+            foreach ($rowKeys as $key) {
+                $this->assertInternalType('string', $key);
+            }
+        }
+    }
+
     public function testInsertAddsRow()
     {
         $sql   = 'SELECT * FROM dewdrop_test_fruits';
