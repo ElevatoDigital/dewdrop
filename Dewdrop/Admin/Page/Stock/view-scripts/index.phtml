@@ -70,12 +70,6 @@ if ($this->isSortable) {
         $this->listing->getPrimaryKey()->getName()
     );
 
-    if (!$fields->has($sortField)) {
-        $fields->add($sortField);
-    }
-
-    $this->listing->getSelectModifierByName('SelectSort')->setDefaultField($sortField);
-
     echo $this->tableSortHandle()->open($this->adminUrl('sort-listing'));
 }
 

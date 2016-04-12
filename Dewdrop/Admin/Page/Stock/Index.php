@@ -98,6 +98,19 @@ class Index extends StockPageAbstract
 
         $this->session = new Session(Pimple::getInstance());
         $this->session->set($this->component->getListingQueryParamsSessionName(), $this->request->getQuery());
+
+        if ($this->component instanceof SortableListingInterface) {
+            $fields    = $this->component->getFields();
+            $sortField = $this->component->getSortField();
+
+            if (!$fields->has($sortField)) {
+                $fields->add($sortField);
+            }
+
+            /* @var $sorter \Dewdrop\Fields\Helper\SelectSort */
+            $sorter = $this->component->getListing()->getSelectModifierByName('SelectSort');
+            $sorter->setDefaultField($sortField);
+        }
     }
 
     /**
