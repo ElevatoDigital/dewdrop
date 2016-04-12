@@ -36,7 +36,7 @@ class Upload extends StockPageAbstract
             $this->error = 'Upload request must be POST.';
             return;
         } else if (!count($_FILES)) {
-            $this->error = 'No file uploads were present.  Check form encoding.';
+            $this->error = 'No file uploads were present.  Check form encoding or upload_max_filesize.';
             return;
         } else {
             $handlerFound = null;

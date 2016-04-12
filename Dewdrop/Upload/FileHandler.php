@@ -106,9 +106,11 @@ class FileHandler
             $uploadFileValidator = new UploadFileValidator();
             $this->validatorChain->attach($uploadFileValidator);
 
-            $mimeTypeValidator = new MimeTypeValidator();
-            $mimeTypeValidator->addMimeType($this->allowedMimeTypes);
-            $this->validatorChain->attach($mimeTypeValidator);
+            if(!empty($this->allowedMimeTypes)) {
+                $mimeTypeValidator = new MimeTypeValidator();
+                $mimeTypeValidator->addMimeType($this->allowedMimeTypes);
+                $this->validatorChain->attach($mimeTypeValidator);
+            }
         }
 
         return $this->validatorChain;

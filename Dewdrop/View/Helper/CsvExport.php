@@ -12,6 +12,7 @@ namespace Dewdrop\View\Helper;
 
 use Dewdrop\Fields;
 use Dewdrop\Fields\Helper\CsvCell;
+use Dewdrop\Fields\Listing;
 
 /**
  * Generate a CSV export.
@@ -96,6 +97,40 @@ class CsvExport extends AbstractHelper
         ob_end_clean();
 
         return $output;
+    }
+
+    /**
+     * @param Fields $fields
+     * @param Listing $listing
+     * @param CsvCell $csvCellRenderer
+     * @return void
+     */
+    public function renderWithGenerator(Fields $fields, Listing $listing, CsvCell $csvCellRenderer)
+    {
+        // Output CSV data
+        $outputHandle = fopen('php://output', 'w');
+
+        // Get the visible component fields
+        $fields = $fields->getVisibleFields();
+
+        // Render header
+        fputcsv($outputHandle, $this->renderHeader($fields, $csvCellRenderer));
+
+        // Render content
+        $rowIndex = 0;
+        foreach ($listing->fetchDataWithGenerator($fields) as $row) {
+            $csvRow      = [];
+            $columnIndex = 0;
+            foreach ($fields as $field) {
+                $csvRow[] = $csvCellRenderer->getContentRenderer()->render($field, $row, $rowIndex, $columnIndex);
+                $columnIndex++;
+            }
+            fputcsv($outputHandle, $csvRow);
+            $rowIndex++;
+        }
+
+        // Close output handle
+        fclose($outputHandle);
     }
 
     /**

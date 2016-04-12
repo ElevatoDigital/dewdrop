@@ -311,6 +311,23 @@ class Adapter
     }
 
     /**
+     * Fetch all results for the supplied SQL statement using a PHP generator.
+     *
+     * This approach uses less memory, but the result set has a forward-only cursor.
+     *
+     * @param string|\Dewdrop\Db\Select $sql
+     * @param array $bind
+     * @param string $fetchMode
+     * @return \Generator
+     */
+    public function fetchAllWithGenerator($sql, $bind = [], $fetchMode = null)
+    {
+        foreach ($this->driver->fetchAllWithGenerator($sql, $bind, $fetchMode) as $row) {
+            yield $row;
+        }
+    }
+
+    /**
      * Fetch a single column of the results from the supplied SQL statement.
      *
      * @param string|\Dewdrop\Db\Select $sql

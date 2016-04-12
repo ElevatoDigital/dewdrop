@@ -307,6 +307,25 @@ class Listing
     }
 
     /**
+     * Fetch the data for this listing, passing the supplied \Dewdrop\Fields object to all modifiers before fetching the
+     * data from the DB using a PHP generator.
+     *
+     * @param Fields $fields
+     * @return \Generator
+     */
+    public function fetchDataWithGenerator(Fields $fields)
+    {
+        $adapter = $this->select->getAdapter();
+
+        $this->totalRowCount = 0;
+
+        foreach ($adapter->fetchAllWithGenerator($this->getModifiedSelect($fields)) as $row) {
+            $this->totalRowCount++;
+            yield $row;
+        }
+    }
+
+    /**
      * Return the total row count that would have been retrieved during
      * fetchData() if no LIMIT clause was applied to the Select.  Note that this
      * will only work if you have a SelectPaginate select modifier registered
