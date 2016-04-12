@@ -14,12 +14,7 @@
         "griffbrad/html-node": "1.*",
         "ircmaxell/password-compat": "1.0.*",
         "jdorn/sql-formatter": "1.2.*",
-        "squizlabs/php_codesniffer": "2.*",
-        "phpdocumentor/phpdocumentor": "2.7.*",
         "phpoffice/phpexcel": "1.8.*",
-        "phpunit/dbunit": "2.*",
-        "phpunit/phpunit": "4.*",
-        "phpunit/phpunit-mock-objects": "2.*",
         "pimple/pimple": "1.*",
         "psy/psysh": "0.6.*",
         "swiftmailer/swiftmailer": "@stable",
@@ -33,5 +28,12 @@
         "zendframework/zend-log": "~2.4.0",
         "zendframework/zend-validator": "~2.4.0",
         "zendframework/zend-view": "~2.4.0"
+    },
+    "require-dev" : {
+        "squizlabs/php_codesniffer": "2.*",
+        "phpdocumentor/phpdocumentor": "2.7.*",
+        "phpunit/dbunit": "2.*",
+        "phpunit/phpunit": "4.*",
+        "phpunit/phpunit-mock-objects": "2.*"
     }
 }
