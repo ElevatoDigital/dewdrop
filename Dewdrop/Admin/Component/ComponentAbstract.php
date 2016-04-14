@@ -494,6 +494,12 @@ abstract class ComponentAbstract
         return $this->shouldRenderLayout;
     }
 
+    public function setEnv(EnvInterface $env)
+    {
+        $this->env = $env;
+        return $this;
+    }
+
     /**
      * Set the title of this component as it should be displayed in the
      * admin menu.
