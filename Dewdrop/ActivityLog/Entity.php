@@ -23,6 +23,11 @@ class Entity
      */
     private $primaryKeyValue;
 
+    /**
+     * @var string
+     */
+    private $title;
+
     public function __construct(HandlerInterface $handler, $primaryKeyValue)
     {
         if (!$primaryKeyValue) {
@@ -48,6 +53,27 @@ class Entity
             $handlerResolver->resolve($shortcode->getName()),
             $shortcode->getParameter('id')
         );
+    }
+
+    public function getLink()
+    {
+        return $this->handler->renderLinkUrl($this->primaryKeyValue);
+    }
+
+    public function setTitle($title)
+    {
+        $this->title = $title;
+
+        return $this;
+    }
+
+    public function getTitle()
+    {
+        if (!$this->title) {
+            $this->title = $this->handler->renderTitleText($this->primaryKeyValue);
+        }
+
+        return $this->title;
     }
 
     public function getHandler()

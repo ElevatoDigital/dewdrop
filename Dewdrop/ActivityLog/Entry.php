@@ -5,6 +5,7 @@ namespace Dewdrop\ActivityLog;
 use DateTimeImmutable;
 use Dewdrop\ActivityLog\Entry\Collection;
 use Dewdrop\ActivityLog\Exception\EntityNotFound;
+use Dewdrop\ActivityLog\Handler\HandlerInterface;
 
 class Entry
 {
@@ -29,10 +30,12 @@ class Entry
         return $this->data['dewdrop_activity_log_id'];
     }
 
-    public function getEntity($handler, $id)
+    public function getEntity(HandlerInterface $handler, $id)
     {
-        foreach ($this->getEntities() as $entity) {
-            if ($entity['handler'] === $handler && $entity['id'] === (int) $id) {
+        foreach ($this->getEntities() as $entityData) {
+            if ($entityData['handler'] === $handler->getFullyQualifiedName() && $entityData['id'] === (int) $id) {
+                $entity = new Entity($handler, $entityData['id']);
+                $entity->setTitle($entityData['title']);
                 return $entity;
             }
         }

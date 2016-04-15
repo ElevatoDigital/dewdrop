@@ -5,6 +5,8 @@ namespace Dewdrop\ActivityLog\Handler;
 use Dewdrop\ActivityLog;
 use Dewdrop\ActivityLog\Entity;
 use Dewdrop\Db\Table;
+use Dewdrop\Fields\UserInterface;
+use Dewdrop\Pimple;
 
 abstract class HandlerAbstract implements HandlerInterface
 {
@@ -39,10 +41,27 @@ abstract class HandlerAbstract implements HandlerInterface
     private $modelClass;
 
     /**
+     * @var UserInterface
+     */
+    private $user;
+
+    /**
+     * @var string
+     */
+    private $defaultLinkTemplate = null;
+
+    /**
+     * @var array
+     */
+    private $roleSpecificLinkTemplates = [];
+
+    /**
      * HandlerAbstract constructor.
      */
-    public function __construct()
+    public function __construct(UserInterface $user = null)
     {
+        $this->user = $user;
+
         $this->init();
     }
 
@@ -96,6 +115,19 @@ abstract class HandlerAbstract implements HandlerInterface
         return $this->aliases;
     }
 
+    public function setLinkTemplate($linkTemplate, array $roles = null)
+    {
+        if (!$roles) {
+            $this->defaultLinkTemplate = $linkTemplate;
+        } else {
+            foreach ($roles as $role) {
+                $this->roleSpecificLinkTemplates[$role] = $linkTemplate;
+            }
+        }
+
+        return $this;
+    }
+
     public function setIcon($icon)
     {
         $this->icon = $icon;
@@ -130,6 +162,29 @@ abstract class HandlerAbstract implements HandlerInterface
         }
 
         return $this->model;
+    }
+
+    public function renderLinkUrl($primaryKeyValue)
+    {
+        $linkTemplate = $this->defaultLinkTemplate;
+
+        $user = $this->user;
+
+        if (null === $user && Pimple::hasResource('user') && Pimple::getResource('user') instanceof UserInterface) {
+            $user = Pimple::getResource('user');
+        }
+
+        foreach ($this->roleSpecificLinkTemplates as $role => $roleSpecificLinkTemplate) {
+            if ($user && $user->hasRole($role)) {
+                $linkTemplate = $roleSpecificLinkTemplate;
+            }
+        }
+
+        if (!$linkTemplate) {
+            return null;
+        }
+
+        return sprintf($linkTemplate, $primaryKeyValue);
     }
 
     public function renderTitleText($primaryKeyValue)

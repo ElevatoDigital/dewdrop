@@ -59,6 +59,11 @@ class NullHandler implements HandlerInterface
         return 'null';
     }
 
+    public function renderLinkUrl($primaryKeyValue)
+    {
+        return '#';
+    }
+    
     public function createEntity($primaryKeyValue)
     {
         return new Entity($this, $primaryKeyValue);

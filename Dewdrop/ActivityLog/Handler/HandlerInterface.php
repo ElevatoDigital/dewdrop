@@ -22,5 +22,7 @@ interface HandlerInterface
 
     public function renderTitleText($primaryKeyValue);
 
+    public function renderLinkUrl($primaryKeyValue);
+
     public function createEntity($primaryKeyValue);
 }
