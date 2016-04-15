@@ -10,6 +10,7 @@
 
 namespace Dewdrop\Db;
 
+use Dewdrop\ActivityLog\Handler\TableHandler as ActivityLogTableHandler;
 use Dewdrop\Db\Eav\Definition as EavDefinition;
 use Dewdrop\Db\ManyToMany\Relationship as ManyToManyRelationship;
 use Dewdrop\Db\Select\TableListing;
@@ -129,6 +130,13 @@ abstract class Table
     private $singularTitle;
 
     /**
+     * The activity log handler used to log events for this table.
+     *
+     * @var ActivityLogTableHandler
+     */
+    private $activityLogHandler;
+
+    /**
      * Create new table object with supplied DB adapter
      *
      * @param Adapter $db
@@ -155,6 +163,15 @@ abstract class Table
      * @return void
      */
     abstract public function init();
+
+    public function getActivityLogHandler()
+    {
+        if (!$this->activityLogHandler) {
+            $this->activityLogHandler = new ActivityLogTableHandler($this);
+        }
+
+        return $this->activityLogHandler;
+    }
 
     /**
      * Return a listing for the admin.
