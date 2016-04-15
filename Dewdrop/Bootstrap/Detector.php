@@ -11,6 +11,7 @@
 namespace Dewdrop\Bootstrap;
 
 use ArrayObject;
+use Dewdrop\ActivityLog\PimpleServiceProvider;
 use Dewdrop\Admin\PageFactory\Custom as CustomPageFactory;
 use Dewdrop\Auth\Db\UsersTableGateway;
 use Dewdrop\Config;
@@ -130,6 +131,9 @@ class Detector
                 );
             }
         }
+
+        $activityLogServiceProvider = new PimpleServiceProvider();
+        $activityLogServiceProvider->register($pimple);
 
         if ($pimple instanceof Application) {
             $pimple->error(
