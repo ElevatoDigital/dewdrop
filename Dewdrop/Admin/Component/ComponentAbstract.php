@@ -10,6 +10,8 @@
 
 namespace Dewdrop\Admin\Component;
 
+use Dewdrop\ActivityLog\Handler\HandlerInterface as ActivityLogHandlerInterface;
+use Dewdrop\ActivityLog\Handler\NullHandler as ActivityLogNullHandler;
 use Dewdrop\Admin\Env\EnvInterface;
 use Dewdrop\Admin\Page\PageAbstract;
 use Dewdrop\Admin\PageFactory\Files as PageFilesFactory;
@@ -140,6 +142,11 @@ abstract class ComponentAbstract
     protected $name;
 
     /**
+     * @var ActivityLogHandlerInterface
+     */
+    private $activityLogHandler;
+
+    /**
      * Whether this component is active (currently in charge of dispatching a
      * page/response).
      *
@@ -171,6 +178,8 @@ abstract class ComponentAbstract
 
         $this->path = dirname($reflectionClass->getFileName());
         $this->name = basename($this->path);
+
+        $this->activityLogHandler = new ActivityLogNullHandler();
 
         // Setup the default page factory, which looks for files in the component's folder
         $this->addPageFactory(new PageFilesFactory($this));
@@ -322,6 +331,25 @@ abstract class ComponentAbstract
     public function getDb()
     {
         return $this->getPimpleResource('db');
+    }
+
+    /**
+     * @param ActivityLogHandlerInterface $activityLogHandler
+     * @return $this
+     */
+    public function setActivityLogHandler(ActivityLogHandlerInterface $activityLogHandler)
+    {
+        $this->activityLogHandler = $activityLogHandler;
+
+        return $this;
+    }
+
+    /**
+     * @return ActivityLogHandlerInterface
+     */
+    public function getActivityLogHandler()
+    {
+        return $this->activityLogHandler;
     }
 
     /**
@@ -492,12 +520,6 @@ abstract class ComponentAbstract
     public function shouldRenderLayout()
     {
         return $this->shouldRenderLayout;
-    }
-
-    public function setEnv(EnvInterface $env)
-    {
-        $this->env = $env;
-        return $this;
     }
 
     /**
