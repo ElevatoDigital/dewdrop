@@ -136,6 +136,11 @@ class Paths
         return $this->getPluginRoot() . '/www';
     }
 
+    public function getActivityLog()
+    {
+        return $this->getPluginRoot() . '/activity-log';
+    }
+
     /**
      * The folder housing your admin components
      *
