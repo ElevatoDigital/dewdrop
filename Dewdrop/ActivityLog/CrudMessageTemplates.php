@@ -99,7 +99,7 @@ class CrudMessageTemplates
             // OK to proceed without the user handler.  Will just treat as anonymous.
         }
 
-        if (!$this->user || !$userHandler) {
+        if (!$user || !$userHandler) {
             $template = $this->anonymousMessages[$name];
         } else {
             $template = $this->userMessages[$name];
