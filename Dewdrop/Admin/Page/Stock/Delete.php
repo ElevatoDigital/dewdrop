@@ -12,6 +12,7 @@ namespace Dewdrop\Admin\Page\Stock;
 
 use Dewdrop\Admin\Component\ComponentAbstract;
 use Dewdrop\Admin\Component\CrudInterface;
+use Dewdrop\Fields\RowEditor;
 
 /**
  * This page handles requests to delete items using a CRUD component's row
@@ -50,11 +51,32 @@ class Delete extends StockPageAbstract
     {
         if ($this->request->isPost()) {
             $rowEditor = $this->component->getRowEditor();
-
             $rowEditor->link();
             $rowEditor->delete();
 
+            $this->logActivity($rowEditor);
+
             $this->result = 'success';
+        }
+    }
+
+    protected function logActivity(RowEditor $rowEditor)
+    {
+        $model = $this->component->getPrimaryModel();
+        $rows  = $rowEditor->getRows();
+        $id    = null;
+
+        /* @var $row \Dewdrop\Db\Row */
+        foreach ($rows as $row) {
+            if ($row->getTable() === $model) {
+                $id = $row->get(current($model->getPrimaryKey()));
+            }
+        }
+
+        if ($id) {
+            /* @var $handler \Dewdrop\ActivityLog\Handler\CrudHandlerAbstract */
+            $handler = $this->component->getActivityLogHandler();
+            $handler->delete($id);
         }
     }
 

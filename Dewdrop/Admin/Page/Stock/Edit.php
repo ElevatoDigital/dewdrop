@@ -184,9 +184,36 @@ class Edit extends StockPageAbstract
 
                 $this->rowEditor->save();
 
+                $this->logActivity();
+
                 if (!$this->request->isAjax()) {
                     $this->redirect($responseHelper);
                 }
+            }
+        }
+    }
+
+    protected function logActivity()
+    {
+        $model = $this->component->getPrimaryModel();
+        $rows  = $this->rowEditor->getRows();
+        $id    = null;
+
+        /* @var $row \Dewdrop\Db\Row */
+        foreach ($rows as $row) {
+            if ($row->getTable() === $model) {
+                $id = $row->get(current($model->getPrimaryKey()));
+            }
+        }
+
+        if ($id) {
+            /* @var $handler \Dewdrop\ActivityLog\Handler\CrudHandlerAbstract */
+            $handler = $this->component->getActivityLogHandler();
+
+            if ($this->isNew) {
+                $handler->create($id);
+            } else {
+                $handler->edit($id);
             }
         }
     }
