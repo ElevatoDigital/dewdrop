@@ -402,6 +402,10 @@ class Content extends HelperAbstract implements ContentHelperInterface
             }
         }
 
-        return $this->view->escapeHtml(date($this->dateFormat . ' ' . $this->timeFormat, $timestamp));
+        if ($timestamp) {
+            return $this->view->escapeHtml(date($this->dateFormat . ' ' . $this->timeFormat, $timestamp));
+        } else {
+            return '';
+        }
     }
 }
