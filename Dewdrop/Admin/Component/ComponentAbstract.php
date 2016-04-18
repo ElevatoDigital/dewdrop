@@ -523,6 +523,18 @@ abstract class ComponentAbstract
     }
 
     /**
+     * Allow overriding of the admin environment after instantiation.
+     *
+     * @param EnvInterface $env
+     * @return $this
+     */
+    public function setEnv(EnvInterface $env)
+    {
+        $this->env = $env;
+        return $this;
+    }
+
+    /**
      * Set the title of this component as it should be displayed in the
      * admin menu.
      *
