@@ -89,7 +89,7 @@ class Env implements EnvInterface
             }
         );
 
-        $pimple['session.storage'] = $pimple->share(
+        $pimple['session.access'] = $pimple->share(
             function () use ($pimple) {
                 return new SessionAccess($pimple['session']);
             }
