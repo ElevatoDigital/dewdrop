@@ -10,7 +10,7 @@
 
 namespace Dewdrop\Admin;
 
-use Dewdrop\Admin\Component\ComponentAbstract;
+use Dewdrop\Admin\Component\ComponentInterface;
 use Dewdrop\Admin\Component\CrudInterface;
 use Dewdrop\Exception;
 use Dewdrop\Pimple;
@@ -72,8 +72,8 @@ class Permissions
      */
     public function __construct($component, $debug = null)
     {
-        if (!$component instanceof ComponentAbstract && !$component instanceof CrudInterface) {
-            throw new Exception('Component must be CopmonentAbstract or implement CrudInterface');
+        if (!$component instanceof ComponentInterface && !$component instanceof CrudInterface) {
+            throw new Exception('Component must be CopmonentInterface or implement CrudInterface');
         }
 
         $this->component = $component;

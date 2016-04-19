@@ -10,7 +10,7 @@
 
 namespace Dewdrop\View\Helper;
 
-use Dewdrop\Admin\Component\ComponentAbstract;
+use Dewdrop\Admin\Component\ComponentInterface;
 use Dewdrop\Admin\Component\CrudInterface;
 
 /**
@@ -23,10 +23,10 @@ class AdminComponentNav extends AbstractHelper
     /**
      * Render the nav for the provided component.
      *
-     * @param ComponentAbstract $component
+     * @param ComponentInterface $component
      * @return string
      */
-    public function direct(ComponentAbstract $component, array $options = [])
+    public function direct(ComponentInterface $component, array $options = [])
     {
         if ($component instanceof CrudInterface) {
             $singularTitle = $component->getPrimaryModel()->getSingularTitle();

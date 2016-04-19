@@ -3,6 +3,8 @@
 namespace Dewdrop\Admin\Component;
 
 use Dewdrop\Db\Adapter;
+use Dewdrop\Env;
+use Dewdrop\Zf1\Env as Zf1Env;
 use Dewdrop\Pimple;
 use Dewdrop\Request;
 use Dewdrop\Test\BaseTestCase;
@@ -22,6 +24,10 @@ class ComponentAbstractTest extends BaseTestCase
 
     public function setUp()
     {
+        if (Env::getInstance() instanceof Zf1Env) {
+            $this->markTestSkipped('Zend Framework 1 environment does not support ComponentAbstract.');
+        }
+
         $testPimple = new \Pimple();
         $testPimple['dewdrop-request'] = new Request();
 

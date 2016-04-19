@@ -34,8 +34,12 @@ class AdminUrl extends AbstractHelper implements PageDelegateInterface
      * @param boolean $resetParams
      * @return string
      */
-    public function direct($page, array $params = array(), $resetParams = true)
+    public function direct($page = null, array $params = array(), $resetParams = true)
     {
+        if (!$page) {
+            return $this;
+        }
+
         if (!$resetParams) {
             $params = array_merge($this->view->getRequest()->getQuery(), $params);
         }

@@ -12,7 +12,7 @@ namespace Dewdrop\Admin\Page;
 
 use Dewdrop\Exception;
 use Dewdrop\Request;
-use Dewdrop\Admin\Component\ComponentAbstract;
+use Dewdrop\Admin\Component\ComponentInterface;
 use Dewdrop\Fields\Edit as EditFields;
 use Zend\InputFilter\InputFilter;
 
@@ -111,11 +111,11 @@ abstract class EditAbstract extends PageAbstract
      * Override the PageAbstract contructor so we can add a \Dewdrop\Fields\Edit
      * object before proceeding to init().
      *
-     * @param ComponentAbstract $component
+     * @param ComponentInterface $component
      * @param Request $request
      * @param string $pageFile The file in which the page class is defined.
      */
-    public function __construct(ComponentAbstract $component, Request $request, $pageFile)
+    public function __construct(ComponentInterface $component, Request $request, $pageFile)
     {
         parent::__construct($component, $request, $pageFile);
 
@@ -168,6 +168,7 @@ abstract class EditAbstract extends PageAbstract
             $modelClass = '\Model\\' . $modelClass;
         }
 
+        /* @var $model \Dewdrop\Db\Table */
         $model = new $modelClass($this->component->getDb());
         $pkey  = $model->getPrimaryKey();
         $query = $this->request->getQuery();

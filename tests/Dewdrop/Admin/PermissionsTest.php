@@ -2,14 +2,47 @@
 
 namespace Dewdrop\Admin;
 
-use Dewdrop\Admin\Component\ComponentAbstract;
+use Dewdrop\Admin\Component\ComponentInterface;
+use Dewdrop\Admin\Component\ComponentTrait;
 use Dewdrop\Db\Table;
 
-class PermissionsTestComponent extends ComponentAbstract
+class PermissionsTestComponent implements ComponentInterface
 {
+    use ComponentTrait;
+
+    public function url($page, array $params = [])
+    {
+
+    }
+
     public function init()
     {
-        $this->setTitle('TEST');
+        // TODO: Implement init() method.
+    }
+
+    public function preDispatch()
+    {
+        // TODO: Implement preDispatch() method.
+    }
+
+    public function hasPimpleResource($name)
+    {
+        // TODO: Implement hasPimpleResource() method.
+    }
+
+    public function getPimpleResource($name)
+    {
+        // TODO: Implement getPimpleResource() method.
+    }
+
+    public function getTitle()
+    {
+        return 'Test Component';
+    }
+
+    public function getName()
+    {
+        return 'component';
     }
 }
 

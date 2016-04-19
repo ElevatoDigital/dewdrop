@@ -96,7 +96,7 @@ class Index extends StockPageAbstract
     {
         $this->component->getPermissions()->haltIfNotAllowed('view-listing');
 
-        $this->session = new Session(Pimple::getInstance());
+        $this->session = new Session();
         $this->session->set($this->component->getListingQueryParamsSessionName(), $this->request->getQuery());
 
         if ($this->component instanceof SortableListingInterface) {

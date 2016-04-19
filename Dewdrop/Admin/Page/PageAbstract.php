@@ -44,7 +44,7 @@ abstract class PageAbstract
     /**
      * The component the page is part of
      *
-     * @var ComponentAbstract
+     * @var ComponentInterface
      */
     protected $component;
 
@@ -87,11 +87,11 @@ abstract class PageAbstract
      * Also, by default, the page will be configured to look for view scripts
      * in the view-scripts sub-folder of its component.
      *
-     * @param ComponentAbstract $component
+     * @param ComponentInterface $component
      * @param Request $request
      * @param string $viewScriptPath
      */
-    public function __construct(ComponentAbstract $component, Request $request, $viewScriptPath = null)
+    public function __construct(ComponentInterface $component, Request $request, $viewScriptPath = null)
     {
         $this->component   = $component;
         $this->view        = Pimple::getResource('view');
