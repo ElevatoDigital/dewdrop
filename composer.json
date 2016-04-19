@@ -14,6 +14,7 @@
         "griffbrad/html-node": "1.*",
         "ircmaxell/password-compat": "1.0.*",
         "jdorn/sql-formatter": "1.2.*",
+        "monolog/monolog": "^1.4.1",
         "phpoffice/phpexcel": "1.8.*",
         "pimple/pimple": "1.*",
         "psy/psysh": "0.6.*",
