@@ -13,9 +13,10 @@ namespace Dewdrop\Admin\Component;
 use Dewdrop\ActivityLog\Handler\HandlerInterface as ActivityLogHandlerInterface;
 use Dewdrop\ActivityLog\Handler\NullHandler as ActivityLogNullHandler;
 use Dewdrop\Admin\Env\EnvInterface;
-use Dewdrop\Admin\Page\PageAbstract;
 use Dewdrop\Admin\PageFactory\Files as PageFilesFactory;
+use Dewdrop\Admin\PageFactory\PageFactoryInterface;
 use Dewdrop\Exception;
+use Dewdrop\Admin\Permissions;
 use Dewdrop\Pimple as DewdropPimple;
 use Pimple;
 
@@ -107,13 +108,6 @@ abstract class ComponentAbstract implements ComponentInterface, ShellIntegration
      * @var string
      */
     protected $path;
-
-    /**
-     * The component name (as it would show up in the URL, for example).
-     *
-     * @var string
-     */
-    protected $name;
 
     /**
      * @var ActivityLogHandlerInterface

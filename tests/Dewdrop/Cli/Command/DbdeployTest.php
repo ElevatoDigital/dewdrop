@@ -2,6 +2,8 @@
 
 namespace Dewdrop\Cli\Command;
 
+use Dewdrop\Env;
+use Dewdrop\Wp\Env as WpEnv;
 use Dewdrop\Paths;
 
 class DbdeployTest extends \PHPUnit_Framework_TestCase
@@ -91,8 +93,10 @@ class DbdeployTest extends \PHPUnit_Framework_TestCase
 
     public function testBackfillActionAddsToChangelog()
     {
+        $env = Env::getInstance();
+
         $command = $this->getMockCommand();
-        $command->parseArgs(array('--action=backfill', '--changeset=plugin', '--revision=1'));
+        $command->parseArgs(array('--action=backfill', '--changeset=' . $env->getProjectNoun(), '--revision=1'));
         $command->execute();
 
         $db = $this->runner->connectDb();
@@ -144,8 +148,10 @@ class DbdeployTest extends \PHPUnit_Framework_TestCase
 
     public function testCallingBackfillWhenAlreadyUpdatedDelegatesToStatus()
     {
+        $env = Env::getInstance();
+
         $command = $this->getMockCommand();
-        $command->parseArgs(array('--action=backfill', '--changeset=plugin', '--revision=1'));
+        $command->parseArgs(array('--action=backfill', '--changeset=' . $env->getProjectNoun(), '--revision=1'));
         $command->execute();
 
         $db = $this->runner->connectDb();
@@ -162,7 +168,7 @@ class DbdeployTest extends \PHPUnit_Framework_TestCase
             ->method('executeStatus')
             ->will($this->returnValue(true));
 
-        $command->parseArgs(array('--action=backfill', '--changeset=plugin', '--revision=1'));
+        $command->parseArgs(array('--action=backfill', '--changeset=' . $env->getProjectNoun(), '--revision=1'));
         $command->execute();
     }
 
@@ -243,14 +249,16 @@ class DbdeployTest extends \PHPUnit_Framework_TestCase
             array($this->runner, $this->renderer)
         );
 
+        $env = Env::getInstance();
+
         $dbTypeSuffix = 'pgsql';
 
-        if (defined('WPINC')) {
+        if ($env instanceof WpEnv) {
             $dbTypeSuffix = 'mysql';
         }
 
         $command->overrideChangesetPath(
-            'plugin',
+            $env->getProjectNoun(),
             $this->paths->getDewdropLib() . '/tests/Dewdrop/Cli/Command/dbdeploy-test/plugin/' . $dbTypeSuffix
         );
 

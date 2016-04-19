@@ -150,6 +150,7 @@ class ChangelogGateway
 
         if ('plugin' !== $primaryChangesetName) {
             $this->dbAdapter->update(
+                $this->tableName,
                 ['delta_set' => $primaryChangesetName],
                 "delta_set = 'plugin'"
             );
