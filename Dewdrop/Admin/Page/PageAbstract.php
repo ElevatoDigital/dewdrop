@@ -10,7 +10,7 @@
 
 namespace Dewdrop\Admin\Page;
 
-use Dewdrop\Admin\Component\ComponentAbstract;
+use Dewdrop\Admin\Component\ComponentInterface;
 use Dewdrop\Admin\ResponseHelper\Standard as ResponseHelper;
 use Dewdrop\Pimple;
 use Dewdrop\Request;
@@ -95,7 +95,7 @@ abstract class PageAbstract
     {
         $this->component   = $component;
         $this->view        = Pimple::getResource('view');
-        $this->request     = ($request ?: $this->application['dewdrop-request']);
+        $this->request     = ($request ?: Pimple::getResource('dewdrop-request'));
 
         if (null === $viewScriptPath) {
             $viewScriptPath = $this->component->getPath() . '/view-scripts';
