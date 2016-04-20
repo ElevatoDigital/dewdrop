@@ -13,6 +13,7 @@ namespace Dewdrop\Wp\Session;
 use ArrayObject;
 use Dewdrop\Exception;
 use Dewdrop\Session\SessionAccessInterface;
+use Recursive_ArrayAccess;
 use WP_Session;
 
 class Access implements SessionAccessInterface
@@ -37,7 +38,13 @@ class Access implements SessionAccessInterface
 
     public function get($name)
     {
-        return $this->session[$name];
+        $out = $this->session[$name];
+        
+        if ($out instanceof Recursive_ArrayAccess) {
+            $out = $out->toArray();
+        }
+
+        return $out;
     }
 
     public function set($name, $value)
