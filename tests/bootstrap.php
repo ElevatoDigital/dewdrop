@@ -2,6 +2,11 @@
 
 require_once __DIR__ . '/../../../autoload.php';
 
-\Dewdrop\Bootstrap\Wp::handleWpLoadGlobals();
+use Dewdrop\Env;
+
+Env::bootstrapCli();
+
+$env = Env::getInstance();
+$env->initializeCli();
 
 $GLOBALS['dewdrop_pimple'] = \Dewdrop\Bootstrap\Detector::findPimple();

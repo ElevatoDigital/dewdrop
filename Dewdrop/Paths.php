@@ -76,6 +76,7 @@ class Paths
      * Check to see if we're running in WP.  We currently just look for
      * the WPINC constant, but there might be better ways of detecting this.
      *
+     * @deprecated
      * @return boolean
      */
     public function isWp()

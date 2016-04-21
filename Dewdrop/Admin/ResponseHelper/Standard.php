@@ -13,7 +13,6 @@ namespace Dewdrop\Admin\ResponseHelper;
 use Dewdrop\Admin\Page\PageAbstract;
 use Dewdrop\Pimple;
 use Dewdrop\Session;
-use WP_Session;
 
 /**
  * The response helper object gets injected into a page's process() method
@@ -93,7 +92,7 @@ class Standard
     {
         $this->page       = $page;
         $this->redirector = $redirector;
-        $this->session    = ($session ?: Pimple::getResource('session'));
+        $this->session    = ($session ?: new Session());
     }
 
     /**
@@ -187,11 +186,7 @@ class Standard
     public function executeSuccessMessage()
     {
         if ($this->successMessage) {
-            if ($this->session instanceof WP_Session) {
-                $this->session['successMessage'] = $this->successMessage;
-            } else {
-                $this->session->set('successMessage', $this->successMessage);
-            }
+            $this->session['successMessage'] = $this->successMessage;
         }
 
         return $this;

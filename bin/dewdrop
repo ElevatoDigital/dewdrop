@@ -11,18 +11,12 @@ if (file_exists(__DIR__ . '/../vendor/autoload.php')) {
     require_once __DIR__ . '/../../../autoload.php';
 }
 
-\Dewdrop\Bootstrap\Wp::handleWpLoadGlobals();
+use Dewdrop\Env;
 
-$paths = new \Dewdrop\Paths();
+Env::bootstrapCli();
 
-if ($paths->isWp()) {
-    $folder     = basename($paths->getPluginRoot());
-    $pluginFile = $paths->getPluginRoot() . '/' . $folder . '.php';
-
-    if (file_exists($pluginFile)) {
-        require_once $pluginFile;
-    }
-}
+$env = Env::getInstance();
+$env->initializeCli();
 
 $cli = new \Dewdrop\Cli\Run();
 $cli->run();

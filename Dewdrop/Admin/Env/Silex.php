@@ -10,7 +10,8 @@
 
 namespace Dewdrop\Admin\Env;
 
-use Dewdrop\Admin\Component\ComponentAbstract;
+use Dewdrop\Admin\Component\ComponentInterface;
+use Dewdrop\Admin\Component\ShellIntegrationInterface;
 use Dewdrop\Pimple;
 use Dewdrop\View\View;
 use Silex\Application;
@@ -113,14 +114,14 @@ class Silex extends EnvAbstract
     /**
      * Initialize the provided component by setting up routes for it in Silex.
      *
-     * @param ComponentAbstract $component
+     * @param ComponentInterface $component
      */
-    public function initComponent(ComponentAbstract $component)
+    public function initComponent(ComponentInterface $component)
     {
         $this->application->match(
             '/admin/' . $component->getName() . '/{page}',
             function ($page) use ($component) {
-                /* @var $component ComponentAbstract */
+                /* @var $component ComponentInterface */
                 foreach ($this->components as $preDispatchComponent) {
                     $preDispatchComponent->preDispatch();
                 }
@@ -209,12 +210,12 @@ class Silex extends EnvAbstract
      * Generate a URL for the provided page and params that will match the
      * Silex routes set up by this class.
      *
-     * @param ComponentAbstract $component
+     * @param ComponentInterface $component
      * @param string $page
      * @param array $params
      * @return string
      */
-    public function url(ComponentAbstract $component, $page, array $params = array())
+    public function url(ComponentInterface $component, $page, array $params = array())
     {
         $url = '/admin/'
             . $component->getName() . '/'
@@ -255,8 +256,8 @@ class Silex extends EnvAbstract
         usort(
             $components,
             function ($a, $b) {
-                /* @var $a ComponentAbstract */
-                /* @var $b ComponentAbstract */
+                /* @var $a ShellIntegrationInterface */
+                /* @var $b ShellIntegrationInterface */
                 $aPos = $a->getMenuPosition();
                 $bPos = $b->getMenuPosition();
 

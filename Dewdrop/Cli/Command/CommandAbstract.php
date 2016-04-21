@@ -168,7 +168,7 @@ abstract class CommandAbstract
     {
         $this->runner   = $runner;
         $this->renderer = $renderer;
-        $this->paths    = new Paths();
+        $this->paths    = $runner->getPimple()['paths'];
 
         // All commands support the --help argument
         $this->addArg(

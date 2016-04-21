@@ -10,7 +10,8 @@
 
 namespace Dewdrop\Admin\Env;
 
-use Dewdrop\Admin\Component\ComponentAbstract;
+use Dewdrop\Admin\Component\ComponentInterface;
+use Dewdrop\Admin\Component\ShellIntegrationInterface;
 use Dewdrop\Admin\Response;
 use Dewdrop\Pimple;
 use Dewdrop\View\View;
@@ -81,12 +82,12 @@ class Wp extends EnvAbstract
      * return submenu-friendly URLs when a submenu item matches the supplied
      * page and params arguments.
      *
-     * @param ComponentAbstract $component
+     * @param ComponentInterface $component
      * @param string $page
      * @param array $params
      * @return string
      */
-    public function url(ComponentAbstract $component, $page, array $params = array())
+    public function url(ComponentInterface $component, $page, array $params = array())
     {
         $base  = get_bloginfo('wpurl') . '/wp-admin/admin.php?page=' . $component->getSlug();
         $query = $this->assembleQueryString($params, $separator = '&');
@@ -148,10 +149,10 @@ class Wp extends EnvAbstract
      * event handlers so that we can supply the ComponentAbstract object to those
      * functions.
      *
-     * @param ComponentAbstract $component
+     * @param ComponentInterface $component
      * @return void
      */
-    public function initComponent(ComponentAbstract $component)
+    public function initComponent(ComponentInterface $component)
     {
         add_action(
             'admin_init',
@@ -183,12 +184,12 @@ class Wp extends EnvAbstract
      * @param string $page The name of the page to route to (e.g. "Index" or "Edit").
      * @param Response $response Inject a response object, usually for tests.
      *
-     * @param ComponentAbstract $component
+     * @param ComponentInterface $component
      * @param string|null $page
      * @param Response|null $response
-     * @return ComponentAbstract
+     * @return ComponentInterface
      */
-    public function adminInit(ComponentAbstract $component, $page = null, Response $response = null)
+    public function adminInit(ComponentInterface $component, $page = null, Response $response = null)
     {
         if ($this->componentIsCurrentlyActive($component)) {
             $page = $component->createPageObject($component->getRequest()->getQuery('route', 'Index'));
@@ -257,15 +258,15 @@ class Wp extends EnvAbstract
      * register() method.  It essentially tells WP to call this component's
      * route() method whenever the component is accessed.
      *
-     * @param ComponentAbstract $component
+     * @param ComponentInterface $component
      */
-    public function registerMenuPage(ComponentAbstract $component)
+    public function registerMenuPage(ComponentInterface $component)
     {
         $slug = $component->getSlug();
 
         $this->registerComponentHandlingCallback($component);
 
-        if (count($component->getSubmenuPages())) {
+        if ($component instanceof ShellIntegrationInterface && count($component->getSubmenuPages())) {
             global $submenu_file;
 
             foreach ($component->getSubmenuPages() as $page) {
@@ -303,10 +304,10 @@ class Wp extends EnvAbstract
      * get our callback over to WP without displaying anything in the
      * menu.
      *
-     * @param ComponentAbstract $component
+     * @param ComponentInterface $component
      * @throws \Dewdrop\Exception
      */
-    protected function registerComponentHandlingCallback(ComponentAbstract $component)
+    protected function registerComponentHandlingCallback(ComponentInterface $component)
     {
         if ($component->getPermissions()->can('display-menu')) {
             $this->addObjectPage(
@@ -365,10 +366,10 @@ class Wp extends EnvAbstract
      * WP shell itself is rendered.  This method is attached to the appropiate
      * hooks to allow that to happen.
      *
-     * @param ComponentAbstract $component
+     * @param ComponentInterface $component
      * @return void
      */
-    public function renderOutputIntoShell(ComponentAbstract $component)
+    public function renderOutputIntoShell(ComponentInterface $component)
     {
         echo $this->output;
     }
@@ -384,7 +385,7 @@ class Wp extends EnvAbstract
      *
      * @return boolean
      */
-    protected function componentIsCurrentlyActive(ComponentAbstract $component)
+    protected function componentIsCurrentlyActive(ComponentInterface $component)
     {
         return preg_match('/^' . $component->getSlug() . '($|\/)/i', $component->getRequest()->getQuery('page')) ||
             $component->getSlug() === $component->getRequest()->getPost('action');

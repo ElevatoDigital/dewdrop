@@ -11,36 +11,106 @@
 namespace Dewdrop;
 
 use ArrayAccess;
+use Dewdrop\Exception;
+use Dewdrop\Session\SessionAccessInterface;
 use Pimple as PimpleProper;
-use Silex\Application as SilexApplication;
-use WP_Session;
 
 /**
- * A simple facade to session data
+ * A simple facade to session data.  You can use \Dewdrop\Session regardless of the
+ * environment you're running in (i.e. WP, Silex, Zend Framework, etc).  It allows you
+ * to manipulate session data using object properties, array access or explicit method
+ * calls.  This makes it particularly important for Dewdrop core because you can write
+ * your session code against \Dewdrop\Session and not worry about whether it will work
+ * in the other supported environments.
  */
 class Session implements ArrayAccess
 {
     /**
-     * A \Dewdrop\Paths object for getting info about the application environment.
-     * @var Paths
-     */
-    protected $paths;
-
-    /**
      * The session data storage container appropriate for the current environment.
      *
-     * @var \Symfony\Component\HttpFoundation\Session\Session|WP_Session
+     * @var SessionAccessInterface
      */
-    protected $container;
+    protected $access;
 
     /**
      * Provide a Pimple container for retrieval of session storage.
      *
-     * @param PimpleProper $pimple
+     * @param mixed $container
      */
-    public function __construct(PimpleProper $pimple)
+    public function __construct($access = null)
     {
-        $this->container = $pimple['session'];
+        if ($access instanceof PimpleProper) {
+            $access = $access['session.access'];
+        }
+
+        if (null === $access) {
+            $access = Pimple::getResource('session.access');
+        }
+
+        if (!$access instanceof SessionAccessInterface) {
+            throw new Exception('Must provide a SessionAccessInterface object.');
+        }
+
+        $this->access = $access;
+    }
+
+    /**
+     * Returns value for given name
+     *
+     * @param string $name
+     * @return mixed
+     */
+    public function get($name)
+    {
+        return $this->access->get($name);
+    }
+
+    /**
+     * Returns whether value is set for given name
+     *
+     * @param string $name
+     * @return bool
+     */
+    public function has($name)
+    {
+        return $this->access->has($name);
+    }
+
+    /**
+     * Regenerates the session ID
+     *
+     * @return void
+     */
+    public function regenerateId()
+    {
+        $this->access->regenerateId();
+    }
+
+    /**
+     * Removes the named value
+     *
+     * @param string $name
+     * @return $this
+     */
+    public function remove($name)
+    {
+        $this->access->remove($name);
+
+        return $this;
+    }
+
+    /**
+     * Sets name to the given value
+     *
+     * @param string $name
+     * @param mixed $value
+     * @return $this
+     */
+    public function set($name, $value)
+    {
+        $this->access->set($name, $value);
+
+        return $this;
     }
 
     /**
@@ -66,6 +136,16 @@ class Session implements ArrayAccess
     }
 
     /**
+     * Unset a value by calling unset() on an object property.
+     *
+     * @param $name
+     */
+    public function __unset($name)
+    {
+        return $this->remove($name);
+    }
+
+    /**
      * Sets name to the given value
      *
      * @param string $name
@@ -77,39 +157,6 @@ class Session implements ArrayAccess
         $this->set($name, $value);
     }
 
-    /**
-     * Returns value for given name
-     *
-     * @param string $name
-     * @return mixed
-     */
-    public function get($name)
-    {
-        if ($this->container instanceof WP_Session) {
-            $value = $this->container->offsetGet($name);
-        } else {
-            $value = $this->container->get($name);
-        }
-
-        return $value;
-    }
-
-    /**
-     * Returns whether value is set for given name
-     *
-     * @param string $name
-     * @return bool
-     */
-    public function has($name)
-    {
-        if ($this->container instanceof WP_Session) {
-            $result = $this->container->offsetExists($name);
-        } else {
-            $result = $this->container->has($name);
-        }
-
-        return $result;
-    }
 
     /**
      * Whether a offset exists
@@ -157,47 +204,12 @@ class Session implements ArrayAccess
     }
 
     /**
-     * Regenerates the session ID
+     * Mostly provided to allow checking of storage setup during testing.
      *
-     * @return void
+     * @return SessionAccessInterface
      */
-    public function regenerateId()
+    public function getAccessObject()
     {
-        if ($this->container instanceof WP_Session) {
-            $this->container->regenerate_id();
-        } else {
-            $this->container->migrate();
-        }
-    }
-
-    /**
-     * Removes the named value
-     *
-     * @param string $name
-     * @return void
-     */
-    public function remove($name)
-    {
-        if ($this->container instanceof WP_Session) {
-            $this->container->offsetUnset($name);
-        } else {
-            $this->container->remove($name);
-        }
-    }
-
-    /**
-     * Sets name to the given value
-     *
-     * @param string $name
-     * @param mixed $value
-     * @return void
-     */
-    public function set($name, $value)
-    {
-        if ($this->container instanceof WP_Session) {
-            $this->container->offsetSet($name, $value);
-        } else {
-            $this->container->set($name, $value);
-        }
+        return $this->access;
     }
 }

@@ -45,7 +45,7 @@ abstract class AbstractClassMapFactory implements PageFactoryInterface
     public function createPage($name)
     {
         // Remain compatible with WP style naming
-        $name = $this->component->getInflector()->hyphenize($name);
+        $name = $this->component->getPimpleResource('inflector')->hyphenize($name);
 
         if (array_key_exists($name, $this->pageClassMap)) {
             $pageClass      = $this->pageClassMap[$name];
@@ -53,7 +53,7 @@ abstract class AbstractClassMapFactory implements PageFactoryInterface
 
             return new $pageClass(
                 $this->component,
-                $this->component->getRequest(),
+                $this->component->getPimpleResource('dewdrop-request'),
                 dirname($reflectedClass->getFileName()) . '/view-scripts'
             );
         }

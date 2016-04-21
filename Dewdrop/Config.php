@@ -11,7 +11,8 @@
 namespace Dewdrop;
 
 use ArrayAccess;
-use Dewdrop\Paths;
+use Dewdrop\Env;
+use Dewdrop\Env\EnvInterface;
 
 /**
  * This class manages the basic Dewdrop configuration needed to get
@@ -44,36 +45,10 @@ class Config implements ArrayAccess
      *
      * @param string $file
      */
-    public function __construct($file = null)
+    public function __construct(EnvInterface $env = null, $file = null)
     {
-        $paths = new Paths();
-
-        if (!$paths->isWp()) {
-            if (null === $file) {
-                $file  = $paths->getPluginRoot() . '/dewdrop-config.php';
-            }
-
-            if (file_exists($file) || is_readable($file)) {
-                $this->data = require $file;
-            }
-        } else {
-            $className = '\Dewdrop\Bootstrap\Wp';
-
-            if (defined('DEWDROP_BOOTSTRAP_CLASS')) {
-                $className = DEWDROP_BOOTSTRAP_CLASS;
-            }
-
-            $this->data = array(
-                'bootstrap' => $className,
-                'db' => array(
-                    'username' => DB_USER,
-                    'password' => DB_PASSWORD,
-                    'host'     => DB_HOST,
-                    'name'     => DB_NAME,
-                    'type'     => 'mysql'
-                )
-            );
-        }
+        $env = ($env ?: Env::getInstance());
+        $this->data = $env->getConfigData($file);
     }
 
     /**

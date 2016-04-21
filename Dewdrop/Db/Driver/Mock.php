@@ -240,7 +240,7 @@ class Mock implements DriverInterface
     {
 
     }
-    
+
     /**
      * Rollback the current transaction.
      *
@@ -248,7 +248,7 @@ class Mock implements DriverInterface
      */
     public function rollback()
     {
-        
+
     }
 
     /**
