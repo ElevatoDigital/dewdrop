@@ -48,17 +48,6 @@ abstract class AbstractHelper
     }
 
     /**
-     * This method is used by \Dewdrop\View\View::__call() to allow direct
-     * execution of a helper.
-     *
-     * @return mixed
-     */
-    public function direct()
-    {
-        return $this;
-    }
-
-    /**
      * Render a partial view script.
      *
      * Generally, your helper should render HTML with partial view scripts
