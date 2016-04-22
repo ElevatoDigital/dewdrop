@@ -119,9 +119,7 @@ class ChangelogGateway
             $this->createTable();
         }
 
-        if ('plugin' === $changesetName) {
-            $this->maintainBackwardCompatibilityOnPrimaryChangeset();
-        }
+        $this->maintainBackwardCompatibilityOnPrimaryChangeset();
 
         return $this->dbAdapter->insert(
             $this->tableName,
