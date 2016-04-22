@@ -29,7 +29,10 @@
         "zendframework/zend-inputfilter": "~2.4.0",
         "zendframework/zend-log": "~2.4.0",
         "zendframework/zend-validator": "~2.4.0",
-        "zendframework/zend-view": "~2.4.0"
+        "zendframework/zend-view": "~2.4.0",
+        "geoip2/geoip2": "2.*",
+        "willdurand/geocoder": "3.*",
+        "jenssegers/agent": "2.*"
     },
     "require-dev" : {
         "squizlabs/php_codesniffer": "2.*",
