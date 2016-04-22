@@ -51,17 +51,19 @@ class DbGateway extends Table
             'ip_address'                  => $ipAddress,
             'sapi_name'                   => substr($sapiName, 0, 32),
             'user_agent'                  => substr($userAgentString, 0, 255),
-            'user_agent_browser'          => $browser,
-            'user_agent_device'           => $userAgent->device(),
-            'user_agent_browser_version'  => $userAgent->version($browser),
-            'user_agent_platform_version' => $userAgent->version($platform),
-            'user_agent_platform'         => $platform,
-            'user_agent_robot'            => $userAgent->robot()
+            'user_agent_browser'          => substr($browser, 0, 32),
+            'user_agent_device'           => substr($userAgent->device(), 0, 32),
+            'user_agent_browser_version'  => substr($userAgent->version($browser), 0, 32),
+            'user_agent_platform_version' => substr($userAgent->version($platform), 0, 32),
+            'user_agent_platform'         => substr($platform, 0, 32),
+            'user_agent_robot'            => substr($userAgent->robot(), 0, 32)
         ];
 
         if ($geocoderResult) {
+            $region = $geocoderResult->getAdminLevels()->first();
+
             $data['geo_city']         = substr($geocoderResult->getLocality(), 0, 32);
-            $data['geo_region']       = substr($geocoderResult->getAdminLevels()->first()->getCode(), 0, 32);
+            $data['geo_region']       = ($region ? substr($region->getCode(), 0, 32) : null);
             $data['geo_country']      = substr($geocoderResult->getCountry(), 0, 32);
             $data['geo_country_code'] = substr($geocoderResult->getCountryCode(), 0, 6);
             $data['geo_latitude']     = substr($geocoderResult->getLatitude(), 0, 32);
@@ -111,11 +113,7 @@ class DbGateway extends Table
         }
 
         if ($limit) {
-            $select->limit($limit);
-        }
-
-        if ($offset) {
-            $select->offset($offset);
+            $select->limit($limit, $offset);
         }
 
         $select->order("date_created {$order}");
