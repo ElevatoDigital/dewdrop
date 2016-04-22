@@ -113,11 +113,7 @@ class DbGateway extends Table
         }
 
         if ($limit) {
-            $select->limit($limit);
-        }
-
-        if ($offset) {
-            $select->offset($offset);
+            $select->limit($limit, $offset);
         }
 
         $select->order("date_created {$order}");
