@@ -26,7 +26,11 @@ class PimpleServiceProvider
 
         $pimple['activity-log.user-information'] = $pimple->share(
             function () use ($pimple) {
-                return new UserInformation($pimple['activity-log.db-gateway'], $pimple['activity-log.geocoder']);
+                return new UserInformation(
+                    $pimple['activity-log.db-gateway'],
+                    $pimple['dewdrop-request'],
+                    $pimple['activity-log.geocoder']
+                );
             }
         );
 

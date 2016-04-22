@@ -10,6 +10,9 @@
 
 namespace Dewdrop\ActivityLog;
 
+use Dewdrop\Pimple;
+use Dewdrop\Request;
+use Geocoder\Exception\NoResult as NoResultException;
 use Geocoder\Provider\GeoIP2 as GeoIp2Provider;
 
 class UserInformation
@@ -23,6 +26,11 @@ class UserInformation
      * @var int
      */
     private $cookieTtl = 3600;
+
+    /**
+     * @var Request
+     */
+    private $request;
 
     /**
      * @var GeoIp2Provider
@@ -39,9 +47,10 @@ class UserInformation
      * @param DbGateway $dbGateway
      * @param GeoIp2Provider $geocoder
      */
-    public function __construct(DbGateway $dbGateway, GeoIp2Provider $geocoder = null)
+    public function __construct(DbGateway $dbGateway, Request $request = null, GeoIp2Provider $geocoder = null)
     {
         $this->dbGateway = $dbGateway;
+        $this->request   = ($request ?: Pimple::getResource('dewdrop-request'));
         $this->geocoder  = $geocoder;
     }
 
@@ -75,13 +84,21 @@ class UserInformation
         $id = $this->getIdFromSignedCookie();
 
         if (false === $id) {
-            $ipAddress = $_SERVER['REMOTE_ADDR'];
+            $ipAddress      = $this->request->getClientIp();
+            $geocoderResult = null;
+
+            if ($this->geocoder) {
+                try {
+                    $geocoderResult = $this->geocoder->geocode($ipAddress)->first();
+                } catch (NoResultException $e) {
+                }
+            }
 
             $id = $this->dbGateway->insertUserInformation(
                 $ipAddress,
                 $_SERVER['HTTP_USER_AGENT'],
                 php_sapi_name(),
-                ($this->geocoder ? $this->geocoder->geocode($ipAddress)->first() : null)
+                $geocoderResult
             );
 
             $this->writeSignedCookie($id);
