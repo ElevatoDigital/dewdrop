@@ -30,6 +30,11 @@ class Entry
         return $this->data['dewdrop_activity_log_id'];
     }
 
+    public function getUserInformation()
+    {
+        return $this->collection->getUserInformationById($this->data['dewdrop_activity_log_user_information_id']);
+    }
+
     public function getEntity(HandlerInterface $handler, $id)
     {
         foreach ($this->getEntities() as $entityData) {

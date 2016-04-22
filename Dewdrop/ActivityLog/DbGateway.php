@@ -4,6 +4,8 @@ namespace Dewdrop\ActivityLog;
 
 use Dewdrop\Db\Select;
 use Dewdrop\Db\Table;
+use Geocoder\Model\Address as GeocoderResult;
+use Jenssegers\Agent\Agent as UserAgent;
 
 class DbGateway extends Table
 {
@@ -12,14 +14,18 @@ class DbGateway extends Table
         $this->setTableName('dewdrop_activity_log');
     }
 
-    public function insertEntry($summary, $message, array $entities)
+    public function insertEntry($summary, $message, array $entities, $userInfoId = null)
     {
-        $id = $this->insert(
-            [
-                'summary' => $summary,
-                'message' => $message
-            ]
-        );
+        $data = [
+            'summary' => $summary,
+            'message' => $message,
+        ];
+
+        if ($userInfoId) {
+            $data['dewdrop_activity_log_user_information_id'] = $userInfoId;
+        }
+
+        $id = $this->insert($data);
 
         foreach ($entities as $entity) {
             $entity['dewdrop_activity_log_id'] = $id;
@@ -27,6 +33,44 @@ class DbGateway extends Table
         }
 
         return $id;
+    }
+
+    public function insertUserInformation(
+        $ipAddress,
+        $userAgentString,
+        $sapiName,
+        GeocoderResult $geocoderResult = null
+    ) {
+        $userAgent = new UserAgent();
+        $userAgent->setUserAgent($userAgentString);
+
+        $browser  = $userAgent->browser();
+        $platform = $userAgent->platform();
+
+        $data = [
+            'ip_address'                  => $ipAddress,
+            'sapi_name'                   => substr($sapiName, 0, 32),
+            'user_agent'                  => substr($userAgentString, 0, 255),
+            'user_agent_browser'          => $browser,
+            'user_agent_device'           => $userAgent->device(),
+            'user_agent_browser_version'  => $userAgent->version($browser),
+            'user_agent_platform_version' => $userAgent->version($platform),
+            'user_agent_platform'         => $platform,
+            'user_agent_robot'            => $userAgent->robot()
+        ];
+
+        if ($geocoderResult) {
+            $data['geo_city']         = substr($geocoderResult->getLocality(), 0, 32);
+            $data['geo_region']       = substr($geocoderResult->getAdminLevels()->first()->getCode(), 0, 32);
+            $data['geo_country']      = substr($geocoderResult->getCountry(), 0, 32);
+            $data['geo_country_code'] = substr($geocoderResult->getCountryCode(), 0, 6);
+            $data['geo_latitude']     = substr($geocoderResult->getLatitude(), 0, 32);
+            $data['geo_longitude']    = substr($geocoderResult->getLongitude(), 0, 32);
+        }
+
+        $this->getAdapter()->insert('dewdrop_activity_log_user_information', $data);
+
+        return $this->getAdapter()->lastInsertId();
     }
 
     public function selectEntries(array $handlers, array $entities, $limit, $offset, $order)
@@ -113,5 +157,30 @@ class DbGateway extends Table
         }
 
         return $out;
+    }
+
+    public function fetchUserInformationForEntries(array $entries)
+    {
+        $ids = [];
+
+        foreach ($entries as $entry) {
+            $id = $entry['dewdrop_activity_log_user_information_id'];
+
+            if ($id && !in_array($id, $ids)) {
+                $ids[] = $id;
+            }
+        }
+
+        if (!count($ids)) {
+            return [];
+        }
+
+        return $this->getAdapter()->fetchAll(
+            $this->getAdapter()->quoteInto(
+                'SELECT * FROM dewdrop_activity_log_user_information
+                WHERE dewdrop_activity_log_user_information_id IN (?)',
+                $ids
+            )
+        );
     }
 }

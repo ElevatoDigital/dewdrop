@@ -137,6 +137,11 @@ class Paths
         return $this->getPluginRoot() . '/www';
     }
 
+    /**
+     * Get the folder where we can find custom activity log handlers.
+     *
+     * @return string
+     */
     public function getActivityLog()
     {
         return $this->getPluginRoot() . '/activity-log';
@@ -160,6 +165,16 @@ class Paths
     public function getCommands()
     {
         return $this->pluginRoot . '/commands';
+    }
+
+    /**
+     * Get the data folder where Dewdrop can write data on the server.
+     * 
+     * @return string
+     */
+    public function getData()
+    {
+        return $this->pluginRoot . '/data';
     }
 
     /**

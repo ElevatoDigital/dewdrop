@@ -11,14 +11,14 @@ use Dewdrop\Pimple;
 class CrudMessageTemplates
 {
     private $summaries = [
-        'create'           => 'Create',
-        'edit'             => 'Edit',
-        'delete'           => 'Delete',
-        'restore'          => 'Restore',
-        'import'           => 'Import',
-        'export'           => 'Export',
-        'reorder-items'    => 'Reorder Items',
-        'rearrange-fields' => 'Rearrange Fields'
+        'create'           => 'Create %singularTitle%',
+        'edit'             => 'Edit %singularTitle%',
+        'delete'           => 'Delete %singularTitle%',
+        'restore'          => 'Restore %singularTitle%',
+        'import'           => 'Import %pluralTitle%',
+        'export'           => 'Export %pluralTitle%',
+        'reorder-items'    => 'Reorder %pluralTitle%',
+        'rearrange-fields' => 'Rearrange %singularTitle% Fields'
     ];
 
     private $anonymousMessages = [
@@ -70,13 +70,13 @@ class CrudMessageTemplates
         $this->userMessages[$name]      = $userMessage;
     }
 
-    public function getSummary($name)
+    public function getSummary($name, array $templateValues)
     {
         if (!array_key_exists($name, $this->summaries)) {
             throw new TemplateNotFound("Message summary template not found with name '{$name}'.");
         }
 
-        return $this->summaries[$name];
+        return $this->renderTemplateTags($this->summaries[$name], $templateValues);
     }
 
     public function getMessage($name, array $templateValues)

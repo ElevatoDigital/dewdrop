@@ -5,7 +5,6 @@ namespace Dewdrop\ActivityLog\Entry;
 use Countable;
 use Dewdrop\ActivityLog\DbGateway;
 use Dewdrop\ActivityLog\Entity;
-use Dewdrop\ActivityLog\Entry\Collection;
 use Dewdrop\ActivityLog\Exception\HandlerNotFound;
 use Dewdrop\ActivityLog\Exception\InvalidEntity;
 use Dewdrop\ActivityLog\Exception\InvalidEntryReaderOrder;

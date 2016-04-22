@@ -66,13 +66,16 @@ abstract class CrudAbstract extends ComponentAbstract implements CrudInterface
      * @param Pimple $pimple
      * @param null $componentName
      */
-    public function __construct(Pimple $pimple = null, $componentName = null)
+    public function __construct(Pimple $pimple = null)
     {
-        parent::__construct($pimple, $componentName);
+        parent::__construct($pimple);
 
         $this->addPageFactory(new CrudFactory($this));
     }
 
+    /**
+     * @return \Dewdrop\ActivityLog\Handler\TableHandler
+     */
     public function getActivityLogHandler()
     {
         if (parent::getActivityLogHandler() instanceof ActivityLogNullHandler) {

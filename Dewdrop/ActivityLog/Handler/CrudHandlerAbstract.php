@@ -86,7 +86,7 @@ abstract class CrudHandlerAbstract extends HandlerAbstract
         }
 
         $this->log(
-            $this->messageTemplates->getSummary($name),
+            $this->messageTemplates->getSummary($name, $templateValues),
             $this->messageTemplates->getMessage($name, $templateValues)
         );
     }

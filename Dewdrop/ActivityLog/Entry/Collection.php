@@ -24,10 +24,30 @@ class Collection implements Iterator, Countable
      */
     private $entitiesByMessageId = null;
 
+    /**
+     * @var array
+     */
+    private $userInformationData = null;
+
     public function __construct(DbGateway $dbGateway, array $data)
     {
         $this->data      = $data;
         $this->dbGateway = $dbGateway;
+    }
+
+    public function getUserInformationById($id)
+    {
+        if (!$this->userInformationData) {
+            $this->userInformationData = $this->dbGateway->fetchUserInformationForEntries($this->data);
+        }
+
+        foreach ($this->userInformationData as $userInformation) {
+            if ($userInformation['dewdrop_activity_log_user_information_id'] === $id) {
+                return $userInformation;
+            }
+        }
+
+        return null;
     }
 
     public function getEntitiesForEntry(Entry $entry)

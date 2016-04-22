@@ -48,6 +48,8 @@ class Run
         'GenEav',
         'Sniff',
         'Tinker',
+        'ActivityLogKeyGen',
+        'ActivityLogGeoIpDownload',
         'DewdropDev',
         'DewdropDoc',
         'DewdropSniff',

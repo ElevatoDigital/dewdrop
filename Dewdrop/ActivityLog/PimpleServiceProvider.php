@@ -3,6 +3,9 @@
 namespace Dewdrop\ActivityLog;
 
 use Dewdrop\ActivityLog;
+use Geocoder\Adapter\GeoIP2Adapter;
+use Geocoder\Provider\GeoIP2 as GeoIp2Provider;
+use GeoIp2\Database\Reader as GeoIp2Reader;
 use Pimple;
 
 class PimpleServiceProvider
@@ -21,11 +24,34 @@ class PimpleServiceProvider
             }
         );
 
+        $pimple['activity-log.user-information'] = $pimple->share(
+            function () use ($pimple) {
+                return new UserInformation($pimple['activity-log.db-gateway'], $pimple['activity-log.geocoder']);
+            }
+        );
+
+        $pimple['activity-log.geocoder'] = $pimple->share(
+            function () use ($pimple) {
+                $paths  = $pimple['paths'];
+                $dbFile = $paths->getData() . '/activity-log/GeoLite2.mmdb';
+
+                if (!file_exists($dbFile) || !is_readable($dbFile)) {
+                    return null;
+                } else {
+                    $reader   = new GeoIp2Reader($dbFile);
+                    $adapter  = new GeoIP2Adapter($reader);
+                    $geocoder = new GeoIp2Provider($adapter);
+                    return $geocoder;
+                }
+            }
+        );
+
         $pimple['activity-log'] = $pimple->share(
             function () use ($pimple) {
                 $dbGateway       = $pimple['activity-log.db-gateway'];
                 $handlerResolver = $pimple['activity-log.handler-resolver'];
-                return new ActivityLog($dbGateway, $handlerResolver);
+                $userInformation = $pimple['activity-log.user-information'];
+                return new ActivityLog($dbGateway, $handlerResolver, $userInformation);
             }
         );
 
