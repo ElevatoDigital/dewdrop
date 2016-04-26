@@ -422,20 +422,34 @@ class Relationship
     {
         $anchorColumn = $select->quoteWithAlias($this->sourceTable->getTableName(), $this->getSourceColumnName());
         $titleColumn  = $this->findReferenceTitleColumn();
+        $driver       = $select->getAdapter()->getDriver();
 
-        $expr = new Expr(
-            "ARRAY_TO_STRING(
-                ARRAY(
-                    SELECT {$titleColumn}
+        if ($driver instanceof \Dewdrop\Db\Driver\Pdo\Pgsql) {
+            $expr = new Expr(
+                "ARRAY_TO_STRING(
+                    ARRAY(
+                        SELECT {$titleColumn}
+                        FROM {$this->getReferenceTableName()} ref
+                        JOIN {$this->xrefTableName} xref
+                            ON xref.{$this->xrefReferenceColumnName} = ref.{$this->getReferenceColumnName()}
+                        WHERE xref.{$this->xrefAnchorColumnName} = {$anchorColumn}
+                        ORDER BY {$titleColumn}
+                    ),
+                    ', '
+                )"
+            );
+        } else {
+            $expr = new Expr(
+                "(SELECT
+                    GROUP_CONCAT({$titleColumn} SEPARATOR ', ')
                     FROM {$this->getReferenceTableName()} ref
                     JOIN {$this->xrefTableName} xref
                         ON xref.{$this->xrefReferenceColumnName} = ref.{$this->getReferenceColumnName()}
                     WHERE xref.{$this->xrefAnchorColumnName} = {$anchorColumn}
                     ORDER BY {$titleColumn}
-                ),
-                ', '
-            )"
-        );
+                )"
+            );
+        }
 
         return $select->columns([$name => $expr]);
     }
