@@ -1,4 +1,4 @@
-(function () {
+(function ($) {
     'use strict';
 
     var DEWDROP = {};
@@ -24,5 +24,8 @@
 
     moment.locale(navigator.language);
 
+    $.fn.bootstrapTooltip = $.fn.tooltip.noConflict();
+    $.fn.tooltip.Constructor = $.fn.bootstrapTooltip.Constructor;
+
     window.DEWDROP = DEWDROP;
-}());
+}(jQuery));

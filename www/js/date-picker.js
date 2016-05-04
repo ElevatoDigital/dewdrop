@@ -4,15 +4,10 @@ require.config({
     }
 });
 
-var bsTooltip = jQuery.fn.tooltip;
-
 require(
     ['jquery', 'jquery-ui'],
     function ($) {
         'use strict';
-
-        // Restore Bootstrap tooltip plugin
-        jQuery.fn.tooltip = bsTooltip;
 
         // Used to append popovers.  Avoids WP and Bootstrap CSS conflicts.
         var styleWrapper = $('<div class="bootstrap-wrapper"></div>');
