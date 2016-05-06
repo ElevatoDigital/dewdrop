@@ -45,7 +45,7 @@ class Entry
             }
         }
 
-        throw new EntityNotFound("Could not find {$handler} entity with ID of {$id}");
+        throw new EntityNotFound("Could not find {$handler->getName()} entity with ID of {$id}");
     }
 
     public function getEntities()
