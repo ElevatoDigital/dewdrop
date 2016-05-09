@@ -100,7 +100,6 @@ require(
                             var $popover;
 
                             $input.popover('show');
-console.log($input.data('bs.popover'));
                             $popover = $('[data-input="' + $input.data('input') + '"] .date-wrapper');
 
                             $('[data-input="' + $input.data('input') + '"] a').on(
