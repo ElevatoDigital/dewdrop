@@ -161,7 +161,7 @@ abstract class PageAbstract
      *
      * @param ResponseHelper $response
      */
-    public function process($response)
+    public function process(ResponseHelper $response)
     {
 
     }
