@@ -1,6 +1,6 @@
 {
     "name": "dewdrop",
-    "version": "1.4.0",
+    "version": "1.14.9",
     "main": [
         "www/css",
         "www/js",
