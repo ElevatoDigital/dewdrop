@@ -260,7 +260,11 @@ class Edit extends StockPageAbstract
         if (!$this->request->isPost() && !$this->request->isGet()) {
             return ['result' => 'error', 'message' => 'AJAX edit requests must be POST or GET'];
         } elseif ($this->request->isPost() && !$this->invalidSubmission) {
-            return ['result' => 'success', 'id' => $this->component->getListing()->getPrimaryKey()->getValue()];
+            return [
+                'result'    => 'success',
+                'id'        => $this->component->getListing()->getPrimaryKey()->getValue(),
+                'data'      => $this->getData()
+            ];
         } elseif ($this->request->isGet()) {
             return $this->renderAjaxForm();
         } else {
@@ -283,5 +287,17 @@ class Edit extends StockPageAbstract
         $this->component->setShouldRenderLayout(false);
 
         return $this->view->render('edit-fields-for-ajax.phtml');
+    }
+
+    public function getData()
+    {
+        $fields = $this->getFields()->getEditableFields();
+        $data   = [];
+
+        foreach ($fields as $id => $field) {
+            $data[$id] = $field->getValue();
+        }
+
+        return $data;
     }
 }
