@@ -827,7 +827,7 @@ abstract class Table
         /* @var \Dewdrop\Paths $paths */
         $paths = $pimple['paths'];
         if ($this->getMetadata('columns', 'created_by_user_id')) {
-            if ($paths->isWp()) {
+            if ($paths->isWp() && 0 < get_current_user_id()) {
                 $data['created_by_user_id'] = get_current_user_id();
             } elseif (Pimple::hasResource('user') && ($user = Pimple::getResource('user')) && isset($user['user_id'])
                 && 0 < $user['user_id']) {
@@ -863,7 +863,7 @@ abstract class Table
         /* @var \Dewdrop\Paths $paths */
         $paths = $pimple['paths'];
         if ($this->getMetadata('columns', 'updated_by_user_id')) {
-            if ($paths->isWp()) {
+            if ($paths->isWp() && 0 < get_current_user_id()) {
                 $data['updated_by_user_id'] = get_current_user_id();
             } elseif (Pimple::hasResource('user') && ($user = Pimple::getResource('user')) && isset($user['user_id'])
                 && 0 < $user['user_id']) {
