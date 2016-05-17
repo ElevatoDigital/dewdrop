@@ -1,6 +1,8 @@
 #!/usr/bin/env php
 <?php
 
+ini_set('display_errors', 1);
+
 if ('cli' !== php_sapi_name()) {
     exit;
 }
