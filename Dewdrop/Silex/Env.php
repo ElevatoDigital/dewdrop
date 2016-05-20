@@ -74,7 +74,11 @@ class Env implements EnvInterface
         $pimple->error(
             function (PhpException $e) use ($pimple) {
                 if ($pimple['debug']) {
-                    return new Response($e->render());
+                    if (method_exists($e, 'render')) {
+                        return new Response($e->render());
+                    } else {
+                        return new Response($e->getMessage());
+                    }
                 }
             }
         );
