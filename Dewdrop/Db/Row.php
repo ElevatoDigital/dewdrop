@@ -508,6 +508,9 @@ class Row implements ArrayAccess, SaveHandlerInterface
 
         $this->data = $this->table->findRowRefreshData($pkey);
 
+        // Virtual fields need to load their values again after data refresh
+        $this->virtualFieldsInitialized = array();
+
         return $this;
     }
 
