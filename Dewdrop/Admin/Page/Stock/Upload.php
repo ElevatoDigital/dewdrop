@@ -5,6 +5,7 @@ namespace Dewdrop\Admin\Page\Stock;
 use Dewdrop\Upload\Exception as UploadException;
 use Dewdrop\Upload\FileHandler;
 use Dewdrop\Upload\UploadedFile;
+use Dewdrop\Admin\ResponseHelper\Standard as ResponseHelper;
 
 class Upload extends StockPageAbstract
 {
@@ -30,7 +31,7 @@ class Upload extends StockPageAbstract
         return $this;
     }
 
-    public function process()
+    public function process(ResponseHelper $response)
     {
         if (!$this->request->isPost()) {
             $this->error = 'Upload request must be POST.';
