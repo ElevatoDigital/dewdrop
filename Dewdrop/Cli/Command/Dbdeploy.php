@@ -248,6 +248,8 @@ class Dbdeploy extends CommandAbstract
      */
     public function execute()
     {
+        $this->dbType = $this->runner->getPimple()['config']['db']['type'];
+
         $this->initChangesets();
 
         if (null === $this->action) {
@@ -512,10 +514,8 @@ class Dbdeploy extends CommandAbstract
      *
      * @return void
      */
-    private function initChangesets()
+    protected function initChangesets()
     {
-        $this->dbType = $this->runner->getPimple()['config']['db']['type'];
-
         $mainChangesetName = Env::getInstance()->getProjectNoun();
 
         $defaultChangesets = [
