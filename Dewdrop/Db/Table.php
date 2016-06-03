@@ -804,7 +804,7 @@ abstract class Table
      * @param array $data
      * @return array
      */
-    private function augmentInsertedDataArrayWithWhenAndByWhom(array $data)
+    public function augmentInsertedDataArrayWithWhenAndByWhom(array $data)
     {
         // When
         static $whenColumnCandidates = [
@@ -846,7 +846,7 @@ abstract class Table
      * @param array $data
      * @return array
      */
-    private function augmentUpdatedDataArrayWithWhenAndByWhom(array $data)
+    public function augmentUpdatedDataArrayWithWhenAndByWhom(array $data)
     {
         // When
         if ($this->getMetadata('columns', 'date_updated')) {
@@ -899,7 +899,7 @@ abstract class Table
      * @param array $data
      * @return array The filtered version of the data array.
      */
-    private function filterDataArrayForPhysicalColumns(array $data)
+    public function filterDataArrayForPhysicalColumns(array $data)
     {
         foreach ($data as $column => $value) {
             $metadata = $this->getMetadata('columns', $column);
