@@ -12,6 +12,7 @@ namespace Dewdrop\Admin\Page\Stock;
 
 use Dewdrop\Admin\Component\ComponentAbstract;
 use Dewdrop\Admin\Component\CrudInterface;
+use Dewdrop\Admin\ResponseHelper\Standard as ResponseHelper;
 use Dewdrop\Fields\RowEditor;
 
 /**
@@ -46,8 +47,10 @@ class Delete extends StockPageAbstract
     /**
      * When receiving a POST, get the row editor setup and then call its
      * delete() method.
+     *
+     * @param ResponseHelper $response
      */
-    public function process()
+    public function process(ResponseHelper $response)
     {
         if ($this->request->isPost()) {
             $rowEditor = $this->component->getRowEditor();
