@@ -26,6 +26,15 @@ use Dewdrop\Pimple;
 class Dbdeploy extends CommandAbstract
 {
     /**
+     * The changesets that need to be updated when the default dbdeploy command
+     * is run.  If you only want to run a single changeset, you can manually
+     * set the changeset argument as well.
+     *
+     * @var array
+     */
+    protected $changesets = array();
+
+    /**
      * The valid options for the action arg.
      *
      * @var array
@@ -82,15 +91,6 @@ class Dbdeploy extends CommandAbstract
      * @var string
      */
     private $changeset;
-
-    /**
-     * The changesets that need to be updated when the default dbdeploy command
-     * is run.  If you only want to run a single changeset, you can manually
-     * set the changeset argument as well.
-     *
-     * @var array
-     */
-    private $changesets = array();
 
     /**
      * The name of the changelog table.  This is not intended to be modified
