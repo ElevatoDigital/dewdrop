@@ -115,9 +115,11 @@ class Permissions
             'filter'         => "Filter {$plural}",
             'import'         => 'Import data from a file',
             'count-fields'   => "Count {$plural} while grouping by fields",
+            'restore'        => "Restore deleted {$plural}",
             'sort-fields'    => "Sort and group {$singular} fields",
             'notifications'  => "Subscribe to be notified when {$plural} are added or updated",
             'view'           => "See an individual {$singular} in detail",
+            'view-activity'  => 'View recent activity',
             'view-listing'   => "See the full {$plural} listing"
         );
 
@@ -130,6 +132,8 @@ class Permissions
         // These features are disabled by default.  Can be turned on whenever they're wanted.
         $this->set('count-fields', false);
         $this->set('import', false);
+        $this->set('restore', false);
+        $this->set('view-activity', false);
 
         // @ todo Re-enable these pages once they're complete
         $this->set('custom-views', false);
