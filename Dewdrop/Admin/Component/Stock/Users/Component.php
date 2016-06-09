@@ -10,11 +10,13 @@
 
 namespace Dewdrop\Admin\Component\Stock\Users;
 
+use Dewdrop\ActivityLog\Handler\NullHandler as ActivityLogNullHandler;
 use Dewdrop\Admin\Component\ComponentAbstract;
 use Dewdrop\Admin\Component\CrudInterface;
 use Dewdrop\Fields;
 use Dewdrop\Fields\Filter\Groups as GroupsFilter;
 use Dewdrop\Fields\Filter\Visibility as VisibilityFilter;
+use Dewdrop\Fields\Helper\SelectDeletedRecords as DeletedRecordsModifier;
 use Dewdrop\Fields\Listing;
 use Dewdrop\Fields\RowEditor;
 use Dewdrop\Pimple;
@@ -123,6 +125,18 @@ class Component extends ComponentAbstract implements CrudInterface
     }
 
     /**
+     * @return \Dewdrop\ActivityLog\Handler\TableHandler
+     */
+    public function getActivityLogHandler()
+    {
+        if (parent::getActivityLogHandler() instanceof ActivityLogNullHandler) {
+            return $this->getPrimaryModel()->getActivityLogHandler();
+        } else {
+            return parent::getActivityLogHandler();
+        }
+    }
+
+    /**
      * Get the \Dewdrop\Fields\RowEditor object that will assist with the
      * editing of items in this component.
      *
@@ -158,6 +172,14 @@ class Component extends ComponentAbstract implements CrudInterface
                 $this->getPrimaryModel()->selectAdminListing(),
                 $this->getPrimaryModel()->field('user_id')
             );
+
+            $model   = $this->getPrimaryModel();
+            $columns = $model->getMetadata('columns');
+
+            if (array_key_exists('deleted', $columns)) {
+                $deletedRecordsModifier = new DeletedRecordsModifier($this->getRequest(), $model->field('deleted'));
+                $this->listing->registerSelectModifier($deletedRecordsModifier);
+            }
         }
 
         return $this->listing;

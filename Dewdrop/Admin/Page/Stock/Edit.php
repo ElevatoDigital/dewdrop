@@ -155,6 +155,10 @@ class Edit extends StockPageAbstract
         } else {
             $this->component->getPermissions()->haltIfNotAllowed('edit');
         }
+
+        if ($this->rowEditor->isDeleted()) {
+            $this->component->getPermissions()->haltIfNotAllowed('restore');
+        }
     }
 
     /**

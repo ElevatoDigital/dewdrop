@@ -15,7 +15,8 @@ if ($this->bulkActionFailureMessage) {
 echo $this->adminComponentNav(
     $this->component,
     [
-        'createUrl' => $this->createUrl
+        'createUrl'              => $this->createUrl,
+        'deletedRecordsModifier' => $this->deletedRecordsModifier
     ]
 );
 
@@ -54,7 +55,6 @@ if ($this->permissions->can('view')) {
     $rowActionArgs['view'] = $this->adminUrl('view', array($pkey => '%s'));
 }
 
-
 $this->bootstrapRowActions()->assignCallback($rowActionArgs);
 
 $selectFilter  = $this->listing->getSelectModifierByName('SelectFilter');
@@ -77,6 +77,13 @@ if ($this->bulkActions) {
     $fields->prepend($this->bulkActionCheckboxField($this->bulkActions, $renderer));
 
     echo $this->bulkActionForm()->open();
+}
+
+if ($this->deletedRecordsModifier && $this->deletedRecordsModifier->isShowingDeletedRecords()) {
+    printf(
+        '<div class="alert alert-warning">Currently displaying deleted %s.</div>',
+        $this->escapeHtml($this->pluralTitle)
+    );
 }
 
 if (0 === $totalRowCount && $selectFilter->hasFilters()) {

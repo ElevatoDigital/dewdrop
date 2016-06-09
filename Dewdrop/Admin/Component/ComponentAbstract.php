@@ -282,7 +282,13 @@ abstract class ComponentAbstract implements ComponentInterface, ShellIntegration
     public function getPermissions()
     {
         if (!$this->permissions) {
-            $this->permissions = new Permissions($this);
+            if (DewdropPimple::hasResource('admin.permissions-factory')) {
+                /* @var $factory callable */
+                $factory = DewdropPimple::getResource('admin.permissions-factory');
+                $this->permissions = $factory($this);
+            } else {
+                $this->permissions = new Permissions($this);
+            }
         }
 
         return $this->permissions;

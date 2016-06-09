@@ -49,7 +49,9 @@ class Crud extends AbstractClassMapFactory
         'index'               => '\Dewdrop\Admin\Page\Stock\Index',
         'notification-edit'   => '\Dewdrop\Admin\Page\Stock\NotificationEdit',
         'notifications'       => '\Dewdrop\Admin\Page\Stock\Notifications',
+        'recent-activity'     => '\Dewdrop\Admin\Page\Stock\RecentActivity',
         'render-edit-control' => '\Dewdrop\Admin\Page\Stock\RenderEditControl',
+        'restore'             => '\Dewdrop\Admin\Page\Stock\Restore',
         'sort-fields'         => '\Dewdrop\Admin\Page\Stock\SortFields',
         'sort-listing'        => '\Dewdrop\Admin\Page\Stock\SortListing',
         'view'                => '\Dewdrop\Admin\Page\Stock\View'

@@ -149,18 +149,19 @@ class Index extends StockPageAbstract
         $filter  = $this->component->getVisibilityFilter();
 
         $this->view->assign([
-            'component'        => $this->component,
-            'permissions'      => $this->component->getPermissions(),
-            'singularTitle'    => $this->component->getPrimaryModel()->getSingularTitle(),
-            'pluralTitle'      => $this->component->getPrimaryModel()->getPluralTitle(),
-            'listing'          => $listing,
-            'visibilityFilter' => $filter,
-            'groupingFilter'   => $this->component->getFieldGroupsFilter(),
-            'fields'           => $fields,
-            'debug'            => Pimple::getResource('debug'),
-            'isSortable'       => ($this->component instanceof SortableListingInterface),
-            'page'             => $this,
-            'createUrl'        => $this->getCreateUrl()
+            'component'              => $this->component,
+            'permissions'            => $this->component->getPermissions(),
+            'singularTitle'          => $this->component->getPrimaryModel()->getSingularTitle(),
+            'pluralTitle'            => $this->component->getPrimaryModel()->getPluralTitle(),
+            'listing'                => $listing,
+            'visibilityFilter'       => $filter,
+            'groupingFilter'         => $this->component->getFieldGroupsFilter(),
+            'fields'                 => $fields,
+            'debug'                  => Pimple::getResource('debug'),
+            'isSortable'             => ($this->component instanceof SortableListingInterface),
+            'page'                   => $this,
+            'createUrl'              => $this->getCreateUrl(),
+            'deletedRecordsModifier' => $listing->getSelectModifierByName('SelectDeletedRecords')
         ]);
 
         if ($this->component instanceof BulkActionProcessorInterface) {

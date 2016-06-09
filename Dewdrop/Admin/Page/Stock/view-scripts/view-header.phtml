@@ -10,10 +10,16 @@
 <div class="modal-body">
 <?php endif;?>
 
-<?php if ($this->permissions->can('edit')):?>
+<?php if ($this->permissions->can('edit') || $this->permissions->can('view-activity')):?>
     <nav class="navbar navbar-default navbar-admin-index" role="navigation">
         <div class="navbar-header">
+            <?php if ($this->permissions->can('edit')):?>
             <a href="<?php echo $this->escapeHtmlAttr($this->adminUrl('edit', $this->params));?>" class="btn btn-primary navbar-btn">Edit <?php echo $this->escapeHtml($this->singularTitle);?></a>
+            <?php endif;?>
+
+            <?php if ($this->permissions->can('view-activity')):?>
+            <a href="<?php echo $this->escapeHtmlAttr($this->adminUrl('recent-activity', ['id' => $this->id]));?>" class="btn btn-link navbar-btn">Recent Activity</a>
+            <?php endif;?>
         </div>
     </nav>
 <?php endif;?>
