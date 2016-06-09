@@ -462,6 +462,11 @@ class RowEditor implements SaveHandlerInterface
         return null !== $this->deleteField;
     }
 
+    public function isDeleted()
+    {
+        return $this->hasDeleteField() && $this->deleteField->getValue();
+    }
+
     /**
      * Perform a delete using the RowEditor's delete field, if specified.
      *
@@ -474,6 +479,19 @@ class RowEditor implements SaveHandlerInterface
         if ($this->hasDeleteField()) {
             $this->deleteField
                 ->setValue(1)
+                ->getRow()
+                    ->save();
+        }
+    }
+
+    /**
+     * Perform a restore using the RowEditor's delete field, if specified.
+     */
+    public function restore()
+    {
+        if ($this->hasDeleteField()) {
+            $this->deleteField
+                ->setValue(0)
                 ->getRow()
                     ->save();
         }
