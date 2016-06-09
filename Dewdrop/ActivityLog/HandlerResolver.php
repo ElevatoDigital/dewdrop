@@ -13,7 +13,12 @@ class HandlerResolver
     /**
      * @var Paths
      */
-    private $paths;
+    private $systemPaths;
+
+    /**
+     * @var array
+     */
+    private $paths = [];
 
     /**
      * @var array
@@ -25,14 +30,28 @@ class HandlerResolver
      */
     private $pathSearchPerformed = false;
 
-    public function __construct(Paths $paths = null)
+    public function __construct(Paths $systemPaths = null)
     {
-        $this->paths = ($paths ?: Pimple::getResource('paths'));
+        $this->systemPaths = ($systemPaths ?: Pimple::getResource('paths'));
     }
 
     public function registerHandler(HandlerInterface $handler)
     {
         $this->handlerInstances[] = $handler;
+
+        return $this;
+    }
+
+    /**
+     * Add another path to search for handlers on top of the default system paths.
+     *
+     * @param string $path
+     * @param string $namespacePrefix
+     * @return $this
+     */
+    public function addPath($path, $namespacePrefix)
+    {
+        $this->paths[$path] = trim($namespacePrefix, '\\');
 
         return $this;
     }
@@ -44,7 +63,7 @@ class HandlerResolver
      */
     public function resolve($name)
     {
-        $this->searchSystemPathsForHandlers();
+        $this->searchPathsForHandlers();
 
         /* @var $handler HandlerInterface */
         foreach ($this->handlerInstances as $handler) {
@@ -70,7 +89,7 @@ class HandlerResolver
      */
     public function resolveByFullyQualifiedName($fullyQualifiedName)
     {
-        $this->searchSystemPathsForHandlers();
+        $this->searchPathsForHandlers();
 
         /* @var $handler HandlerInterface */
         foreach ($this->handlerInstances as $handler) {
@@ -84,7 +103,7 @@ class HandlerResolver
         );
     }
 
-    private function searchSystemPathsForHandlers()
+    private function searchPathsForHandlers()
     {
         if ($this->pathSearchPerformed) {
             return;
@@ -92,14 +111,18 @@ class HandlerResolver
 
         $this->pathSearchPerformed = true;
 
-        $this->searchPathForHandlers($this->paths->getActivityLog(), 'ActivityLog');
-        $this->searchPathForHandlers($this->paths->getModels(), 'Model');
+        $this->searchPathForHandlers($this->systemPaths->getActivityLog(), 'ActivityLog');
+        $this->searchPathForHandlers($this->systemPaths->getModels(), 'Model');
+
+        foreach ($this->paths as $path => $namespacePrefix) {
+            $this->searchPathForHandlers($path, $namespacePrefix);
+        }
     }
 
     private function searchPathForHandlers($path, $namespacePrefix)
     {
         if (!file_exists($path) || !is_dir($path)) {
-            return;
+            return $this;
         }
 
         $files = glob("{$path}/*.php");
@@ -115,5 +138,7 @@ class HandlerResolver
 
             $this->registerHandler($object);
         }
+
+        return $this;
     }
 }
