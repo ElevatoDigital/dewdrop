@@ -184,6 +184,10 @@ abstract class HandlerAbstract implements HandlerInterface
             return null;
         }
 
+        /* @var $urlFilter callable */
+        $urlFilter    = Pimple::getResource('url-filter');
+        $linkTemplate = $urlFilter($linkTemplate);
+
         return sprintf($linkTemplate, $primaryKeyValue);
     }
 
