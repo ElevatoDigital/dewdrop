@@ -44,13 +44,18 @@ class AdminComponentNav extends AbstractHelper
             $options['createUrl'] = null;
         }
 
+        if (!isset($options['deletedRecordsModifier'])) {
+            $options['deletedRecordsModifier'] = null;
+        }
+
         return $this->partial(
             'admin-component-nav.phtml',
             array(
-                'permissions'   => $component->getPermissions(),
-                'singularTitle' => $singularTitle,
-                'pluralTitle'   => $pluralTitle,
-                'createUrl'     => $options['createUrl']
+                'permissions'            => $component->getPermissions(),
+                'singularTitle'          => $singularTitle,
+                'pluralTitle'            => $pluralTitle,
+                'createUrl'              => $options['createUrl'],
+                'deletedRecordsModifier' => $options['deletedRecordsModifier']
             )
         );
     }
