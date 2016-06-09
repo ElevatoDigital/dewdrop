@@ -1,0 +1,47 @@
+<?php ob_start();?>
+<table class="table table-condensed">
+    <tbody>
+        <tr>
+            <th scope="row">IP Address</th>
+            <td><?php echo $this->escapeHtml($this->userInformation['ip_address']);?></td>
+        </tr>
+        <tr>
+            <th scope="row">Location</th>
+            <td>
+                <?php
+                if (!$this->userInformation['geo_city']) {
+                    echo '<div class="uk-text-muted">Unknown</div>';
+                } else {
+                    echo $this->escapeHtml($this->userInformation['geo_city']) . ', '
+                        . $this->escapeHtml($this->userInformation['geo_region']) . ', '
+                        . $this->escapeHtml($this->userInformation['geo_country']);
+                }
+                ?>
+            </td>
+        </tr>
+        <tr>
+            <th scope="row">Browser</th>
+            <td>
+                <?php echo $this->escapeHtml($this->userInformation['user_agent_browser'] . ' ' . $this->userInformation['user_agent_browser_version']);?>
+            </td>
+        </tr>
+        <tr>
+            <th scope="row">Platform</th>
+            <td>
+                <?php echo $this->escapeHtml($this->userInformation['user_agent_platform'] . ' ' . $this->userInformation['user_agent_platform_version']);?>
+            </td>
+        </tr>
+        <tr>
+            <th scope="row">Device</th>
+            <td>
+                <?php echo $this->escapeHtml($this->userInformation['user_agent_device']);?>
+            </td>
+        </tr>
+    </tbody>
+</table>
+<?php $content = ob_get_clean(); ?>
+
+<a href="#" class="activity-log-user-information" data-content="<?php echo $this->escapeHtmlAttr($content);?>">
+    <span class="glyphicon glyphicon-option-horizontal"></span>
+</a>
+

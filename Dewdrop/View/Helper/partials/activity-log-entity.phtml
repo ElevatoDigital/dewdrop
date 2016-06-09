@@ -1,0 +1,30 @@
+<?php
+/* @var $entity \Dewdrop\ActivityLog\Entity */
+$entity = $this->entity;
+
+/* @var $handler \Dewdrop\ActivityLog\Handler\HandlerInterface */
+$handler = $entity->getHandler();
+
+$url = $entity->getLink();
+
+if (null === $url) {
+    echo '<span>';
+} else {
+    printf('<a href="%s">', $this->escapeHtmlAttr($url));
+}
+
+if ($handler->getIcon()) {
+    printf(
+        '<span class="glyphicon glyphicon-%s"></span> ',
+        $this->escapeHtmlAttr($handler->getIcon())
+    );
+}
+
+echo $this->escapeHtml($entity->getTitle());
+
+if (null === $url) {
+    echo '</span>';
+} else {
+    echo '</a>';
+}
+?>
