@@ -61,6 +61,11 @@ class EntryReader implements IteratorAggregate, Countable
      */
     private $entries = null;
 
+    /**
+     * @var int
+     */
+    private $totalCount = 0;
+
     public function __construct(DbGateway $dbGateway, HandlerResolver $handlerResolver)
     {
         $this->dbGateway       = $dbGateway;
@@ -165,10 +170,22 @@ class EntryReader implements IteratorAggregate, Countable
         );
     }
 
+    public function getTotalCount()
+    {
+        $this->fetchEntries();
+        return $this->totalCount;
+    }
+
     private function fetchEntries()
     {
         if (!is_array($this->entries)) {
-            $this->entries = $this->dbGateway->getAdapter()->fetchAll($this->select());
+            $select = $this->select();
+            $driver = $select->getAdapter()->getDriver();
+
+            $driver->prepareSelectForTotalRowCalculation($select);
+
+            $this->entries    = $this->dbGateway->getAdapter()->fetchAll($select);
+            $this->totalCount = $driver->fetchTotalRowCount($this->entries);
         }
 
         return $this->entries;
