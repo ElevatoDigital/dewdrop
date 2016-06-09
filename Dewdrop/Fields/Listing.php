@@ -219,6 +219,30 @@ class Listing
     }
 
     /**
+     * @return SelectSort
+     */
+    public function getSelectSortModifier()
+    {
+        return $this->getSelectModifierByName('SelectSort');
+    }
+
+    /**
+     * @return SelectFilter
+     */
+    public function getSelectFilterModifier()
+    {
+        return $this->getSelectModifierByName('SelectFilter');
+    }
+
+    /**
+     * @return SelectPaginate
+     */
+    public function getSelectPaginateModifier()
+    {
+        return $this->getSelectModifierByName('SelectPaginate');
+    }
+
+    /**
      * Check to see if this listing has a select modifier with the given name.
      *
      * @param string $name
