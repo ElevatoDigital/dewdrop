@@ -102,8 +102,8 @@ class FieldChange
         $newValue = $this->field->getValue();
 
         if (is_array($this->originalValue) && is_array($newValue)) {
-            return count($this->originalValue) &&
-                count($this->originalValue) !== count(array_intersect($this->originalValue, $newValue));
+            return (!count($this->originalValue) && count($newValue)) ||
+                (count($this->originalValue) !== count(array_intersect($this->originalValue, $newValue)));
         } else {
             return $this->originalValue !== $newValue;
         }
