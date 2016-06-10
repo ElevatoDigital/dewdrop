@@ -11,7 +11,6 @@
 namespace Dewdrop\Db\ManyToMany;
 
 use Dewdrop\Db\Field as BaseField;
-use Zend\InputFilter\Input;
 
 /**
  * This class enables you to leverage the Db\Field API for many-to-many

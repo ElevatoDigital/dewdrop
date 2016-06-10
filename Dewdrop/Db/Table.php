@@ -354,6 +354,7 @@ abstract class Table
         foreach ($this->fieldProviders as $provider) {
             if ($provider->has($name)) {
                 $field = $provider->instantiate($name);
+                break;
             }
         }
 

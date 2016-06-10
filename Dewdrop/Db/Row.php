@@ -188,7 +188,7 @@ class Row implements ArrayAccess, SaveHandlerInterface
      */
     public function field($name)
     {
-        $field = $this->table->field($name, $this);
+        $field = $this->table->field($name);
         $field->setRow($this);
         return $field;
     }
@@ -412,6 +412,8 @@ class Row implements ArrayAccess, SaveHandlerInterface
             $updateData = $this->data;
 
             $this->table->update($updateData, $this->assembleUpdateWhereClause());
+
+            $this->getTable()->getActivityLogHandler()->triggerFieldChangeEvents($this);
         } else {
             $id = $this->table->insert($this->data);
 
@@ -491,6 +493,27 @@ class Row implements ArrayAccess, SaveHandlerInterface
     public function toArray()
     {
         return $this->getData();
+    }
+
+    /**
+     * @return string
+     */
+    public function shortcode()
+    {
+        $primaryKey = $this->getTable()->getPrimaryKey();
+
+        if (1 !== count($primaryKey)) {
+            throw new Exception('Shortcodes cannot be generated for tables with multi-column primary keys.');
+        }
+
+        $columnName = current($primaryKey);
+        $value      = $this->get($columnName);
+
+        if (!$value) {
+            throw new Exception('Cannot generate shortcode when primary key is not set.');
+        }
+
+        return $this->getTable()->getActivityLogHandler()->createEntity($value)->assembleShortCode();
     }
 
     /**

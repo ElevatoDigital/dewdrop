@@ -257,6 +257,8 @@ class Field extends FieldAbstract
     {
         $this->row = $row;
 
+        $this->getTable()->getActivityLogHandler()->prepareFieldChangeEvents($this);
+
         return $this;
     }
 
