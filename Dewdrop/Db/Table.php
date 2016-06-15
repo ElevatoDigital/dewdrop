@@ -10,6 +10,7 @@
 
 namespace Dewdrop\Db;
 
+use Dewdrop\ActivityLog\Handler\HandlerInterface;
 use Dewdrop\ActivityLog\Handler\TableHandler as ActivityLogTableHandler;
 use Dewdrop\Db\Eav\Definition as EavDefinition;
 use Dewdrop\Db\ManyToMany\Relationship as ManyToManyRelationship;
@@ -163,6 +164,13 @@ abstract class Table
      * @return void
      */
     abstract public function init();
+
+    public function setActivityLogHandler(HandlerInterface $activityLogHandler)
+    {
+        $this->activityLogHandler = $activityLogHandler;
+
+        return $this;
+    }
 
     public function getActivityLogHandler()
     {
