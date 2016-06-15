@@ -492,7 +492,11 @@ class Row implements ArrayAccess, SaveHandlerInterface
      */
     public function toArray()
     {
-        return $this->getData();
+        $data = [];
+        foreach ($this->columns as $column) {
+            $data[$column] = $this->get($column);
+        }
+        return $data;
     }
 
     /**
