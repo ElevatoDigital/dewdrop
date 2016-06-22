@@ -268,7 +268,7 @@ class ImportMapFields extends StockPageAbstract
                         $field,
                         $this->importFile,
                         $this->request,
-                        $callback($control, $control->getView())
+                        $callback($control->getView(), 1)
                     );
                 }
             );

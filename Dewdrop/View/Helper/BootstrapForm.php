@@ -361,7 +361,8 @@ class BootstrapForm extends AbstractHelper
     {
         return false === stripos($output, '<label')
             || false !== stripos($output, '<ul')
-            || false !== stripos($output, 'option-input-decorator');
+            || false !== stripos($output, 'option-input-decorator')
+            || false !== stripos($output, 'import-edit-control');
     }
 }
 
