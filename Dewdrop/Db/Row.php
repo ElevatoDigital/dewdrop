@@ -161,7 +161,7 @@ class Row implements ArrayAccess, SaveHandlerInterface
      * implementing a __wakeup() method.
      *
      * @param Table $table
-     * @return Row
+     * @return $this
      */
     public function setTable(Table $table)
     {
@@ -237,7 +237,7 @@ class Row implements ArrayAccess, SaveHandlerInterface
      *
      * @param string|array $column
      * @param mixed $value
-     * @return Row
+     * @return $this
      * @throws Exception
      */
     public function set($column, $value = null)
@@ -404,7 +404,7 @@ class Row implements ArrayAccess, SaveHandlerInterface
     /**
      * Save this row, inserting if it is a new row and updating otherwise.
      *
-     * @return \Dewdrop\Db\Row
+     * @return $this
      */
     public function save()
     {
@@ -523,7 +523,7 @@ class Row implements ArrayAccess, SaveHandlerInterface
     /**
      * Refresh the row, pulling in the latest data from the DB.
      *
-     * @return \Dewdrop\Db\Row
+     * @return $this
      */
     private function refresh()
     {
