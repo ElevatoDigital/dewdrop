@@ -142,6 +142,16 @@ class Detector
 
         $env->initializePimple($pimple);
 
+        if (!isset($pimple['url-filter'])) {
+            $pimple['url-filter'] = $pimple->share(
+                $pimple->protect(
+                    function ($url) {
+                        return $url;
+                    }
+                )
+            );
+        }
+
         if (!isset($pimple['session'])) {
             $env->providePimpleSessionResource($pimple);
 
