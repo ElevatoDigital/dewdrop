@@ -40,6 +40,7 @@ class Run
         'WpInit',
         'BuildMetadata',
         'Dbdeploy',
+        'DbForeignKeyIndexes',
         'DbMetadata',
         'AuthHashPassword',
         'Lint',
@@ -221,6 +222,18 @@ class Run
     public function getCommands()
     {
         return $this->commands;
+    }
+
+    public function getCommandByName($name)
+    {
+        /* @var $command CommandAbstract */
+        foreach ($this->commands as $command) {
+            if ($command->getCommand() === $name) {
+                return $command;
+            }
+        }
+
+        return false;
     }
 
     /**
