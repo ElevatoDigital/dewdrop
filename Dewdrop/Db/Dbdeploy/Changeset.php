@@ -88,7 +88,7 @@ class Changeset
     public function writeNewFile($changeName, $contents)
     {
         $path = sprintf(
-            '%s/%05s-%s',
+            '%s/%05s-%s.sql',
             $this->path,
             $this->getCurrentRevision() + 1,
             $changeName
