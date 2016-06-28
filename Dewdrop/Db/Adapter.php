@@ -862,6 +862,11 @@ class Adapter
         return $this->driver->listForeignKeyReferences($tableName);
     }
 
+    public function listMissingForeignKeyIndexes($tableName)
+    {
+        return $this->driver->listMissingForeignKeyIndexes($tableName);
+    }
+
     /**
      * Returns an associative array containing all the unique constraints on a table.
      *
@@ -971,6 +976,16 @@ class Adapter
                 $value = (string) $key;
         }
         return $value;
+    }
+
+    public function generateCreateIndexStatement($tableName, array $columnNames)
+    {
+        return $this->driver->generateCreateIndexStatement($tableName, $columnNames);
+    }
+
+    public function generateAnalyzeTableStatement($tableName)
+    {
+        return $this->driver->generateAnalyzeTableStatement($tableName);
     }
 
     /**
