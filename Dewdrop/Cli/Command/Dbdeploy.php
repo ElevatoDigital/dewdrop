@@ -527,8 +527,8 @@ class Dbdeploy extends CommandAbstract
         $mainChangesetName = Env::getInstance()->getProjectNoun();
 
         $defaultChangesets = [
-            $mainChangesetName => $this->paths->getPluginRoot() . '/db',
             'dewdrop-core'     => $this->paths->getDewdropLib() . '/db/' . $this->dbType,
+            $mainChangesetName => $this->paths->getPluginRoot() . '/db',
             'dewdrop-test'     => $this->paths->getDewdropLib() . '/tests/db/' . $this->dbType
         ];
 
