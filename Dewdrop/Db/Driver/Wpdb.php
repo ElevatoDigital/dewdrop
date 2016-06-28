@@ -33,6 +33,21 @@ class Wpdb implements DriverInterface
      */
     protected $mysqli;
 
+    public function listMissingForeignKeyIndexes($tableName)
+    {
+        throw new Exception('Listing of missing foreign key indexes is not currently supported on WPDB.');
+    }
+
+    public function generateCreateIndexStatement($tableName, array $columnNames)
+    {
+        throw new Exception('Generation of index creation SQL is not currently supported on WPDB.');
+    }
+
+    public function generateAnalyzeTableStatement($tableName)
+    {
+        throw new Exception('Generation of table analysis SQL is not currently supported on WPDB.');
+    }
+
     /**
      * The wpdb object itself.
      *

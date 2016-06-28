@@ -132,6 +132,23 @@ interface DriverInterface
     public function listForeignKeyReferences($tableName);
 
     /**
+     * List all missing foreign key indexes on the supplied table.
+     *
+     * The resulting array has the following shape:
+     *
+     * <pre>
+     * [
+     *     ['foreign_key_id'],
+     *     ['multi_column_foreign_key_id', 'second_column_foreign_key_id']
+     * ]
+     * </pre>
+     *
+     * @param $tableName
+     * @return mixed
+     */
+    public function listMissingForeignKeyIndexes($tableName);
+
+    /**
      * Returns an associative array containing all the unique constraints on a table.
      *
      * The array has the following format:
@@ -267,4 +284,22 @@ interface DriverInterface
      * @return string
      */
     public function quoteInternal($input);
+
+    /**
+     * Generate an SQL statement to create an index on the supplied table and
+     * column(s).
+     *
+     * @param string $tableName
+     * @param array $columnNames
+     * @return string
+     */
+    public function generateCreateIndexStatement($tableName, array $columnNames);
+
+    /**
+     * Generate an SQL statement to analyze a table.
+     * 
+     * @param string $tableName
+     * @return string
+     */
+    public function generateAnalyzeTableStatement($tableName);
 }

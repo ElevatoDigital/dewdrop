@@ -27,6 +27,21 @@ class Mock implements DriverInterface
      */
     private $adapter;
 
+    public function listMissingForeignKeyIndexes($tableName)
+    {
+        return [];
+    }
+
+    public function generateCreateIndexStatement($tableName, array $columnNames)
+    {
+        return '';
+    }
+
+    public function generateAnalyzeTableStatement($tableName)
+    {
+        return '';
+    }
+
     /**
      * Create new instance with the supplied adapter.
      *

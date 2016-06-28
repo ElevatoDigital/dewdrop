@@ -608,7 +608,6 @@ class Pgsql implements DriverInterface
                 $genericType = 'timestamp';
                 break;
             case 'time':
-            case 'timetz':
                 $genericType = 'time';
                 break;
             case 'float':
@@ -727,5 +726,80 @@ class Pgsql implements DriverInterface
     public function truncateTimeStampToDate($timestamp)
     {
         return "DATE_TRUNC('day', {$timestamp})";
+    }
+
+    public function listMissingForeignKeyIndexes($tableName)
+    {
+        $missingIndexes = $this->adapter->fetchCol(
+            'SELECT ARRAY_TO_JSON(column_name_list) AS columns
+            FROM (
+                SELECT DISTINCT
+                    conrelid,
+                    ARRAY_AGG(attname) AS column_name_list,
+                    ARRAY_AGG(attnum) AS column_list
+                FROM pg_attribute
+                JOIN (
+                    SELECT conrelid::regclass,
+                        conname,
+                        UNNEST(conkey) as column_index
+                    FROM (
+                        SELECT DISTINCT
+                            conrelid,
+                            conname,
+                            conkey
+                        FROM pg_constraint
+                        JOIN pg_class ON pg_class.oid = pg_constraint.conrelid
+                        JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
+                        WHERE nspname !~ \'^pg_\' 
+                            AND nspname <> \'information_schema\'
+                            AND contype = \'f\'
+                    ) fkey
+                ) fkey
+                ON fkey.conrelid = pg_attribute.attrelid
+                    AND fkey.column_index = pg_attribute.attnum
+                GROUP BY conrelid, conname
+            ) candidate_index
+            JOIN pg_class ON pg_class.oid = candidate_index.conrelid
+            LEFT JOIN pg_index ON pg_index.indrelid = conrelid
+                AND indkey::text = ARRAY_TO_STRING(column_list, \' \')
+            WHERE indexrelid IS NULL
+                AND relname = ?',
+            [$tableName]
+        );
+
+        $out = [];
+
+        foreach ($missingIndexes as $columnsJson) {
+            $out[] = json_decode($columnsJson, true);
+        }
+
+        sort($out);
+
+        return $out;
+    }
+
+    public function generateCreateIndexStatement($tableName, array $columnNames)
+    {
+        return sprintf(
+            'CREATE INDEX ON %s (%s);',
+            $this->adapter->quoteIdentifier($tableName),
+            implode(
+                ', ',
+                array_map(
+                    function ($columnName) {
+                        return $this->adapter->quoteIdentifier($columnName);
+                    },
+                    $columnNames
+                )
+            )
+        );
+    }
+
+    public function generateAnalyzeTableStatement($tableName)
+    {
+        return sprintf(
+            'ANALYZE %s;',
+            $this->adapter->quoteIdentifier($tableName)
+        );
     }
 }
