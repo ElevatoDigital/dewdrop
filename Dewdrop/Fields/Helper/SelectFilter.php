@@ -7,7 +7,6 @@ use Dewdrop\Fields;
 use Dewdrop\Fields\Helper\SelectFilter\DefaultVars;
 use Dewdrop\Fields\Helper\SelectFilter\FilterType;
 use Dewdrop\Fields\Helper\SelectFilter\SelectModifier;
-use Dewdrop\Fields\Helper\SelectModifierInterface;
 use Dewdrop\Request;
 
 class SelectFilter implements SelectModifierInterface
@@ -29,8 +28,8 @@ class SelectFilter implements SelectModifierInterface
         $this->request = $request;
 
         $this->filterTypeHelper  = new FilterType();
-        $this->selectModifier    = new SelectModifier($request);
         $this->defaultVarsHelper = new DefaultVars($request);
+        $this->selectModifier    = new SelectModifier($request, $this->defaultVarsHelper);
     }
 
     public static function isQueryStringParamNotRelatedToFiltering($paramName, $paramPrefix)

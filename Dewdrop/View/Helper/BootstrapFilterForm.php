@@ -116,7 +116,7 @@ class BootstrapFilterForm extends AbstractHelper
             array(
                 'fields'      => $fields->getFilterableFields(),
                 'typeHelper'  => $selectFilter->getFilterTypeHelper(),
-                'values'      => $selectFilter->getSelectModifier()->getCurrentFilters(),
+                'values'      => $selectFilter->getSelectModifier()->getCurrentFilters($fields),
                 'defaultVars' => $selectFilter->getDefaultVarsHelper(),
                 'title'       => $title,
                 'method'      => $method,
