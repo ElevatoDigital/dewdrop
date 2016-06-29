@@ -11,6 +11,7 @@
 namespace Dewdrop\Admin\Component\Stock\Users;
 
 use Dewdrop\Admin\Page\Stock\Edit as StockEdit;
+use Dewdrop\Admin\ResponseHelper\Standard as ResponseHelper;
 use Dewdrop\Pimple;
 
 /**
@@ -41,7 +42,7 @@ class Edit extends StockEdit
      * @param \Dewdrop\Admin\ResponseHelper\Standard $responseHelper
      * @return void
      */
-    public function process($responseHelper)
+    public function process(ResponseHelper $responseHelper)
     {
         if ($this->request->isPost()) {
             $this->invalidSubmission = (!$this->rowEditor->isValid($this->request->getPost()));
