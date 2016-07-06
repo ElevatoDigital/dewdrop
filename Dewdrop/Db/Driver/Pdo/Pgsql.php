@@ -608,6 +608,7 @@ class Pgsql implements DriverInterface
                 $genericType = 'timestamp';
                 break;
             case 'time':
+            case 'timetz':
                 $genericType = 'time';
                 break;
             case 'float':
