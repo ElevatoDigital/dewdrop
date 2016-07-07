@@ -3,7 +3,7 @@
 namespace Dewdrop\ActivityLog\Handler\Event;
 
 use Dewdrop\ActivityLog\Handler\TableHandler;
-use Dewdrop\Db\ManyToMany\Field;
+use Dewdrop\Db\Field as DbField;
 use Dewdrop\Db\Row;
 use Dewdrop\Db\Table;
 use Dewdrop\Fields\FieldInterface;
@@ -99,6 +99,10 @@ class FieldChange
 
     private function valueChanged()
     {
+        if ($this->field instanceof DbField && !$this->field->hasRow()) {
+            return false;
+        }
+
         $newValue = $this->field->getValue();
 
         if (is_array($this->originalValue) && is_array($newValue)) {
