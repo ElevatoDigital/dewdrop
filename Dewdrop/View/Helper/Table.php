@@ -11,6 +11,7 @@
 namespace Dewdrop\View\Helper;
 
 use Dewdrop\Fields;
+use Dewdrop\Fields\FieldInterface;
 use Dewdrop\Fields\Helper\SelectSort;
 use Dewdrop\Fields\Helper\TableCell as TableCellHelper;
 
@@ -170,9 +171,8 @@ class Table extends AbstractHelper
     protected function renderSortLink($content, $fieldId, $direction, SelectSort $sorter = null)
     {
         return sprintf(
-            '<a href="?sort=%s&dir=%s">%s</a>',
-            $this->view->escapeHtmlAttr($fieldId),
-            $this->view->escapeHtmlAttr($direction),
+            '<a href="%s">%s</a>',
+            $this->view->escapeHtmlAttr($this->assembleSortUrl($fieldId, $direction)),
             $this->view->escapeHtml($content)
         );
     }
@@ -189,6 +189,7 @@ class Table extends AbstractHelper
     {
         $out = '';
 
+        /* @var $field FieldInterface */
         foreach ($fields as $index => $field) {
             $out .= '<th scope="col">';
 
@@ -210,5 +211,38 @@ class Table extends AbstractHelper
         }
 
         return $out;
+    }
+
+    protected function toggleDirection($direction)
+    {
+        return ('asc' === strtolower($direction) ? 'desc' : 'asc');
+    }
+
+    protected function getActiveSortDirection($fieldId, SelectSort $sorter = null)
+    {
+        if (!$sorter) {
+            return ('asc' === $this->view->getRequest()->getQuery('dir') ? 'asc' : 'desc');
+        } else if ($sorter->isSorted() && $sorter->getSortedField()->getQueryStringId() === $fieldId) {
+            return strtolower($sorter->getSortedDirection());
+        }
+
+        return 'asc';
+    }
+
+    /**
+     * Generate a URL for sorting.
+     *
+     * @param string $id
+     * @param string $direction
+     * @return string
+     */
+    protected function assembleSortUrl($id, $direction)
+    {
+        $request = clone $this->view->getRequest();
+
+        return $request
+            ->setQuery('sort', $id)
+            ->setQuery('dir', $direction)
+            ->getUrl();
     }
 }
