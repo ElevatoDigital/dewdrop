@@ -71,6 +71,13 @@ interface FieldInterface
     public function getId();
 
     /**
+     * Get the name used to represent this field in result sets.
+     * 
+     * @return string
+     */
+    public function getName();
+
+    /**
      * Get an ID for this field that doesn't contain any special characters not
      * allowed in HTML ID attributes and/or CSS selectors.
      *
@@ -148,6 +155,20 @@ interface FieldInterface
      * @return array
      */
     public function getAllHelperCallbacks();
+
+    /**
+     * Get any filters supplied for the given helper name.
+     *
+     * @return array
+     */
+    public function getHelperFilters($helperName);
+
+    /**
+     * @param string $helperName
+     * @param callable $filter
+     * @return $this
+     */
+    public function addHelperFilter($helperName, callable $filter);
 
     /**
      * Set whether this field should be visible.  Can supply either a
@@ -367,4 +388,12 @@ interface FieldInterface
      * @return mixed
      */
     public function getValue();
+
+    /**
+     * Apply a template to this field.
+     *
+     * @param callable $template
+     * @return $this
+     */
+    public function applyTemplate(callable $template);
 }

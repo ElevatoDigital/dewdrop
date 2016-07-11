@@ -161,7 +161,7 @@ abstract class HelperAbstract implements HelperInterface
                 );
             }
 
-            $this->assignments[$id] = $this->wrapCallable($callback);
+            $this->assignments[$id] = $this->wrapCallable($callback, $field);
         }
 
         return $this->assignments[$id];
@@ -204,16 +204,26 @@ abstract class HelperAbstract implements HelperInterface
      * always supplied as the first argument to the callback.
      *
      * @param callable $callable
+     * @param FieldInterface $field
      * @return callable
      */
-    protected function wrapCallable(callable $callable)
+    protected function wrapCallable(callable $callable, FieldInterface $field)
     {
-        return function () use ($callable) {
+        return function () use ($callable, $field) {
             $arguments = func_get_args();
 
             array_unshift($arguments, $this);
 
-            return call_user_func_array($callable, $arguments);
+            $output = call_user_func_array($callable, $arguments);
+
+            /* @var $filter callable */
+            foreach ($field->getHelperFilters($this->name) as $filter) {
+                $filterArguments = $arguments;
+                array_unshift($filterArguments, $output);
+                $output = call_user_func_array($filter, $filterArguments);
+            }
+
+            return $output;
         };
     }
 }

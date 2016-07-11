@@ -111,6 +111,11 @@ abstract class FieldAbstract implements FieldInterface
     protected $customHelperCallbacks = array();
 
     /**
+     * @var array
+     */
+    protected $helperFilters = array();
+
+    /**
      * Set a note that will be displayed alongside this field when it is used
      * in a UI.
      *
@@ -516,6 +521,33 @@ abstract class FieldAbstract implements FieldInterface
     }
 
     /**
+     * @param string $helperName
+     * @return array
+     */
+    public function getHelperFilters($helperName)
+    {
+        return (array_key_exists($helperName, $this->helperFilters) ? $this->helperFilters[$helperName] : []);
+    }
+
+    /**
+     * @param $helperName
+     * @param callable $filter
+     * @return $this
+     */
+    public function addHelperFilter($helperName, callable $filter)
+    {
+        $helperName = strtolower($helperName);
+
+        if (!array_key_exists($helperName, $this->helperFilters)) {
+            $this->helperFilters[$helperName] = [];
+        }
+
+        $this->helperFilters[$helperName][] = $filter;
+
+        return $this;
+    }
+
+    /**
      * Get all helper callbacks that have been assigned to this field.
      * The returned array with have helper names as keys and the callables
      * themselves as values.  Mostly useful in debugging/introspection
@@ -526,6 +558,12 @@ abstract class FieldAbstract implements FieldInterface
     public function getAllHelperCallbacks()
     {
         return $this->customHelperCallbacks;
+    }
+
+    public function applyTemplate(callable $template)
+    {
+        $template($this);
+        return $this;
     }
 
     /**
