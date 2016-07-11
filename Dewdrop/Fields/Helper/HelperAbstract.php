@@ -207,7 +207,7 @@ abstract class HelperAbstract implements HelperInterface
      * @param FieldInterface $field
      * @return callable
      */
-    protected function wrapCallable(callable $callable, FieldInterface $field)
+    protected function wrapCallable(callable $callable, FieldInterface $field = null)
     {
         return function () use ($callable, $field) {
             $arguments = func_get_args();
@@ -216,11 +216,13 @@ abstract class HelperAbstract implements HelperInterface
 
             $output = call_user_func_array($callable, $arguments);
 
-            /* @var $filter callable */
-            foreach ($field->getHelperFilters($this->name) as $filter) {
-                $filterArguments = $arguments;
-                array_unshift($filterArguments, $output);
-                $output = call_user_func_array($filter, $filterArguments);
+            if ($field) {
+                /* @var $filter callable */
+                foreach ($field->getHelperFilters($this->name) as $filter) {
+                    $filterArguments = $arguments;
+                    array_unshift($filterArguments, $output);
+                    $output = call_user_func_array($filter, $filterArguments);
+                }
             }
 
             return $output;
