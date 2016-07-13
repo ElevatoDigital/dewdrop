@@ -49,9 +49,8 @@ body {
 }
 
 .navbar-right-btn-group {
-    max-width: 220px;
     top: 0;
-    position: absolute;
+    position: relative;
     right: 15px;
 }
 
@@ -67,6 +66,23 @@ body {
 
 #admin-index-collapse .btn-link-first {
     margin-left: 12px;
+}
+
+#admin-index-collapse.collapsing .navbar-right {
+    display: none;
+}
+
+#admin-index-collapse.collapse.in .navbar-right {
+    position: absolute;
+    right: 0;
+    top: 50px;
+}
+
+#admin-index-collapse.collapsing .btn-link,
+#admin-index-collapse.collapse.in .btn-link {
+    left: -12px;
+    margin-left: 0;
+    position: relative;
 }
 
 .checkbox-list {
@@ -149,6 +165,17 @@ tr:hover .row-actions {
 
 .bootstrap-columns-modal .settings label {
     font-weight: normal;
+}
+
+.navbar-edit .navbar-header .btn {
+    left: 8px;
+    position: relative;
+    top: 8px;
+}
+
+.navbar-edit .navbar-right .btn {
+    left: -8px;
+    position: relative;
 }
 
 @media (max-width: 767px) {

@@ -1,21 +1,3 @@
-<div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-    <h4 class="modal-title">View <?php echo $this->escapeHtml($this->singularTitle);?></h4>
-</div>
-<div class="modal-body">
-    <?php if ($this->permissions->can('edit')):?>
-    <nav class="navbar navbar-default navbar-admin-index" role="navigation">
-        <div class="navbar-header">
-            <a href="<?php echo $this->escapeHtmlAttr($this->adminUrl('edit', $this->params));?>" class="btn btn-primary navbar-btn">Edit <?php echo $this->escapeHtml($this->singularTitle);?></a>
-        </div>
-    </nav>
-    <?php endif;?>
-    <?php
-    echo $this->bootstrapDetailsView(
-        $this->fields->getVisibleFields($this->groupingFilter),
-        $this->data,
-        $this->tableCellRenderer(),
-        $this->id
-    );
-    ?>
-</div>
+<?php
+require __DIR__ . '/view-header.phtml';
+require __DIR__ . '/view-footer.phtml';

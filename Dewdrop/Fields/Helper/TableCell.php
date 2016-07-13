@@ -59,7 +59,7 @@ use Dewdrop\View\View;
  * );
  * </pre>
  */
-class TableCell
+class TableCell implements CellRendererInterface
 {
     /**
      * The helper used to render &lt;td&gt; content.
@@ -78,7 +78,7 @@ class TableCell
     /**
      * The helper used to build a CSS class string for a &lt;td&gt;.
      *
-     * @var \Dewdrop\Fields\Helper\TableCell\Header
+     * @var TdClassNames
      */
     private $tdClassNamesRenderer;
 
@@ -131,7 +131,7 @@ class TableCell
      * Get the TD class names renderer so you can assign custom callbacks and
      * generate class strings.
      *
-     * @return \Dewdrop\Fields\Helper\TableCell\Header
+     * @return TdClassNames
      */
     public function getTdClassNamesRenderer()
     {

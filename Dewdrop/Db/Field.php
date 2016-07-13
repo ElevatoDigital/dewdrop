@@ -11,7 +11,9 @@
 namespace Dewdrop\Db;
 
 use Dewdrop\Db\Field\InputFilterBuilder;
+use Dewdrop\Exception;
 use Dewdrop\Fields\FieldAbstract;
+use Dewdrop\Fields\OptionGroups;
 use Dewdrop\Fields\OptionPairs;
 use Dewdrop\Pimple;
 
@@ -27,9 +29,17 @@ class Field extends FieldAbstract
      * A \Dewdrop\Fields\OptionPairs object for use in retrieving key-value
      * pair options for a foreign key field.
      *
-     * @var \Dewdrop\Fields\OptionPairs
+     * @var OptionPairs
      */
     protected $optionPairs;
+
+    /**
+     * A \Dewdrop\Fields\OptionGroups object for use in retrieving key-value
+     * pair groups for a foreign key field.
+     *
+     * @var \Dewdrop\Fields\OptionGroups
+     */
+    protected $optionGroups;
 
     /**
      * The table this field is associated with.
@@ -116,6 +126,13 @@ class Field extends FieldAbstract
      * @var string
      */
     private $controlName;
+
+    /**
+     * An identifier suitable for use in an HTML ID attribute.
+     *
+     * @var string
+     */
+    private $htmlId;
 
     /**
      * The \Zend\InputFilter\Input instance used to validate and filter this
@@ -240,6 +257,8 @@ class Field extends FieldAbstract
     {
         $this->row = $row;
 
+        $this->getTable()->getActivityLogHandler()->prepareFieldChangeEvents($this);
+
         return $this;
     }
 
@@ -278,10 +297,16 @@ class Field extends FieldAbstract
 
     /**
      * Retrieve the value of this field for the associated row, if available.
+     *
+     * @throws Exception
      * @return mixed
      */
     public function getValue()
     {
+        if (!$this->row) {
+            throw new Exception("Attempting to retrieve value for {$this->name} field with no row assigned.");
+        }
+
         return $this->row->get($this->name);
     }
 
@@ -362,6 +387,10 @@ class Field extends FieldAbstract
     {
         $this->controlName = $controlName;
 
+        if ($this->inputFilter) {
+            $this->inputFilter->setName($this->controlName);
+        }
+
         return $this;
     }
 
@@ -408,6 +437,19 @@ class Field extends FieldAbstract
     }
 
     /**
+     * Override the default HTML ID for this field.
+     *
+     * @param string $htmlId
+     * @return $this
+     */
+    public function setHtmlId($htmlId)
+    {
+        $this->htmlId = $htmlId;
+
+        return $this;
+    }
+
+    /**
      * Get a version of the control name using underscores as word separators to
      * be more friendly in CSS selectors, etc.
      *
@@ -415,7 +457,7 @@ class Field extends FieldAbstract
      */
     public function getHtmlId()
     {
-        return str_replace(':', '_', $this->getControlName());
+        return $this->htmlId ?: str_replace(':', '_', $this->getControlName());
     }
 
     /**
@@ -485,15 +527,42 @@ class Field extends FieldAbstract
 
             if ($ref) {
                 $this->optionPairs->setOptions(
-                    array(
+                    [
                         'tableName'   => $ref['table'],
                         'valueColumn' => $ref['column']
-                    )
+                    ]
                 );
             }
         }
 
         return $this->optionPairs;
+    }
+
+    /**
+     * Get an OptionGroups object for this field.  Allows you to easily
+     * fetch key-value option pairs for foreign keys.
+     *
+     * @return \Dewdrop\Fields\OptionGroups
+     */
+    public function getOptionGroups()
+    {
+        if (null === $this->optionGroups) {
+            $this->optionGroups = new OptionGroups($this->table->getAdapter());
+
+            $ref = $this->getOptionPairsReference();
+
+            if ($ref) {
+                $this->optionGroups->setOptions(
+                    [
+                        'tableName'   => $ref['table'],
+                        'valueColumn' => $ref['column'],
+                        'optionPairs' => $this->getOptionPairs()
+                    ]
+                );
+            }
+        }
+
+        return $this->optionGroups;
     }
 
     /**
@@ -620,8 +689,7 @@ class Field extends FieldAbstract
      */
     protected function isTypeInteger()
     {
-        return 'integer' === $this->metadata['DATA_TYPE'] ||
-            $this->isType('int', 'mediumint', 'smallint', 'bigint');
+        return 'integer' === $this->metadata['GENERIC_TYPE'];
     }
 
     /**
@@ -632,8 +700,7 @@ class Field extends FieldAbstract
      */
     protected function isTypeFloat()
     {
-        return 'float' === $this->metadata['DATA_TYPE'] ||
-            $this->isType('dec', 'decimal', 'double', 'double precision', 'fixed');
+        return 'float' === $this->metadata['GENERIC_TYPE'];
     }
 
     /**

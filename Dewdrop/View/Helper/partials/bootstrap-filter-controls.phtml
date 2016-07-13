@@ -1,0 +1,74 @@
+<?php
+use Dewdrop\Fields\Helper\SelectFilter;
+?>
+
+<div class="ftr-logic-wrapper text-muted">
+    <small>
+        Find <?php echo $this->escapeHtml(strtolower($this->title ?: 'records'));?> matching
+        <select title="Search Field" data-chosen-exclude name="<?php echo $this->escapeHtmlAttr($this->paramPrefix);?>ftr-logic">
+            <?php
+            $operators = array('all', 'any');
+
+            foreach ($operators as $operator) {
+                if ($operator === $this->getRequest()->getQuery($this->paramPrefix . 'ftr-logic')) {
+                    echo '<option value="' . $operator . '" selected="selected">' . $operator . '</option>';
+                } else {
+                    echo '<option value="' . $operator . '">' . $operator . '</option>';
+                }
+            }
+            ?>
+        </select>
+        of these filters.
+    </small>
+</div>
+
+<fieldset>
+    <?php
+    $config = array();
+
+    /* @var $field \Dewdrop\Fields\FieldInterface */
+    foreach ($this->fields as $field) {
+        $filterTypeAndOptions = $this->typeHelper->getTypeAndRelatedOptions($field);
+
+        $config[] = array(
+            'id'       => $field->getQueryStringId(),
+            'label'    => $field->getLabel(),
+            'type'     => $filterTypeAndOptions['type'],
+            'defaults' => $this->defaultVars->getDefaultVars($field),
+            'options'  => $filterTypeAndOptions['options']
+        );
+    }
+
+    // Alphabetize filter fields by label
+    usort(
+        $config,
+        function ($a, $b) {
+            return strnatcasecmp($a['label'], $b['label']);
+        }
+    );
+    ?>
+
+    <script type="text/javascript">
+        var <?php echo $this->paramPrefix;?>FILTER_FIELDS = <?php echo $this->encodeJsonHtmlSafe($config);?>;
+        var <?php echo $this->paramPrefix;?>FILTER_VALUES = <?php echo $this->encodeJsonHtmlSafe($this->values);?>;
+    </script>
+</fieldset>
+
+<?php if ($this->showButtons):?>
+<div class="footer">
+    <input type="submit" class="btn btn-success btn-sm" value="Apply Filters" />
+    <?php
+    $params = [];
+
+    foreach ($this->getRequest()->getQuery() as $param => $value) {
+        if (SelectFilter::isQueryStringParamNotRelatedToFiltering($param, $this->paramPrefix)) {
+            $params[$param] = $value;
+        }
+    }
+
+    $queryString = http_build_query($params);
+    ?>
+    <a class="btn btn-link btn-sm" href="?<?php echo $this->escapeHtmlAttr($queryString);?>">Clear Filters</a>
+</div>
+<?php endif;?>
+

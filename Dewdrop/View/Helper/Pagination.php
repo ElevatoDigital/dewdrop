@@ -10,6 +10,8 @@
 
 namespace Dewdrop\View\Helper;
 
+use HtmlNode\Node;
+
 /**
  * Render pagination controls using Bootstrappy markup.
  */
@@ -28,7 +30,8 @@ class Pagination extends AbstractHelper
     {
         $pageCount = ceil($rowCount / $pageSize);
 
-        $out = '<div class="dewdrop-pagination text-center">';
+        $node = Node::create('div')->addClass('dewdrop-pagination')->addClass('text-center');
+        $out  = '';
 
         if ($rowCount > $pageSize) {
 
@@ -62,7 +65,7 @@ class Pagination extends AbstractHelper
 
                     if ($j + 1 !== $i) {
                         // ellipses
-                        $out .= '<li class="disabled"><a href="#">…</a></li>';
+                        $out .= '<li class="disabled"><a href="#">...</a></li>';
                     }
 
                     $out .= '<li' . ($i === $page ? ' class="disabled"' : '' ) . '><a href="' . $this->url($i) .
@@ -84,9 +87,9 @@ class Pagination extends AbstractHelper
             $this->view->escapeHtml($title)
         );
 
-        $out .= '</div>';
+        $node->setHtml($out);
 
-        return $out;
+        return $node;
     }
 
     /**

@@ -1,0 +1,69 @@
+<?php
+$mode   = 'blank';
+$modeId = $this->field->getControlName() . ':mode';
+
+if ($this->request->getPost($modeId)) {
+    $mode = $this->request->getPost($modeId);
+}
+?>
+<div class="import-edit-control">
+    <div class="btn-group btn-group-justified btn-group-import" role="group">
+        <div class="btn-group">
+            <button type="button" class="btn btn-default btn-column">Use Import Column</button>
+        </div>
+        <div class="btn-group">
+            <button type="button" class="btn btn-default btn-edit">Enter a Value</button>
+        </div>
+        <div class="btn-group">
+            <button type="button" class="btn btn-default btn-blank">Leave Blank</button>
+        </div>
+    </div>
+
+    <div class="import-column">
+        <div class="well">
+            <p class="text-muted">
+                Select a column from your spreadsheet to use when filling out this field:
+            </p>
+            <?php
+            $importId = $this->field->getControlName() . ':column';
+            $headers  = $this->importFile->getHeaders();
+            $value    = null;
+
+            if ($this->request->isPost()) {
+                $value = $this->request->getPost($importId);
+            } else {
+                foreach ($headers as $index => $header) {
+                    if (strtolower($header) === strtolower($this->field->getLabel())) {
+                        $value = $index;
+                        $mode  = 'column';
+                        break;
+                    }
+                }
+            }
+
+            echo $this->bootstrapSelect(
+                [
+                    'options' => $this->importFile->getHeaders(),
+                    'id'      => $importId,
+                    'name'    => $importId,
+                    'value'   => $value
+                ]
+            );
+            ?>
+        </div>
+    </div>
+
+    <div class="import-edit">
+        <div class="well">
+            <p class="text-muted">
+                Enter a value to use for all imported records:
+            </p>
+            <?php echo $this->originalHtml;?>
+        </div>
+    </div>
+
+    <input type="hidden" class="import-mode-input"
+        value="<?php echo $this->escapeHtmlAttr($mode);?>"
+        name="<?php echo $this->escapeHtmlAttr($modeId);?>"
+        id="<?php echo $this->escapeHtmlAttr($modeId);?>" />
+</div>

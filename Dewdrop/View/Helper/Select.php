@@ -97,7 +97,11 @@ class Select extends AbstractHelper
             $classes[] = 'form-control';
         }
 
-        $value = (string) $value;
+        $value = (array) $value;
+
+        if (count($value) > 1) {
+            $name .= '[]';
+        }
 
         return $this->partial(
             'select.phtml',

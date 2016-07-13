@@ -10,7 +10,7 @@
 
 namespace Dewdrop\View\Helper;
 
-use Dewdrop\Admin\Component\ComponentAbstract;
+use Dewdrop\Admin\Component\ComponentInterface;
 use Dewdrop\Admin\Component\CrudInterface;
 
 /**
@@ -23,22 +23,39 @@ class AdminComponentNav extends AbstractHelper
     /**
      * Render the nav for the provided component.
      *
-     * @param ComponentAbstract $component
+     * @param ComponentInterface $component
      * @return string
      */
-    public function direct(ComponentAbstract $component)
+    public function direct(ComponentInterface $component, array $options = [])
     {
         if ($component instanceof CrudInterface) {
-            $title = $component->getPrimaryModel()->getSingularTitle();
+            $singularTitle = $component->getPrimaryModel()->getSingularTitle();
         } else {
-            $title = $component->getTitle();
+            $singularTitle = $component->getTitle();
+        }
+
+        if ($component instanceof CrudInterface) {
+            $pluralTitle = $component->getPrimaryModel()->getPluralTitle();
+        } else {
+            $pluralTitle = $component->getTitle();
+        }
+
+        if (!isset($options['createUrl'])) {
+            $options['createUrl'] = null;
+        }
+
+        if (!isset($options['deletedRecordsModifier'])) {
+            $options['deletedRecordsModifier'] = null;
         }
 
         return $this->partial(
             'admin-component-nav.phtml',
             array(
-                'permissions'   => $component->getPermissions(),
-                'singularTitle' => $title
+                'permissions'            => $component->getPermissions(),
+                'singularTitle'          => $singularTitle,
+                'pluralTitle'            => $pluralTitle,
+                'createUrl'              => $options['createUrl'],
+                'deletedRecordsModifier' => $options['deletedRecordsModifier']
             )
         );
     }

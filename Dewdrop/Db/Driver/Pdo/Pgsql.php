@@ -82,6 +82,56 @@ class Pgsql implements DriverInterface
     }
 
     /**
+     * Fetch all results for the supplied SQL query using a PHP generator.
+     *
+     * This approach uses less memory, but the result set has a forward-only cursor.
+     *
+     * The SQL query can be a simple string or a Select object.  The bind array
+     * should supply values for all the parameters, either named or numeric, in
+     * the query.  And the fetch mode should match one of these 4 class constants
+     * from \Dewdrop\Db\Adapter: ARRAY_A, ARRAY_N, OBJECT, or OBJECT_K.
+     *
+     * @param string|Select $sql
+     * @param array $bind
+     * @param string $fetchMode
+     * @return \Generator
+     * @throws Exception
+     */
+    public function fetchAllWithGenerator($sql, $bind = [], $fetchMode = null)
+    {
+        if (null === $fetchMode) {
+            $fetchMode = Adapter::ARRAY_A;
+        }
+
+        $sql = $this->adapter->prepare($sql, $bind);
+
+        /* @var PDO $pdo */
+        $pdo = $this->getConnection();
+
+        $pdoFetchClass = null;
+        switch ($fetchMode) {
+            case Adapter::ARRAY_A:
+                $pdoFetchMode = PDO::FETCH_ASSOC;
+                break;
+            case Adapter::ARRAY_N:
+                $pdoFetchMode = PDO::FETCH_NUM;
+                break;
+            case Adapter::OBJECT: // intentional fall-through
+            case Adapter::OBJECT_K:
+                $pdoFetchMode = PDO::FETCH_OBJ;
+                break;
+            default:
+                throw new Exception("Unsupported fetch mode '{$fetchMode}'");
+        }
+
+        $statement = $pdo->query($sql, $pdoFetchMode);
+
+        while (false !== ($row = $statement->fetch())) {
+            yield $row;
+        }
+    }
+
+    /**
      * Fetch a single column of the results from the supplied SQL statement.
      *
      * @param string|\Dewdrop\Db\Select $sql
@@ -515,9 +565,12 @@ class Pgsql implements DriverInterface
             case 'int2':
                 if ($length === 2) {
                     $genericType = 'boolean';
+                    break;
                 }
-                break;
+                // If int2 and $length != 2, then non-boolean
+                // value, and continue to case 'int2'
             case 'int':
+            case 'int2':
             case 'int4':
             case 'integer':
             case 'serial':
@@ -551,9 +604,11 @@ class Pgsql implements DriverInterface
                 break;
             case 'datetime':
             case 'timestamp':
+            case 'timestamptz':
                 $genericType = 'timestamp';
                 break;
             case 'time':
+            case 'timetz':
                 $genericType = 'time';
                 break;
             case 'float':
@@ -610,6 +665,16 @@ class Pgsql implements DriverInterface
     }
 
     /**
+     * Rollback the current transaction.
+     *
+     * @return void
+     */
+    public function rollback()
+    {
+        $this->query('ROLLBACK');
+    }
+
+    /**
      * Use the OVER() window function to store a count of the total number
      * of rows that would have been retrieved if no LIMIT clause was applied
      * on the supplied Select object.  The total row count will be added
@@ -662,5 +727,80 @@ class Pgsql implements DriverInterface
     public function truncateTimeStampToDate($timestamp)
     {
         return "DATE_TRUNC('day', {$timestamp})";
+    }
+
+    public function listMissingForeignKeyIndexes($tableName)
+    {
+        $missingIndexes = $this->adapter->fetchCol(
+            'SELECT ARRAY_TO_JSON(column_name_list) AS columns
+            FROM (
+                SELECT DISTINCT
+                    conrelid,
+                    ARRAY_AGG(attname) AS column_name_list,
+                    ARRAY_AGG(attnum) AS column_list
+                FROM pg_attribute
+                JOIN (
+                    SELECT conrelid::regclass,
+                        conname,
+                        UNNEST(conkey) as column_index
+                    FROM (
+                        SELECT DISTINCT
+                            conrelid,
+                            conname,
+                            conkey
+                        FROM pg_constraint
+                        JOIN pg_class ON pg_class.oid = pg_constraint.conrelid
+                        JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
+                        WHERE nspname !~ \'^pg_\' 
+                            AND nspname <> \'information_schema\'
+                            AND contype = \'f\'
+                    ) fkey
+                ) fkey
+                ON fkey.conrelid = pg_attribute.attrelid
+                    AND fkey.column_index = pg_attribute.attnum
+                GROUP BY conrelid, conname
+            ) candidate_index
+            JOIN pg_class ON pg_class.oid = candidate_index.conrelid
+            LEFT JOIN pg_index ON pg_index.indrelid = conrelid
+                AND indkey::text = ARRAY_TO_STRING(column_list, \' \')
+            WHERE indexrelid IS NULL
+                AND relname = ?',
+            [$tableName]
+        );
+
+        $out = [];
+
+        foreach ($missingIndexes as $columnsJson) {
+            $out[] = json_decode($columnsJson, true);
+        }
+
+        sort($out);
+
+        return $out;
+    }
+
+    public function generateCreateIndexStatement($tableName, array $columnNames)
+    {
+        return sprintf(
+            'CREATE INDEX ON %s (%s);',
+            $this->adapter->quoteIdentifier($tableName),
+            implode(
+                ', ',
+                array_map(
+                    function ($columnName) {
+                        return $this->adapter->quoteIdentifier($columnName);
+                    },
+                    $columnNames
+                )
+            )
+        );
+    }
+
+    public function generateAnalyzeTableStatement($tableName)
+    {
+        return sprintf(
+            'ANALYZE %s;',
+            $this->adapter->quoteIdentifier($tableName)
+        );
     }
 }

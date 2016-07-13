@@ -1,0 +1,11 @@
+.row-collection-input-table table .alert {
+    margin-bottom: 0;
+}
+
+.row-collection-delete-column {
+    text-align: center;
+}
+
+.row-collection-hidden-input-row {
+    display: none;
+}

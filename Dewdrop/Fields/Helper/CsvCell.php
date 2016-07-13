@@ -54,7 +54,7 @@ use Dewdrop\Fields\Helper\CsvCell\Header;
  * );
  * </pre>
  */
-class CsvCell
+class CsvCell implements CellRendererInterface
 {
     /**
      * The helper used to render content.

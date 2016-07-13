@@ -15,7 +15,6 @@ use Dewdrop\Admin\Component\ComponentAbstract;
 use Dewdrop\Admin\Component\CrudInterface;
 use Dewdrop\Admin\Component\SortableListingInterface;
 use Dewdrop\Admin\ResponseHelper\Standard as ResponseHelper;
-use Dewdrop\Admin\Page\PageAbstract;
 use Dewdrop\Bootstrap;
 use Dewdrop\Pimple;
 use Dewdrop\Session;
@@ -31,7 +30,7 @@ use Dewdrop\Session;
  * 2) BulkActionProcessInterface: Enables checkboxes on the listing rows to
  *    allow selection of records and application of actions to them in bulk.
  */
-class Index extends PageAbstract
+class Index extends StockPageAbstract
 {
     /**
      * The CRUD component.
@@ -46,7 +45,7 @@ class Index extends PageAbstract
      *
      * @var string
      */
-    private $bulkActionFailureMessage = '';
+    protected $bulkActionFailureMessage = '';
 
     /**
      * Session storage for remembering query params for redirects.
@@ -56,14 +55,62 @@ class Index extends PageAbstract
     private $session;
 
     /**
+     * The URL to use for the create button.
+     *
+     * @var string
+     */
+    private $createUrl;
+
+    /**
+     * Override the default URL used on the create button.
+     *
+     * @param string $createUrl
+     * @return $this
+     */
+    public function setCreateUrl($createUrl)
+    {
+        $this->createUrl = $createUrl;
+
+        return $this;
+    }
+
+    /**
+     * Get the URL that should be used for the create button.  By default,
+     * this uses the stock edit page class.
+     *
+     * @return string
+     */
+    public function getCreateUrl()
+    {
+        if (!$this->createUrl) {
+            $this->createUrl = $this->getView()->adminUrl('edit');
+        }
+
+        return $this->createUrl;
+    }
+
+    /**
      * Ensure the user is allowed to view the listing in this component.
      */
     public function init()
     {
         $this->component->getPermissions()->haltIfNotAllowed('view-listing');
 
-        $this->session = new Session(Pimple::getInstance());
+        $this->session = new Session();
         $this->session->set($this->component->getListingQueryParamsSessionName(), $this->request->getQuery());
+
+        if ($this->component instanceof SortableListingInterface) {
+            $fields    = $this->component->getFields();
+            $sortField = $this->component->getSortField();
+
+            if (!$fields->has($sortField)) {
+                $fields->add($sortField);
+            }
+
+            /* @var $sorter \Dewdrop\Fields\Helper\SelectSort */
+            $sorter = $this->component->getListing()->getSelectModifierByName('SelectSort');
+            $sorter->setDefaultField($sortField);
+        }
     }
 
     /**
@@ -102,17 +149,19 @@ class Index extends PageAbstract
         $filter  = $this->component->getVisibilityFilter();
 
         $this->view->assign([
-            'component'        => $this->component,
-            'permissions'      => $this->component->getPermissions(),
-            'singularTitle'    => $this->component->getPrimaryModel()->getSingularTitle(),
-            'pluralTitle'      => $this->component->getPrimaryModel()->getPluralTitle(),
-            'listing'          => $listing,
-            'visibilityFilter' => $filter,
-            'groupingFilter'   => $this->component->getFieldGroupsFilter(),
-            'fields'           => $fields,
-            'debug'            => Pimple::getResource('debug'),
-            'isSortable'       => ($this->component instanceof SortableListingInterface),
-            'page'             => $this
+            'component'              => $this->component,
+            'permissions'            => $this->component->getPermissions(),
+            'singularTitle'          => $this->component->getPrimaryModel()->getSingularTitle(),
+            'pluralTitle'            => $this->component->getPrimaryModel()->getPluralTitle(),
+            'listing'                => $listing,
+            'visibilityFilter'       => $filter,
+            'groupingFilter'         => $this->component->getFieldGroupsFilter(),
+            'fields'                 => $fields,
+            'debug'                  => Pimple::getResource('debug'),
+            'isSortable'             => ($this->component instanceof SortableListingInterface),
+            'page'                   => $this,
+            'createUrl'              => $this->getCreateUrl(),
+            'deletedRecordsModifier' => $listing->getSelectModifierByName('SelectDeletedRecords')
         ]);
 
         if ($this->component instanceof BulkActionProcessorInterface) {
@@ -121,5 +170,7 @@ class Index extends PageAbstract
                 'bulkActionFailureMessage' => $this->bulkActionFailureMessage
             ]);
         }
+
+        return $this->renderView();
     }
 }

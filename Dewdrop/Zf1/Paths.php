@@ -8,13 +8,14 @@
  * @license   https://github.com/DeltaSystems/dewdrop/LICENSE
  */
 
-namespace Dewdrop\Admin\Component\Stock\Users;
+namespace Dewdrop\Zf1;
 
-use Dewdrop\Admin\Page\Stock\Index as StockIndexPage;
+use Dewdrop\Paths as CorePaths;
 
-/**
- * User listing page
- */
-class Index extends StockIndexPage
+class Paths extends CorePaths
 {
+    public function getModels()
+    {
+        return $this->getAppRoot() . '/application/models';
+    }
 }

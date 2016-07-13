@@ -155,4 +155,49 @@ class Mock implements RendererInterface
     {
         return false !== stripos($this->output, $search);
     }
+
+    /**
+     * Ask the user for a line of input.
+     *
+     * @param $promptText
+     * @param bool $allowEmpty
+     * @return string
+     */
+    public function ask($promptText, $allowEmpty = false)
+    {
+    }
+
+    /**
+     * Ask the user for a line of input and don't display that input as they're
+     * typing.  Ideal for passwords, etc.
+     *
+     * @param $promptText
+     * @param bool $allowEmpty
+     * @return string
+     */
+    public function secret($promptText, $allowEmpty = false)
+    {
+    }
+
+    /**
+     * Request that the user select an option from a list.
+     *
+     * @param $promptText
+     * @param array $options
+     * @param bool $allowEmpty
+     * @return string
+     */
+    public function select($promptText, array $options, $allowEmpty = false)
+    {
+    }
+
+    /**
+     * Ask the user to answer a yes/no confirmation prompt.
+     *
+     * @param $promptText
+     * @return boolean
+     */
+    public function confirm($promptText)
+    {
+    }
 }

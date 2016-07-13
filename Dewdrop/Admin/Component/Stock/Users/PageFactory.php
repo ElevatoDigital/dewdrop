@@ -29,6 +29,5 @@ class PageFactory extends CrudPageFactory
 
         $this->pageClassMap['change-password'] = '\Dewdrop\Admin\Component\Stock\Users\ChangePassword';
         $this->pageClassMap['edit']            = '\Dewdrop\Admin\Component\Stock\Users\Edit';
-        $this->pageClassMap['index']           = '\Dewdrop\Admin\Component\Stock\Users\Index';
     }
 }

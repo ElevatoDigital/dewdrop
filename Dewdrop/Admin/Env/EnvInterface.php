@@ -10,7 +10,7 @@
 
 namespace Dewdrop\Admin\Env;
 
-use Dewdrop\Admin\Component\ComponentAbstract;
+use Dewdrop\Admin\Component\ComponentInterface;
 use Zend\View\Helper\HeadLink;
 use Zend\View\Helper\HeadScript;
 
@@ -45,10 +45,10 @@ interface EnvInterface
     /**
      * Register an already instantiated component.
      *
-     * @param ComponentAbstract $component
+     * @param ComponentInterface $component
      * @return EnvInterface
      */
-    public function registerComponent(ComponentAbstract $component);
+    public function registerComponent(ComponentInterface $component);
 
     /**
      * Render the layout for the response.  A layout should wrap the
@@ -67,24 +67,32 @@ interface EnvInterface
      * your environment.  The URLs may vary quite a lot depending upon the
      * environment.
      *
-     * @param ComponentAbstract $component
+     * @param ComponentInterface $component
      * @param string $page
      * @param array $params
      * @return string
      */
-    public function url(ComponentAbstract $component, $page, array $params = array());
+    public function url(ComponentInterface $component, $page, array $params = array());
 
     /**
      * Initialize the component, setting up any needed routes, event handlers,
      * etc. for the environment.
      *
-     * @param ComponentAbstract $component
+     * @param ComponentInterface $component
      * @return void
      */
-    public function initComponent(ComponentAbstract $component);
+    public function initComponent(ComponentInterface $component);
 
     /**
-     * Perforn a redirect to the supplied URL using whatever method is preferred
+     * Retrieve a component by name.
+     *
+     * @param string $name
+     * @return ComponentInterface
+     */
+    public function getComponent($name);
+
+    /**
+     * Perform a redirect to the supplied URL using whatever method is preferred
      * by the current environment.
      *
      * @param string $url

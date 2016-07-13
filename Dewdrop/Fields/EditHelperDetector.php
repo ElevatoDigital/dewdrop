@@ -96,12 +96,14 @@ class EditHelperDetector
             return 'textarea';
         } elseif ($field->isType('text', 'integer', 'float')) {
             return 'inputText';
+        } elseif ($field->isType('date')) {
+            return 'inputDate';
         } elseif ($field->isType('timestamp')) {
             return 'inputTimestamp';
         }
 
         throw new Exception(
-            'Fields\EditHelperDetector: Could not find a suitaable view helper for field '
+            'Fields\EditHelperDetector: Could not find a suitable view helper for field '
             . $field->getControlName() . '.'
         );
     }

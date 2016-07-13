@@ -76,6 +76,7 @@ class Paths
      * Check to see if we're running in WP.  We currently just look for
      * the WPINC constant, but there might be better ways of detecting this.
      *
+     * @deprecated
      * @return boolean
      */
     public function isWp()
@@ -137,6 +138,16 @@ class Paths
     }
 
     /**
+     * Get the folder where we can find custom activity log handlers.
+     *
+     * @return string
+     */
+    public function getActivityLog()
+    {
+        return $this->getPluginRoot() . '/activity-log';
+    }
+
+    /**
      * The folder housing your admin components
      *
      * @return string
@@ -144,6 +155,26 @@ class Paths
     public function getAdmin()
     {
         return $this->pluginRoot . '/admin';
+    }
+
+    /**
+     * The folder where custom CLI commands are located.
+     *
+     * @return string
+     */
+    public function getCommands()
+    {
+        return $this->pluginRoot . '/commands';
+    }
+
+    /**
+     * Get the data folder where Dewdrop can write data on the server.
+     * 
+     * @return string
+     */
+    public function getData()
+    {
+        return $this->pluginRoot . '/data';
     }
 
     /**

@@ -12,6 +12,7 @@ namespace Dewdrop\Db;
 
 use ArrayAccess;
 use Dewdrop\Exception;
+use Dewdrop\SaveHandlerInterface;
 
 /**
  * The Row class provides a simple way to manipulate the values associated
@@ -69,7 +70,7 @@ use Dewdrop\Exception;
  * APIs, leveraging the database metadata to add validators, retrieve lists
  * of options, etc.
  */
-class Row implements ArrayAccess
+class Row implements ArrayAccess, SaveHandlerInterface
 {
     /**
      * The data represented by this row.
@@ -118,9 +119,11 @@ class Row implements ArrayAccess
         // Apply defaults for new rows
         if (!count($this->data)) {
             foreach ($this->columns as $column) {
-                $default = $this->table->getMetadata('columns', $column)['DEFAULT'];
+                $columnMetadata = $this->table->getMetadata('columns', $column);
+                $default        = $columnMetadata['DEFAULT'];
 
-                if (null !== $default) {
+                // We skip temporal fields to avoid problems with certain defaults (e.g., CURRENT_TIMESTAMP, NOW())
+                if (!in_array($columnMetadata['GENERIC_TYPE'], ['date', 'time', 'timestamp']) && null !== $default) {
                     $this->data[$column] = $default;
                 }
             }
@@ -158,7 +161,7 @@ class Row implements ArrayAccess
      * implementing a __wakeup() method.
      *
      * @param Table $table
-     * @return Row
+     * @return $this
      */
     public function setTable(Table $table)
     {
@@ -185,7 +188,7 @@ class Row implements ArrayAccess
      */
     public function field($name)
     {
-        $field = $this->table->field($name, $this);
+        $field = $this->table->field($name);
         $field->setRow($this);
         return $field;
     }
@@ -234,7 +237,7 @@ class Row implements ArrayAccess
      *
      * @param string|array $column
      * @param mixed $value
-     * @return Row
+     * @return $this
      * @throws Exception
      */
     public function set($column, $value = null)
@@ -401,7 +404,7 @@ class Row implements ArrayAccess
     /**
      * Save this row, inserting if it is a new row and updating otherwise.
      *
-     * @return \Dewdrop\Db\Row
+     * @return $this
      */
     public function save()
     {
@@ -409,6 +412,8 @@ class Row implements ArrayAccess
             $updateData = $this->data;
 
             $this->table->update($updateData, $this->assembleUpdateWhereClause());
+
+            $this->getTable()->getActivityLogHandler()->triggerFieldChangeEvents($this);
         } else {
             $id = $this->table->insert($this->data);
 
@@ -487,13 +492,38 @@ class Row implements ArrayAccess
      */
     public function toArray()
     {
-        return $this->getData();
+        $data = [];
+        foreach ($this->columns as $column) {
+            $data[$column] = $this->get($column);
+        }
+        return $data;
+    }
+
+    /**
+     * @return string
+     */
+    public function shortcode()
+    {
+        $primaryKey = $this->getTable()->getPrimaryKey();
+
+        if (1 !== count($primaryKey)) {
+            throw new Exception('Shortcodes cannot be generated for tables with multi-column primary keys.');
+        }
+
+        $columnName = current($primaryKey);
+        $value      = $this->get($columnName);
+
+        if (!$value) {
+            throw new Exception('Cannot generate shortcode when primary key is not set.');
+        }
+
+        return $this->getTable()->getActivityLogHandler()->createEntity($value)->assembleShortCode();
     }
 
     /**
      * Refresh the row, pulling in the latest data from the DB.
      *
-     * @return \Dewdrop\Db\Row
+     * @return $this
      */
     private function refresh()
     {
@@ -504,6 +534,9 @@ class Row implements ArrayAccess
         }
 
         $this->data = $this->table->findRowRefreshData($pkey);
+
+        // Virtual fields need to load their values again after data refresh
+        $this->virtualFieldsInitialized = array();
 
         return $this;
     }

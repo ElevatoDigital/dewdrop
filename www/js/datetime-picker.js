@@ -5,15 +5,15 @@ require.config({
     }
 });
 
-var bsTooltip = jQuery.fn.tooltip;
-
 require(
     ['jquery', 'jquery-ui', 'timepicker'],
     function ($) {
         'use strict';
 
-        // Restore Bootstrap tooltip plugin
-        jQuery.fn.tooltip = bsTooltip;
+        // Used to append popovers.  Avoids WP and Bootstrap CSS conflicts.
+        var styleWrapper = $('<div class="bootstrap-wrapper"></div>');
+
+        $(document.body).append(styleWrapper);
 
         var renderInputs = function ($input, dateValue, timeValue) {
             var $row   = $('<div class="row"></div>'),
@@ -87,7 +87,7 @@ require(
                     content += '</div>';
 
                     $input.popover({
-                        container: 'body',
+                        container: styleWrapper,
                         placement: 'bottom',
                         trigger:   'manual',
                         content:   content,
@@ -100,7 +100,6 @@ require(
                             var $popover;
 
                             $input.popover('show');
-
                             $popover = $('[data-input="' + $input.data('input') + '"] .date-wrapper');
 
                             $('[data-input="' + $input.data('input') + '"] a').on(
@@ -114,7 +113,7 @@ require(
                             var options = {
                                 changeMonth: true,
                                 changeYear:  true,
-                                defaultDate: moment($input.val()).toDate(),
+                                defaultDate: moment($input.val(), 'MM/DD/YYYY').toDate(),
                                 onSelect: function (e) {
                                     var selected = $popover.datepicker('getDate');
 

@@ -15,6 +15,7 @@ use Dewdrop\Db\Field as DbField;
 use Dewdrop\Db\Select;
 use Dewdrop\Fields;
 use Dewdrop\Fields\Exception;
+use Dewdrop\Fields\OptionPairs\TitleColumnNotDetectedException;
 use Dewdrop\Fields\FieldInterface;
 use Dewdrop\Request;
 
@@ -298,17 +299,28 @@ class SelectSort extends HelperAbstract implements SelectModifierInterface
      *
      * @param DbField $field
      * @param Select $select
-     * @param $direction
+     * @param string $direction
      * @return Select
      * @throws Select\SelectException
      */
     public function sortDbReference(DbField $field, Select $select, $direction)
     {
-        return $select->order(
-            new Expr(
-                "{$select->quoteWithAlias($field->getTable()->getTableName(), $field->getName())} $direction"
-            )
-        );
+        $optionPairs = $field->getOptionPairs();
+        $tableName   = $optionPairs->getTableName();
+
+        try {
+            $titleColumn = $optionPairs->detectTitleColumn();
+        } catch (TitleColumnNotDetectedException $e) {
+            $titleColumn = $field->getName();
+        }
+
+        if ($titleColumn instanceof Expr) {
+            $orderSpec = "{$titleColumn} {$direction}";
+        } else {
+            $orderSpec = new Expr("{$select->quoteWithAlias($tableName, $titleColumn)} $direction");
+        }
+
+        return $select->order($orderSpec);
     }
 
     /**

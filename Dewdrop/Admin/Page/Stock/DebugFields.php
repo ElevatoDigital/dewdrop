@@ -12,7 +12,6 @@ namespace Dewdrop\Admin\Page\Stock;
 
 use Dewdrop\Admin\Component\ComponentAbstract;
 use Dewdrop\Admin\Component\CrudInterface;
-use Dewdrop\Admin\Page\PageAbstract;
 use Dewdrop\Fields;
 
 /**
@@ -21,7 +20,7 @@ use Dewdrop\Fields;
  * callbacks are in use for each field.  Can be useful when familiarizing
  * yourself with a new component.
  */
-class DebugFields extends PageAbstract
+class DebugFields extends StockPageAbstract
 {
     /**
      * The CRUD component.
@@ -40,5 +39,7 @@ class DebugFields extends PageAbstract
 
         $this->view->displayFields   = new Fields();
         $this->view->componentFields = $this->component->getFields();
+
+        return $this->renderView();
     }
 }

@@ -10,8 +10,6 @@
 
 namespace Dewdrop\Admin\Page\Stock;
 
-use Dewdrop\Admin\Page\PageAbstract;
-
 /**
  * This page provides a full listing of a component's available pages.  Pages
  * in Dewdrop admin components are provided by PageFactory objects.  One factory
@@ -20,7 +18,7 @@ use Dewdrop\Admin\Page\PageAbstract;
  * though the Crud page factory would also provide and Index), the superseded
  * page will be crossed-out.
  */
-class DebugPages extends PageAbstract
+class DebugPages extends StockPageAbstract
 {
     /**
      * Pass all the page factories for this component into the view.
@@ -32,5 +30,7 @@ class DebugPages extends PageAbstract
         $this->view->assign([
             'pageFactories' => $this->component->getPageFactories(),
         ]);
+
+        return $this->renderView();
     }
 }

@@ -63,6 +63,11 @@ class Field extends FieldAbstract
         return $this->id;
     }
 
+    public function getName()
+    {
+        return $this->getId();
+    }
+
     /**
      * Get the field's ID for use in HTML contexts.  This ID should be compatible
      * with CSS selectors, etc.  For custom fields, this is generally equivalent

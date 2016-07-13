@@ -47,6 +47,14 @@ class Request
     private $method;
 
     /**
+     * An index present in $_SERVER that is set by a trusted proxy and can be used
+     * to get the user's actual IP address.
+     *
+     * @var string
+     */
+    private $trustedClientIpHeader;
+
+    /**
      * Create request, optionally injecting alterative values for post, query,
      * and method properties, primarily to aid in testing.
      *
@@ -65,6 +73,29 @@ class Request
             $this->method = $_SERVER['REQUEST_METHOD'];
         } else {
             $this->method = 'GET';
+        }
+    }
+
+    /**
+     * @param string $trustedClientIpHeader
+     * @return $this
+     */
+    public function setTrustedClientIpHeader($trustedClientIpHeader)
+    {
+        $this->trustedClientIpHeader = $trustedClientIpHeader;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getClientIp()
+    {
+        if ($this->trustedClientIpHeader && isset($_SERVER[$this->trustedClientIpHeader])) {
+            return $_SERVER[$this->trustedClientIpHeader];
+        } else {
+            return $_SERVER['REMOTE_ADDR'];
         }
     }
 
@@ -110,6 +141,16 @@ class Request
     public function isPost()
     {
         return 'POST' === $this->method;
+    }
+
+    /**
+     * Whether the request is a GET.
+     *
+     * @return boolean
+     */
+    public function isGet()
+    {
+        return 'GET' === $this->method;
     }
 
     /**

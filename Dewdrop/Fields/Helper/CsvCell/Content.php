@@ -10,9 +10,11 @@
 
 namespace Dewdrop\Fields\Helper\CsvCell;
 
+use DateTimeZone;
 use Dewdrop\Db\Field as DbField;
 use Dewdrop\Fields\FieldInterface;
 use Dewdrop\Fields\Helper\HelperAbstract;
+use Dewdrop\Fields\Helper\CellRenderer\ContentHelperInterface;
 
 /**
  * The header helper allows you to render the content of the header for
@@ -34,7 +36,7 @@ use Dewdrop\Fields\Helper\HelperAbstract;
  * );
  * </pre>
  */
-class Content extends HelperAbstract
+class Content extends HelperAbstract implements ContentHelperInterface
 {
     /**
      * The name for this helper, used when you want to define a global custom
@@ -52,28 +54,28 @@ class Content extends HelperAbstract
      *
      * @var array
      */
-    private $callbacksByColumnPosition = array();
+    protected $callbacksByColumnPosition = array();
 
     /**
      * This content will be returned if any field's callback generates no output.
      *
      * @var string
      */
-    private $nullContentPlaceholder = '';
+    protected $nullContentPlaceholder = '';
 
     /**
      * The default format for rendering dates.  Uses PHP's date() syntax.
      *
      * @var string
      */
-    private $dateFormat = 'M j, Y';
+    protected $dateFormat = 'M j, Y';
 
     /**
      * The default format for rendering time.  Uses PHP's date() syntax.
      *
      * @var string
      */
-    private $timeFormat = 'g:iA';
+    protected $timeFormat = 'g:iA';
 
     /**
      * Set the content that should be returned if a field's callback returns no
@@ -134,7 +136,7 @@ class Content extends HelperAbstract
 
         $output = call_user_func($callable, $rowData, $rowIndex, $columnIndex);
 
-        if (!trim($output)) {
+        if (null === $output) {
             return $this->nullContentPlaceholder;
         } else {
             return $output;
@@ -249,6 +251,16 @@ class Content extends HelperAbstract
         $value     = $rowData[$field->getName()];
         $timestamp = strtotime($value);
 
+        // Hack for handling GMT offsets in WordPress.
+        if (function_exists('get_option')) {
+            $timezoneString = get_option('timezone_string');
+
+            if ($timezoneString) {
+                $offset = timezone_offset_get(new DateTimeZone($timezoneString), date_create($value));
+                $timestamp += $offset;
+            }
+        }
+
         if ($timestamp) {
             return date($this->dateFormat, $timestamp);
         } else {
@@ -269,6 +281,16 @@ class Content extends HelperAbstract
     {
         $value     = $rowData[$field->getName()];
         $timestamp = strtotime($value);
+
+        // Hack for handling GMT offsets in WordPress.
+        if (function_exists('get_option')) {
+            $timezoneString = get_option('timezone_string');
+
+            if ($timezoneString) {
+                $offset = timezone_offset_get(new DateTimeZone($timezoneString), date_create($value));
+                $timestamp += $offset;
+            }
+        }
 
         if ($timestamp) {
             return date($this->dateFormat . ' ' . $this->timeFormat, $timestamp);

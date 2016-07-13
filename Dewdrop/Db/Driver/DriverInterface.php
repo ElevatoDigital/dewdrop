@@ -44,6 +44,23 @@ interface DriverInterface
     public function fetchAll($sql, $bind = array(), $fetchMode = null);
 
     /**
+     * Fetch all results for the supplied SQL query using a PHP generator.
+     *
+     * This approach uses less memory, but the result set has a forward-only cursor.
+     *
+     * The SQL query can be a simple string or a Select object.  The bind array
+     * should supply values for all the parameters, either named or numeric, in
+     * the query.  And the fetch mode should match one of these 4 class constants
+     * from \Dewdrop\Db\Adapter: ARRAY_A, ARRAY_N, OBJECT, or OBJECT_K.
+     *
+     * @param string|Select $sql
+     * @param array $bind
+     * @param string $fetchMode
+     * @return \Generator
+     */
+    public function fetchAllWithGenerator($sql, $bind = [], $fetchMode = null);
+
+    /**
      * Fetch a single column of the results from the supplied SQL statement.
      *
      * @param string|\Dewdrop\Db\Select $sql
@@ -113,6 +130,23 @@ interface DriverInterface
      * @return array
      */
     public function listForeignKeyReferences($tableName);
+
+    /**
+     * List all missing foreign key indexes on the supplied table.
+     *
+     * The resulting array has the following shape:
+     *
+     * <pre>
+     * [
+     *     ['foreign_key_id'],
+     *     ['multi_column_foreign_key_id', 'second_column_foreign_key_id']
+     * ]
+     * </pre>
+     *
+     * @param $tableName
+     * @return mixed
+     */
+    public function listMissingForeignKeyIndexes($tableName);
 
     /**
      * Returns an associative array containing all the unique constraints on a table.
@@ -197,6 +231,13 @@ interface DriverInterface
     public function commit();
 
     /**
+     * Rollback the current transaction.
+     *
+     * @return void
+     */
+    public function rollback();
+
+    /**
      * Modify a \Dewdrop\Db\Select object so that the RDBMS can calculate the
      * total number of rows that would have been returned if no LIMIT was
      * present.
@@ -243,4 +284,22 @@ interface DriverInterface
      * @return string
      */
     public function quoteInternal($input);
+
+    /**
+     * Generate an SQL statement to create an index on the supplied table and
+     * column(s).
+     *
+     * @param string $tableName
+     * @param array $columnNames
+     * @return string
+     */
+    public function generateCreateIndexStatement($tableName, array $columnNames);
+
+    /**
+     * Generate an SQL statement to analyze a table.
+     * 
+     * @param string $tableName
+     * @return string
+     */
+    public function generateAnalyzeTableStatement($tableName);
 }

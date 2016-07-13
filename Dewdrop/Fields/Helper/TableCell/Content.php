@@ -10,9 +10,11 @@
 
 namespace Dewdrop\Fields\Helper\TableCell;
 
+use DateTimeZone;
 use Dewdrop\Db\Field as DbField;
 use Dewdrop\Fields\FieldInterface;
 use Dewdrop\Fields\Helper\HelperAbstract;
+use Dewdrop\Fields\Helper\CellRenderer\ContentHelperInterface;
 use Dewdrop\View\View;
 
 /**
@@ -35,8 +37,18 @@ use Dewdrop\View\View;
  * );
  * </pre>
  */
-class Content extends HelperAbstract
+class Content extends HelperAbstract implements ContentHelperInterface
 {
+    /**
+     * @const
+     */
+    const VIEW_MODE_TABLE = 'table';
+
+    /**
+     * @const
+     */
+    const VIEW_MODE_DETAIL = 'detail';
+
     /**
      * The name for this helper, used when you want to define a global custom
      * callback for a given field
@@ -45,6 +57,14 @@ class Content extends HelperAbstract
      * @var string
      */
     protected $name = 'tablecell.content';
+
+    /**
+     * The current view mode of this renderer.  Either VIEW_MODE_TABLE or
+     * VIEW_MODE_DETAIL.
+     *
+     * @var string
+     */
+    protected $viewMode = self::VIEW_MODE_TABLE;
 
     /**
      * A view object used for rendering and escaping.
@@ -91,6 +111,43 @@ class Content extends HelperAbstract
     public function __construct(View $view)
     {
         $this->view = $view;
+    }
+
+    /**
+     * Switch the view mode of this renderer.  Must by either VIEW_MODE_TABLE
+     * or VIEW_MODE_DETAIL.  Allows callback authors to detect table view vs
+     * detail view and render accordingly.
+     *
+     * @param string $viewMode
+     * @return $this
+     */
+    public function setViewMode($viewMode)
+    {
+        $this->viewMode = $viewMode;
+
+        return $this;
+    }
+
+    /**
+     * Check to see if this renderer is being used to render a table for
+     * multiple records rather than the details of a single record.
+     *
+     * @return bool
+     */
+    public function isTableView()
+    {
+        return self::VIEW_MODE_TABLE === $this->viewMode;
+    }
+
+    /**
+     * Check to see if this renderer is being used to render a single
+     * record's details rather than a collection of records.
+     *
+     * @return bool
+     */
+    public function isDetailView()
+    {
+        return self::VIEW_MODE_DETAIL === $this->viewMode;
     }
 
     /**
@@ -175,9 +232,9 @@ class Content extends HelperAbstract
             $callable = $this->getFieldAssignment($field);
         }
 
-        $output = call_user_func($callable, $rowData, $rowIndex, $columnIndex);
+        $output = trim(call_user_func($callable, $rowData, $rowIndex, $columnIndex));
 
-        if (!trim($output)) {
+        if ('' === $output) {
             return $this->nullContentPlaceholder;
         } else {
             return $output;
@@ -304,6 +361,16 @@ class Content extends HelperAbstract
         $value     = $rowData[$field->getName()];
         $timestamp = strtotime($value);
 
+        // Hack for handling GMT offsets in WordPress.
+        if (function_exists('get_option')) {
+            $timezoneString = get_option('timezone_string');
+
+            if ($timezoneString) {
+                $offset = timezone_offset_get(new DateTimeZone($timezoneString), date_create($value));
+                $timestamp += $offset;
+            }
+        }
+
         if ($timestamp) {
             return $this->view->escapeHtml(date($this->dateFormat, $timestamp));
         } else {
@@ -325,6 +392,20 @@ class Content extends HelperAbstract
         $value     = $rowData[$field->getName()];
         $timestamp = strtotime($value);
 
-        return $this->view->escapeHtml(date($this->dateFormat . ' ' . $this->timeFormat, $timestamp));
+        // Hack for handling GMT offsets in WordPress.
+        if (function_exists('get_option')) {
+            $timezoneString = get_option('timezone_string');
+
+            if ($timezoneString) {
+                $offset = timezone_offset_get(new DateTimeZone($timezoneString), date_create($value));
+                $timestamp += $offset;
+            }
+        }
+
+        if ($timestamp) {
+            return $this->view->escapeHtml(date($this->dateFormat . ' ' . $this->timeFormat, $timestamp));
+        } else {
+            return '';
+        }
     }
 }

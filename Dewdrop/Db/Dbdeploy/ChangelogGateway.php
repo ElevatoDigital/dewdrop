@@ -12,6 +12,7 @@ namespace Dewdrop\Db\Dbdeploy;
 
 use Dewdrop\Db\Adapter as DbAdapter;
 use Dewdrop\Db\Dbdeploy\Exception;
+use Dewdrop\Env;
 
 /**
  * This class enables other dbdeploy classes to access the dbdeploy
@@ -118,6 +119,8 @@ class ChangelogGateway
             $this->createTable();
         }
 
+        $this->maintainBackwardCompatibilityOnPrimaryChangeset();
+
         return $this->dbAdapter->insert(
             $this->tableName,
             array(
@@ -129,6 +132,27 @@ class ChangelogGateway
                 'complete_dt'   => $endTime
             )
         );
+    }
+
+    /**
+     * When Dewdrop was WP-only, the primary dbdeploy changeset was called "plugin".
+     * We now support several environments and calling projects "plugins" doesn't
+     * make sense in some cases.  To reflect this, the EnvInterface->getProjectNoun()
+     * method was added.  Because existing projects had "plugin" in the dbdeploy_changelog
+     * already, this method is in place to update any of those records on older
+     * projects.
+     */
+    public function maintainBackwardCompatibilityOnPrimaryChangeset()
+    {
+        $primaryChangesetName = Env::getInstance()->getProjectNoun();
+
+        if ('plugin' !== $primaryChangesetName) {
+            $this->dbAdapter->update(
+                $this->tableName,
+                ['delta_set' => $primaryChangesetName],
+                "delta_set = 'plugin'"
+            );
+        }
     }
 
     /**

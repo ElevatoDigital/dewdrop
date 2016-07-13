@@ -33,6 +33,13 @@ class SelectPaginate extends HelperAbstract implements SelectModifierInterface
     protected $name = 'selectpaginate';
 
     /**
+     * Whether modifications from this modifier should be applied at all.
+     *
+     * @var bool
+     */
+    private $enabled = true;
+
+    /**
      * The current page.
      *
      * @var int
@@ -82,6 +89,40 @@ class SelectPaginate extends HelperAbstract implements SelectModifierInterface
     public function setPrefix($prefix)
     {
         $this->prefix = $prefix;
+
+        return $this;
+    }
+
+    /**
+     * Check to see if this helper is enabled.
+     *
+     * @return bool
+     */
+    public function isEnabled()
+    {
+        return $this->enabled;
+    }
+
+    /**
+     * Enable this modifier.
+     *
+     * @return $this
+     */
+    public function enable()
+    {
+        $this->enabled = true;
+
+        return $this;
+    }
+
+    /**
+     * Disable this modifier.
+     *
+     * @return $this
+     */
+    public function disable()
+    {
+        $this->enabled = false;
 
         return $this;
     }
@@ -156,11 +197,19 @@ class SelectPaginate extends HelperAbstract implements SelectModifierInterface
      */
     public function modifySelect(Fields $fields, Select $select)
     {
+        if ($this->request->getQuery($this->prefix . 'disable-pagination')) {
+            $this->disable();
+        }
+
         $driver = $select->getAdapter()->getDriver();
 
         $this->page = (int) $this->request->getQuery($this->prefix . 'listing-page', 1);
 
         $driver->prepareSelectForTotalRowCalculation($select);
+
+        if (!$this->enabled) {
+            return $select;
+        }
 
         return $select->limit(
             $this->getPageSize(),

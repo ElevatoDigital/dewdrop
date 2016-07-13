@@ -12,7 +12,14 @@ if ($this->bulkActionFailureMessage) {
     );
 }
 
-echo $this->adminComponentNav($this->component);
+echo $this->adminComponentNav(
+    $this->component,
+    [
+        'createUrl'              => $this->createUrl,
+        'deletedRecordsModifier' => $this->deletedRecordsModifier
+    ]
+);
+
 echo $this->bootstrapFilterForm()->adminPanel($this->component);
 ?>
 
@@ -48,7 +55,6 @@ if ($this->permissions->can('view')) {
     $rowActionArgs['view'] = $this->adminUrl('view', array($pkey => '%s'));
 }
 
-
 $this->bootstrapRowActions()->assignCallback($rowActionArgs);
 
 $selectFilter  = $this->listing->getSelectModifierByName('SelectFilter');
@@ -64,12 +70,6 @@ if ($this->isSortable) {
         $this->listing->getPrimaryKey()->getName()
     );
 
-    if (!$fields->has($sortField)) {
-        $fields->add($sortField);
-    }
-
-    $this->listing->getSelectModifierByName('SelectSort')->setDefaultField($sortField);
-
     echo $this->tableSortHandle()->open($this->adminUrl('sort-listing'));
 }
 
@@ -77,6 +77,13 @@ if ($this->bulkActions) {
     $fields->prepend($this->bulkActionCheckboxField($this->bulkActions, $renderer));
 
     echo $this->bulkActionForm()->open();
+}
+
+if ($this->deletedRecordsModifier && $this->deletedRecordsModifier->isShowingDeletedRecords()) {
+    printf(
+        '<div class="alert alert-warning">Currently displaying deleted %s.</div>',
+        $this->escapeHtml($this->pluralTitle)
+    );
 }
 
 if (0 === $totalRowCount && $selectFilter->hasFilters()) {
@@ -97,20 +104,21 @@ if ($this->isSortable) {
     echo $this->tableSortHandle()->close();
 }
 
+/* @var $paginationHelper \Dewdrop\Fields\Helper\SelectPaginate */
 $paginationHelper = $this->listing->getSelectModifierByName('SelectPaginate');
 
 if ($this->bulkActions) {
     echo $this->bulkActionForm()->close(
         $this->bulkActions,
         $totalRowCount,
-        $paginationHelper->getPageSize(),
+        ($paginationHelper->isEnabled() ? $paginationHelper->getPageSize() : $totalRowCount),
         $this->pluralTitle
     );
 }
 
 echo $this->pagination(
     $totalRowCount,
-    $paginationHelper->getPageSize(),
+    ($paginationHelper->isEnabled() ? $paginationHelper->getPageSize() : $totalRowCount),
     $paginationHelper->getPage(),
     (1 === $totalRowCount ? $this->singularTitle : $this->pluralTitle)
 );

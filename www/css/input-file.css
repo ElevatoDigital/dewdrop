@@ -1,0 +1,46 @@
+.input-file-upload-form {
+    display: none;
+}
+
+.input-file .alert {
+    padding-bottom: 6px;
+    padding-top: 6px;
+}
+
+.input-file .btn-group-justified {
+    margin-top: 5px;
+    width: 160px;
+}
+
+.input-file .progress {
+    width: 200px;
+    height: 8px;
+}
+
+.input-file .progress-text {
+    position: relative;
+    top: -15px;
+}
+
+.input-file {
+    padding-bottom: 20px;
+    position: relative;
+}
+
+.input-file .button-wrapper {
+    float: left;
+    margin-right: 15px;
+}
+
+.input-file .input-file-status-ui {
+    float: left;
+}
+
+.input-file .thumbnail {
+    margin: 0 auto 10px auto;
+    max-width: 120px;
+}
+
+.input-file .panel {
+    text-align: center;
+}

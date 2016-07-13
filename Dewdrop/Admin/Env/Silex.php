@@ -10,7 +10,8 @@
 
 namespace Dewdrop\Admin\Env;
 
-use Dewdrop\Admin\Component\ComponentAbstract;
+use Dewdrop\Admin\Component\ComponentInterface;
+use Dewdrop\Admin\Component\ShellIntegrationInterface;
 use Dewdrop\Pimple;
 use Dewdrop\View\View;
 use Silex\Application;
@@ -90,6 +91,16 @@ class Silex extends EnvAbstract
     }
 
     /**
+     * Get the title for this admin environment.
+     *
+     * @return string
+     */
+    public function getTitle()
+    {
+        return $this->title;
+    }
+
+    /**
      * Inflect a component name for use in URLs and routes.
      *
      * @param string $name
@@ -103,22 +114,36 @@ class Silex extends EnvAbstract
     /**
      * Initialize the provided component by setting up routes for it in Silex.
      *
-     * @param ComponentAbstract $component
+     * @param ComponentInterface $component
      */
-    public function initComponent(ComponentAbstract $component)
+    public function initComponent(ComponentInterface $component)
     {
         $this->application->match(
             '/admin/' . $component->getName() . '/{page}',
             function ($page) use ($component) {
-                /* @var $component ComponentAbstract */
+                /* @var $component ComponentInterface */
                 foreach ($this->components as $preDispatchComponent) {
                     $preDispatchComponent->preDispatch();
                 }
 
                 return $component->dispatchPage($page);
             }
-        )
-        ->value('page', 'index');
+        );
+
+        $this->application->get(
+            '/admin/' . $component->getName(),
+            function () use ($component) {
+                $url = '/admin/' . $component->getName() . '/index';
+
+                if (Pimple::hasResource('url-filter')) {
+                    /* @var $filter callable */
+                    $filter = Pimple::getResource('url-filter');
+                    $url    = $filter($url);
+                }
+
+                return $this->application->redirect($url);
+            }
+        );
     }
 
     /**
@@ -170,6 +195,7 @@ class Silex extends EnvAbstract
 
         $view
             ->assign('title', $this->title)
+            ->assign('env', $this)
             ->assign('components', $this->getSortedComponentsForMenu())
             ->assign('content', $content)
             ->assign('user', (isset($this->application['user']) ? $this->application['user'] : null))
@@ -184,17 +210,25 @@ class Silex extends EnvAbstract
      * Generate a URL for the provided page and params that will match the
      * Silex routes set up by this class.
      *
-     * @param ComponentAbstract $component
+     * @param ComponentInterface $component
      * @param string $page
      * @param array $params
      * @return string
      */
-    public function url(ComponentAbstract $component, $page, array $params = array())
+    public function url(ComponentInterface $component, $page, array $params = array())
     {
-        return '/admin/'
+        $url = '/admin/'
             . $component->getName() . '/'
             . $this->application['inflector']->hyphenize($page)
             . $this->assembleQueryString($params, '?');
+
+        if (Pimple::hasResource('url-filter')) {
+            /* @var $filter callable */
+            $filter = Pimple::getResource('url-filter');
+            $url    = $filter($url);
+        }
+
+        return $url;
     }
 
     /**
@@ -222,8 +256,8 @@ class Silex extends EnvAbstract
         usort(
             $components,
             function ($a, $b) {
-                /* @var $a ComponentAbstract */
-                /* @var $b ComponentAbstract */
+                /* @var $a ShellIntegrationInterface */
+                /* @var $b ShellIntegrationInterface */
                 $aPos = $a->getMenuPosition();
                 $bPos = $b->getMenuPosition();
 

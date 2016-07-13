@@ -10,7 +10,7 @@
 
 namespace Dewdrop\Admin\Page;
 
-use Dewdrop\Admin\Component\ComponentAbstract;
+use Dewdrop\Admin\Component\ComponentInterface;
 use Dewdrop\Admin\ResponseHelper\Standard as ResponseHelper;
 use Dewdrop\Pimple;
 use Dewdrop\Request;
@@ -44,7 +44,7 @@ abstract class PageAbstract
     /**
      * The component the page is part of
      *
-     * @var ComponentAbstract
+     * @var ComponentInterface
      */
     protected $component;
 
@@ -67,30 +67,66 @@ abstract class PageAbstract
     protected $request;
 
     /**
+     * The path where this page's view script should be found.
+     *
+     * @var string
+     */
+    protected $viewScriptPath;
+
+    /**
+     * The name used in the URL to route to this page.
+     *
+     * @var string
+     */
+    private $name;
+
+    /**
      * Create a new page with a reference to its component and the file in which
      * it is defined.
      *
      * Also, by default, the page will be configured to look for view scripts
      * in the view-scripts sub-folder of its component.
      *
-     * @param ComponentAbstract $component
+     * @param ComponentInterface $component
      * @param Request $request
      * @param string $viewScriptPath
      */
-    public function __construct(ComponentAbstract $component, Request $request, $viewScriptPath = null)
+    public function __construct(ComponentInterface $component, Request $request, $viewScriptPath = null)
     {
         $this->component   = $component;
         $this->view        = Pimple::getResource('view');
-        $this->request     = ($request ?: $this->application['dewdrop-request']);
+        $this->request     = ($request ?: Pimple::getResource('dewdrop-request'));
 
         if (null === $viewScriptPath) {
             $viewScriptPath = $this->component->getPath() . '/view-scripts';
         }
 
+        $this->viewScriptPath = $viewScriptPath;
+
         $this->view
-            ->setScriptPath($viewScriptPath)
+            ->setScriptPath($this->viewScriptPath)
             ->helper('AdminUrl')
                 ->setPage($this);
+    }
+
+    public function createStockPage($name)
+    {
+        /* @var $inflector \Dewdrop\Inflector */
+        $inflector = Pimple::getResource('inflector');
+        $className = '\Dewdrop\Admin\Page\Stock\\' . $inflector->camelize($name);
+
+        /* @var $page PageAbstract */
+        $page = new $className(
+            $this->component,
+            $this->request,
+            __DIR__ . '/Stock/view-scripts'
+        );
+
+        $page->getView()
+            ->assignInstance('headlink', $this->view->headLink())
+            ->assignInstance('headscript', $this->view->headScript());
+
+        return $page;
     }
 
     /**
@@ -125,7 +161,7 @@ abstract class PageAbstract
      *
      * @param ResponseHelper $response
      */
-    public function process($response)
+    public function process(ResponseHelper $response)
     {
 
     }
@@ -133,7 +169,7 @@ abstract class PageAbstract
     /**
      * Assign variables to your page's view and render the output.
      *
-     * @return void
+     * @return mixed
      */
     public function render()
     {
@@ -194,6 +230,29 @@ abstract class PageAbstract
     }
 
     /**
+     * Set the name used in the URL to route to this page.
+     *
+     * @param string $name
+     * @return $this
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * Set the name used in the URL to route to this page.
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
      * Determine the view script name for this page by inflecting the page
      * class name to all lower case with the words separated by hyphens.
      * For example, the following class name:
@@ -206,7 +265,7 @@ abstract class PageAbstract
      *
      * @return string
      */
-    private function inflectViewScriptName()
+    protected function inflectViewScriptName()
     {
         $className = get_class($this);
         $pageName  = substr($className, strrpos($className, '\\') + 1);

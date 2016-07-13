@@ -4,12 +4,39 @@
 </div>
 <?php endif;?>
 
-<ol class="breadcrumb">
-    <li><a href="<?php echo $this->escapeHtmlAttr($this->adminUrl('index'));?>"><?php echo $this->escapeHtml($this->component->getTitle());?></a></li>
-    <li class="active"><?php echo ($this->isNew ? 'Add' : 'Edit');?> <?php echo $this->escapeHtml($this->model->getSingularTitle());?></li>
-</ol>
+<?php
+echo $this->bootstrapBreadcrumbs([
+    ['title' => $this->component->getTitle(), 'href' => $this->adminUrl('index')],
+    ['title' => ($this->isNew ? 'Add' : 'Edit') . ' ' . $this->model->getSingularTitle(), 'active' => true]
+]);
+?>
 
-<?php if (!$this->rowEditor->isNew() && $this->rowEditor->hasDeleteField()):?>
+<?php echo $this->bootstrapForm()->open();?>
+
+<?php
+/* @var $permissions \Dewdrop\Admin\Permissions */
+$permissions = $this->component->getPermissions();
+
+/* @var $rowEditor \Dewdrop\Fields\RowEditor */
+$rowEditor = $this->rowEditor;
+
+$displayDeleteRestore = (!$rowEditor->isNew() && $rowEditor->hasDeleteField());
+$displayTopSave       = ($this->saveButtonPosition & \Dewdrop\Admin\Page\Stock\Edit::SAVE_BUTTON_TOP);
+
+if ($displayDeleteRestore) {
+    if ($rowEditor->isDeleted() && !$permissions->can('restore')) {
+        $displayDeleteRestore = false;
+    } else if (!$rowEditor->isDeleted() && !$permissions->can('delete')) {
+        $displayDeleteRestore = false;
+    }
+}
+?>
+
+<?php if ($displayDeleteRestore && $rowEditor->isDeleted()): ?>
+<div class="alert alert-warning">This <?php echo $this->escapeHtml($this->model->getSingularTitle());?> has been deleted.  You can restore it by clicking the button below.</div>
+<?php endif;?>
+
+<?php if ($displayDeleteRestore || $displayTopSave):?>
 
 <?php
 $params = [];
@@ -19,18 +46,39 @@ foreach ($this->model->getPrimaryKey() as $field) {
 }
 ?>
 
-<div class="navbar navbar-default" role="navigation">
-    <div class="navbar-right navbar-right-btn-group">
-        <a class="navbar-btn btn btn-danger btn-delete" data-message="Are you sure you want to delete this <?php echo $this->escapeHtmlAttr(strtolower($this->model->getSingularTitle()));?>?" data-href="<?php echo $this->escapeHtmlAttr($this->adminUrl('delete', $params));?>" data-redirect="<?php echo $this->escapeHtmlAttr($this->adminUrl('index'));?>">Delete This <?php echo $this->escapeHtml($this->model->getSingularTitle());?></a>
+<div class="navbar navbar-default navbar-edit" role="navigation">
+    <?php if ($displayTopSave): ?>
+    <div class="navbar-header">
+        <?php echo $this->bootstrapForm()->renderSubmitButton();?>
     </div>
+    <?php endif;?>
+
+    <?php if ($displayDeleteRestore):?>
+    <div class="navbar-right navbar-right-btn-group">
+        <?php if ($rowEditor->isDeleted()):?>
+        <a class="navbar-btn btn btn-success btn-delete" data-message="Are you sure you want to restore this <?php echo $this->escapeHtmlAttr(strtolower($this->model->getSingularTitle()));?>?" data-href="<?php echo $this->escapeHtmlAttr($this->adminUrl('restore', $params));?>" data-redirect="<?php echo $this->escapeHtmlAttr($this->adminUrl('index'));?>">Restore This <?php echo $this->escapeHtml($this->model->getSingularTitle());?></a>
+        <?php else:?>
+        <a class="navbar-btn btn btn-danger btn-delete" data-message="Are you sure you want to delete this <?php echo $this->escapeHtmlAttr(strtolower($this->model->getSingularTitle()));?>?" data-href="<?php echo $this->escapeHtmlAttr($this->adminUrl('delete', $params));?>" data-redirect="<?php echo $this->escapeHtmlAttr($this->adminUrl('index'));?>">Delete This <?php echo $this->escapeHtml($this->model->getSingularTitle());?></a>
+        <?php endif;?>
+    </div>
+    <?php endif;?>
 </div>
 <?php $this->headScript()->appendFile($this->bowerUrl('/dewdrop/www/js/delete-button.js'));?>
 
 <?php endif;?>
 
 <?php
-echo $this->bootstrapForm(
-    $this->fields->getEditableFields($this->groupingFilter),
-    $this->rowEditor->getInputFilter()
+echo $this->bootstrapForm()->renderContent(
+    $this->fields,
+    $this->rowEditor->getInputFilter(),
+    $this->editControlRenderer()
 );
+?>
+
+<?php
+if ($this->saveButtonPosition & \Dewdrop\Admin\Page\Stock\Edit::SAVE_BUTTON_BOTTOM) {
+    echo $this->bootstrapForm()->renderSubmitButton();
+}
+
+echo $this->bootstrapForm()->close();
 ?>

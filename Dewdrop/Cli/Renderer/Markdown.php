@@ -11,7 +11,12 @@
 namespace Dewdrop\Cli\Renderer;
 
 use Zend\Console\Console;
+use Zend\Console\Adapter\AbstractAdapter as ConsoleAdapter;
 use Zend\Console\Color\Xterm256 as Color;
+use Zend\Console\Prompt\Confirm as ConfirmPrompt;
+use Zend\Console\Prompt\Line as LinePrompt;
+use Zend\Console\Prompt\Password as PasswordPrompt;
+use Zend\Console\Prompt\Select as SelectPrompt;
 
 /**
  * Render output as Markdown.  For more information, see:
@@ -23,17 +28,23 @@ class Markdown implements RendererInterface
     /**
      * The console adapter used for rendering color output.
      *
-     * @var Zend\Console\Adapter\AbstractAdapter
+     * @var ConsoleAdapter
      */
     private $console;
 
     /**
      * Create console instance for color output of success/failure
      * messages.
+     *
+     * @param ConsoleAdapter $console
      */
-    public function __construct()
+    public function __construct(ConsoleAdapter $console = null)
     {
-        $this->console = Console::getInstance();
+        if (null === $console) {
+            $this->console = Console::getInstance();
+        } else {
+            $this->console = $console;
+        }
     }
 
     /**
@@ -218,5 +229,34 @@ class Markdown implements RendererInterface
         echo PHP_EOL;
 
         return $this;
+    }
+
+    public function ask($promptText, $allowEmpty = false)
+    {
+        $prompt = new LinePrompt($promptText, $allowEmpty);
+        $prompt->setConsole($this->console);
+        return $prompt->show();
+    }
+
+    public function secret($promptText, $allowEmpty = false)
+    {
+        $prompt = new PasswordPrompt($promptText, $allowEmpty, true);
+        $prompt->setConsole($this->console);
+        return $prompt->show();
+    }
+
+    public function select($promptText, array $options, $allowEmpty = false)
+    {
+        $prompt = new SelectPrompt($promptText, $options, $allowEmpty);
+        $prompt->setConsole($this->console);
+        return $prompt->show();
+    }
+
+    public function confirm($promptText, $echo = true)
+    {
+        $prompt = new ConfirmPrompt($promptText);
+        $prompt->setEcho($echo);
+        $prompt->setConsole($this->console);
+        return $prompt->show();
     }
 }

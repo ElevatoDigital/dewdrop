@@ -1,24 +1,24 @@
 #!/usr/bin/env php
 <?php
 
+ini_set('display_errors', 1);
+
 if ('cli' !== php_sapi_name()) {
     exit;
 }
 
-require_once __DIR__ . '/../../../autoload.php';
-
-\Dewdrop\Bootstrap\Wp::handleWpLoadGlobals();
-
-$paths = new \Dewdrop\Paths();
-
-if ($paths->isWp()) {
-    $folder     = basename($paths->getPluginRoot());
-    $pluginFile = $paths->getPluginRoot() . '/' . $folder . '.php';
-
-    if (file_exists($pluginFile)) {
-        require_once $pluginFile;
-    }
+if (file_exists(__DIR__ . '/../vendor/autoload.php')) {
+    require_once __DIR__ . '/../vendor/autoload.php';
+} else {
+    require_once __DIR__ . '/../../../autoload.php';
 }
+
+use Dewdrop\Env;
+
+Env::bootstrapCli();
+
+$env = Env::getInstance();
+$env->initializeCli();
 
 $cli = new \Dewdrop\Cli\Run();
 $cli->run();

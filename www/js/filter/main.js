@@ -1,11 +1,11 @@
-require.config({
+var dewdropFilter = require.config({
     baseUrl: DEWDROP.bowerUrl('/dewdrop/www/js/filter'),
     paths: {
         text: DEWDROP.bowerUrl('/requirejs-text/text')
     }
 });
 
-require(
+dewdropFilter(
     ['jquery', 'fields-collection', 'filters-collection', 'filters-view'],
     function ($, FieldsCollection, FiltersCollection, FiltersView) {
         'use strict';

@@ -219,6 +219,30 @@ class Listing
     }
 
     /**
+     * @return SelectSort
+     */
+    public function getSelectSortModifier()
+    {
+        return $this->getSelectModifierByName('SelectSort');
+    }
+
+    /**
+     * @return SelectFilter
+     */
+    public function getSelectFilterModifier()
+    {
+        return $this->getSelectModifierByName('SelectFilter');
+    }
+
+    /**
+     * @return SelectPaginate
+     */
+    public function getSelectPaginateModifier()
+    {
+        return $this->getSelectModifierByName('SelectPaginate');
+    }
+
+    /**
      * Check to see if this listing has a select modifier with the given name.
      *
      * @param string $name
@@ -304,6 +328,25 @@ class Listing
         }
 
         return $data;
+    }
+
+    /**
+     * Fetch the data for this listing, passing the supplied \Dewdrop\Fields object to all modifiers before fetching the
+     * data from the DB using a PHP generator.
+     *
+     * @param Fields $fields
+     * @return \Generator
+     */
+    public function fetchDataWithGenerator(Fields $fields)
+    {
+        $adapter = $this->select->getAdapter();
+
+        $this->totalRowCount = 0;
+
+        foreach ($adapter->fetchAllWithGenerator($this->getModifiedSelect($fields)) as $row) {
+            $this->totalRowCount++;
+            yield $row;
+        }
     }
 
     /**

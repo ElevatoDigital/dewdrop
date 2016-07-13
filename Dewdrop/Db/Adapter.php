@@ -10,10 +10,12 @@
 
 namespace Dewdrop\Db;
 
+use Dewdrop\Db\Adapter\GroupKeyNotPresentInResultsetException;
 use Dewdrop\Db\Driver\DriverInterface;
 use Dewdrop\Db\Driver\Wpdb as WpdbDriver;
 use Dewdrop\Exception;
 use Dewdrop\Paths;
+use Dewdrop\Pimple;
 use wpdb;
 
 /**
@@ -192,7 +194,8 @@ class Adapter
     public function getTableMetadataPath()
     {
         if (null === $this->tableMetadataPath) {
-            $paths                   = new Paths();
+            /* @var $paths Paths */
+            $paths = Pimple::getResource('paths');
             $this->tableMetadataPath = $paths->getModels() . '/metadata';
         }
 
@@ -233,6 +236,97 @@ class Adapter
     public function fetchAll($sql, $bind = array(), $fetchMode = null)
     {
         return $this->driver->fetchAll($sql, $bind, $fetchMode);
+    }
+
+    /**
+     * Fetch all results for the supplied SQL statement and group them into
+     * a nested array using the supplied $groupKey.
+     *
+     * For exapmle, if you had a resultset containing these three rows:
+     *
+     * <pre>
+     * name | family_id
+     * ----------------
+     * Bob  | 1
+     * Tim  | 1
+     * Ken  | 2
+     * </pre>
+     *
+     * And you called fetchAllGroupedByKey() with a $groupKey of 'family_id',
+     * you'd get the following array in return:
+     *
+     * <pre>
+     * [
+     *     1 => [
+     *         ['name' => 'Bob', 'family_id' => 1],
+     *         ['name' => 'Tim', 'family_id' => 1],
+     *     ],
+     *     2 => [
+     *         ['name' => 'Ken', 'family_id' => 2],
+     *     ]
+     * ]
+     * </pre>
+     *
+     * @param string|\Dewdrop\Db\Select $sql
+     * @param string $groupKey
+     * @param array $bind
+     * @param string $fetchMode
+     * @return array
+     */
+    public function fetchAllGroupedByKey($sql, $groupKey, $bind = array(), $fetchMode = null)
+    {
+        $rows = $this->fetchAll($sql, $bind, $fetchMode);
+        $out  = [];
+
+        if (count($rows)) {
+            $validationRow = current($rows);
+
+            // Convert validation row to array from stdClass in case fetchMode returned an object
+            if (is_object($validationRow)) {
+                $validationRow = get_object_vars($validationRow);
+            }
+
+            if (is_array($validationRow) && !isset($validationRow[$groupKey])) {
+                $exception = new GroupKeyNotPresentInResultsetException("'{$groupKey}' was not present in results.");
+                $exception
+                    ->setGroupKey($groupKey)
+                    ->setValidationRow($validationRow);
+                throw $exception;
+            }
+        }
+
+        foreach ($rows as $row) {
+            if (is_array($row)) {
+                $groupValue = $row[$groupKey];
+            } else {
+                $groupValue = $row->$groupKey;
+            }
+
+            if (!array_key_exists($groupValue, $out)) {
+                $out[$groupValue] = [];
+            }
+
+            $out[$groupValue][] = $row;
+        }
+
+        return $out;
+    }
+
+    /**
+     * Fetch all results for the supplied SQL statement using a PHP generator.
+     *
+     * This approach uses less memory, but the result set has a forward-only cursor.
+     *
+     * @param string|\Dewdrop\Db\Select $sql
+     * @param array $bind
+     * @param string $fetchMode
+     * @return \Generator
+     */
+    public function fetchAllWithGenerator($sql, $bind = [], $fetchMode = null)
+    {
+        foreach ($this->driver->fetchAllWithGenerator($sql, $bind, $fetchMode) as $row) {
+            yield $row;
+        }
     }
 
     /**
@@ -768,6 +862,11 @@ class Adapter
         return $this->driver->listForeignKeyReferences($tableName);
     }
 
+    public function listMissingForeignKeyIndexes($tableName)
+    {
+        return $this->driver->listMissingForeignKeyIndexes($tableName);
+    }
+
     /**
      * Returns an associative array containing all the unique constraints on a table.
      *
@@ -842,6 +941,16 @@ class Adapter
     }
 
     /**
+     * Rollback the current transaction.
+     *
+     * @return void
+     */
+    public function rollback()
+    {
+        $this->driver->rollback();
+    }
+
+    /**
      * Helper method to change the case of the strings used
      * when returning result sets in FETCH_ASSOC and FETCH_BOTH
      * modes.
@@ -867,6 +976,16 @@ class Adapter
                 $value = (string) $key;
         }
         return $value;
+    }
+
+    public function generateCreateIndexStatement($tableName, array $columnNames)
+    {
+        return $this->driver->generateCreateIndexStatement($tableName, $columnNames);
+    }
+
+    public function generateAnalyzeTableStatement($tableName)
+    {
+        return $this->driver->generateAnalyzeTableStatement($tableName);
     }
 
     /**

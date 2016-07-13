@@ -11,6 +11,7 @@
 namespace Dewdrop\View\Helper;
 
 use Dewdrop\Fields;
+use Dewdrop\Fields\FieldInterface;
 use Dewdrop\Fields\GroupedFields;
 use Dewdrop\Fields\Helper\TableCell as Renderer;
 
@@ -39,7 +40,8 @@ class BootstrapDetailsView extends AbstractHelper
     public function direct(Fields $fields, array $data, Renderer $renderer = null, $viewIndex = null)
     {
         if (null === $renderer) {
-            $renderer = $this->view->tableCellRenderer();
+            $renderer = $this->view->tableCellRenderer()->getContentRenderer()
+                ->setViewMode(Renderer\Content::VIEW_MODE_DETAIL);
         }
 
         /**
@@ -124,18 +126,16 @@ class BootstrapDetailsView extends AbstractHelper
         foreach ($fields->getVisibleFields() as $field) {
             $out .= '<tr>';
 
-            $out .= '<th scope="row">';
-            $out .= $renderer->getHeaderRenderer()->render($field);
-            $out .= '</th>';
+            $content    = $renderer->getContentRenderer()->render($field, $data, $rowIndex, 1);
+            $classNames = $renderer->getTdClassNamesRenderer()->render($field, $data, $rowIndex, 1);
+            $header     = $renderer->getHeaderRenderer()->render($field);
 
-            $out .= sprintf(
-                '<td class="%s">',
-                $renderer->getTdClassNamesRenderer()->render($field, $data, $rowIndex, 1)
-            );
+            if (false !== stripos($content, '<table ')) {
+                $out .= $this->renderTableContentInPanel($header, $classNames, $content);
+            } else {
+                $out .= $this->renderHeaderAndContent($header, $classNames, $content);
+            }
 
-            $out .= $renderer->getContentRenderer()->render($field, $data, $rowIndex, 1);
-
-            $out .= '</td>';
             $out .= '</tr>';
 
             $rowIndex += 1;
@@ -143,6 +143,30 @@ class BootstrapDetailsView extends AbstractHelper
 
         $out .= '</table>';
         $out .= '</div>';
+
+        return $out;
+    }
+
+    protected function renderTableContentInPanel($header, $classNames, $content)
+    {
+        return $this->partial(
+            'bootstrap-details-view-table-panel.phtml',
+            [
+                'header'     => $header,
+                'classNames' => $classNames,
+                'content'    => $content
+            ]
+        );
+    }
+
+    protected function renderHeaderAndContent($header, $classNames, $content)
+    {
+        $out = '<th scope="row">';
+        $out .= $header;
+        $out .= '</th>';
+        $out .= sprintf('<td class="%s">', $classNames);
+        $out .= $content;
+        $out .= '</td>';
 
         return $out;
     }

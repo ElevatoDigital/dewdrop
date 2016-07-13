@@ -13,6 +13,7 @@ namespace Dewdrop\View\Helper;
 use Dewdrop\Admin\Component\CrudInterface;
 use Dewdrop\Fields;
 use Dewdrop\Fields\Helper\SelectFilter;
+use HtmlNode\Node;
 
 /**
  * Render a form that allows the user to filter by one or more fields.  The form
@@ -76,19 +77,51 @@ class BootstrapFilterForm extends AbstractHelper
      */
     public function directWithArgs(Fields $fields, SelectFilter $selectFilter, $title, $method = 'GET')
     {
+        return Node::create('form')
+            ->addClass('filter-form')
+            ->setAttribute('data-prefix', $selectFilter->getPrefix())
+            ->setAttribute('action', '')
+            ->setAttribute('method', $method)
+            ->setHtml(
+                $this->partial(
+                    'bootstrap-filter-form.phtml',
+                    ['controls' => $this->inline($fields, $selectFilter, $title, $method, true)]
+                )
+            );
+    }
+
+    /**
+     * Render the filter controls inside a form tag that is rendered elsewhere.
+     * No form HTML tags or buttons will be rendered by this method, only the
+     * filter controls themselves.
+     *
+     * By default, this form will use GET so that it geneates a query string
+     * that can be used to share search results, but you can use POST if needed
+     * for your case.
+     *
+     * @param Fields $fields
+     * @param SelectFilter $selectFilter
+     * @param string $title
+     * @param string $method
+     * @param boolean $buttons
+     * @return string
+     */
+    public function inline(Fields $fields, SelectFilter $selectFilter, $title, $method = 'GET', $buttons = false)
+    {
         $this->view->headScript()->appendFile($this->view->bowerUrl('/dewdrop/www/js/filter/main.js'));
         $this->view->headLink()->appendStylesheet($this->view->bowerUrl('/dewdrop/www/css/filter.css'));
 
         return $this->partial(
-            'bootstrap-filter-form.phtml',
+            'bootstrap-filter-controls.phtml',
             array(
                 'fields'      => $fields->getFilterableFields(),
                 'typeHelper'  => $selectFilter->getFilterTypeHelper(),
-                'values'      => $selectFilter->getSelectModifier()->getCurrentFilters(),
+                'values'      => $selectFilter->getSelectModifier()->getCurrentFilters($fields),
                 'defaultVars' => $selectFilter->getDefaultVarsHelper(),
                 'title'       => $title,
                 'method'      => $method,
-                'paramPrefix' => $selectFilter->getPrefix()
+                'paramPrefix' => $selectFilter->getPrefix(),
+                'showButtons' => $buttons
             )
         );
     }

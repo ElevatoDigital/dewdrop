@@ -10,7 +10,8 @@
 
 namespace Dewdrop\Admin\Env;
 
-use Dewdrop\Admin\Component\ComponentAbstract;
+use Dewdrop\Admin\Component\ComponentInterface;
+use Dewdrop\Exception;
 use Dewdrop\Pimple;
 use Dewdrop\Session;
 use DirectoryIterator;
@@ -36,6 +37,12 @@ abstract class EnvAbstract implements EnvInterface
     protected $session;
 
     /**
+     * The registered active component object.
+     * @var ComponentInterface
+     */
+    protected $activeComponent;
+
+    /**
      * The core client-side dependencies we expect to be loaded in the admin.
      * These should all be sent through the bowerUrl() view helper so that their
      * paths point to the bower_components folder for the current environment.
@@ -54,13 +61,88 @@ abstract class EnvAbstract implements EnvInterface
             'underscore'   => '/underscore/underscore.js',
             'backbone'     => '/backbone/backbone.js',
             'requirejs'    => '/requirejs/require.js',
-            'dewdrop-core' => '/dewdrop/www/js/core.js'
+            'dewdrop-core' => '/dewdrop/www/js/core.js',
+            'dewdrop-form' => '/dewdrop/www/js/form.js',
         ],
         'css' => [
             'bootstrap'     => '/bootstrap/dist/css/bootstrap.min.css',
             'dewdrop-admin' => '/dewdrop/www/css/admin.css'
         ]
     ];
+
+    /**
+     * Prepend a client-side dependency you'd like to use throughout the admin environment.
+     *
+     * @param string $type Either "css" or "js".
+     * @param string $name An identifier for the dependency.
+     * @param string $path The path (in your bower_components folder) to the dependency.
+     * @return $this
+     */
+    public function prependClientSideDependency($type, $name, $path)
+    {
+        $this->validateClientSideDependencyType($type);
+
+        $this->coreClientSideDependencies[$type] = array_merge(
+            array($name => $path),
+            $this->coreClientSideDependencies[$type]
+        );
+
+        return $this;
+    }
+
+    /**
+     * Append a client-side dependency you'd like to use throughout the admin environment.
+     *
+     * @param string $type Either "css" or "js".
+     * @param string $name An identifier for the dependency.
+     * @param string $path The path (in your bower_components folder) to the dependency.
+     * @return $this
+     */
+    public function appendClientSideDependency($type, $name, $path)
+    {
+        $this->validateClientSideDependencyType($type);
+
+        $this->coreClientSideDependencies[$type][$name] = $path;
+
+        return $this;
+    }
+
+    /**
+     * Add a client-side dependency you'd like to use throughout the admin environment.
+     *
+     * @param string $type Either "css" or "js".
+     * @param string $name An identifier for the dependency.
+     * @param string $path The path (in your bower_components folder) to the dependency.
+     * @param string $key The key of the value you want to put a dependency after.
+     * @return $this
+     */
+    public function addClientSideDependencyAfterKey($type, $name, $path, $key)
+    {
+        $this->validateClientSideDependencyType($type);
+
+        $dependenciesOfType = $this->coreClientSideDependencies[$type];
+
+        $offset = array_search($key, array_keys($dependenciesOfType)) + 1;
+        $lastIndex = count($dependenciesOfType) - 1;
+
+        $this->coreClientSideDependencies[$type] = array_slice($dependenciesOfType, 0, $offset, true)
+                                                    + [$name => $path]
+                                                    + array_slice($dependenciesOfType, $offset, $lastIndex, true);
+
+        return $this;
+    }
+
+    /**
+     * Validate that a type is either "css" or "js".
+     *
+     * @param string $type Either "css" or "js".
+     */
+    private function validateClientSideDependencyType($type)
+    {
+        if (!array_key_exists($type, $this->coreClientSideDependencies)) {
+            throw new Exception('Client-side dependencies must be of type "css" or "js".');
+        }
+    }
 
     /**
      * Inflect a component name for use in URLs and routes.
@@ -85,6 +167,29 @@ abstract class EnvAbstract implements EnvInterface
         $this->session = $session;
 
         return $this;
+    }
+
+    /**
+     * Set a reference to the active component.
+     *
+     * @param ComponentInterface $component
+     * @return $this
+     */
+    public function setActiveComponent(ComponentInterface $component)
+    {
+        $this->activeComponent = $component;
+
+        return $this;
+    }
+
+    /**
+     * Get a reference to the active component.
+     *
+     * @return ComponentInterface
+     */
+    public function getActiveComponent()
+    {
+        return $this->activeComponent;
     }
 
     /**
@@ -146,10 +251,10 @@ abstract class EnvAbstract implements EnvInterface
     /**
      * Register an already instantiated component.
      *
-     * @param ComponentAbstract $component
+     * @param ComponentInterface $component
      * @return EnvAbstract
      */
-    public function registerComponent(ComponentAbstract $component)
+    public function registerComponent(ComponentInterface $component)
     {
         $this->initComponent($component);
 
@@ -159,13 +264,31 @@ abstract class EnvAbstract implements EnvInterface
     }
 
     /**
+     * Retrieve a component by name.
+     *
+     * @param string $name
+     * @return ComponentInterface
+     */
+    public function getComponent($name)
+    {
+        /* @var $component ComponentInterface */
+        foreach ($this->components as $component) {
+            if ($name === $component->getName()) {
+                return $component;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Assemble the remainder of a URL query string.
      *
      * @param array $params
      * @param string $separator
      * @return string
      */
-    protected function assembleQueryString(array $params, $separator)
+    public function assembleQueryString(array $params, $separator)
     {
         $segments = array();
 

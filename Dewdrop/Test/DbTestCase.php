@@ -10,6 +10,7 @@
 
 namespace Dewdrop\Test;
 
+use Dewdrop\Pimple;
 use Dewdrop\Test\Db\TruncateOperation;
 use PHPUnit_Extensions_Database_TestCase;
 use PDO;
@@ -35,9 +36,9 @@ abstract class DbTestCase extends PHPUnit_Extensions_Database_TestCase
     final public function getConnection()
     {
         if (!defined('WPINC')) {
-            return $this->createDefaultDbConnection(
-                $GLOBALS['dewdrop_pimple']['db']->getConnection(),
-                $GLOBALS['dewdrop_pimple']['config']['db']['name']
+            return $this->createDefaultDBConnection(
+                Pimple::getResource('db')->getConnection(),
+                Pimple::getResource('config')['db']['name']
             );
         } else {
             $connection = new PDO(

@@ -80,6 +80,26 @@ class Changeset
     }
 
     /**
+     * Write a new change file to the changeset using the next available revision number.
+     * @param string $changeName
+     * @param string $contents
+     * @return string
+     */
+    public function writeNewFile($changeName, $contents)
+    {
+        $path = sprintf(
+            '%s/%05s-%s.sql',
+            $this->path,
+            $this->getCurrentRevision() + 1,
+            $changeName
+        );
+
+        file_put_contents($path, $contents, LOCK_EX);
+
+        return $path;
+    }
+
+    /**
      * Check the DB changelog to find the highest revision number that has
      * been applied for this changeset.
      *

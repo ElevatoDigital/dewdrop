@@ -9,6 +9,7 @@ use Dewdrop\Db\Select\Filter\ManyToMany as ManyToManyFilter;
 use Dewdrop\Fields;
 use Dewdrop\Fields\Exception;
 use Dewdrop\Fields\FieldInterface;
+use Dewdrop\Fields\Helper\SelectFilter\DefaultVars as DefaultVarsHelper;
 use Dewdrop\Fields\Helper\HelperAbstract;
 use Dewdrop\Fields\Helper\SelectModifierInterface;
 use Dewdrop\Request;
@@ -28,11 +29,20 @@ class SelectModifier extends HelperAbstract implements SelectModifierInterface
 
     private $prefix;
 
+    /**
+     * @var array
+     */
     private $customFilters = array();
 
-    public function __construct(Request $request)
+    /**
+     * @var DefaultVars
+     */
+    private $defaultVars;
+
+    public function __construct(Request $request, DefaultVarsHelper $defaultVars)
     {
-        $this->request = $request;
+        $this->request     = $request;
+        $this->defaultVars = $defaultVars;
     }
 
     public function setPrefix($prefix)
@@ -121,12 +131,39 @@ class SelectModifier extends HelperAbstract implements SelectModifierInterface
         return $vars;
     }
 
-    public function getCurrentFilters()
+    public function getCurrentFilters(Fields $fields = null)
     {
-        $out = array();
+        $out = [];
 
-        foreach ($this->getFilteredFieldIds() as $index => $id) {
-            $out[] = $this->getFilterVars($index);
+        $filteredFieldIds = $this->getFilteredFieldIds();
+
+        if ($fields) {
+            $fields = $fields->getFilterableFields();
+
+            /* @var $field FieldInterface */
+            foreach ($fields as $field) {
+                $queryStringId = $field->getQueryStringId();
+                $defaults      = $this->defaultVars->getDefaultVars($field);
+
+                if (count($defaults) && !in_array($queryStringId, $filteredFieldIds)) {
+                    $out[] = array_merge($defaults, ['id' => $queryStringId]);
+                }
+            }
+        }
+
+        foreach ($filteredFieldIds as $index => $id) {
+            $defaults = [];
+
+            if ($fields) {
+                /* @var $field FieldInterface */
+                foreach ($fields as $field) {
+                    if ($field->getQueryStringId() === $id) {
+                        $defaults = $this->defaultVars->getDefaultVars($field);
+                    }
+                }
+            }
+
+            $out[] = array_merge($defaults, $this->getFilterVars($index));
         }
 
         return $out;
@@ -134,12 +171,10 @@ class SelectModifier extends HelperAbstract implements SelectModifierInterface
 
     public function modifySelect(Fields $fields, Select $select)
     {
-        $conditionSetName = $this->prefix . 'filters';
+        $conditionSetName      = $this->prefix . 'filters';
+        $filteredInQueryString = [];
 
-        $select->registerConditionSet(
-            $conditionSetName,
-            $this->getConditionSetConjunction()
-        );
+        $select->registerConditionSet($conditionSetName, $this->getConditionSetConjunction());
 
         foreach ($this->getFilteredFieldIds() as $index => $id) {
             $urlId = urlencode($id);
@@ -147,14 +182,35 @@ class SelectModifier extends HelperAbstract implements SelectModifierInterface
             foreach ($fields as $field) {
                 if ($urlId === $field->getQueryStringId()) {
                     $callback = $this->getFieldAssignment($field);
+                    $defaults = $this->defaultVars->getDefaultVars($field);
 
                     $select = call_user_func(
                         $callback,
                         $select,
                         $conditionSetName,
-                        $this->getFilterVars($index)
+                        array_merge($defaults, $this->getFilterVars($index))
                     );
+
+                    $filteredInQueryString[] = $field->getQueryStringId();
                 }
+            }
+        }
+
+        /* @var $field FieldInterface */
+        foreach ($fields as $field) {
+            if (in_array($field->getQueryStringId(), $filteredInQueryString)) {
+                continue;
+            }
+
+            $defaults = $this->defaultVars->getDefaultVars($field);
+
+            if (count($defaults)) {
+                $select = call_user_func(
+                    $this->getFieldAssignment($field),
+                    $select,
+                    $conditionSetName,
+                    $defaults
+                );
             }
         }
 
@@ -184,7 +240,7 @@ class SelectModifier extends HelperAbstract implements SelectModifierInterface
             } elseif ($field->isType('date', 'timestamp')) {
                 $type = 'Date';
             } elseif ($field->isType('integer', 'float')) {
-                //$type = 'Numeric';
+                $type = 'Numeric';
             } elseif ($field->isType('clob', 'text')) {
                 $type = 'Text';
             } else {

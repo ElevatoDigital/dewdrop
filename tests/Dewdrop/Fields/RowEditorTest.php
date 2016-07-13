@@ -127,7 +127,7 @@ class RowEditorTest extends \PHPUnit_Framework_TestCase
     {
         $db = Pimple::getResource('db');
 
-        $db->query('TRUNCATE TABLE dewdrop_test_fruits CASCADE');
+	$db->query('DELETE FROM dewdrop_test_fruits');
         $db->insert('dewdrop_test_fruits', array('name' => 'APPLE'));
         $id = $db->lastInsertId();
 
@@ -182,7 +182,7 @@ class RowEditorTest extends \PHPUnit_Framework_TestCase
     public function testCanProvideACustomSaveCallback()
     {
         $db = Pimple::getResource('db');
-        $db->query('TRUNCATE TABLE dewdrop_test_fruits CASCADE');
+        $db->query('DELETE FROM dewdrop_test_fruits');
 
         $this->assertEquals(0, $db->fetchOne('SELECT COUNT(*) FROM dewdrop_test_fruits'));
 
@@ -228,7 +228,7 @@ class RowEditorTest extends \PHPUnit_Framework_TestCase
     public function testCanSaveWithoutACustomCallback()
     {
         $db = Pimple::getResource('db');
-        $db->query('TRUNCATE TABLE dewdrop_test_fruits CASCADE');
+        $db->query('DELETE FROM dewdrop_test_fruits');
 
         $this->assertEquals(0, $db->fetchOne('SELECT COUNT(*) FROM dewdrop_test_fruits'));
 
@@ -250,7 +250,7 @@ class RowEditorTest extends \PHPUnit_Framework_TestCase
     public function testSavingWillTraverseLinkedFieldsToHookRowsTogether()
     {
         $db = Pimple::getResource('db');
-        $db->query('TRUNCATE TABLE dewdrop_test_fruits CASCADE');
+        $db->query('DELETE FROM dewdrop_test_fruits');
 
         $animalModel = new RowEditorAnimalModel();
 

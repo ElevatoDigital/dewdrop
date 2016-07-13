@@ -29,6 +29,26 @@ class Wpdb implements DriverInterface
     private $adapter;
 
     /**
+     * @var \mysqli
+     */
+    protected $mysqli;
+
+    public function listMissingForeignKeyIndexes($tableName)
+    {
+        throw new Exception('Listing of missing foreign key indexes is not currently supported on WPDB.');
+    }
+
+    public function generateCreateIndexStatement($tableName, array $columnNames)
+    {
+        throw new Exception('Generation of index creation SQL is not currently supported on WPDB.');
+    }
+
+    public function generateAnalyzeTableStatement($tableName)
+    {
+        throw new Exception('Generation of table analysis SQL is not currently supported on WPDB.');
+    }
+
+    /**
      * The wpdb object itself.
      *
      * @var \wpdb
@@ -42,6 +62,7 @@ class Wpdb implements DriverInterface
      *
      * @param \Dewdrop\Db\Adapter $adapter
      * @param \wpdb $wpdb
+     * @throws Exception
      */
     public function __construct(Adapter $adapter, RawWpdb $wpdb = null)
     {
@@ -88,6 +109,58 @@ class Wpdb implements DriverInterface
         $rs  = $this->execWpdb($this->wpdb->get_results($sql, $fetchMode));
 
         return $rs;
+    }
+
+    /**
+     * Fetch all results for the supplied SQL query using a PHP generator.
+     *
+     * This approach uses less memory, but the result set has a forward-only cursor.
+     *
+     * The SQL query can be a simple string or a Select object.  The bind array
+     * should supply values for all the parameters, either named or numeric, in
+     * the query.  And the fetch mode should match one of these 4 class constants
+     * from \Dewdrop\Db\Adapter: ARRAY_A, ARRAY_N, OBJECT, or OBJECT_K.
+     *
+     * @param string|Select $sql
+     * @param array $bind
+     * @param string $fetchMode
+     * @return \Generator
+     * @throws Exception
+     */
+    public function fetchAllWithGenerator($sql, $bind = [], $fetchMode = null)
+    {
+        if (null === $fetchMode) {
+            $fetchMode = Adapter::ARRAY_A;
+        }
+
+        $mysqli = $this->getMysqli();
+        $sql    = $this->adapter->prepare($sql, $bind);
+
+        /* @var \mysqli_result $mysqliResult */
+        $mysqliResult = mysqli_query($mysqli, $sql);
+
+        if (!$mysqliResult) {
+            throw new Exception("{$mysqli->errno}: {$mysqli->error}");
+        }
+
+        switch ($fetchMode) {
+            case Adapter::ARRAY_A:
+                $methodName = 'fetch_assoc';
+                break;
+            case Adapter::ARRAY_N:
+                $methodName = 'fetch_row';
+                break;
+            case Adapter::OBJECT: // intentional fall-through
+            case Adapter::OBJECT_K:
+                $methodName = 'fetch_object';
+                break;
+            default:
+                throw new Exception("Unsupported fetch mode '{$fetchMode}'");
+        }
+
+        while (null !== ($row = $mysqliResult->$methodName())) {
+            yield $row;
+        }
     }
 
     /**
@@ -290,12 +363,20 @@ class Wpdb implements DriverInterface
             if (preg_match('/^((?:var)?char)\((\d+)\)/', $row['Type'], $matches)) {
                 $row['Type'] = $matches[1];
                 $row['Length'] = $matches[2];
+            }
+            if (preg_match('/^((?:var)?binary)\((\d+)\)/', $row['Type'], $matches)) {
+                $row['Type'] = $matches[1];
+                $row['Length'] = $matches[2];
             } elseif (preg_match('/^decimal\((\d+),(\d+)\)/', $row['Type'], $matches)) {
                 $row['Type'] = 'decimal';
                 $row['Precision'] = $matches[1];
                 $row['Scale'] = $matches[2];
             } elseif (preg_match('/^float\((\d+),(\d+)\)/', $row['Type'], $matches)) {
                 $row['Type'] = 'float';
+                $row['Precision'] = $matches[1];
+                $row['Scale'] = $matches[2];
+            } elseif (preg_match('/^double\((\d+),(\d+)\)/', $row['Type'], $matches)) {
+                $row['Type'] = 'double';
                 $row['Precision'] = $matches[1];
                 $row['Scale'] = $matches[2];
             } elseif (preg_match('/^((?:big|medium|small|tiny)?int)\((\d+)\)/', $row['Type'], $matches)) {
@@ -466,6 +547,16 @@ class Wpdb implements DriverInterface
     }
 
     /**
+     * Rollback the current transaction.
+     *
+     * @return void
+     */
+    public function rollback()
+    {
+        $this->query('ROLLBACK');
+    }
+
+    /**
      * Use the SQL_CALC_FOUND_ROWS facility in MySQL to calculate the total
      * number of rows that would have been returned from a query if no LIMIT
      * had been applied.
@@ -524,5 +615,17 @@ class Wpdb implements DriverInterface
     public function quoteInternal($input)
     {
         return "'" . $this->wpdb->escape($input) . "'";
+    }
+
+    /**
+     * @return \mysqli
+     */
+    protected function getMysqli()
+    {
+        if (!$this->mysqli) {
+            $this->mysqli = mysqli_connect(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
+        }
+
+        return $this->mysqli;
     }
 }

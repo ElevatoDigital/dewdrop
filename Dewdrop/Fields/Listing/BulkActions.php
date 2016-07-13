@@ -262,7 +262,7 @@ class BulkActions
      *
      * @return array
      */
-    private function getSelectedItemsFromRequest()
+    public function getSelectedItemsFromRequest()
     {
         $input = $this->getRequest()->getPost($this->id);
 

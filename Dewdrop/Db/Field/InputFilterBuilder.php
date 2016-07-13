@@ -11,8 +11,11 @@
 namespace Dewdrop\Db\Field;
 
 use Dewdrop\Db\Field;
+use Dewdrop\Filter\IsoDate as IsoDateFilter;
+use Dewdrop\Filter\IsoTimestamp as IsoTimestampFilter;
 use Dewdrop\Filter\NullableDbBoolean as NullableDbBooleanFilter;
 use Dewdrop\Filter\NullableDbInteger as NullableDbIntegerFilter;
+use Dewdrop\Filter\NullableDbFloat as NullableDbFloatFilter;
 use Zend\Filter;
 use Zend\InputFilter\Input;
 use Zend\Validator;
@@ -31,6 +34,7 @@ class InputFilterBuilder
     protected $types = [
         'ManyToMany',
         'String',
+        'Timestamp',
         'Date',
         'Boolean',
         'Integer',
@@ -118,7 +122,21 @@ class InputFilterBuilder
         }
 
         $input->getFilterChain()->attach(new Filter\StringTrim());
-        $input->getFilterChain()->attach(new Filter\Null(Filter\Null::TYPE_STRING));
+        $input->getFilterChain()->attach(new Filter\ToNull(Filter\ToNull::TYPE_STRING));
+
+        return $input;
+    }
+
+    /**
+     * Attach validator for timestamp fields.
+     *
+     * @param Input $input
+     * @return Input
+     */
+    protected function attachForTimestamp(Input $input)
+    {
+        $input->getFilterChain()->attach(new IsoTimestampFilter());
+        $input->getValidatorChain()->attach(new Validator\Date(['format' => 'Y-m-d H:i:s']));
 
         return $input;
     }
@@ -131,6 +149,7 @@ class InputFilterBuilder
      */
     protected function attachForDate(Input $input)
     {
+        $input->getFilterChain()->attach(new IsoDateFilter());
         $input->getValidatorChain()->attach(new Validator\Date());
 
         return $input;
@@ -153,7 +172,7 @@ class InputFilterBuilder
         if ($this->metadata['NULLABLE']) {
             $input->getFilterChain()->attach(new NullableDbBooleanFilter());
         } else {
-            $input->getFilterChain()->attach(new Filter\Int());
+            $input->getFilterChain()->attach(new Filter\ToInt());
         }
 
         return $input;
@@ -170,10 +189,12 @@ class InputFilterBuilder
         if ($this->metadata['NULLABLE']) {
             $input->getFilterChain()->attach(new NullableDbIntegerFilter());
         } else {
-            $input->getFilterChain()->attach(new Filter\Int());
+            $input->getFilterChain()
+                ->attach(new Filter\ToNull(Filter\ToNull::TYPE_STRING))
+                ->attach(new Filter\ToInt());
         }
-        
-        $input->getValidatorChain()->attach(new \Zend\I18n\Validator\Int());
+
+        $input->getValidatorChain()->attach(new \Zend\I18n\Validator\IsInt());
 
         return $input;
     }
@@ -186,8 +207,14 @@ class InputFilterBuilder
      */
     protected function attachForFloat(Input $input)
     {
-        $input->getFilterChain()->attach(new Filter\Digits());
-        $input->getValidatorChain()->attach(new \Zend\I18n\Validator\Float());
+        if ($this->metadata['NULLABLE']) {
+            $input->getFilterChain()->attach(new NullableDbFloatFilter());
+        } else {
+            $input->getFilterChain()->attach(new Filter\Callback(function ($value) {
+                return preg_replace('/[^0-9.-]/', '', $value);
+            }));
+            $input->getValidatorChain()->attach(new \Zend\I18n\Validator\IsFloat());
+        }
 
         return $input;
     }

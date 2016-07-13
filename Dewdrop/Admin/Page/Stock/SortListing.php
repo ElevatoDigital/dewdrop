@@ -13,7 +13,6 @@ namespace Dewdrop\Admin\Page\Stock;
 use Dewdrop\Admin\Component\ComponentAbstract;
 use Dewdrop\Admin\Component\CrudInterface;
 use Dewdrop\Admin\Component\SortableListingInterface;
-use Dewdrop\Admin\Page\PageAbstract;
 use Dewdrop\Admin\ResponseHelper\Standard as ResponseHelper;
 use Dewdrop\Exception;
 
@@ -21,7 +20,7 @@ use Dewdrop\Exception;
  * This page handles the saving of new sort order values for a component that
  * implements the SortableListingInterface.
  */
-class SortListing extends PageAbstract
+class SortListing extends StockPageAbstract
 {
     /**
      * The CRUD component.
@@ -60,12 +59,12 @@ class SortListing extends PageAbstract
     public function process(ResponseHelper $responseHelper)
     {
         if (!$this->request->isPost()) {
-            $this->error = json_encode(['result' => 'error', 'message' => 'Must be POST.']);
+            $this->error = ['result' => 'error', 'message' => 'Must be POST.'];
             return;
         }
 
         if (!is_array($this->request->getPost('sort_order'))) {
-            $this->error = json_encode(['result' => 'error', 'message' => 'sort_order array not available.']);
+            $this->error = ['result' => 'error', 'message' => 'sort_order array not available.'];
             return;
         }
 
@@ -85,7 +84,7 @@ class SortListing extends PageAbstract
                     )
                 );
             } catch (Exception $e) {
-                $this->error = json_encode(['result' => 'error', 'message' => 'Failed to save.']);
+                $this->error = ['result' => 'error', 'message' => 'Failed to save.'];
             }
         }
     }
@@ -96,9 +95,6 @@ class SortListing extends PageAbstract
      */
     public function render()
     {
-        header('Content-Type: application/json');
-        $this->component->setShouldRenderLayout(false);
-        echo (null === $this->error ? json_encode(['result' => 'success']) : $this->error);
-        exit;
+        return (null === $this->error ? ['result' => 'success'] : $this->error);
     }
 }

@@ -1,0 +1,26 @@
+<h4>Setting a custom title column on an OptionPairs object using customizeField() in a Table class</h4>
+
+<p>
+    Customizing your OptionPairs objects using the customizeField() API in \Dewdrop\Db\Table is often ideal because
+    your customizations will be available throughout your application.
+</p>
+
+<script src="https://gist.github.com/griffbrad/f0781965904df15d965d.js"></script>
+
+<h4>Using a \Dewdrop\Db\Expr object rather than a column name</h4>
+
+<p>
+    Sometimes you need something more complex than a column name.  Perhaps you want to concatenate two fields together
+    for the option's title.  In those cases, use an Expr object.
+</p>
+
+<script src="https://gist.github.com/griffbrad/6855c5664d13e7204e2f.js"></script>
+
+<h4>Using your own Select to retrieve options rather than relying on auto-generation</h4>
+
+<p>
+    If Dewdrop's attempts to auto-generate a Select object to retrieve your options aren't working, you can set your
+    own with the setSelect() method.
+</p>
+
+<script src="https://gist.github.com/griffbrad/5c7332918a1e6b687348.js"></script>

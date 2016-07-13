@@ -113,6 +113,14 @@ class Definition
     private $requiredIndex = 'is_required';
 
     /**
+     * The name of a column in the attributes DB table that will be true when
+     * the attribute should be treated as if it was deleted.
+     *
+     * @var string
+     */
+    private $deletedIndex = 'deleted';
+
+    /**
      * Register a new EAV definition to supplied table and set any additional
      * options specified in the supplied array.
      *
@@ -246,6 +254,21 @@ class Definition
     public function getRequiredIndex()
     {
         return $this->requiredIndex;
+    }
+
+    /**
+     * Set the index of the column in the attributes table that will be used to
+     * determine if an attribute has been deleted or not.  Useful when end-users
+     * can delete attributes via some kind of GUI.
+     *
+     * @param string $deletedIndex
+     * @return $this
+     */
+    public function setDeletedIndex($deletedIndex)
+    {
+        $this->deletedIndex = $deletedIndex;
+
+        return $this;
     }
 
     /**
@@ -428,6 +451,10 @@ class Definition
             $rs  = $this->table->getAdapter()->fetchAll($stmt);
 
             foreach ($rs as $row) {
+                if ($this->deletedIndex && isset($row[$this->deletedIndex]) && $row[$this->deletedIndex]) {
+                    continue;
+                }
+
                 $name = 'eav_' . $row['attribute_id'];
 
                 $out[$name] = $row;

@@ -1,0 +1,36 @@
+<ol class="breadcrumb">
+    <li><a href="<?php echo $this->escapeHtmlAttr($this->adminUrl('index'));?>"><?php echo $this->escapeHtml($this->title);?></a></li>
+    <li class="active">Copy <?php echo $this->escapeHtml($this->model->getPluralTitle());?></li>
+</ol>
+
+<?php if ($this->dataCopier->hasGroupField() && !$this->selectedGroup) :?>
+<div class="alert alert-info">
+    Select the <?php echo $this->escapeHtml($this->dataCopier->getGroupField()->getLabel());?> from which you'd like to
+    copy <?php echo $this->escapeHtml($this->model->getPluralTitle());?>.
+</div>
+
+<div class="row">
+    <?php foreach ($this->dataCopier->fetchGroups() as $group): ?>
+    <div class="col-sm-4 col-lg-3">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title"><?php echo $this->escapeHtml($group['name']);?></h3>
+            </div>
+            <div class="panel-body">
+                <?php echo $this->escapeHtml($group['count']);?> <?php echo $this->model->getPluralTitle();?> available to copy.
+            </div>
+            <div class="panel-footer">
+                <a href="<?php echo $this->escapeHtmlAttr($this->adminUrl('copy', ['group' => $group['id']]));?>" class="btn btn-primary">
+                    Select <?php echo $this->escapeHtml($this->dataCopier->getGroupField()->getLabel());?>
+                </a>
+            </div>
+        </div>
+    </div>
+    <?php endforeach;?>
+</div>
+<?php else: ?>
+
+<div class="alert alert-info">
+</div>
+
+<?php endif;?>

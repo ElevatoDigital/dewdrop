@@ -92,7 +92,7 @@ class Standard
     {
         $this->page       = $page;
         $this->redirector = $redirector;
-        $this->session    = ($session ?: Pimple::getResource('session'));
+        $this->session    = ($session ?: new Session());
     }
 
     /**
@@ -186,7 +186,7 @@ class Standard
     public function executeSuccessMessage()
     {
         if ($this->successMessage) {
-            $this->session->set('successMessage', $this->successMessage);
+            $this->session['successMessage'] = $this->successMessage;
         }
 
         return $this;

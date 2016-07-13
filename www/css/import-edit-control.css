@@ -1,0 +1,9 @@
+.import-edit-control .btn-group-import {
+    margin-bottom: 15px;
+    max-width: 480px;
+}
+
+.import-edit-control .import-column,
+.import-edit-control .import-edit {
+    display: none;
+}

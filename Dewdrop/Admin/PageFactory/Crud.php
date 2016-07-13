@@ -12,7 +12,6 @@ namespace Dewdrop\Admin\PageFactory;
 
 use Dewdrop\Admin\Component\ComponentAbstract;
 use Dewdrop\Admin\Component\CrudInterface;
-use ReflectionClass;
 
 /**
  * Page factory for CRUD-capable components.  Provides a lot of CRUD functionality
@@ -20,7 +19,7 @@ use ReflectionClass;
  * pages by adding a file to your component (see Files page factory) and can disable
  * some of the provided functionality via your component's permissions.
  */
-class Crud implements PageFactoryInterface
+class Crud extends AbstractClassMapFactory
 {
     /**
      * The component the pages will be provided for.
@@ -35,20 +34,27 @@ class Crud implements PageFactoryInterface
      * @var array
      */
     protected $pageClassMap = [
-        'adjust-visibility'  => '\Dewdrop\Admin\Page\Stock\AdjustVisibility',
-        'debug-fields'       => '\Dewdrop\Admin\Page\Stock\DebugFields',
-        'debug-listing-sql'  => '\Dewdrop\Admin\Page\Stock\DebugListingSql',
-        'debug-pages'        => '\Dewdrop\Admin\Page\Stock\DebugPages',
-        'debug-test-sorting' => '\Dewdrop\Admin\Page\Stock\DebugTestSorting',
-        'delete'             => '\Dewdrop\Admin\Page\Stock\Delete',
-        'edit'               => '\Dewdrop\Admin\Page\Stock\Edit',
-        'export'             => '\Dewdrop\Admin\Page\Stock\Export',
-        'index'              => '\Dewdrop\Admin\Page\Stock\Index',
-        'notification-edit'  => '\Dewdrop\Admin\Page\Stock\NotificationEdit',
-        'notifications'      => '\Dewdrop\Admin\Page\Stock\Notifications',
-        'sort-fields'        => '\Dewdrop\Admin\Page\Stock\SortFields',
-        'sort-listing'       => '\Dewdrop\Admin\Page\Stock\SortListing',
-        'view'               => '\Dewdrop\Admin\Page\Stock\View'
+        'adjust-visibility'   => '\Dewdrop\Admin\Page\Stock\AdjustVisibility',
+        'counts'              => '\Dewdrop\Admin\Page\Stock\Counts',
+        'counts-export'       => '\Dewdrop\Admin\Page\Stock\CountsExport',
+        'debug-fields'        => '\Dewdrop\Admin\Page\Stock\DebugFields',
+        'debug-listing-sql'   => '\Dewdrop\Admin\Page\Stock\DebugListingSql',
+        'debug-pages'         => '\Dewdrop\Admin\Page\Stock\DebugPages',
+        'debug-test-sorting'  => '\Dewdrop\Admin\Page\Stock\DebugTestSorting',
+        'delete'              => '\Dewdrop\Admin\Page\Stock\Delete',
+        'edit'                => '\Dewdrop\Admin\Page\Stock\Edit',
+        'export'              => '\Dewdrop\Admin\Page\Stock\Export',
+        'import'              => '\Dewdrop\Admin\Page\Stock\Import',
+        'import-map-fields'   => '\Dewdrop\Admin\Page\Stock\ImportMapFields',
+        'index'               => '\Dewdrop\Admin\Page\Stock\Index',
+        'notification-edit'   => '\Dewdrop\Admin\Page\Stock\NotificationEdit',
+        'notifications'       => '\Dewdrop\Admin\Page\Stock\Notifications',
+        'recent-activity'     => '\Dewdrop\Admin\Page\Stock\RecentActivity',
+        'render-edit-control' => '\Dewdrop\Admin\Page\Stock\RenderEditControl',
+        'restore'             => '\Dewdrop\Admin\Page\Stock\Restore',
+        'sort-fields'         => '\Dewdrop\Admin\Page\Stock\SortFields',
+        'sort-listing'        => '\Dewdrop\Admin\Page\Stock\SortListing',
+        'view'                => '\Dewdrop\Admin\Page\Stock\View'
     ];
 
     /**
@@ -59,48 +65,5 @@ class Crud implements PageFactoryInterface
     public function __construct(CrudInterface $component)
     {
         $this->component = $component;
-    }
-
-    /**
-     * Returns a page instance for the given name or false on failure
-     *
-     * @param string $name
-     * @return \Dewdrop\Admin\Page\PageAbstract|false
-     */
-    public function createPage($name)
-    {
-        // Remain compatible with WP style naming
-        $name = $this->component->getInflector()->hyphenize($name);
-
-        if (array_key_exists($name, $this->pageClassMap)) {
-            $pageClass      = $this->pageClassMap[$name];
-            $reflectedClass = new ReflectionClass($pageClass);
-
-            return new $pageClass(
-                $this->component,
-                $this->component->getRequest(),
-                dirname($reflectedClass->getFileName()) . '/view-scripts'
-            );
-        }
-
-        return false;
-    }
-
-    /**
-     * List the pages this factory is capable of producing.
-     *
-     * @return array
-     */
-    public function listAvailablePages()
-    {
-        $pages = [];
-
-        foreach ($this->pageClassMap as $urlName => $className) {
-            $reflectedClass = new ReflectionClass($className);
-
-            $pages[] = new Page($urlName, $reflectedClass->getFileName(), $className);
-        }
-
-        return $pages;
     }
 }

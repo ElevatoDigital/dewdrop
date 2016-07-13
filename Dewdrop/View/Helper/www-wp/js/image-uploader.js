@@ -1,5 +1,5 @@
 jQuery(function () {
-    jQuery('button').click(function (e) {
+    jQuery('button.dewdrop-image-picker').click(function (e) {
         var button = jQuery(this);
 
         var frame = wp.media({
@@ -11,7 +11,7 @@ jQuery(function () {
 
         frame.on( 'select', function () {
             var selection = frame.state().get('selection');
-            
+
             selection.each(function (attachment) {
                 jQuery(button.data('target')).val(attachment.attributes.url);
 
@@ -25,10 +25,10 @@ jQuery(function () {
                     );
 
                     image.prependTo(container);
-                    
+
                     image = image.find('img');
                 }
-                        
+
                 image.attr('src', attachment.attributes.url)
             });
         });

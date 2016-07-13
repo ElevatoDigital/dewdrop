@@ -35,6 +35,7 @@ class BootstrapTable extends Table
     public function open()
     {
         $tableWrapperIdAttr = '';
+
         if (null !== $this->tableWrapperId) {
             $tableWrapperIdAttr = ' id="' . $this->view->escapeHtmlAttr($this->tableWrapperId) . '"';
         }
@@ -89,19 +90,12 @@ HTML;
      */
     protected function renderSortLink($content, $fieldId, $direction, SelectSort $sorter = null)
     {
-        $request = $this->view->getRequest();
-        $caret   = '';
+        $caret = '';
 
-        if (($sorter && $sorter->isSorted() && $sorter->getSortedField()->getQueryStringId() === $fieldId) ||
-            $fieldId === $request->getQuery('sort')
-        ) {
-            if ($sorter) {
-                $activeDir = strtolower($sorter->getSortedDirection());
-            } else {
-                $activeDir = ('asc' === $request->getQuery('dir') ? 'asc' : 'desc');
-            }
+        if ($fieldId === $sorter->getSortedField()->getQueryStringId()) {
+            $activeDirection = $this->getActiveSortDirection($fieldId, $sorter);
 
-            if ('asc' === $activeDir) {
+            if ('asc' === $activeDirection) {
                 $caret = ' <span class="caret caret-up"></span>';
             } else {
                 $caret = '<span class="caret"></span>';
@@ -110,26 +104,9 @@ HTML;
 
         return sprintf(
             '<a href="%s">%s%s</a>',
-            $this->view->escapeHtmlAttr($this->url($fieldId, $direction)),
+            $this->view->escapeHtmlAttr($this->assembleSortUrl($fieldId, $direction)),
             $this->view->escapeHtml($content),
             $caret
         );
-    }
-
-    /**
-     * Generate a URL for sorting.
-     *
-     * @param string $id
-     * @param string $direction
-     * @return string
-     */
-    protected function url($id, $direction)
-    {
-        $request = clone $this->view->getRequest();
-
-        return $request
-            ->setQuery('sort', $id)
-            ->setQuery('dir', $direction)
-            ->getUrl();
     }
 }

@@ -12,14 +12,15 @@ namespace Dewdrop\Admin\Page\Stock;
 
 use Dewdrop\Admin\Component\ComponentAbstract;
 use Dewdrop\Admin\Component\CrudInterface;
-use Dewdrop\Admin\Page\PageAbstract;
+use Dewdrop\Admin\ResponseHelper\Standard as ResponseHelper;
+use Dewdrop\Fields\RowEditor;
 
 /**
  * This page handles requests to delete items using a CRUD component's row
  * editor object.  It requires a POST request, to avoid simple attacks where
  * a user is tricked into navigating to a link that deletes a record.
  */
-class Delete extends PageAbstract
+class Delete extends StockPageAbstract
 {
     /**
      * The CRUD component.
@@ -27,6 +28,13 @@ class Delete extends PageAbstract
      * @var CrudInterface|ComponentAbstract
      */
     protected $component;
+
+    /**
+     * The result to return in the JSON response.
+     *
+     * @var string
+     */
+    private $result = 'error';
 
     /**
      * Ensure the user has the permission to delete records in this component.
@@ -39,18 +47,39 @@ class Delete extends PageAbstract
     /**
      * When receiving a POST, get the row editor setup and then call its
      * delete() method.
+     *
+     * @param ResponseHelper $response
      */
-    public function process()
+    public function process(ResponseHelper $response)
     {
         if ($this->request->isPost()) {
             $rowEditor = $this->component->getRowEditor();
-
             $rowEditor->link();
             $rowEditor->delete();
 
-            header('Content-Type: application/json');
-            echo json_encode(['result' => 'success']);
-            exit;
+            $this->logActivity($rowEditor);
+
+            $this->result = 'success';
+        }
+    }
+
+    protected function logActivity(RowEditor $rowEditor)
+    {
+        $model = $this->component->getPrimaryModel();
+        $rows  = $rowEditor->getRows();
+        $id    = null;
+
+        /* @var $row \Dewdrop\Db\Row */
+        foreach ($rows as $row) {
+            if ($row->getTable() === $model) {
+                $id = $row->get(current($model->getPrimaryKey()));
+            }
+        }
+
+        if ($id) {
+            /* @var $handler \Dewdrop\ActivityLog\Handler\CrudHandlerAbstract */
+            $handler = $this->component->getActivityLogHandler();
+            $handler->delete($id);
         }
     }
 
@@ -60,8 +89,6 @@ class Delete extends PageAbstract
      */
     public function render()
     {
-        header('Content-Type: application/json');
-        echo json_encode(['result' => 'error']);
-        exit;
+        return ['result' => $this->result];
     }
 }

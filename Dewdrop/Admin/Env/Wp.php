@@ -10,8 +10,10 @@
 
 namespace Dewdrop\Admin\Env;
 
-use Dewdrop\Admin\Component\ComponentAbstract;
+use Dewdrop\Admin\Component\ComponentInterface;
+use Dewdrop\Admin\Component\ShellIntegrationInterface;
 use Dewdrop\Admin\Response;
+use Dewdrop\Pimple;
 use Dewdrop\View\View;
 use Zend\View\Helper\HeadLink;
 use Zend\View\Helper\HeadScript;
@@ -44,6 +46,8 @@ class Wp extends EnvAbstract
      */
     public function renderLayout($content, HeadScript $headScript = null, HeadLink $headLink = null)
     {
+        global $wp_version;
+
         $view = new View();
 
         $output  = $view->wpWrap()->open();
@@ -54,7 +58,10 @@ class Wp extends EnvAbstract
             // We're prefixing the name here so we don't conflict with WP names
             wp_enqueue_script(
                 'dewdrop-' . basename($script->attributes['src'], '.js'),
-                $script->attributes['src']
+                $script->attributes['src'],
+                [],
+                $wp_version,
+                true
             );
         }
 
@@ -75,12 +82,12 @@ class Wp extends EnvAbstract
      * return submenu-friendly URLs when a submenu item matches the supplied
      * page and params arguments.
      *
-     * @param ComponentAbstract $component
+     * @param ComponentInterface $component
      * @param string $page
      * @param array $params
      * @return string
      */
-    public function url(ComponentAbstract $component, $page, array $params = array())
+    public function url(ComponentInterface $component, $page, array $params = array())
     {
         $base  = get_bloginfo('wpurl') . '/wp-admin/admin.php?page=' . $component->getSlug();
         $query = $this->assembleQueryString($params, $separator = '&');
@@ -104,12 +111,23 @@ class Wp extends EnvAbstract
                         $route = '/' . $submenu['route'];
                     }
 
-                    return "{$base}{$route}{$query}";
+                    return $this->filterUrl("{$base}{$route}{$query}");
                 }
             }
         }
 
-        return "{$base}&route={$page}{$query}";
+        return $this->filterUrl("{$base}&route={$page}{$query}");
+    }
+
+    protected function filterUrl($url)
+    {
+        if (Pimple::hasResource('url-filter')) {
+            /* @var $filter callable */
+            $filter = Pimple::getResource('url-filter');
+            $url    = $filter($url);
+        }
+
+        return $url;
     }
 
     /**
@@ -131,10 +149,10 @@ class Wp extends EnvAbstract
      * event handlers so that we can supply the ComponentAbstract object to those
      * functions.
      *
-     * @param ComponentAbstract $component
+     * @param ComponentInterface $component
      * @return void
      */
-    public function initComponent(ComponentAbstract $component)
+    public function initComponent(ComponentInterface $component)
     {
         add_action(
             'admin_init',
@@ -166,12 +184,12 @@ class Wp extends EnvAbstract
      * @param string $page The name of the page to route to (e.g. "Index" or "Edit").
      * @param Response $response Inject a response object, usually for tests.
      *
-     * @param ComponentAbstract $component
+     * @param ComponentInterface $component
      * @param string|null $page
      * @param Response|null $response
-     * @return ComponentAbstract
+     * @return ComponentInterface
      */
-    public function adminInit(ComponentAbstract $component, $page = null, Response $response = null)
+    public function adminInit(ComponentInterface $component, $page = null, Response $response = null)
     {
         if ($this->componentIsCurrentlyActive($component)) {
             $page = $component->createPageObject($component->getRequest()->getQuery('route', 'Index'));
@@ -208,6 +226,8 @@ class Wp extends EnvAbstract
      */
     protected function enqueueClientSideDependencies(View $view)
     {
+        global $wp_version;
+
         // Use jQuery and Backbone from WP core
         wp_enqueue_script('jquery-core');
         wp_enqueue_script('wp-backbone');
@@ -217,7 +237,7 @@ class Wp extends EnvAbstract
         // Enqueue non-WP core scripts
         foreach ($this->coreClientSideDependencies['js'] as $name => $script) {
             if (!in_array($name, $wpCoreScripts)) {
-                wp_enqueue_script($name, $view->bowerUrl($script), array('jquery', 'wp-backbone'));
+                wp_enqueue_script($name, $view->bowerUrl($script), ['jquery', 'wp-backbone'], $wp_version, true);
             }
         }
 
@@ -238,25 +258,15 @@ class Wp extends EnvAbstract
      * register() method.  It essentially tells WP to call this component's
      * route() method whenever the component is accessed.
      *
-     * @param ComponentAbstract $component
+     * @param ComponentInterface $component
      */
-    public function registerMenuPage(ComponentAbstract $component)
+    public function registerMenuPage(ComponentInterface $component)
     {
         $slug = $component->getSlug();
 
-        $this->addObjectPage(
-            $component->getTitle(),
-            $component->getTitle(),
-            'add_users',
-            $component->getSlug(),
-            function () use ($component) {
-                $this->renderOutputIntoShell($component);
-            },
-            $component->getIcon(),
-            $component->getMenuPosition()
-        );
+        $this->registerComponentHandlingCallback($component);
 
-        if (count($component->getSubmenuPages())) {
+        if ($component instanceof ShellIntegrationInterface && count($component->getSubmenuPages())) {
             global $submenu_file;
 
             foreach ($component->getSubmenuPages() as $page) {
@@ -282,6 +292,46 @@ class Wp extends EnvAbstract
                     }
                 );
             }
+        }
+    }
+
+    /**
+     * Registering a component in WordPress means registering a handler
+     * for a hook.  Typically, add_object_page is used, but that implies
+     * an entry in the top-level admin menu.  Because we want to support
+     * components that don't appear in the menu, we check the display-menu
+     * permission here and then use add_submenu_page() with no slug to
+     * get our callback over to WP without displaying anything in the
+     * menu.
+     *
+     * @param ComponentInterface $component
+     * @throws \Dewdrop\Exception
+     */
+    protected function registerComponentHandlingCallback(ComponentInterface $component)
+    {
+        if ($component->getPermissions()->can('display-menu')) {
+            $this->addObjectPage(
+                $component->getTitle(),
+                $component->getTitle(),
+                'add_users',
+                $component->getSlug(),
+                function () use ($component) {
+                    $this->renderOutputIntoShell($component);
+                },
+                $component->getIcon(),
+                $component->getMenuPosition()
+            );
+        } else {
+            $this->addSubmenuPage(
+                null,
+                $component->getTitle(),
+                $component->getTitle(),
+                'add_users',
+                $component->getSlug(),
+                function () use ($component) {
+                    $this->renderOutputIntoShell($component);
+                }
+            );
         }
     }
 
@@ -316,10 +366,10 @@ class Wp extends EnvAbstract
      * WP shell itself is rendered.  This method is attached to the appropiate
      * hooks to allow that to happen.
      *
-     * @param ComponentAbstract $component
+     * @param ComponentInterface $component
      * @return void
      */
-    public function renderOutputIntoShell(ComponentAbstract $component)
+    public function renderOutputIntoShell(ComponentInterface $component)
     {
         echo $this->output;
     }
@@ -335,7 +385,7 @@ class Wp extends EnvAbstract
      *
      * @return boolean
      */
-    protected function componentIsCurrentlyActive(ComponentAbstract $component)
+    protected function componentIsCurrentlyActive(ComponentInterface $component)
     {
         return preg_match('/^' . $component->getSlug() . '($|\/)/i', $component->getRequest()->getQuery('page')) ||
             $component->getSlug() === $component->getRequest()->getPost('action');

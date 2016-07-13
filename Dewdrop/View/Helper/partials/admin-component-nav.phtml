@@ -1,7 +1,7 @@
 <nav class="navbar navbar-default navbar-admin-index" role="navigation">
     <div class="navbar-header">
         <?php if ($this->permissions->can('create')) :?>
-        <a data-keyboard-role="create" href="<?php echo $this->escapeHtmlAttr($this->adminUrl('edit'));?>" class="btn btn-primary navbar-btn">Add <?php echo $this->escapeHtml($this->singularTitle);?></a>
+        <a data-keyboard-role="create" href="<?php echo $this->escapeHtmlAttr($this->createUrl ?: $this->adminUrl('edit'));?>" class="btn btn-primary navbar-btn">Add <?php echo $this->escapeHtml($this->singularTitle);?></a>
         <?php endif;?>
 
         <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#admin-index-collapse">
@@ -14,47 +14,71 @@
 
     <div class="collapse navbar-collapse" id="admin-index-collapse">
         <?php if ($this->permissions->can('export')) :?>
-        <a href="<?php echo $this->escapeHtmlAttr($this->adminUrl('export', array('format' => 'csv'), false));?>" class="btn btn-link btn-link-first navbar-btn">Export</a>
+        <?php
+            $exportParams = array_merge(array('format' => 'csv'), $this->request->getQuery());
+        ?>
+        <a href="<?php echo $this->escapeHtmlAttr($this->adminUrl('export', $exportParams));?>" class="btn btn-link btn-link-first navbar-btn">Export</a>
         <?php endif;?>
 
-        <?php if ($this->permissions->can('adjust-columns')) :?>
+        <?php if ($this->permissions->can('import')):?>
+            <a href="<?php echo $this->escapeHtmlAttr($this->adminUrl('import'));?>" class="btn btn-link btn-link-first navbar-btn">Import</a>
+        <?php endif;?>
+
+        <?php if ($this->permissions->can('count-fields')):?>
+        <a href="<?php echo $this->escapeHtmlAttr($this->adminUrl('counts'));?>" class="btn btn-link navbar-btn">Count <?php echo $this->escapeHtml($this->pluralTitle);?></a>
+        <?php endif;?>
+
+        <?php if ($this->permissions->can('adjust-columns')):?>
         <a href="#" data-toggle="modal" data-target="#adjust-columns-modal" class="btn btn-link navbar-btn">Adjust Columns</a>
         <?php endif;?>
-        <div class="navbar-right navbar-right-btn-group">
-            <div class="btn-group btn-group-justified">
-                <div class="btn-group">
-                    <?php if ($this->permissions->can('filter')) :?>
-                    <button data-keyboard-role="filter" type="button" class="btn btn-default navbar-btn" data-toggle="collapse" data-target="#admin-filter-panel"><span class="glyphicon glyphicon-filter"></span> Filter</button>
+
+        <?php if ($this->permissions->can('view-activity')):?>
+        <a href="<?php echo $this->escapeHtmlAttr($this->adminUrl('recent-activity'));?>" class="btn btn-link navbar-btn">Recent Activity</a>
+        <?php endif;?>
+
+        <div class="navbar-right">
+            <div class="container-fluid">
+                <?php if ($this->permissions->can('filter')) :?>
+                <button data-keyboard-role="filter" type="button" class="btn btn-default navbar-btn" data-toggle="collapse" data-target="#admin-filter-panel">
+                    <span class="glyphicon glyphicon-filter"></span> Filter <span class="caret"></span>
+                </button>
+                <?php endif;?>
+                <button type="button" class="btn btn-default admin-btn-settings navbar-btn" data-toggle="dropdown"><span class="glyphicon glyphicon-cog"></span></button>
+                <ul class="dropdown-menu" role="menu">
+                    <?php if ($this->permissions->can('custom-views')) :?>
+                    <li><a href="#">Save Current View</a></li>
+                    <li><a href="#">Manage Custom Views</a></li>
                     <?php endif;?>
-                </div>
-                <div class="btn-group">
-                    <button type="button" class="btn btn-default admin-btn-settings navbar-btn" data-toggle="dropdown"><span class="glyphicon glyphicon-cog"></span> Settings <span class="caret"></span></button>
-                    <ul class="dropdown-menu" role="menu">
-                        <?php if ($this->permissions->can('custom-views')) :?>
-                        <li><a href="#">Save Current View</a></li>
-                        <li><a href="#">Manage Custom Views</a></li>
-                        <?php endif;?>
 
-                        <?php if ($this->permissions->can('sort-fields')) :?>
-                        <li><a href="<?php echo $this->escapeHtmlAttr($this->adminUrl('sort-fields'));?>">Sort and Group Fields</a></li>
-                        <?php endif;?>
+                    <?php if ($this->permissions->can('sort-fields')) :?>
+                    <li><a href="<?php echo $this->escapeHtmlAttr($this->adminUrl('sort-fields'));?>">Sort and Group Fields</a></li>
+                    <?php endif;?>
 
-                        <?php if ($this->permissions->can('notifications')) :?>
-                        <li><a href="<?php echo $this->escapeHtmlAttr($this->adminUrl('notifications'));?>">Notifications</a></li>
-                        <?php endif;?>
+                    <?php if ($this->permissions->can('restore') && $this->deletedRecordsModifier):?>
 
-                        <li><a data-toggle="modal" data-target="#keyboard-shortcuts-modal" href="#">View Keyboard Shortcuts</a></li>
+                    <?php
+                    $params = $this->getRequest()->getQuery();
+                    $params[$this->deletedRecordsModifier->getQueryParameterName()] = 1;
+                    ?>
+                    <li><a href="<?php echo $this->escapeHtmlAttr($this->adminUrl('index', $params));?>">View Deleted <?php echo $this->escapeHtml($this->pluralTitle);?></a></li>
 
-                        <?php if ($this->permissions->can('debug')):?>
-                        <li role="presentation" class="divider"></li>
-                        <li role="presentation" class="dropdown-header"><span class="glyphicon glyphicon-wrench"></span> Dev Tools</li>
-                        <li><a href="<?php echo $this->escapeHtmlAttr($this->adminUrl('debug-fields'));?>">View Fields</a></li>
-                        <li><a href="<?php echo $this->escapeHtmlAttr($this->adminUrl('debug-listing-sql', $this->request->getQuery()));?>">View Listing SQL</a></li>
-                        <li><a href="<?php echo $this->escapeHtmlAttr($this->adminUrl('debug-pages'));?>">View Pages</a></li>
-                        <li><a href="<?php echo $this->escapeHtmlAttr($this->adminUrl('debug-test-sorting'));?>">Test Sorting</a></li>
-                        <?php endif;?>
-                    </ul>
-                </div>
+                    <?php endif;?>
+
+                    <?php if ($this->permissions->can('notifications')) :?>
+                    <li><a href="<?php echo $this->escapeHtmlAttr($this->adminUrl('notifications'));?>">Notifications</a></li>
+                    <?php endif;?>
+
+                    <li><a data-toggle="modal" data-target="#keyboard-shortcuts-modal" href="#">View Keyboard Shortcuts</a></li>
+
+                    <?php if ($this->permissions->can('debug')):?>
+                    <li role="presentation" class="divider"></li>
+                    <li role="presentation" class="dropdown-header"><span class="glyphicon glyphicon-wrench"></span> Dev Tools</li>
+                    <li><a href="<?php echo $this->escapeHtmlAttr($this->adminUrl('debug-fields'));?>">View Fields</a></li>
+                    <li><a href="<?php echo $this->escapeHtmlAttr($this->adminUrl('debug-listing-sql', $this->request->getQuery()));?>">View Listing SQL</a></li>
+                    <li><a href="<?php echo $this->escapeHtmlAttr($this->adminUrl('debug-pages'));?>">View Pages</a></li>
+                    <li><a href="<?php echo $this->escapeHtmlAttr($this->adminUrl('debug-test-sorting'));?>">Test Sorting</a></li>
+                    <?php endif;?>
+                </ul>
             </div>
         </div>
     </div>

@@ -10,6 +10,8 @@
 
 namespace Dewdrop\Db;
 
+use Dewdrop\ActivityLog\Handler\HandlerInterface;
+use Dewdrop\ActivityLog\Handler\TableHandler as ActivityLogTableHandler;
 use Dewdrop\Db\Eav\Definition as EavDefinition;
 use Dewdrop\Db\ManyToMany\Relationship as ManyToManyRelationship;
 use Dewdrop\Db\Select\TableListing;
@@ -129,6 +131,13 @@ abstract class Table
     private $singularTitle;
 
     /**
+     * The activity log handler used to log events for this table.
+     *
+     * @var ActivityLogTableHandler
+     */
+    private $activityLogHandler;
+
+    /**
      * Create new table object with supplied DB adapter
      *
      * @param Adapter $db
@@ -155,6 +164,22 @@ abstract class Table
      * @return void
      */
     abstract public function init();
+
+    public function setActivityLogHandler(HandlerInterface $activityLogHandler)
+    {
+        $this->activityLogHandler = $activityLogHandler;
+
+        return $this;
+    }
+
+    public function getActivityLogHandler()
+    {
+        if (!$this->activityLogHandler) {
+            $this->activityLogHandler = new ActivityLogTableHandler($this);
+        }
+
+        return $this->activityLogHandler;
+    }
 
     /**
      * Return a listing for the admin.
@@ -333,9 +358,11 @@ abstract class Table
 
         $field = null;
 
+        /* @var $provider \Dewdrop\Db\FieldProvider\ProviderInterface */
         foreach ($this->fieldProviders as $provider) {
             if ($provider->has($name)) {
                 $field = $provider->instantiate($name);
+                break;
             }
         }
 
@@ -612,7 +639,7 @@ abstract class Table
     {
         $this->db->insert(
             $this->tableName,
-            $this->augmentInsertedDataArrayWithDateFields(
+            $this->augmentInsertedDataArrayWithWhenAndByWhom(
                 $this->filterDataArrayForPhysicalColumns($data)
             )
         );
@@ -648,7 +675,7 @@ abstract class Table
     {
         $result = 0;
 
-        $updateData = $this->augmentUpdatedDataArrayWithDateFields(
+        $updateData = $this->augmentUpdatedDataArrayWithWhenAndByWhom(
             $this->filterDataArrayForPhysicalColumns($data)
         );
 
@@ -780,35 +807,77 @@ abstract class Table
 
     /**
      * If this table has date_created or datetime_created columns, supply a
-     * value for them automatically during insert().
+     * value for them automatically during insert(). It also will assign
+     * the current user ID as the creator if possible.
      *
      * @param array $data
      * @return array
      */
-    private function augmentInsertedDataArrayWithDateFields(array $data)
+    private function augmentInsertedDataArrayWithWhenAndByWhom(array $data)
     {
-        if ($this->getMetadata('columns', 'date_created')) {
-            $data['date_created'] = date('Y-m-d G:i:s');
-        } elseif ($this->getMetadata('columns', 'datetime_created')) {
-            $data['datetime_created'] = date('Y-m-d G:i:s');
+        // When
+        static $whenColumnCandidates = [
+            'date_created',
+            'datetime_created',
+        ];
+        foreach ($whenColumnCandidates as $whenColumnCandidate) {
+            if ($this->getMetadata('columns', $whenColumnCandidate)) {
+                $whenColumn = $whenColumnCandidate;
+                break;
+            }
+        }
+        if (isset($whenColumn) && (!array_key_exists($whenColumn, $data) || !$data[$whenColumn])) {
+            $data[$whenColumn] = date('Y-m-d H:i:s');
         }
 
-        return $this->augmentUpdatedDataArrayWithDateFields($data);
+        // By whom
+        /* @var \Dewdrop\Pimple $pimple */
+        $pimple = Pimple::getInstance();
+        /* @var \Dewdrop\Paths $paths */
+        $paths = $pimple['paths'];
+        if ($this->getMetadata('columns', 'created_by_user_id')) {
+            if ($paths->isWp() && 0 < get_current_user_id()) {
+                $data['created_by_user_id'] = get_current_user_id();
+            } elseif (Pimple::hasResource('user') && ($user = Pimple::getResource('user')) && isset($user['user_id'])
+                && 0 < $user['user_id']) {
+                $data['created_by_user_id'] = $user['user_id'];
+            }
+        }
+
+        return $this->augmentUpdatedDataArrayWithWhenAndByWhom($data);
     }
 
     /**
      * If this table has date_updated or datetime_updated columns, supply a
-     * value for them automatically during update().
+     * value for them automatically during update(). It also will assign
+     * the current user ID as the updater if possible.
      *
      * @param array $data
      * @return array
      */
-    private function augmentUpdatedDataArrayWithDateFields(array $data)
+    private function augmentUpdatedDataArrayWithWhenAndByWhom(array $data)
     {
+        // When
         if ($this->getMetadata('columns', 'date_updated')) {
             $data['date_updated'] = date('Y-m-d G:i:s');
         } elseif ($this->getMetadata('columns', 'datetime_updated')) {
             $data['datetime_updated'] = date('Y-m-d G:i:s');
+        } elseif ($this->getMetadata('columns', 'updated_at')) {
+            $data['updated_at'] = date('Y-m-d H:i:s');
+        }
+
+        // By whom
+        /* @var \Dewdrop\Pimple $pimple */
+        $pimple = Pimple::getInstance();
+        /* @var \Dewdrop\Paths $paths */
+        $paths = $pimple['paths'];
+        if ($this->getMetadata('columns', 'updated_by_user_id')) {
+            if ($paths->isWp() && 0 < get_current_user_id()) {
+                $data['updated_by_user_id'] = get_current_user_id();
+            } elseif (Pimple::hasResource('user') && ($user = Pimple::getResource('user')) && isset($user['user_id'])
+                && 0 < $user['user_id']) {
+                $data['updated_by_user_id'] = $user['user_id'];
+            }
         }
 
         return $data;
@@ -844,7 +913,7 @@ abstract class Table
         foreach ($data as $column => $value) {
             $metadata = $this->getMetadata('columns', $column);
 
-            if (!$metadata || ($metadata['PRIMARY'] && null === $value)) {
+            if (!$metadata || (isset($metadata['PRIMARY']) && $metadata['PRIMARY'] && null === $value)) {
                 unset($data[$column]);
             }
         }

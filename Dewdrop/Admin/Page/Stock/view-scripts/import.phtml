@@ -1,0 +1,39 @@
+<?php
+
+echo $this->bootstrapBreadcrumbs(
+    [
+        ['title' => $this->title, 'href' => $this->adminUrl('index')],
+        ['title' => 'Upload Import File', 'active' => true]
+    ]
+);
+
+?>
+
+<?php
+foreach ($this->validationMessages as $field => $messages) {
+    foreach ($messages as $message) {
+        printf(
+            '<div class="alert alert-danger">%s</div>',
+            $this->escapeHtml($message)
+        );
+    }
+}
+?>
+
+<form class="form" action="" method="POST" enctype="multipart/form-data">
+    <div class="form-group">
+        <label class="control-label" for="file">Spreadsheet File</label>
+        <input type="file" name="file" />
+        <p class="help-block">
+            Upload an Excel or CSV file containing <?php echo $this->escapeHtml($this->singularTitle);?> records to
+            import.
+        </p>
+    </div>
+    <div class="form-group">
+        <label for="first_row_is_headers">
+            <input type="checkbox" name="first_row_is_headers" id="first_row_is_headers" value="1" checked="checked" />
+            The first row of the spreadsheet is column headers/labels
+        </label>
+    </div>
+    <button type="submit" class="btn btn-primary">Upload File</button>
+</form>

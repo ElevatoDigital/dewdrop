@@ -1,0 +1,15 @@
+<ol class="breadcrumb">
+    <?php
+    foreach ($this->crumbs as $crumb) {
+        if ($crumb['active']) {
+            printf('<li class="active">%s</li>', $this->escapeHtml($crumb['title']));
+        } else {
+            printf(
+                '<li><a href="%s">%s</a></li>',
+                $this->escapeHtmlAttr($crumb['href']),
+                $this->escapeHtml($crumb['title'])
+            );
+        }
+    }
+    ?>
+</ol>

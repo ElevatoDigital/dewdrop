@@ -16,7 +16,9 @@ use Dewdrop\Db\Dbdeploy\CliExec;
 use Dewdrop\Db\Dbdeploy\Command\Backfill;
 use Dewdrop\Db\Dbdeploy\Command\Status;
 use Dewdrop\Db\Dbdeploy\Command\Apply;
+use Dewdrop\Env;
 use Dewdrop\Exception;
+use Dewdrop\Pimple;
 
 /**
  * Apply update to your database schema in a controlled and repeatable manner.
@@ -114,12 +116,6 @@ class Dbdeploy extends CommandAbstract
      */
     public function init()
     {
-        $this->dbType = $this->runner->getPimple()['config']['db']['type'];
-
-        $this->changesets['plugin']       = $this->paths->getPluginRoot() . '/db';
-        $this->changesets['dewdrop-core'] = $this->paths->getDewdropLib() . '/db/' . $this->dbType;
-        $this->changesets['dewdrop-test'] = $this->paths->getDewdropLib() . '/tests/db/' . $this->dbType;
-
         $this
             ->setDescription('Update database schema using dbdeploy')
             ->setCommand('dbdeploy')
@@ -252,6 +248,8 @@ class Dbdeploy extends CommandAbstract
      */
     public function execute()
     {
+        $this->initChangesets();
+
         if (null === $this->action) {
             $this->action = 'update';
         }
@@ -263,25 +261,12 @@ class Dbdeploy extends CommandAbstract
             );
         }
 
-        $config = $this->runner->getPimple()['config']['db'];
-
-        $cliExec = new CliExec(
-            $config['type'],
-            $config['username'],
-            $config['password'],
-            $config['host'],
-            $config['name'],
-            ('psql' === $this->dbType ? $this->psql : $this->mysql)
-        );
-
         $this->db = $this->runner->connectDb();
 
-        $gateway    = new ChangelogGateway($this->db, $cliExec, $this->dbType, $this->changelogTableName);
-        $changesets = array();
-
-        foreach ($this->changesets as $name => $path) {
-            $changesets[] = new Changeset($gateway, $name, $path);
-        }
+        $config     = $this->runner->getPimple()['config']['db'];
+        $cliExec    = $this->createCliExec($config);
+        $gateway    = $this->createChangelogGateway($cliExec, $config);
+        $changesets = $this->instantiateChangesets($gateway);
 
         $method = 'execute' . ucfirst($this->action);
         return $this->$method($changesets, $gateway, $cliExec);
@@ -507,6 +492,68 @@ class Dbdeploy extends CommandAbstract
             ->newline();
     }
 
+    public function getPrimaryChangeset()
+    {
+        $this->initChangesets();
+
+        $config     = $this->runner->getPimple()['config']['db'];
+        $cliExec    = $this->createCliExec($config);
+        $gateway    = $this->createChangelogGateway($cliExec, $config);
+        $changesets = $this->instantiateChangesets($gateway);
+
+        $primaryChangesetName = Env::getInstance()->getProjectNoun();
+
+        /* @var $changeset Changeset */
+        foreach ($changesets as $changeset) {
+            if ($changeset->getName() === $primaryChangesetName) {
+                return $changeset;
+            }
+        }
+
+        throw new Exception("Could not find '{$primaryChangesetName}' dbdeploy changeset.");
+    }
+
+    /**
+     * Setup the default changesets.  If a changeset has already been configured with a given
+     * name, the default will not be applied.  This is done primarily to allow the
+     * overrideChangesetPath() method to swap out the default paths during testing.
+     *
+     * @return void
+     */
+    private function initChangesets()
+    {
+        $this->dbType = $this->runner->getPimple()['config']['db']['type'];
+
+        $mainChangesetName = Env::getInstance()->getProjectNoun();
+
+        $defaultChangesets = [
+            'dewdrop-core'     => $this->paths->getDewdropLib() . '/db/' . $this->dbType,
+            $mainChangesetName => $this->paths->getPluginRoot() . '/db',
+            'dewdrop-test'     => $this->paths->getDewdropLib() . '/tests/db/' . $this->dbType
+        ];
+
+        if (Pimple::hasResource('dbdeploy.changesets')) {
+            $defaultChangesets = array_merge($defaultChangesets, Pimple::getResource('dbdeploy.changesets'));
+        }
+
+        foreach ($defaultChangesets as $name => $path) {
+            if (!array_key_exists($name, $this->changesets)) {
+                $this->changesets[$name] = $path;
+            }
+        }
+    }
+
+    private function instantiateChangesets(ChangelogGateway $gateway)
+    {
+        $changesets = [];
+
+        foreach ($this->changesets as $name => $path) {
+            $changesets[] = new Changeset($gateway, $name, $path);
+        }
+
+        return $changesets;
+    }
+
     /**
      * Override the default changelog table name.
      *
@@ -540,12 +587,25 @@ class Dbdeploy extends CommandAbstract
      */
     public function overrideChangesetPath($changeset, $path)
     {
-        if (!array_key_exists($changeset, $this->changesets)) {
-            throw new Exception("No changeset found with name \"{$changeset}\"");
-        }
-
         $this->changesets[$changeset] = $path;
 
         return $this;
+    }
+
+    protected function createChangelogGateway(CliExec $cliExec, array $config)
+    {
+        return new ChangelogGateway($this->runner->connectDb(), $cliExec, $config['type'], $this->changelogTableName);
+    }
+
+    protected function createCliExec(array $config)
+    {
+        return new CliExec(
+            $config['type'],
+            $config['username'],
+            $config['password'],
+            $config['host'],
+            $config['name'],
+            ('psql' === $config['type'] ? $this->psql : $this->mysql)
+        );
     }
 }

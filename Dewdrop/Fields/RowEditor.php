@@ -12,12 +12,15 @@ namespace Dewdrop\Fields;
 
 use Dewdrop\Db\Field as DbField;
 use Dewdrop\Db\Row;
+use Dewdrop\Db\Table;
 use Dewdrop\Fields;
 use Dewdrop\Fields\Helper\InputFilter as InputFilterHelper;
+use Dewdrop\Fields\Helper\SaveHandler as SaveHandlerHelper;
 use Dewdrop\Fields\RowEditor\Link\LinkInterface;
 use Dewdrop\Fields\RowEditor\Link\Field as FieldLink;
 use Dewdrop\Fields\RowEditor\Link\QueryString as QueryStringLink;
 use Dewdrop\Request;
+use Dewdrop\SaveHandlerInterface;
 
 /**
  * This class assists in the editing of one or more row objects.  To achieve
@@ -27,7 +30,7 @@ use Dewdrop\Request;
  * to edit those fields, you somehow have to call setRow() on each of those
  * fields, giving them the ability to get and set values on that row.
  */
-class RowEditor
+class RowEditor implements SaveHandlerInterface
 {
     /**
      * An associative array containing all the row objects you've provided, with
@@ -78,11 +81,39 @@ class RowEditor
     private $inputFilterHelper;
 
     /**
+     * @var \Dewdrop\Fields\Helper\SaveHandler
+     */
+    private $saveHandlerHelper;
+
+    /**
      * A boolean field that can be used to flag a row as deleted.
      *
      * @var DbField
      */
     private $deleteField;
+
+    /**
+     * The fields from which we'll get input filter inputs and for which we'll
+     * set values.
+     *
+     * @var Fields
+     */
+    private $fields;
+
+    /**
+     * The HTTP request where we'll get the input data.
+     *
+     * @var Request
+     */
+    private $request;
+
+    /**
+     * Default values for rows by model name.  Will set these automatically
+     * once the rows are linked.
+     *
+     * @var array
+     */
+    private $defaultsByModelName = [];
 
     /**
      * Supply the fields and HTTP request that will be used during editing.
@@ -91,11 +122,90 @@ class RowEditor
      * @param Request $request
      * @param InputFilterHelper $inputFilterHelper
      */
-    public function __construct(Fields $fields, Request $request, InputFilterHelper $inputFilterHelper = null)
-    {
+    public function __construct(
+        Fields $fields,
+        Request $request,
+        InputFilterHelper $inputFilterHelper = null,
+        SaveHandlerHelper $saveHandlerHelper = null
+    ) {
         $this->fields            = $fields;
         $this->request           = $request;
         $this->inputFilterHelper = ($inputFilterHelper ?: new InputFilterHelper());
+        $this->saveHandlerHelper = ($inputFilterHelper ?: new SaveHandlerHelper());
+    }
+
+    /**
+     * Get the Fields object associated with this RowEditor.
+     *
+     * @return Fields
+     */
+    public function getFields()
+    {
+        return $this->fields;
+    }
+
+    /**
+     * Get the HTTP request associated wit this RowEditor.
+     *
+     * @return Request
+     */
+    public function getRequest()
+    {
+        return $this->request;
+    }
+    /**
+     * Set some default values for the row matching the supplied model name.
+     * Once the rows are linked, your defaults will be applied automatically.
+     *
+     * @param string $modelName
+     * @param array $defaults
+     * @return $this
+     * @throws Exception
+     */
+    public function setDefaults($modelName, array $defaults)
+    {
+        $this->defaultsByModelName[$modelName] = $defaults;
+
+        if ($this instanceof RowEditor && $this->hasRow($modelName)) {
+            $this->applyDefaultsToRow($this->getRow($modelName), $defaults);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Apply the supplied default values to the row, skipping any fields
+     * that already have a value.
+     *
+     * @param Row $row
+     * @param array $defaults
+     * @return $this
+     * @throws \Dewdrop\Exception
+     */
+    public function applyDefaultsToRow(Row $row, array $defaults)
+    {
+        foreach ($defaults as $key => $value) {
+            if (!$row->get($key)) {
+                if ($value instanceof FieldInterface) {
+                    $value = $value->getValue();
+                }
+
+                $row->set($key, $value);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Clear out the row objects on this editor.  Useful if you're using the same editor
+     * @return $this
+     */
+    public function reset()
+    {
+        $this->rowsByName = [];
+
+        return $this;
     }
 
     /**
@@ -133,6 +243,7 @@ class RowEditor
                     $modelName,
                     $link->link($this->getModel($modelName))
                 );
+
             }
         }
 
@@ -185,6 +296,28 @@ class RowEditor
     public function linkByQueryString($modelName, $queryStringVariableName)
     {
         return $this->addLink($modelName, new QueryStringLink($this->request, $queryStringVariableName));
+    }
+
+    /**
+     * A shortcut for linkByQueryString() that uses Table object get the model
+     * and query string param name.
+     *
+     * @param Table $table
+     * @return RowEditor
+     * @throws Exception
+     */
+    public function linkTableByQueryString(Table $table)
+    {
+        $primaryKey = $table->getPrimaryKey();
+
+        if (1 !== count($primaryKey)) {
+            throw new Exception('Can only use linkTableByQueryString() when a single primary key column is present.');
+        }
+
+        return $this->linkByQueryString(
+            $table->getTableName(),
+            current($primaryKey)
+        );
     }
 
     /**
@@ -241,11 +374,9 @@ class RowEditor
             $presentInData = array_key_exists($field->getId(), $data);
 
             if ($presentInData) {
-                $id = $field->getId();
-
                 /* @var $filter \Zend\Filter\FilterChain */
-                $filter = $inputFilter->get($id)->getFilterChain();
-                $value  = $data[$id];
+                $filter = $inputFilter->get($field->getId())->getFilterChain();
+                $value  = $data[$field->getId()];
 
                 if (!$value && $field instanceof DbField && $field->isType('reference')) {
                     $value = null;
@@ -298,6 +429,17 @@ class RowEditor
     }
 
     /**
+     * Get the validation messages associated with a specific field.
+     *
+     * @param FieldInterface $field
+     * @return array
+     */
+    public function getMessages(FieldInterface $field)
+    {
+        return $this->getInputFilter()->get($field->getId())->getMessages();
+    }
+
+    /**
      * Set the field that can be used to delete this item.
      *
      * @param DbField $deleteField
@@ -320,6 +462,11 @@ class RowEditor
         return null !== $this->deleteField;
     }
 
+    public function isDeleted()
+    {
+        return $this->hasDeleteField() && $this->deleteField->getValue();
+    }
+
     /**
      * Perform a delete using the RowEditor's delete field, if specified.
      *
@@ -332,6 +479,19 @@ class RowEditor
         if ($this->hasDeleteField()) {
             $this->deleteField
                 ->setValue(1)
+                ->getRow()
+                    ->save();
+        }
+    }
+
+    /**
+     * Perform a restore using the RowEditor's delete field, if specified.
+     */
+    public function restore()
+    {
+        if ($this->hasDeleteField()) {
+            $this->deleteField
+                ->setValue(0)
                 ->getRow()
                     ->save();
         }
@@ -410,7 +570,43 @@ class RowEditor
             }
         }
 
+        /* @var $field FieldInterface */
+        foreach ($this->fields->getEditableFields() as $field) {
+            $this->saveHandlerHelper->save($field);
+        }
+
         return $this;
+    }
+
+    /**
+     * Check to see if the row editor has a row with the given model name.
+     *
+     * @param string $modelName
+     * @return bool
+     */
+    public function hasRow($modelName)
+    {
+        return array_key_exists($modelName, $this->rowsByName);
+    }
+
+    public function setRowByData($modelName, array $data)
+    {
+        $model = $this->getModel($modelName);
+
+        $pkeyColumns = $model->getPrimaryKey();
+        $pkeyValues  = [];
+
+        foreach ($pkeyColumns as $column) {
+            if (isset($data[$column]) && $data[$column]) {
+                $pkeyValues[$column] = $data[$column];
+            }
+        }
+
+        if (!count($pkeyValues)) {
+            return $this->setRow($modelName, $model->createRow());
+        } else {
+            return $this->setRow($modelName, call_user_func_array([$model, 'find'], $pkeyValues));
+        }
     }
 
     /**
@@ -442,6 +638,10 @@ class RowEditor
             $this->deleteField->setRow($row);
         }
 
+        if (array_key_exists($modelName, $this->defaultsByModelName)) {
+            $this->applyDefaultsToRow($row, $this->defaultsByModelName[$modelName]);
+        }
+
         $this->rowsByName[$modelName] = $row;
 
         return $this;
@@ -467,6 +667,16 @@ class RowEditor
         }
 
         return $this->rowsByName[$modelName];
+    }
+
+    /**
+     * Get all the row objects from this editor.
+     *
+     * @return array
+     */
+    public function getRows()
+    {
+        return $this->rowsByName;
     }
 
     /**

@@ -12,7 +12,6 @@ namespace Dewdrop\Admin\Page\Stock;
 
 use Dewdrop\Admin\Component\ComponentAbstract;
 use Dewdrop\Admin\Component\CrudInterface;
-use Dewdrop\Admin\Page\PageAbstract;
 use Dewdrop\Admin\ResponseHelper\Standard as ResponseHelper;
 use Dewdrop\Db\Field as DbField;
 use Dewdrop\Fields;
@@ -25,7 +24,7 @@ use Dewdrop\Notification\Gateway as NotificationGateway;
  * for a component.  We're hoping to develop this feature so that users can be
  * notified when items in their components are created or updated.
  */
-class NotificationEdit extends PageAbstract
+class NotificationEdit extends StockPageAbstract
 {
     /**
      * The CRUD component.
@@ -98,5 +97,7 @@ class NotificationEdit extends PageAbstract
             'rowEditor'       => $this->rowEditor,
             'breadcrumbTitle' => ($this->rowEditor->isNew() ? 'Add' : 'Edit')
         ]);
+
+        return $this->renderView();
     }
 }

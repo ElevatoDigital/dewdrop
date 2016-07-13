@@ -27,6 +27,21 @@ class Mock implements DriverInterface
      */
     private $adapter;
 
+    public function listMissingForeignKeyIndexes($tableName)
+    {
+        return [];
+    }
+
+    public function generateCreateIndexStatement($tableName, array $columnNames)
+    {
+        return '';
+    }
+
+    public function generateAnalyzeTableStatement($tableName)
+    {
+        return '';
+    }
+
     /**
      * Create new instance with the supplied adapter.
      *
@@ -58,6 +73,26 @@ class Mock implements DriverInterface
     public function fetchAll($sql, $bind = array(), $fetchMode = null)
     {
         return array();
+    }
+
+    /**
+     * Fetch all results for the supplied SQL query using a PHP generator.
+     *
+     * This approach uses less memory, but the result set has a forward-only cursor.
+     *
+     * The SQL query can be a simple string or a Select object.  The bind array
+     * should supply values for all the parameters, either named or numeric, in
+     * the query.  And the fetch mode should match one of these 4 class constants
+     * from \Dewdrop\Db\Adapter: ARRAY_A, ARRAY_N, OBJECT, or OBJECT_K.
+     *
+     * @param string|Select $sql
+     * @param array $bind
+     * @param string $fetchMode
+     * @return \Generator
+     */
+    public function fetchAllWithGenerator($sql, $bind = [], $fetchMode = null)
+    {
+        yield [];
     }
 
     /**
@@ -217,6 +252,16 @@ class Mock implements DriverInterface
      * Commit the current transaction.
      */
     public function commit()
+    {
+
+    }
+
+    /**
+     * Rollback the current transaction.
+     *
+     * @return void
+     */
+    public function rollback()
     {
 
     }

@@ -12,7 +12,6 @@ namespace Dewdrop\Admin\Page\Stock;
 
 use Dewdrop\Admin\Component\ComponentAbstract;
 use Dewdrop\Admin\Component\CrudInterface;
-use Dewdrop\Admin\Page\PageAbstract;
 use SqlFormatter;
 
 /**
@@ -24,7 +23,7 @@ use SqlFormatter;
  * on this page, but that might be tricky when factoring in cross-platform
  * support, etc.
  */
-class DebugListingSql extends PageAbstract
+class DebugListingSql extends StockPageAbstract
 {
     /**
      * The CRUD component.
@@ -44,5 +43,7 @@ class DebugListingSql extends PageAbstract
         $select = $this->component->getListing()->getModifiedSelect($this->component->getFields());
 
         $this->view->formattedSql = SqlFormatter::format((string) $select);
+
+        return $this->renderView();
     }
 }

@@ -10,15 +10,14 @@
 
 namespace Dewdrop\Bootstrap;
 
+use Dewdrop\ActivityLog\PimpleServiceProvider;
+use Dewdrop\Admin\PageFactory\Custom as CustomPageFactory;
 use Dewdrop\Auth\Db\UsersTableGateway;
 use Dewdrop\Config;
 use Dewdrop\Db\Adapter as DbAdapter;
+use Dewdrop\Env;
 use Dewdrop\Exception;
-use Dewdrop\Paths;
 use Pimple;
-use Silex\Application;
-use Silex\Provider\SessionServiceProvider;
-use WP_Session;
 
 /**
  * This class tracks down the bootstrap for your application and grabs
@@ -41,7 +40,8 @@ class Detector
         $config = new Config();
 
         if (!$config->has('bootstrap')) {
-            throw new Exception('Please define a bootstrap class in your dewdrop-config.php.');
+            $bootstrap = new Standalone();
+            return $bootstrap->getPimple();
         } else {
             $bootstrapClass = $config->get('bootstrap');
 
@@ -91,10 +91,6 @@ class Detector
                 throw new Exception("Pimple's db config must include a type of 'pgsql' or 'mysql'");
             }
         }
-
-        if (!isset($pimple['db']) || !$pimple['db'] instanceof DbAdapter) {
-            throw new Exception('Pimple must provide a \Dewdrop\Db\Adapter object in the db resource.');
-        }
     }
 
     /**
@@ -111,10 +107,12 @@ class Detector
         }
 
         $sharedResources = [
+            'custom-page-factory'           => '\Dewdrop\Admin\PageFactory\Custom',
             'dewdrop-request'               => '\Dewdrop\Request',
             'paths'                         => '\Dewdrop\Paths',
             'inflector'                     => '\Dewdrop\Inflector',
-            'db.field.input-filter-builder' => '\Dewdrop\Db\Field\InputFilterBuilder'
+            'db.field.input-filter-builder' => '\Dewdrop\Db\Field\InputFilterBuilder',
+            'view'                          => '\Dewdrop\View\View'
         ];
 
         foreach ($sharedResources as $resourceName => $className) {
@@ -124,6 +122,41 @@ class Detector
                         return new $className();
                     }
                 );
+            }
+        }
+
+        $activityLogServiceProvider = new PimpleServiceProvider();
+        $activityLogServiceProvider->register($pimple);
+
+        if ($pimple instanceof Application) {
+            $pimple->error(
+                function (Exception $e) use ($pimple) {
+                    if ($pimple['debug']) {
+                        return new Response($e->render());
+                    }
+                }
+            );
+        }
+
+        $env = Env::getInstance();
+
+        $env->initializePimple($pimple);
+
+        if (!isset($pimple['url-filter'])) {
+            $pimple['url-filter'] = $pimple->share(
+                $pimple->protect(
+                    function ($url) {
+                        return $url;
+                    }
+                )
+            );
+        }
+
+        if (!isset($pimple['session'])) {
+            $env->providePimpleSessionResource($pimple);
+
+            if (!isset($pimple['session']) || !isset($pimple['session.access'])) {
+                throw new Exception('Environment must provide session and session.access resources for Pimple.');
             }
         }
 
@@ -140,22 +173,6 @@ class Detector
                     }
                 }
             );
-        }
-
-        if (!isset($pimple['session'])) {
-            /* @var $paths Paths */
-            $paths = $pimple['paths'];
-            if ($paths->isWp()) {
-                $pimple['session'] = $pimple->share(
-                    function () {
-                        return WP_Session::get_instance();
-                    }
-                );
-            } elseif ($pimple instanceof Application) {
-                $pimple->register(new SessionServiceProvider());
-            } else {
-                throw new Exception('Silex application unavailable but not in WordPress');
-            }
         }
 
         if (!isset($pimple['users-gateway'])) {

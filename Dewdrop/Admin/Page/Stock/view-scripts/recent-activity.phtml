@@ -1,0 +1,103 @@
+<?php
+
+use Dewdrop\Fields;
+use Dewdrop\Fields\Helper\TableCell\Content as TableCell;
+
+?>
+
+<ol class="breadcrumb">
+    <li><a href="<?php echo $this->escapeHtmlAttr($this->adminUrl('index'));?>"><?php echo $this->escapeHtml($this->title);?></a></li>
+    <li class="active">
+        <?php
+        if (!$this->entity) {
+            echo 'Recent Activity';
+        } else {
+            /* @var $entity \Dewdrop\ActivityLog\Entity */
+            $entity = $this->entity;
+
+            printf('Recent Activity Related to %s', $this->escapeHtml($entity->getTitle()));
+        }
+        ?>
+    </li>
+</ol>
+
+<?php
+$fields = new Fields();
+
+$fields
+    ->add('date')
+        ->setVisible(true)
+        ->setLabel('Date')
+        ->assignHelperCallback(
+            'TableCell.Content',
+            function (TableCell $helper, array $rowData) {
+                /* @var $date \DateTimeImmutable */
+                $date = $rowData['date'];
+
+                return $helper->getView()->escapeHtml(
+                    $date->format('M j, Y g:iA')
+                );
+            }
+        )
+    ->add('message')
+        ->setVisible(true)
+        ->setLabel('Message')
+        ->assignHelperCallback(
+            'TableCell.Content',
+            function (TableCell $helper, array $rowData) {
+                /* @var $entry \Dewdrop\ActivityLog\Entry */
+                $entry = $rowData['entry'];
+                return $helper->getView()->activityLogMessage($entry);
+            }
+        )
+    ->add('information')
+        ->setVisible(true)
+        ->setLabel('Additional Info')
+        ->assignHelperCallback(
+            'TableCell.Content',
+            function (TableCell $helper, array $rowData) {
+                if (!$rowData['user_info']) {
+                    return null;
+                }
+
+                return $helper->getView()->activityLogUserInformation($rowData['user_info']);
+            }
+        );
+
+$data = [];
+
+/* @var $entry \Dewdrop\ActivityLog\Entry */
+foreach ($this->entries as $entry) {
+    $data[] = [
+        'entry'     => $entry,
+        'date'      => $entry->getDate(),
+        'user_info' => $entry->getUserInformation()
+    ];
+}
+
+if (!$this->entryCount) {
+    if (!$this->entity) {
+        printf(
+            '<div class="alert alert-warning">No recent %s activity found.</div>',
+            $this->escapeHtml($this->title)
+        );
+    } else {
+        /* @var $entity \Dewdrop\ActivityLog\Entity */
+        $entity = $this->entity;
+
+        printf(
+            '<div class="alert alert-warning">No recent %s activity found related to %s.</div>',
+            $this->escapeHtml($this->title),
+            $this->escapeHtml($entity->getTitle())
+        );
+    }
+} else {
+    echo $this->bootstrapTable($fields, $data);
+
+    echo $this->pagination(
+        $this->entryCount,
+        $this->pageSize,
+        $this->currentPage,
+        'Entries'
+    );
+}

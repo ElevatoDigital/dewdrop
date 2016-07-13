@@ -12,7 +12,6 @@ namespace Dewdrop\Admin\Page\Stock;
 
 use Dewdrop\Admin\Component\ComponentAbstract;
 use Dewdrop\Admin\Component\CrudInterface;
-use Dewdrop\Admin\Page\PageAbstract;
 
 /**
  * This page, typically rendered in a modal rather than as an independent
@@ -22,7 +21,7 @@ use Dewdrop\Admin\Page\PageAbstract;
  * too.  It just shows _all_ available visible fields rather than only those
  * that pass the component's visibility filter.
  */
-class View extends PageAbstract
+class View extends StockPageAbstract
 {
     /**
      * The CRUD component.
@@ -47,7 +46,14 @@ class View extends PageAbstract
         $listing = $this->component->getListing();
         $id      = $this->request->getQuery($listing->getPrimaryKey()->getName());
         $fields  = $this->component->getFields()->getVisibleFields();
-        $data    = $this->component->getListing()->fetchRow($fields, $id);
+
+        if ($this->component->getPermissions()->can('restore') && $listing->hasSelectModifier('SelectDeletedRecords')) {
+            /* @var $deletedRecordsModifier \Dewdrop\Fields\Helper\SelectDeletedRecords */
+            $deletedRecordsModifier = $listing->getSelectModifierByName('SelectDeletedRecords');
+            $deletedRecordsModifier->disable();
+        }
+
+        $data = $listing->fetchRow($fields, $id);
 
         $primaryKey = $this->component->getPrimaryModel()->getPrimaryKey();
         $params     = array();
@@ -63,12 +69,15 @@ class View extends PageAbstract
             'data'           => $data,
             'id'             => $id,
             'groupingFilter' => $this->component->getFieldGroupsFilter(),
-            'permissions'    => $this->component->getPermissions()
+            'permissions'    => $this->component->getPermissions(),
+            'isAjax'         => $this->request->isAjax()
         ]);
 
         // When requested over XHR, turn off the layout (admin shell chrome)
-        if ($this->component->getRequest()->isAjax()) {
+        if ($this->request->isAjax()) {
             $this->component->setShouldRenderLayout(false);
         }
+
+        return $this->renderView();
     }
 }

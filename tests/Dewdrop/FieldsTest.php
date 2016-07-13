@@ -389,4 +389,91 @@ class FieldsTest extends PHPUnit_Framework_TestCase
             break;
         }
     }
+
+    public function testCanRetrievePositionForExistingField()
+    {
+        $this->assertTrue($this->fields->has('visible', $visiblePosition));
+        $this->assertSame(0, $visiblePosition);
+
+        $this->assertTrue($this->fields->has('sortable', $sortablePosition));
+        $this->assertSame(1, $sortablePosition);
+
+        $this->assertTrue($this->fields->has('editable', $editablePosition));
+        $this->assertSame(2, $editablePosition);
+
+        $this->assertTrue($this->fields->has('filterable', $filterablePosition));
+        $this->assertSame(3, $filterablePosition);
+    }
+
+    public function testCanInsertAFieldIntoAPositionImmediatelyAfterAnExistingField()
+    {
+        // Insert a field after the first field
+        $this->assertInstanceOf('Dewdrop\Fields\FieldInterface', $this->fields->insertAfter('second', 'visible'));
+
+        $this->assertCount(5, $this->fields);
+
+        $this->assertTrue($this->fields->has('visible', $visiblePosition));
+        $this->assertSame(0, $visiblePosition);
+
+        $this->assertTrue($this->fields->has('second', $secondPosition));
+        $this->assertSame(1, $secondPosition);
+
+        $this->assertTrue($this->fields->has('sortable', $sortablePosition));
+        $this->assertSame(2, $sortablePosition);
+
+        $this->assertTrue($this->fields->has('editable', $editablePosition));
+        $this->assertSame(3, $editablePosition);
+
+        $this->assertTrue($this->fields->has('filterable', $filterablePosition));
+        $this->assertSame(4, $filterablePosition);
+
+        // Insert a field after some field in the middle
+        $this->assertInstanceOf('Dewdrop\Fields\FieldInterface', $this->fields->insertAfter('fourth', 'sortable'));
+
+        $this->assertCount(6, $this->fields);
+
+        $this->assertTrue($this->fields->has('visible', $visiblePosition));
+        $this->assertSame(0, $visiblePosition);
+
+        $this->assertTrue($this->fields->has('second', $secondPosition));
+        $this->assertSame(1, $secondPosition);
+
+        $this->assertTrue($this->fields->has('sortable', $sortablePosition));
+        $this->assertSame(2, $sortablePosition);
+
+        $this->assertTrue($this->fields->has('fourth', $sortablePosition));
+        $this->assertSame(3, $sortablePosition);
+
+        $this->assertTrue($this->fields->has('editable', $editablePosition));
+        $this->assertSame(4, $editablePosition);
+
+        $this->assertTrue($this->fields->has('filterable', $filterablePosition));
+        $this->assertSame(5, $filterablePosition);
+
+        // Insert a field after the last field
+        $this->assertInstanceOf('Dewdrop\Fields\FieldInterface', $this->fields->insertAfter('last', 'filterable'));
+
+        $this->assertCount(7, $this->fields);
+
+        $this->assertTrue($this->fields->has('visible', $visiblePosition));
+        $this->assertSame(0, $visiblePosition);
+
+        $this->assertTrue($this->fields->has('second', $secondPosition));
+        $this->assertSame(1, $secondPosition);
+
+        $this->assertTrue($this->fields->has('sortable', $sortablePosition));
+        $this->assertSame(2, $sortablePosition);
+
+        $this->assertTrue($this->fields->has('fourth', $sortablePosition));
+        $this->assertSame(3, $sortablePosition);
+
+        $this->assertTrue($this->fields->has('editable', $editablePosition));
+        $this->assertSame(4, $editablePosition);
+
+        $this->assertTrue($this->fields->has('filterable', $filterablePosition));
+        $this->assertSame(5, $filterablePosition);
+
+        $this->assertTrue($this->fields->has('last', $filterablePosition));
+        $this->assertSame(6, $filterablePosition);
+    }
 }

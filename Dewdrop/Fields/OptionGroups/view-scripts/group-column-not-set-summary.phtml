@@ -1,0 +1,24 @@
+<h4>Background</h4>
+
+<p>
+    The \Dewdrop\Fields\OptionGroups class enables you to fetch options grouped by a specified column.  This can be
+    useful for UI controls like cascading selects where the options changed based upon the value of a related parent
+    control.  To enable OptionGroups to do this, you have to call its setGroupColumn() method to tell it which column
+    in your options look-up table can be used to arrange the options into groups.
+</p>
+<p>
+    See the examples tab for more information.
+</p>
+
+<h4>Your Code</h4>
+
+<p>
+    You've attempted to fetch options from the <code><?php echo $this->escapeHtml($this->tableName);?></code> table.
+    These are the columns in the table that you might pass to setGroupColumn() to group your options:
+</p>
+
+<ul class="list-group">
+    <?php foreach ($this->columns as $column => $metadata) :?>
+    <li class="list-group-item"><?php echo $this->escapeHtml($column);?></li>
+    <?php endforeach;?>
+</ul>

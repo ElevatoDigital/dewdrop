@@ -2,7 +2,7 @@
 
 namespace Dewdrop\Cli\Renderer;
 
-use Dewdrop\Cli\Renderer\Markdown;
+require_once __DIR__ . '/MockStdinConsole.php';
 
 class MarkdownTest extends \PHPUnit_Framework_TestCase
 {
@@ -84,5 +84,50 @@ class MarkdownTest extends \PHPUnit_Framework_TestCase
         $out = ob_get_clean();
 
         $this->assertEquals(PHP_EOL, $out);
+    }
+
+    public function testCanPromptForLineOfInput()
+    {
+        $mockStdinConsole = new MockStdinConsole();
+        $mockStdinConsole->setMockStdinContent('ask');
+        $renderer = new Markdown($mockStdinConsole);
+        $this->assertEquals('ask', $renderer->ask('What is the answer?'));
+    }
+
+    public function testCanPromptForConfirmation()
+    {
+        /**
+         * Wrapping in output buffer here because of bug in the ZF2 Confirm
+         * prompt where it echos directly rather than writing to the console
+         * with the Adapter.
+         */
+        ob_start();
+        $mockStdinConsole = new MockStdinConsole();
+        $mockStdinConsole->setMockStdinContent('y');
+        $renderer = new Markdown($mockStdinConsole);
+        $this->assertTrue($renderer->confirm('Is it?', false));
+        ob_get_clean();
+    }
+
+    public function testCanPromptForSecrets()
+    {
+        $mockStdinConsole = new MockStdinConsole();
+        $mockStdinConsole->setMockStdinContent('psst' . PHP_EOL);
+        $renderer = new Markdown($mockStdinConsole);
+        $this->assertEquals('psst', $renderer->secret('What is the password?'));
+    }
+
+    public function testCanPromptForSelectionFromOptions()
+    {
+        $mockStdinConsole = new MockStdinConsole();
+        $mockStdinConsole->setMockStdinContent('m');
+        $renderer = new Markdown($mockStdinConsole);
+        $this->assertEquals(
+            'm',
+            $renderer->select(
+                'Which one?',
+                ['m' => 'Monkey', 'p' => 'Panda']
+            )
+        );
     }
 }
