@@ -299,7 +299,7 @@ class SelectSort extends HelperAbstract implements SelectModifierInterface
     /**
      * Get the field the Select is currently sorted by.
      *
-     * @deprecated @todo Add something here
+     * @deprecated Use getSortedFields() instead.
      * @return FieldInterface
      */
     public function getSortedField()
@@ -310,7 +310,7 @@ class SelectSort extends HelperAbstract implements SelectModifierInterface
     /**
      * Get the direction the Select is currently sorted.
      *
-     * @deprecated @todo Add something here
+     * @deprecated Use getSortedFields() instead.
      * @return string
      */
     public function getSortedDirection()
