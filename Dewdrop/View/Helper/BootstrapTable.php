@@ -91,7 +91,7 @@ HTML;
     protected function renderSortLink($content, $queryStringId, $direction, SelectSort $sorter = null)
     {
         $caret        = '';
-        $sortedFields = $sorter->getSortedFields();
+        $sortedFields = ($sorter) ? $sorter->getSortedFields() : [];
 
         if (isset($sortedFields[$queryStringId])) {
             $activeDirection = $sortedFields[$queryStringId];
