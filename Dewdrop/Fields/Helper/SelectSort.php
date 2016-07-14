@@ -74,6 +74,13 @@ class SelectSort extends HelperAbstract implements SelectModifierInterface
     private $sortedDirection;
 
     /**
+     * Collection of field query string ids and their sorted direction.
+     *
+     * @var array
+     */
+    private $sortedFields = [];
+
+    /**
      * The default field we'll sort by.
      *
      * @var FieldInterface
@@ -198,14 +205,30 @@ class SelectSort extends HelperAbstract implements SelectModifierInterface
     {
         $this->sortedField     = null;
         $this->sortedDirection = null;
+        $numberOfSorts         = 0;
+        $sortableFields        = $fields->getSortableFields();
+        $sorts                 = (array) $this->request->getQuery($this->prefix . 'sort');
+        $dirs                  = (array) $this->request->getQuery($this->prefix . 'dir');
 
-        /* @var $field FieldInterface */
-        foreach ($fields->getSortableFields() as $field) {
-            if ($field->getQueryStringId() === urlencode($this->request->getQuery($this->prefix . 'sort'))) {
+        if (count($sorts) !== count($dirs)) {
+            return $this->applyDefaultSorting($fields, $select);
+        }
+
+        for ($i=0; $i < count($sorts); $i++) {
+            $id    = urlencode($sorts[$i]);
+            $field = $sortableFields->getByQueryStringId($id);
+
+            if ($field) {
                 if ('ASC' === $this->defaultDirection) {
-                    $dir = ('DESC' === strtoupper($this->request->getQuery($this->prefix . 'dir')) ? 'DESC' : 'ASC');
+                    $dir = ('DESC' === strtoupper($dirs[$i]) ? 'DESC' : 'ASC');
                 } else {
-                    $dir = ('ASC' === strtoupper($this->request->getQuery($this->prefix . 'dir')) ? 'ASC' : 'DESC');
+                    $dir = ('ASC' === strtoupper($dirs[$i]) ? 'ASC' : 'DESC');
+                }
+
+                // support for deprecated single field sort
+                if (0 === $i) {
+                    $this->sortedField     = $field;
+                    $this->sortedDirection = $dir;
                 }
 
                 $select = call_user_func(
@@ -216,19 +239,34 @@ class SelectSort extends HelperAbstract implements SelectModifierInterface
 
                 if (!$select instanceof Select) {
                     throw new Exception('Your SelectSort callback must return the modified Select object.');
+                } else {
+                    $this->sortedFields[$field->getQueryStringId()] = $dir;
+                    $numberOfSorts++;
                 }
-
-                $this->sortedField     = $field;
-                $this->sortedDirection = $dir;
-
-                return $select;
             }
         }
 
         // Sort by the first visible field that is also sortable, if no other sort was performed
+        if (0 === $numberOfSorts) {
+            return $this->applyDefaultSorting($fields, $select);
+        }
+
+        return $select;
+    }
+
+    /**
+     * Apply default sorting and its sort callback to the query.
+     *
+     * @param Fields $fields
+     * @param Select $select
+     * @throws \Dewdrop\Fields\Exception
+     * @return Select
+     */
+    private function applyDefaultSorting(Fields $fields, Select $select)
+    {
         foreach ($fields->getVisibleFields() as $field) {
             if ($field->isSortable() && (null === $this->defaultField || $this->defaultField === $field)) {
-                $this->sortedField     = $field;
+                $this->sortedField = $field;
                 $this->sortedDirection = $this->defaultDirection;
 
                 return call_user_func($this->getFieldAssignment($field), $select, $this->defaultDirection);
@@ -245,12 +283,23 @@ class SelectSort extends HelperAbstract implements SelectModifierInterface
      */
     public function isSorted()
     {
-        return null !== $this->sortedField;
+        return null !== $this->sortedFields;
+    }
+
+    /**
+     * Get collection of actively sorted fields.
+     *
+     * @return array
+     */
+    public function getSortedFields()
+    {
+        return $this->sortedFields;
     }
 
     /**
      * Get the field the Select is currently sorted by.
      *
+     * @deprecated @todo Add something here
      * @return FieldInterface
      */
     public function getSortedField()
@@ -261,6 +310,7 @@ class SelectSort extends HelperAbstract implements SelectModifierInterface
     /**
      * Get the direction the Select is currently sorted.
      *
+     * @deprecated @todo Add something here
      * @return string
      */
     public function getSortedDirection()

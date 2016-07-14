@@ -37,6 +37,26 @@ class TableTest extends BaseTestCase
                 }
             );
         $this->fields->add($field);
+
+        $field = new Field();
+
+        $field
+            ->setId('test-field-name')
+            ->setVisible(true)
+            ->setSortable(true)
+            ->assignHelperCallback(
+                'TableCell.Content',
+                function ($helper, $view) {
+                    return 'test-field-name-value';
+                }
+            )
+            ->assignHelperCallback(
+                'tablecell.tdclassnames',
+                function ($helper, $view) {
+                    return ['test-field-name-class'];
+                }
+            );
+        $this->fields->add($field);
     }
 
     public function testOmittingAllArgumentsReturnsSelf()
@@ -169,7 +189,7 @@ class TableTest extends BaseTestCase
 
         $sorter = $this->getMock(
             '\Dewdrop\Fields\Helper\SelectSort',
-            ['isSorted', 'getSortedField', 'getSortedDirection'],
+            ['isSorted', 'getSortedFields'],
             [$request]
         );
 
@@ -177,19 +197,48 @@ class TableTest extends BaseTestCase
             ->method('isSorted')
             ->will($this->returnValue(true));
 
-        $fieldSortedOn = $this->fields->get('test-field-id');
         $sorter->expects($this->any())
-            ->method('getSortedField')
-            ->will($this->returnValue($fieldSortedOn));
+            ->method('getSortedFields')
+            ->will($this->returnValue(array('test-field-id' => 'ASC')));
 
-        $sorter->expects($this->any())
-            ->method('getSortedDirection')
-            ->will($this->returnValue('ASC'));
 
         $out = $this->view->table($this->fields, array(), null, $sorter);
         $result = $this->queryDom('table thead th a', $out);
-        $out = $result->current()->getAttribute('href');
+        $out = $result[0]->getAttribute('href');
 
         $this->assertEquals('?sort=test-field-id&dir=desc', $out);
+    }
+
+    public function testTableHeaderSortLinkForMultipleSortedFields()
+    {
+        $request = $this->view->getRequest();
+        $request
+            ->setQuery('sort', ['test-field-id', 'test-field-name'])
+            ->setQuery('dir', ['desc', 'asc']);
+
+        $sorter = $this->getMock(
+            '\Dewdrop\Fields\Helper\SelectSort',
+            ['isSorted', 'getSortedFields'],
+            [$request]
+        );
+
+        $sorter->expects($this->any())
+            ->method('isSorted')
+            ->will($this->returnValue(true));
+
+        $sorter->expects($this->any())
+            ->method('getSortedFields')
+            ->will($this->returnValue(array('test-field-id' => 'DESC', 'test-field-name' => 'ASC')));
+
+        $out = $this->view->table($this->fields, array(), null, $sorter);
+        $result = $this->queryDom('table thead th a', $out);
+        $result1 = $result[0];
+        $result2 = $result[1];
+
+        $out1 = $result1->getAttribute('href');
+        $out2 = $result2->getAttribute('href');
+
+        $this->assertEquals('?sort=test-field-id&dir=asc', $out1);
+        $this->assertEquals('?sort=test-field-name&dir=desc', $out2);
     }
 }

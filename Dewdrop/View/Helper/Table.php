@@ -187,11 +187,14 @@ class Table extends AbstractHelper
      */
     protected function renderHeadCells(Fields $fields, TableCellHelper $renderer, SelectSort $sorter = null)
     {
-        $out = '';
+        $out          = '';
+        $sortedFields = ($sorter) ? $sorter->getSortedFields() : [];
 
+        //var_dump($sortedFields);
         /* @var $field FieldInterface */
         foreach ($fields as $index => $field) {
-            $out .= '<th scope="col">';
+            $queryStringId = $field->getQueryStringId();
+            $out          .= '<th scope="col">';
 
             $content = $renderer->getHeaderRenderer()->render($field);
 
@@ -200,16 +203,16 @@ class Table extends AbstractHelper
             } else {
                 $direction = 'asc';
 
-                if ($sorter && $sorter->getSortedField() === $field && 'ASC' === $sorter->getSortedDirection()) {
+                if (isset($sortedFields[$queryStringId]) && 'ASC' === $sortedFields[$queryStringId]) {
                     $direction = 'desc';
                 }
 
-                $out .= $this->renderSortLink($content, $field->getQueryStringId(), $direction, $sorter);
+                $out .= $this->renderSortLink($content, $queryStringId, $direction, $sorter);
             }
 
             $out .= '</th>';
         }
-
+//die;
         return $out;
     }
 
@@ -218,6 +221,12 @@ class Table extends AbstractHelper
         return ('asc' === strtolower($direction) ? 'desc' : 'asc');
     }
 
+    /**
+     * @deprecated This is no longer used, use the getSortedFields method of SelectSort instead.
+     * @param string $fieldId
+     * @param SelectSort|null $sorter
+     * @return string
+     */
     protected function getActiveSortDirection($fieldId, SelectSort $sorter = null)
     {
         if (!$sorter) {
