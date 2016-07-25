@@ -94,7 +94,7 @@ class Field extends BaseField
      *
      * @return array
      */
-    protected function getOptionPairsReference()
+    public function getOptionPairsReference()
     {
         return $this->manyToManyRelationship->getOptionPairsReference();
     }
