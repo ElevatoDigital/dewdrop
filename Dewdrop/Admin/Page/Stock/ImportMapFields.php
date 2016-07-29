@@ -73,6 +73,9 @@ class ImportMapFields extends StockPageAbstract
         $this->importFile    = $this->importGateway->loadFile($this->request->getQuery('id'));
     }
 
+    /**
+     * @param ResponseHelper $helper
+     */
     public function process(ResponseHelper $helper)
     {
         if ($this->request->isPost()) {

@@ -5,7 +5,6 @@ namespace Dewdrop\Admin\Page\Stock;
 use Dewdrop\Admin\Component\ComponentAbstract;
 use Dewdrop\Admin\Component\CrudInterface;
 use Dewdrop\Admin\ResponseHelper\Standard as ResponseHelper;
-use Dewdrop\Exception;
 use Dewdrop\Import\DbGateway;
 use Dewdrop\Import\File as ImportFile;
 use Dewdrop\Import\InputFilterFactory as ImportInputFilterFactory;
@@ -43,6 +42,9 @@ class Import extends StockPageAbstract
         $this->component->getPermissions()->haltIfNotAllowed('import');
     }
 
+    /**
+     * @param ResponseHelper $helper
+     */
     public function process(ResponseHelper $helper)
     {
         if ($this->request->isPost()) {

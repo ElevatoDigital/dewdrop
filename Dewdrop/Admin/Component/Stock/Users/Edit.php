@@ -39,7 +39,7 @@ class Edit extends StockEdit
      *
      * @todo Find a better way to handle the password hashing.
      *
-     * @param \Dewdrop\Admin\ResponseHelper\Standard $responseHelper
+     * @param ResponseHelper $responseHelper
      * @return void
      */
     public function process(ResponseHelper $responseHelper)
