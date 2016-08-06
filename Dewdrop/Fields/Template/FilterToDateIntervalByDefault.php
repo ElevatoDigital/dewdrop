@@ -8,6 +8,21 @@ use Dewdrop\Fields\FieldInterface;
 
 class FilterToDateIntervalByDefault
 {
+    /**
+     * @var DateInterval
+     */
+    private $dateInterval;
+
+    /**
+     * @var DateTimeImmutable
+     */
+    private $startDate;
+
+    /**
+     * FilterToDateIntervalByDefault constructor.
+     * @param string $intervalString
+     * @param DateTimeImmutable|null $startDate
+     */
     public function __construct($intervalString, DateTimeImmutable $startDate = null)
     {
         $this->dateInterval = DateInterval::createFromDateString($intervalString);
