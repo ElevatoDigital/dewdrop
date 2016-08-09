@@ -1,8 +1,10 @@
 <?php
+/* @var $selectFilter \Dewdrop\Fields\Helper\SelectFilter */
 $selectFilter = $this->component->getListing()->getSelectModifierByName('SelectFilter');
+$hasFilters   = $selectFilter->hasFilters($this->component->getFields());
 ?>
 
-<div id="admin-filter-panel" class="panel panel-default admin-filter-panel collapse<?php echo ($selectFilter->hasFilters() ? ' in' : '');?>">
+<div id="admin-filter-panel" class="panel panel-default admin-filter-panel collapse<?php echo ($hasFilters ? ' in' : '');?>">
     <div class="panel-body">
         <?php echo $this->form;?>
     </div>
