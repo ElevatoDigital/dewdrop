@@ -60,7 +60,7 @@ use Symfony\Component\Security\Core\Encoder\BCryptPasswordEncoder;
  *     user_password_change_token_id SERIAL PRIMARY KEY,
  *     user_id INTEGER NOT NULL REFERENCES users,
  *     token VARCHAR(60) NOT NULL UNIQUE,
- *     date_created TIMESTAMP NOT NULL DEFAULT NOW()
+ *     date_created TIMESTAMP NOT NULL DEFAULT NOW(),
  *     used BOOLEAN NOT NULL DEFAULT FALSE
  * );
  * </pre>
