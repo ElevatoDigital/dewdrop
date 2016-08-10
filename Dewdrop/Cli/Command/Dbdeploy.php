@@ -90,7 +90,7 @@ class Dbdeploy extends CommandAbstract
      *
      * @var array
      */
-    private $changesets = array();
+    protected $changesets = array();
 
     /**
      * The name of the changelog table.  This is not intended to be modified
@@ -248,6 +248,8 @@ class Dbdeploy extends CommandAbstract
      */
     public function execute()
     {
+        $this->dbType = $this->runner->getPimple()['config']['db']['type'];
+
         $this->initChangesets();
 
         if (null === $this->action) {
@@ -520,10 +522,8 @@ class Dbdeploy extends CommandAbstract
      *
      * @return void
      */
-    private function initChangesets()
+    protected function initChangesets()
     {
-        $this->dbType = $this->runner->getPimple()['config']['db']['type'];
-
         $mainChangesetName = Env::getInstance()->getProjectNoun();
 
         $defaultChangesets = [
