@@ -194,13 +194,19 @@ class Auth
             'token'   => $token,
         ]);
 
-        if ('80' !== $_SERVER['SERVER_PORT']) {
+        if (!in_array($_SERVER['SERVER_PORT'], ['80', '443'])) {
             $port = ":{$_SERVER['SERVER_PORT']}";
         } else {
             $port = '';
         }
 
-        $resetPasswordUrl = "http://{$_SERVER['SERVER_NAME']}{$port}/auth/reset-password?token=" .
+        if (isset($_SERVER['HTTPS']) && filter_var($_SERVER['HTTPS'], FILTER_VALIDATE_BOOLEAN)) {
+            $scheme = 'https';
+        } else {
+            $scheme = 'http';
+        }
+
+        $resetPasswordUrl = "{$scheme}://{$_SERVER['SERVER_NAME']}{$port}/auth/reset-password?token=" .
             rawurlencode($token);
 
         $mailView = new MailView();
