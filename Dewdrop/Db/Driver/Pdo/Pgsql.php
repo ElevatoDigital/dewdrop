@@ -572,6 +572,7 @@ class Pgsql implements DriverInterface
             case 'int':
             case 'int2':
             case 'int4':
+            case '_int4':
             case 'integer':
             case 'serial':
             case 'serial4':
