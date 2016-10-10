@@ -20,6 +20,8 @@ use \Dewdrop\Pimple;
         ?>
 
         <?php
+        echo $this->headLink();
+
         if ($this->viewHeadLink) {
             echo $this->urlCachePrefix()->headLink($this->viewHeadLink);
         }
@@ -159,6 +161,8 @@ use \Dewdrop\Pimple;
         </script>
 
         <?php
+        echo $this->headScript();
+        
         if ($this->viewHeadScript) {
             echo $this->urlCachePrefix()->headScript($this->viewHeadScript);
         }
