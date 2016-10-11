@@ -55,6 +55,13 @@ class Silex extends EnvAbstract
     private $layoutName = 'silex.phtml';
 
     /**
+     * The View object used to render the layout script.
+     *
+     * @var View
+     */
+    private $layout;
+
+    /**
      * Provide a \Silex\Application object that can be used to retrieve
      * resources, register routes, etc.
      *
@@ -173,6 +180,21 @@ class Silex extends EnvAbstract
     }
 
     /**
+     * Get the View object used to render the layout.  Allows you to add project-specific CSS or JS and call
+     * other view helpers as needed.
+     * 
+     * @return View
+     */
+    public function getLayout()
+    {
+        if (!$this->layout) {
+            $this->layout = Pimple::getResource('view');
+        }
+
+        return $this->layout;
+    }
+
+    /**
      * Render the admin shell's layout, placing the supplied content in the
      * appropriate area of the HTML.
      *
@@ -183,7 +205,7 @@ class Silex extends EnvAbstract
      */
     public function renderLayout($content, HeadScript $headScript = null, HeadLink $headLink = null)
     {
-        $view = Pimple::getResource('view');
+        $view = $this->getLayout();
         $view->setScriptPath($this->layoutPath);
 
         $session = ($this->session ?: $this->application['session']);

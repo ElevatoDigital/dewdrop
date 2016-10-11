@@ -11,6 +11,7 @@
 namespace Dewdrop\Admin\Component\Stock\Users;
 
 use Dewdrop\Admin\Page\PageAbstract;
+use Dewdrop\Admin\ResponseHelper\Standard as ResponseHelper;
 use Dewdrop\Fields;
 use Dewdrop\Pimple;
 use Zend\InputFilter\Input;
@@ -99,10 +100,10 @@ class ChangePassword extends PageAbstract
      * to handle these kinds of actions so that you can easily test your
      * page's code.
      *
-     * @param \Dewdrop\Admin\ResponseHelper\Standard $responseHelper
-     * @return \Dewdrop\Admin\ResponseHelper\Standard|null
+     * @param ResponseHelper $responseHelper
+     * @return ResponseHelper|null
      */
-    public function process($responseHelper)
+    public function process(ResponseHelper $responseHelper)
     {
         $isCurrentUser = ($this->row->get('user_id') === Pimple::getResource('user')->get('user_id'));
 

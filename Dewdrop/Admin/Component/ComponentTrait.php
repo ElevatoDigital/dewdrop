@@ -10,6 +10,7 @@ use Dewdrop\Admin\Response;
 use Dewdrop\Exception;
 use Dewdrop\Inflector;
 use ReflectionClass;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 trait ComponentTrait
 {
@@ -258,6 +259,8 @@ trait ComponentTrait
 
         if (is_array($output)) {
             $this->renderJsonResponse($output);
+        } elseif ($output instanceof SymfonyResponse) {
+            return $output;
         } elseif (!$output) {
             // Capture output generated during render rather than returned
             $output = ob_get_clean();

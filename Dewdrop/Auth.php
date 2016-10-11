@@ -60,7 +60,7 @@ use Symfony\Component\Security\Core\Encoder\BCryptPasswordEncoder;
  *     user_password_change_token_id SERIAL PRIMARY KEY,
  *     user_id INTEGER NOT NULL REFERENCES users,
  *     token VARCHAR(60) NOT NULL UNIQUE,
- *     date_created TIMESTAMP NOT NULL DEFAULT NOW()
+ *     date_created TIMESTAMP NOT NULL DEFAULT NOW(),
  *     used BOOLEAN NOT NULL DEFAULT FALSE
  * );
  * </pre>
@@ -194,13 +194,19 @@ class Auth
             'token'   => $token,
         ]);
 
-        if ('80' !== $_SERVER['SERVER_PORT']) {
+        if (!in_array($_SERVER['SERVER_PORT'], ['80', '443'])) {
             $port = ":{$_SERVER['SERVER_PORT']}";
         } else {
             $port = '';
         }
 
-        $resetPasswordUrl = "http://{$_SERVER['SERVER_NAME']}{$port}/auth/reset-password?token=" .
+        if (isset($_SERVER['HTTPS']) && filter_var($_SERVER['HTTPS'], FILTER_VALIDATE_BOOLEAN)) {
+            $scheme = 'https';
+        } else {
+            $scheme = 'http';
+        }
+
+        $resetPasswordUrl = "{$scheme}://{$_SERVER['SERVER_NAME']}{$port}/auth/reset-password?token=" .
             rawurlencode($token);
 
         $mailView = new MailView();

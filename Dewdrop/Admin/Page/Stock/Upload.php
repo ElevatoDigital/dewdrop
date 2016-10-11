@@ -24,6 +24,12 @@ class Upload extends StockPageAbstract
      */
     private $uploadedFile;
 
+    /**
+     * FileHandler corresponding to the name provided in the request.
+     * @var FileHandler
+     */
+    private $requestedFileHandler;
+
     public function addFileHandler(FileHandler $fileHandler)
     {
         $this->fileHandlers[] = $fileHandler;
@@ -46,6 +52,7 @@ class Upload extends StockPageAbstract
             foreach ($this->fileHandlers as $fileHandler) {
                 foreach ($_FILES as $name => $fileInfo) {
                     if ($name === $fileHandler->getName()) {
+                        $this->requestedFileHandler = $fileHandler;
                         if ($this->isValid($fileHandler, $fileInfo)) {
                             $this->processValidUpload($fileHandler, $fileInfo);
                         }
@@ -92,7 +99,16 @@ class Upload extends StockPageAbstract
                 $this->error = [$this->error];
             }
 
-            return ['result' => 'error', 'messages' => $this->error];
+            $error = [
+                'result'   => 'error',
+                'messages' => $this->error
+            ];
+
+            if ($this->requestedFileHandler) {
+                $error['allowedMimeTypes'] = $this->requestedFileHandler->getAllowedMimeTypes();
+            }
+
+            return $error;
         } else {
             return [
                 'result'    => 'success',

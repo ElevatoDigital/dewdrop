@@ -110,6 +110,16 @@ class Relationship
     private $referenceTitleColumn;
 
     /**
+     * Whether duplicate values should be saved for this field.  By default, we assume a
+     * ManyToMany is something that could be well represented by a checkbox list in a UI.
+     * In some cases, however, the same item can be associated with your record many times.
+     * If that is the case, set this to true to allow those values to be added.
+     *
+     * @var bool
+     */
+    private $allowDuplicateValues = false;
+
+    /**
      * Create relationship using the supplied source table and cross-reference
      * table name.
      *
@@ -143,6 +153,17 @@ class Relationship
                 throw new Exception("ManyToMany\\Relationship: Unknown option \"$name\"");
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * @param boolean $allowDuplicateValues
+     * @return $this
+     */
+    public function setAllowDuplicateValues($allowDuplicateValues)
+    {
+        $this->allowDuplicateValues = $allowDuplicateValues;
 
         return $this;
     }
@@ -587,7 +608,7 @@ class Relationship
 
         // Insert new values
         foreach ($xrefValues as $value) {
-            if (!in_array($value, $existing)) {
+            if (!in_array($value, $existing) || $this->allowDuplicateValues) {
                 $db->insert(
                     $this->xrefTableName,
                     array(
@@ -632,7 +653,7 @@ class Relationship
             "{$this->xrefTableName}.{$this->getXrefAnchorColumnName()}"
         );
 
-        if (!count($xrefValues)) {
+        if (!count($xrefValues) || $this->allowDuplicateValues) {
             $where = "{$anchorName} = ?";
             $where = $db->quoteInto($where, $anchorValue);
         } else {
