@@ -571,7 +571,7 @@ class Field extends FieldAbstract
      *
      * @return array
      */
-    protected function getOptionPairsReference()
+    public function getOptionPairsReference()
     {
         return $this->table->getMetadata('references', $this->name);
     }

@@ -572,6 +572,7 @@ class Pgsql implements DriverInterface
             case 'int':
             case 'int2':
             case 'int4':
+            case '_int4':
             case 'integer':
             case 'serial':
             case 'serial4':
@@ -592,12 +593,16 @@ class Pgsql implements DriverInterface
             case 'unknown':
             case 'char':
             case 'bpchar':
+            case 'interval':
                 $genericType = 'text';
                 if (1 === $length) {
                     $genericType = 'boolean';
                 } elseif (strstr($nativeType, 'text') || $length > 500) {
                     $genericType = 'clob';
                 }
+                break;
+            case 'json':
+                $genericType = 'clob';
                 break;
             case 'date':
                 $genericType = 'date';

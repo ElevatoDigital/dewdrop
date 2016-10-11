@@ -81,7 +81,24 @@ class SelectFilter implements SelectModifierInterface
         return $this;
     }
 
-    public function hasFilters()
+    public function hasFilters(Fields $fields = null)
+    {
+        if (null === $fields) {
+            return $this->hasFiltersWithoutFields();
+        } else {
+            return 0 < count($this->selectModifier->getCurrentFilters($fields));
+        }
+    }
+
+    /**
+     * This is a fallback to an old hacky version of hasFilters() that didn't require the $fields param.  If
+     * you call hasFilters() with no value for the $fields param, you'll end up here.  This won't catch cases where
+     * a filter was added via DefaultVars.
+     *
+     * @deprecated
+     * @return bool
+     */
+    private function hasFiltersWithoutFields()
     {
         if (0 < count($this->selectModifier->getCustomFilters())) {
             return true;

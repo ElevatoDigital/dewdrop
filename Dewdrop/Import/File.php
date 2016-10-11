@@ -4,6 +4,7 @@ namespace Dewdrop\Import;
 
 use Dewdrop\Exception;
 use PHPExcel_IOFactory;
+use PHPExcel_Shared_Date;
 
 class File
 {
@@ -110,7 +111,11 @@ class File
 
             /* @var $cell \PHPExcel_Cell */
             foreach ($cellIterator as $cell) {
-                $rowData[] = trim($cell->getValue());
+                if (PHPExcel_Shared_Date::isDateTime($cell)) {
+                    $rowData[] = $cell->getFormattedValue();
+                } else {
+                    $rowData[] = trim($cell->getValue());
+                }
             }
 
             $data[] = $rowData;
