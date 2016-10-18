@@ -112,6 +112,7 @@ class Request
             $url .= '?';
             $needsAmpersand = false;
             foreach ($this->query as $name => $value) {
+                // @todo This throws warnings if the $name is an array. eg. ?sort[]=something
                 $url .= ($needsAmpersand ? '&' : '') . sprintf('%s=%s', rawurlencode($name), rawurlencode($value));
                 $needsAmpersand = true;
             }
