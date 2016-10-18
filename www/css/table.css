@@ -1,0 +1,7 @@
+/* DataTable specific styling */
+.bootstrap-table.dataTable th {
+    color: #428bca;
+}
+.bootstrap-table.dataTable th::after {
+    color: #444;
+}

@@ -10,7 +10,10 @@
 
 namespace Dewdrop\View\Helper;
 
+use Dewdrop\Admin\Component\CrudAbstract;
+use Dewdrop\Fields;
 use Dewdrop\Fields\Helper\SelectSort;
+use Dewdrop\Fields\Listing;
 
 /**
  * Render a table using classes and markup consistent with Boostrap's
@@ -109,5 +112,10 @@ HTML;
             $this->view->escapeHtml($content),
             $caret
         );
+    }
+
+    public function getData(Listing $listing, CrudAbstract $component, Fields $fields)
+    {
+        return $listing->fetchData($component->getFieldGroupsFilter()->apply($fields));
     }
 }

@@ -173,6 +173,14 @@ class SelectSort extends HelperAbstract implements SelectModifierInterface
     }
 
     /**
+     * @return FieldInterface
+     */
+    public function getDefaultField()
+    {
+        return $this->defaultField;
+    }
+
+    /**
      * Set the default direction that should be used when sorting.
      *
      * @param string $defaultDirection
@@ -193,6 +201,14 @@ class SelectSort extends HelperAbstract implements SelectModifierInterface
     }
 
     /**
+     * @return string
+     */
+    public function getDefaultDirection()
+    {
+        return $this->defaultDirection;
+    }
+
+    /**
      * Given the supplied $fields and \Dewdrop\Request object, find the field
      * referenced in the query string and apply its sort callback to the query.
      *
@@ -207,8 +223,9 @@ class SelectSort extends HelperAbstract implements SelectModifierInterface
         $this->sortedDirection = null;
         $numberOfSorts         = 0;
         $sortableFields        = $fields->getSortableFields();
-        $sorts                 = (array) $this->request->getQuery($this->prefix . 'sort');
-        $dirs                  = (array) $this->request->getQuery($this->prefix . 'dir');
+        $sort                  = $this->getSortFromRequest();
+        $sorts                 = $sort['sorts'];
+        $dirs                  = $sort['dirs'];
 
         if (count($sorts) !== count($dirs)) {
             return $this->applyDefaultSorting($fields, $select);
@@ -252,6 +269,61 @@ class SelectSort extends HelperAbstract implements SelectModifierInterface
         }
 
         return $select;
+    }
+
+    /**
+     * Get the sorted fields from the request.
+     * Sample Request values:
+     *
+     * page:PublicationPages
+     * route:index
+     * format:datatables
+     * draw:2
+     * columns[0][data]:0
+     * columns[0][name]:publication_pages-list_name // field's query string id
+     * columns[0][searchable]:true
+     * columns[0][orderable]:true
+     * columns[0][search][value]:
+     * columns[0][search][regex]:false
+     * columns[1][data]:1
+     * columns[1][name]:publication_pages-datetime_created // field's query string id
+     * columns[1][searchable]:true
+     * columns[1][orderable]:true
+     * columns[1][search][value]:
+     * columns[1][search][regex]:false
+     * order[0][column]:0
+     * order[0][dir]:asc
+     * order[1][column]:1
+     * order[1][dir]:desc
+     * start:0
+     * length:-1
+     * search[value]:
+     * search[regex]:false
+     */
+    protected function getSortFromRequest()
+    {
+        $sorts = [];
+        $dirs  = [];
+
+        if ('datatables' === $this->request->getQuery('format')) {
+            // @todo: move this logic into a new DataTablesSelectSort helper
+            $orders = $this->request->getQuery('order', []);
+            foreach ($orders as $order) {
+                $columns = $this->request->getQuery('columns', []);
+                $fieldId = $columns[ $order['column'] ]['name'];
+
+                $sorts[] = $fieldId;
+                $dirs[]  = $order['dir'];
+            }
+        } else {
+            $sorts = (array) $this->request->getQuery($this->prefix . 'sort');
+            $dirs  = (array) $this->request->getQuery($this->prefix . 'dir');
+        }
+
+        return [
+            'sorts' => $sorts,
+            'dirs'  => $dirs
+        ];
     }
 
     /**

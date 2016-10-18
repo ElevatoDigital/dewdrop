@@ -156,6 +156,14 @@ class SelectPaginate extends HelperAbstract implements SelectModifierInterface
      */
     public function getPage()
     {
+        if ('datatables' === $this->request->getQuery('format')) {
+            // DataTables provides us with 'start'
+            $start      = (int) $this->request->getQuery('start', $this->getPageSize());
+            $this->page = ($start / $this->getPageSize()) + 1;
+        } else {
+            $this->page = (int) $this->request->getQuery($this->prefix . 'listing-page', 1);
+        }
+
         return $this->page;
     }
 
@@ -197,13 +205,13 @@ class SelectPaginate extends HelperAbstract implements SelectModifierInterface
      */
     public function modifySelect(Fields $fields, Select $select)
     {
+        // @todo call $this->setPageSize when using DataTables (so it will change on the fly)
+
         if ($this->request->getQuery($this->prefix . 'disable-pagination')) {
             $this->disable();
         }
 
         $driver = $select->getAdapter()->getDriver();
-
-        $this->page = (int) $this->request->getQuery($this->prefix . 'listing-page', 1);
 
         $driver->prepareSelectForTotalRowCalculation($select);
 
@@ -213,7 +221,7 @@ class SelectPaginate extends HelperAbstract implements SelectModifierInterface
 
         return $select->limit(
             $this->getPageSize(),
-            $this->getPageSize() * ($this->page - 1)
+            $this->getPageSize() * ($this->getPage() - 1)
         );
     }
 }

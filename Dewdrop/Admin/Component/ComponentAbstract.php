@@ -123,6 +123,11 @@ abstract class ComponentAbstract implements ComponentInterface, ShellIntegration
     private $active = false;
 
     /**
+     * @var bool
+     */
+    private $dataTablesEnabled = false;
+
+    /**
      * Create a component instance using the DB adapter creating by the Wiring
      * class.
      *
@@ -518,5 +523,39 @@ abstract class ComponentAbstract implements ComponentInterface, ShellIntegration
         if (!$this->title) {
             throw new Exception('Component title is required');
         }
+    }
+
+    /**
+     * Enable DataTables functionality.
+     *
+     * @return $this
+     */
+    public function enableDataTables()
+    {
+        $this->dataTablesEnabled = true;
+
+        return $this;
+    }
+
+    /**
+     * Disable DataTables functionality.
+     *
+     * @return $this
+     */
+    public function disableDataTables()
+    {
+        $this->dataTablesEnabled = false;
+
+        return $this;
+    }
+
+    /**
+     * Is DataTables enabled?
+     *
+     * @return bool
+     */
+    public function isDataTablesEnabled()
+    {
+        return $this->dataTablesEnabled;
     }
 }
