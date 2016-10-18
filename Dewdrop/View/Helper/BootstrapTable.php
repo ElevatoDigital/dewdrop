@@ -44,7 +44,7 @@ class BootstrapTable extends Table
         }
 
         return <<<HTML
-            <div class="table-responsive"{$tableWrapperIdAttr}><table class="bootstrap-table table table-hover">
+            <div class="table-responsive" {$tableWrapperIdAttr}><table class="bootstrap-table table table-hover">
 HTML;
     }
 
@@ -106,6 +106,7 @@ HTML;
             }
         }
 
+        /** @noinspection HtmlUnknownTarget */
         return sprintf(
             '<a href="%s">%s%s</a>',
             $this->view->escapeHtmlAttr($this->assembleSortUrl($queryStringId, $direction)),
