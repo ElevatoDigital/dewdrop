@@ -1,0 +1,27 @@
+{
+  "name": "dewdrop",
+  "version": "1.27.0",
+  "description": "Dewdrop makes writing complex WordPress plugins simpler by providing a sensible project layout and developer tools.",
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DeltaSystems/dewdrop.git"
+  },
+  "author": "Delta Systems Group",
+  "license": "SEE LICENSE IN LICENSE",
+  "bugs": {
+    "url": "https://github.com/DeltaSystems/dewdrop/issues"
+  },
+  "homepage": "https://github.com/DeltaSystems/dewdrop#readme",
+  "devDependencies": {},
+  "dependencies": {
+    "datatables.net": "^1.10.12",
+    "datatables.net-bs": "^1.10.12",
+    "imports-loader": "^0.6.5",
+    "jquery-deparam": "^0.5.2",
+    "webpack": "^1.13.2"
+  }
+}
