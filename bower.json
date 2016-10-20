@@ -17,16 +17,16 @@
         "composer.lock"
     ],
     "dependencies": {
-        "jquery":         "1.*",
-        "jquery-ui":      "1.*",
-        "backbone":       "1.1.*",
-        "keymaster":      "1.6.*",
-        "moment":         "2.*",
-        "bootstrap":      "3.*",
-        "velocity":       "0.1.*",
-        "requirejs":      "2.*",
+        "backbone": "1.1.*",
+        "bootstrap": "3.*",
+        "jquery": "1.*",
+        "jquery-ui": "1.*",
+        "keymaster": "1.6.*",
+        "moment": "2.*",
+        "requirejs": "2.*",
         "requirejs-text": "2.*",
-        "summernote":     ">=0.6.5",
-        "timepicker":     "1.4.*"
+        "summernote": ">=0.6.5",
+        "timepicker": "1.4.*",
+        "velocity": "0.1.*"
     }
 }
