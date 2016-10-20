@@ -200,12 +200,31 @@ class Index extends StockPageAbstract
         $fields         = $this->component->getFields()->getVisibleFields([$groupingFilter, $filter]);
         $listingData    = $listing->fetchData($groupingFilter->apply($fields));
         $totalRowCount  = $listing->getTotalRowCount();
+        $renderer       = $this->view->tableCellRenderer();
+        $pkey           = $listing->getPrimaryKey()->getName();
+        $permissions    = $this->component->getPermissions();
+        $rowActionArgs  = [
+            'renderer'  => $renderer,
+            'field'     => $fields->getIterator()->current(),
+            'title'     => $this->component->getPrimaryModel()->getSingularTitle(),
+            'urlFields' => $pkey
+        ];
+
+        if ($permissions->can('edit')) {
+            $rowActionArgs['edit'] = $this->view->adminUrl('edit', [$pkey => '%s']);
+        }
+
+        if ($permissions->can('view')) {
+            $rowActionArgs['view'] = $this->view->adminUrl('view', [$pkey => '%s']);
+        }
+
+        $this->view->bootstrapRowActions()->assignCallback($rowActionArgs);
 
         echo $this->view->encodeJsonHtmlSafe(
             $this->view->datatables()->render(
                 $fields,
                 $listingData,
-                $this->view->tableCellRenderer(),
+                $renderer,
                 $totalRowCount
             )
         );
