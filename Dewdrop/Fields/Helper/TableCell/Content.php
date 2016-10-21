@@ -361,16 +361,6 @@ class Content extends HelperAbstract implements ContentHelperInterface
         $value     = $rowData[$field->getName()];
         $timestamp = strtotime($value);
 
-        // Hack for handling GMT offsets in WordPress.
-        if (function_exists('get_option')) {
-            $timezoneString = get_option('timezone_string');
-
-            if ($timezoneString) {
-                $offset = timezone_offset_get(new DateTimeZone($timezoneString), date_create($value));
-                $timestamp += $offset;
-            }
-        }
-
         if ($timestamp) {
             return $this->view->escapeHtml(date($this->dateFormat, $timestamp));
         } else {
@@ -393,7 +383,7 @@ class Content extends HelperAbstract implements ContentHelperInterface
         $timestamp = strtotime($value);
 
         // Hack for handling GMT offsets in WordPress.
-        if (function_exists('get_option')) {
+        if ($timestamp && function_exists('get_option')) {
             $timezoneString = get_option('timezone_string');
 
             if ($timezoneString) {
