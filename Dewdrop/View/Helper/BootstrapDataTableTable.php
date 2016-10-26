@@ -86,18 +86,19 @@ class BootstrapDataTableTable extends BootstrapTable
      *
      * @param Fields $fields
      * @param Listing $listing
+     * @param DataTables $datatables
      * @param string $title Primary models title that is already made singular or plural.
      * @return string Sanitized JSON
      */
-    public function getDataTableOptionsJson(Fields $fields, Listing $listing, $title)
+    public function getDataTableOptionsJson(Fields $fields, Listing $listing, DataTables $datatables, $title)
     {
         /** @var SelectSort $selectSort */
         $selectSort            = $listing->getSelectSortModifier();
         $options               = new \stdClass();
         $options->processing   = true;
         $options->serverSide   = true;
-        $options->pageLength   = 50;
-        $options->lengthChange = false; // @todo allow them to change number of entries in a page
+        $options->pageLength   = $listing->getSelectPaginateModifier()->getPageSize();
+        $options->lengthMenu   = $datatables->getLengthMenuOptions();
         $options->searching    = false;
         $options->columnDefs   = [
             [
@@ -112,9 +113,10 @@ class BootstrapDataTableTable extends BootstrapTable
             ],
         ];
         $options->language     = [
-            'info'  => '_TOTAL_ '.$title,
-            'infoEmpty' => '0 '.$title,
-            'infoFiltered' => ' - filtered from _MAX_ '.$title
+            'info'         => '_TOTAL_ '.$title,
+            'infoEmpty'    => '0 '.$title,
+            'infoFiltered' => ' - filtered from _MAX_ '.$title,
+            'lengthMenu'   => 'Show _MENU_ '.$title
         ];
         $options->columns      = [];
         $options->order        = [];

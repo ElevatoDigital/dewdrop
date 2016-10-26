@@ -18,7 +18,7 @@ use Dewdrop\Request;
 
 /**
  * This helper paginates a Select object so that a single page of a listing
- * can be retrieved at a time.  Yuo can adjust the number of records to
+ * can be retrieved at a time. You can adjust the number of records to
  * return per page.
  */
 class SelectPaginate extends HelperAbstract implements SelectModifierInterface
@@ -47,11 +47,16 @@ class SelectPaginate extends HelperAbstract implements SelectModifierInterface
     private $page;
 
     /**
+     * Default page size.
+     */
+    const DEFAULT_PAGE_SIZE = 50;
+
+    /**
      * The number of records to show per page.
      *
      * @var int
      */
-    private $pageSize = 50;
+    private $pageSize;
 
     /**
      * A Request object we can use to look up the current page.
@@ -187,6 +192,11 @@ class SelectPaginate extends HelperAbstract implements SelectModifierInterface
      */
     public function getPageSize()
     {
+        if (!$this->pageSize) {
+            // @todo DataTables provides this as 'length'
+            $this->pageSize = $this->request->getQuery('page-size', $this::DEFAULT_PAGE_SIZE);
+        }
+
         return $this->pageSize;
     }
 
@@ -205,8 +215,6 @@ class SelectPaginate extends HelperAbstract implements SelectModifierInterface
      */
     public function modifySelect(Fields $fields, Select $select)
     {
-        // @todo call $this->setPageSize when using DataTables (so it will change on the fly)
-
         if ($this->request->getQuery($this->prefix . 'disable-pagination')) {
             $this->disable();
         }

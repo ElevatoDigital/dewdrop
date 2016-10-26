@@ -29,11 +29,17 @@ function getUrl(params = null) {
  * @param settings
  */
 function getDewdropUrl(settings) {
-    var params = {
+    var listingPage = (-1 == settings._iDisplayLength) ? 1 : ((settings._iDisplayStart / settings._iDisplayLength) + 1),
+        params      = {
         "sort":         [],
         "dir":          [],
-        "listing-page": (settings._iDisplayStart / settings._iDisplayLength) + 1
+        "listing-page": listingPage,
+        "page-size":  settings._iDisplayLength
     };
+
+    if (-1 == settings._iDisplayLength) {
+        params["disable-pagination"] = 1;
+    }
 
     _.each(settings.aaSorting, function(sort) {
         var columnIndex = sort[0],
@@ -52,6 +58,10 @@ options.ajax = {
     url: getUrl(),
     data: function (data, settings) {
         data.format = 'datatables';
+
+        if (-1 == settings._iDisplayLength) {
+            data["disable-pagination"] = 1;
+        }
     }
 };
 

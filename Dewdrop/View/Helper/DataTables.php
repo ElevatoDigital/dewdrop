@@ -20,6 +20,36 @@ use Dewdrop\Fields\Helper\TableCell as TableCellHelper;
  */
 class DataTables extends AbstractHelper
 {
+    /**
+     * DataTable options for page length.
+     * https://datatables.net/reference/option/lengthMenu
+     *
+     * @var array
+     */
+    private $lengthMenuOptions = [[25, 50, 100, 500, -1], [25, 50, 100, 500, 'ALL']];
+
+    /**
+     * Get lengthMenu value for DataTables.
+     * https://datatables.net/reference/option/lengthMenu
+     *
+     * @return array
+     */
+    public function getLengthMenuOptions()
+    {
+        return $this->lengthMenuOptions;
+    }
+
+    /**
+     * @param array $options An array compatible with DataTables lengthMenu option
+     * https://datatables.net/reference/option/lengthMenu
+     * @return $this
+     */
+    public function setLengthMenuOptions(array $options)
+    {
+        $this->lengthMenuOptions = $options;
+
+        return $this;
+    }
 
     /**
      * @param Fields $fields
