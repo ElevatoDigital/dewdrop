@@ -290,16 +290,6 @@ abstract class EnvAbstract implements EnvInterface
      */
     public function assembleQueryString(array $params, $separator)
     {
-        $segments = array();
-
-        foreach ($params as $name => $value) {
-            $segments[] = sprintf(
-                "%s=%s",
-                rawurlencode($name),
-                rawurlencode($value)
-            );
-        }
-
-        return (count($segments) ? $separator . implode('&', $segments) : '');
+        return (count($params) ? $separator . http_build_query($params, null, '&', PHP_QUERY_RFC3986) : '');
     }
 }
