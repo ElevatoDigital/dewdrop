@@ -109,13 +109,7 @@ class Request
         $url = preg_replace('/\?.+$/', '', $_SERVER['REQUEST_URI']);
 
         if (0 < count($this->query)) {
-            $url .= '?';
-            $needsAmpersand = false;
-            foreach ($this->query as $name => $value) {
-                // @todo This throws warnings if the $name is an array. eg. ?sort[]=something
-                $url .= ($needsAmpersand ? '&' : '') . sprintf('%s=%s', rawurlencode($name), rawurlencode($value));
-                $needsAmpersand = true;
-            }
+            $url .= '?'.http_build_query($this->query, null, '&', PHP_QUERY_RFC3986);
         }
 
         return $url;
