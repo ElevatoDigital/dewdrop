@@ -112,7 +112,8 @@ class Detector
             'paths'                         => '\Dewdrop\Paths',
             'inflector'                     => '\Dewdrop\Inflector',
             'db.field.input-filter-builder' => '\Dewdrop\Db\Field\InputFilterBuilder',
-            'view'                          => '\Dewdrop\View\View'
+            'view'                          => '\Dewdrop\View\View',
+            'listing-handler'               => '\Dewdrop\Fields\Listing\HandlerAbstract',
         ];
 
         foreach ($sharedResources as $resourceName => $className) {

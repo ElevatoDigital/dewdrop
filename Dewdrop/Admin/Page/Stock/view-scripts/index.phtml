@@ -88,14 +88,11 @@ if (0 === $this->totalRowCount && $selectFilter->hasFilters()) {
         $this->escapeHtml(strtolower($this->pluralTitle))
     );
 } else {
-    /** @var \Dewdrop\View\Helper\BootstrapTable $tableHelper */
-    $tableHelper = $this->component->isDataTablesEnabled() ? 'bootstrapDataTableTable' : 'bootstrapTable';
-
-    echo $this->$tableHelper(
+    echo $this->listing->renderTable(
+        $this,
         $fields,
-        $this->$tableHelper()->getData($this->listing, $this->component, $fields),
-        $renderer,
-        $this->listing->getSelectModifierByName('SelectSort')
+        $this->component,
+        $renderer
     );
 }
 
@@ -121,14 +118,11 @@ if ($this->bulkActions) {
 
 $paginationTitle = (1 === $totalRowCount ? $this->singularTitle : $this->pluralTitle);
 
-if (!$this->component->isDataTablesEnabled()) {
-    echo $this->pagination(
-        $totalRowCount,
-        ($paginationHelper->isEnabled() ? $paginationHelper->getPageSize() : $totalRowCount),
-        $paginationHelper->getPage(),
-        $paginationTitle
-    );
-}
+echo $this->listing->renderPagination(
+    $this,
+    $totalRowCount,
+    $paginationTitle
+);
 
 echo $this->bootstrapColumnsModal(
     $this->fields->getVisibleFields($this->groupingFilter),
@@ -137,19 +131,5 @@ echo $this->bootstrapColumnsModal(
     $this->visibilityFilter->canBeFilteredByUser()
 );
 
-$fields = $this->fields->getVisibleFields([$this->groupingFilter, $this->visibilityFilter]);
-
-if ($this->component->isDataTablesEnabled()) :
-?>
-    <script type="text/javascript">
-        var INDEX_TABLE;
-        var INDEX_TABLE_OPTIONS = <?php echo $this->bootstrapDataTableTable()->getDataTableOptionsJson($fields, $this->listing, $this->datatables(), $paginationTitle); ?>;
-    </script>
-<?php
-    $this->headLink()->appendStylesheet($this->bowerUrl('datatables.net-bs/css/dataTables.bootstrap.min.css'));
-    $this->headScript()->appendFile($this->bowerUrl('/dewdrop/www/js/main-table.js'));
-endif;
-
-$this->headLink()->appendStylesheet($this->bowerUrl('/dewdrop/www/css/table.css'));
-$this->headScript()->appendFile($this->bowerUrl('/dewdrop/www/js/listing-keyboard-shortcuts.js'));
+echo $this->listing->renderFooter($this, $fields, $paginationTitle);
 ?>

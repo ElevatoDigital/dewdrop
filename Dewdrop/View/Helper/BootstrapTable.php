@@ -114,9 +114,4 @@ HTML;
             $caret
         );
     }
-
-    public function getData(Listing $listing, CrudAbstract $component, Fields $fields)
-    {
-        return $listing->fetchData($component->getFieldGroupsFilter()->apply($fields));
-    }
 }

@@ -14,7 +14,9 @@ use Dewdrop\Db\Select;
 use Dewdrop\Exception;
 use Dewdrop\Fields\FieldInterface;
 use Dewdrop\Fields;
+use Dewdrop\Pimple;
 use Dewdrop\Request;
+use Dewdrop\Fields\Listing\HandlerAbstract;
 
 /**
  * This helper paginates a Select object so that a single page of a listing
@@ -66,6 +68,11 @@ class SelectPaginate extends HelperAbstract implements SelectModifierInterface
     private $request;
 
     /**
+     * @var HandlerAbstract
+     */
+    private $listingHandler;
+
+    /**
      * A param prefix that can be used if you have multiple paginated listings
      * displayed on a single page.
      *
@@ -78,10 +85,12 @@ class SelectPaginate extends HelperAbstract implements SelectModifierInterface
      * is selected.
      *
      * @param Request $request
+     * @param HandlerAbstract $listingHandler
      */
-    public function __construct(Request $request)
+    public function __construct(Request $request, HandlerAbstract $listingHandler = null)
     {
-        $this->request = $request;
+        $this->request        = $request;
+        $this->listingHandler = ($listingHandler ?: Pimple::getResource('listing-handler'));
     }
 
     /**
@@ -161,13 +170,7 @@ class SelectPaginate extends HelperAbstract implements SelectModifierInterface
      */
     public function getPage()
     {
-        if ('datatables' === $this->request->getQuery('format')) {
-            // DataTables provides us with 'start'
-            $start      = (int) $this->request->getQuery('start', $this->getPageSize());
-            $this->page = ($start / $this->getPageSize()) + 1;
-        } else {
-            $this->page = (int) $this->request->getQuery($this->prefix . 'listing-page', 1);
-        }
+        $this->page = $this->listingHandler->getPageFromRequest($this->getPrefix(), $this->getPageSize());
 
         return $this->page;
     }
