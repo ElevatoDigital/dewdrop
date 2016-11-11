@@ -188,12 +188,18 @@ trait ComponentTrait
      * is dispatched on this component.  Your callback will receive the new
      * page object as its first argument.
      *
-     * @param $pageName
+     * @param mixed $pageName
      * @param callable $callback
      * @return $this
      */
     public function onPageDispatch($pageName, callable $callback)
     {
+        if(is_array($pageName)) {
+            foreach ($pageName as $name) {
+                $this->onPageDispatch($name, $callback);
+            }
+        }
+        
         if (!array_key_exists($pageName, $this->pageDispatchCallbacks)) {
             $this->pageDispatchCallbacks[$pageName] = [];
         }
