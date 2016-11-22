@@ -52,6 +52,13 @@ class Button implements ActionInterface
     private $buttonTitle;
 
     /**
+     * Classname that gets rendered on the button element.
+     *
+     * @var string
+     */
+    private $buttonClassName = 'btn btn-default';
+
+    /**
      * The callback that should be run when your action is selected.  The IDs
      * (defined by the primary key field on the Listing your BulkActions apply
      * to) of the selected items will be passed to your callable as an array.
@@ -175,6 +182,19 @@ class Button implements ActionInterface
     }
 
     /**
+     * Set the classname for the button element.
+     *
+     * @param string|array $className
+     * @return $this
+     */
+    public function setButtonClassName($className)
+    {
+        $this->buttonClassName  = is_array($className) ? implode(' ', $className) : $className;
+
+        return $this;
+    }
+
+    /**
      * Render the submit button for this action.
      *
      * @param View $view
@@ -191,9 +211,10 @@ class Button implements ActionInterface
         }
 
         return sprintf(
-            '<input id="%s" name="%s" type="submit" class="btn btn-default" value="%s" />',
+            '<input id="%s" name="%s" type="submit" class="%s" value="%s" />',
             $view->escapeHtmlAttr($this->id),
             $view->escapeHtmlAttr($this->id),
+            $view->escapeHtmlAttr($this->buttonClassName),
             $view->escapeHtmlAttr($this->buttonTitle)
         );
     }
