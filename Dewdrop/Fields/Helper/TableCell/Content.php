@@ -284,6 +284,8 @@ class Content extends HelperAbstract implements ContentHelperInterface
             $method = 'renderDbDate';
         } elseif ($field->isType('timestamp')) {
             $method = 'renderDbTimestamp';
+        } elseif ($field->isType('time')) {
+            $method = 'renderDbTime';
         } elseif ($field->isType('manytomany', 'clob', 'string', 'numeric')) {
             $method = 'renderDbText';
         }
@@ -366,6 +368,24 @@ class Content extends HelperAbstract implements ContentHelperInterface
         } else {
             return '';
         }
+    }
+
+    /**
+     * @param DbField $field
+     * @param array $rowData
+     * @return string
+     */
+    protected function renderDbTime(DbField $field, array $rowData)
+    {
+        $value = $rowData[$field->getName()];
+
+        if (!$value) {
+            return '';
+        }
+
+        $timestamp = strtotime($value);
+
+        return $this->view->escapeHtml(date($this->timeFormat, $timestamp));
     }
 
     /**
