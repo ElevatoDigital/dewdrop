@@ -41,6 +41,8 @@ class FilterType extends HelperAbstract
             $type = 'boolean';
         } elseif ($field->isType('date', 'timestamp')) {
             $type = 'date';
+        } elseif ($field->isType('time')) {
+            $type = 'time';
         } elseif ($field->isType('integer', 'float')) {
             $type = 'numeric';
         } elseif ($field->isType('clob', 'text')) {
