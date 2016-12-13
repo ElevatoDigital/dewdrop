@@ -103,11 +103,10 @@ class ActivityLog
         $shortcodes = $this->shortcodeParser->parse($message);
         $entities   = [];
 
+        /* @var \Thunder\Shortcode\Shortcode\Shortcode $shortcode */
         foreach ($shortcodes as $shortcode) {
             if (!$shortcode->hasParameter('id') || !$shortcode->getParameter('id')) {
-                throw new InvalidShortcodeException(
-                    "Shortcode does not contain required 'id' parameter: {$shortcode->getText()}."
-                );
+                continue;
             }
 
             $name      = $shortcode->getName();
