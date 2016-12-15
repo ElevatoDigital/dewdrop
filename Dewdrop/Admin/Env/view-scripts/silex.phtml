@@ -64,6 +64,15 @@ use \Dewdrop\Pimple;
                                 continue;
                             }
 
+                            $icon = '';
+
+                            if ($component->getIcon()) {
+                                $icon = sprintf(
+                                    '<span class="glyphicon glyphicon-%s"></span> ',
+                                    $this->escapeHtmlAttr($component->getIcon())
+                                );
+                            }
+
                             $submenuPages = $component->getSubmenuPages();
                             $badgeContent = '';
                             $activeClass  = '';
@@ -81,9 +90,10 @@ use \Dewdrop\Pimple;
 
                             if (0 === count($submenuPages)) {
                                 printf(
-                                    '<li class="%s"><a href="%s">%s%s</a></li>',
+                                    '<li class="%s"><a href="%s">%s%s%s</a></li>',
                                     $activeClass,
                                     $this->escapeHtmlAttr($this->url('/admin/' . $component->getName() . '/index')),
+                                    $icon,
                                     $this->escapeHtml($component->getTitle()),
                                     $badgeContent
                                 );
@@ -91,7 +101,8 @@ use \Dewdrop\Pimple;
                                 echo '<li class="dropdown">';
 
                                 printf(
-                                    '<a href="#" class="dropdown-toggle" data-toggle="dropdown">%s%s <b class="caret"></b></a>',
+                                    '<a href="#" class="dropdown-toggle" data-toggle="dropdown">%s%s%s <b class="caret"></b></a>',
+                                    $icon,
                                     $this->escapeHtml($component->getTitle()),
                                     $badgeContent
                                 );
@@ -162,7 +173,7 @@ use \Dewdrop\Pimple;
 
         <?php
         echo $this->headScript();
-        
+
         if ($this->viewHeadScript) {
             echo $this->urlCachePrefix()->headScript($this->viewHeadScript);
         }
