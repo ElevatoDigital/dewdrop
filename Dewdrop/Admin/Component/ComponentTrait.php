@@ -10,6 +10,7 @@ use Dewdrop\Admin\Response;
 use Dewdrop\Exception;
 use Dewdrop\Inflector;
 use ReflectionClass;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 trait ComponentTrait
 {
@@ -187,12 +188,20 @@ trait ComponentTrait
      * is dispatched on this component.  Your callback will receive the new
      * page object as its first argument.
      *
-     * @param $pageName
+     * @param mixed $pageName
      * @param callable $callback
      * @return $this
      */
     public function onPageDispatch($pageName, callable $callback)
     {
+        if (is_array($pageName)) {
+            foreach ($pageName as $name) {
+                $this->onPageDispatch($name, $callback);
+            }
+            
+            return $this;
+        }
+        
         if (!array_key_exists($pageName, $this->pageDispatchCallbacks)) {
             $this->pageDispatchCallbacks[$pageName] = [];
         }
@@ -258,6 +267,8 @@ trait ComponentTrait
 
         if (is_array($output)) {
             $this->renderJsonResponse($output);
+        } elseif ($output instanceof SymfonyResponse) {
+            return $output;
         } elseif (!$output) {
             // Capture output generated during render rather than returned
             $output = ob_get_clean();

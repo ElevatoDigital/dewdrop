@@ -16,6 +16,8 @@ class Link
 
     private $target;
 
+    private $cssClasses = [];
+
     public static function createInstance()
     {
         return new Link();
@@ -49,6 +51,17 @@ class Link
         return $this;
     }
 
+    public function setCssClasses($cssClasses)
+    {
+        if (!is_array($cssClasses)) {
+            $cssClasses = [$cssClasses];
+        }
+
+        $this->cssClasses = $cssClasses;
+
+        return $this;
+    }
+
     public function __invoke(FieldInterface $field)
     {
         $field->addHelperFilter(
@@ -64,7 +77,8 @@ class Link
                     $node = new Node('a');
                     $node
                         ->setHtml($content)
-                        ->setAttribute('href', sprintf($this->urlTemplate, $rowData[$this->id]));
+                        ->setAttribute('href', sprintf($this->urlTemplate, $rowData[$this->id]))
+                        ->setAttribute('class', implode(' ', $this->cssClasses));
 
                     if ($this->title) {
                         $node->setAttribute('title', $this->title);

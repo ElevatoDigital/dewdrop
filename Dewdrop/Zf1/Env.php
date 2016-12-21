@@ -73,7 +73,7 @@ class Env implements EnvInterface
                     'type'     => 'pgsql',
                     'username' => $zfConfig['resources']['db']['params']['username'],
                     'password' => $zfConfig['resources']['db']['params']['password'],
-                    'hostname' => $zfConfig['resources']['db']['params']['host'],
+                    'host'     => $zfConfig['resources']['db']['params']['host'],
                     'name'     => $zfConfig['resources']['db']['params']['dbname']
                 ];
             }

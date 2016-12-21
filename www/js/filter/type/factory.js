@@ -2,17 +2,19 @@ define(
     [
         'type/boolean-view',
         'type/date-view',
+        'type/time-view',
         'type/numeric-view',
         'type/text-view',
         'type/reference-view',
         'type/manytomany-view'
     ],
-    function (BooleanView, DateView, NumericView, TextView, ReferenceView, ManyToManyView) {
+    function (BooleanView, DateView, TimeView, NumericView, TextView, ReferenceView, ManyToManyView) {
         'use strict';
 
-        var typeMap = {
+        let typeMap = {
             boolean:    BooleanView,
             date:       DateView,
+            time:       TimeView,
             numeric:    NumericView,
             text:       TextView,
             reference:  ReferenceView,
