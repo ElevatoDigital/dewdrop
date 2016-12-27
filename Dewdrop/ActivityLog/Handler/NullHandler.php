@@ -21,12 +21,10 @@ class NullHandler implements HandlerInterface
 
     public function write($summary, $message)
     {
-
     }
 
     public function log($summary, $message)
     {
-
     }
 
     public function getName()

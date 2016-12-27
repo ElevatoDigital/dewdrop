@@ -163,7 +163,6 @@ abstract class PageAbstract
      */
     public function process(ResponseHelper $response)
     {
-
     }
 
     /**
@@ -173,7 +172,6 @@ abstract class PageAbstract
      */
     public function render()
     {
-
     }
 
     /**

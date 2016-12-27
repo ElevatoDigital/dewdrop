@@ -81,7 +81,6 @@ class NotificationEdit extends StockPageAbstract
     public function process(ResponseHelper $responseHelper)
     {
         if ($this->request->isPost()) {
-
         }
     }
 

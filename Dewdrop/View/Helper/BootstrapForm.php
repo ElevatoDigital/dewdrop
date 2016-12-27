@@ -365,4 +365,3 @@ class BootstrapForm extends AbstractHelper
             || false !== stripos($output, 'import-edit-control');
     }
 }
-

@@ -61,7 +61,7 @@ class ScaleImage implements FilterInterface
 
         if ($originalWidth > $originalHeight) {
             $image->scaleImage($this->width, 0);
-        } else if ($originalHeight > $originalWidth) {
+        } elseif ($originalHeight > $originalWidth) {
             $image->scaleImage(0, $this->height);
         } else {
             $image->scaleImage($this->width, $this->height);

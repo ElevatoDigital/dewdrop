@@ -153,7 +153,6 @@ class Row implements ArrayAccess, SaveHandlerInterface
      */
     public function init()
     {
-
     }
 
     /**

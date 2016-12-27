@@ -242,7 +242,6 @@ class BulkActions
                     break;
                 }
             }
-
         }
 
         return $result;

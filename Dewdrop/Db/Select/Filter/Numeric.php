@@ -75,6 +75,7 @@ class Numeric extends AbstractFilter
                         )
                     );
                 }
+                // break intentionally omitted
             case static::OP_IS_LESS_THAN:
                 if ('' === $op1) {
                     return $select;

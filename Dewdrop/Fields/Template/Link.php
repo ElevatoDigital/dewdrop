@@ -90,7 +90,6 @@ class Link
 
                     return $node;
                 }
-
             }
         );
     }

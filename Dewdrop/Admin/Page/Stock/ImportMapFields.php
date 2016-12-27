@@ -286,13 +286,14 @@ class ImportMapFields extends StockPageAbstract
             case 'value':
                 return $this->request->getPost($id);
             case 'column':
-               $column = $this->request->getPost($id . ':column');
+                $column = $this->request->getPost($id . ':column');
 
                 if (isset($importRow[$column])) {
                     return $importRow[$column];
                 } else {
                     return null;
                 }
+                // break intentionally omitted
             case 'blank':
             default:
                 return null;

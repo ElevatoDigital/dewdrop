@@ -34,7 +34,6 @@ class Pagination extends AbstractHelper
         $out  = '';
 
         if ($rowCount > $pageSize) {
-
             $out .= "<div class=\"page-current-of-all\">Page {$page} of {$pageCount}</div>" .
                 '<ul class="pagination">';
 
@@ -43,26 +42,20 @@ class Pagination extends AbstractHelper
 
             $j = 0;
             for ($i = 1; $i <= $pageCount; $i++) {
-
                 $display = false;
 
                 if ($page < 7 && $i <= 10) {
                     // Current page is in the first 6, show the first 10 pages
                     $display = true;
-
                 } elseif ($page > $pageCount - 6 && $i >= $pageCount - 10) {
-
                     // Current page is in the last 6, show the last 10 pages
                     $display = true;
-
                 } elseif ($i < 3 || $i > $pageCount - 2 || abs($page - $i) <= 3) {
-
                     // Always show the first 2, last 2, and middle 6 pages
                     $display = true;
                 }
 
                 if ($display) {
-
                     if ($j + 1 !== $i) {
                         // ellipses
                         $out .= '<li class="disabled"><a href="#">...</a></li>';

@@ -66,5 +66,4 @@ trait DomAssertions
         $query = new DomQuery($html);
         return $query->execute($selector);
     }
-
 }

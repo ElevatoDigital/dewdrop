@@ -39,7 +39,7 @@ class Access implements SessionAccessInterface
     public function get($name)
     {
         $out = $this->session[$name];
-        
+
         if ($out instanceof Recursive_ArrayAccess) {
             $out = $out->toArray();
         }
@@ -72,5 +72,4 @@ class Access implements SessionAccessInterface
             $this->session->regenerate_id();
         }
     }
-
 }

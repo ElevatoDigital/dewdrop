@@ -57,7 +57,6 @@ class TableHandler extends CrudHandlerAbstract
 
     public function init()
     {
-
     }
 
     public function getTable()

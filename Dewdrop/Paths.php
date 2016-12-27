@@ -169,7 +169,7 @@ class Paths
 
     /**
      * Get the data folder where Dewdrop can write data on the server.
-     * 
+     *
      * @return string
      */
     public function getData()

@@ -182,7 +182,7 @@ class Silex extends EnvAbstract
     /**
      * Get the View object used to render the layout.  Allows you to add project-specific CSS or JS and call
      * other view helpers as needed.
-     * 
+     *
      * @return View
      */
     public function getLayout()

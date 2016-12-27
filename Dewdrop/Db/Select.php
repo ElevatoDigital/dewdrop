@@ -996,7 +996,6 @@ class Select
         }
 
         if ($columnValues) {
-
             // should we attempt to prepend or insert these values?
             if ($afterCorrelationName === true || is_string($afterCorrelationName)) {
                 $tmpColumns = $this->parts[self::COLUMNS];
