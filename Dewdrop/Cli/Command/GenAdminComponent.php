@@ -138,7 +138,7 @@ class GenAdminComponent extends CommandAbstract
         $newDir = "{$path}/{$this->folder}";
 
         if ($this->componentAlreadyExists($newDir)) {
-            return $this->abort(
+            $this->abort(
                 'Cannot generate component because a folder with the name "' . $this->folder . '" already exists.'
             );
         }
@@ -149,7 +149,7 @@ class GenAdminComponent extends CommandAbstract
             '{{namespace}}'     => ($this->namespace ?: $this->inflectNamespaceFromFolder()),
             '{{title}}'         => str_replace("'", "\'", $this->title),
             '{{model}}'         => $this->model ?: $this->inflectModelFromTitle(),
-            '{{primaryKey}}'    => $inflector->singularize($this->title) . '_id',
+            '{{primaryKey}}'    => (new Inflector())->singularize($this->title) . '_id',
         );
 
         $templatesDir = __DIR__ . '/gen-templates/admin-component';
@@ -162,13 +162,13 @@ class GenAdminComponent extends CommandAbstract
 
         $this->writeFileFromTemplate(
             "{$newDir}/Edit.php",
-            "{$templatesDir}/Edit.tpl",
+            "{$templatesDir}/view-scripts/Edit.tpl",
             $templateReplacements
         );
 
         $this->writeFileFromTemplate(
             "{$newDir}/Index.php",
-            "{$templatesDir}/Index.tpl",
+            "{$templatesDir}/view-scripts/Index.tpl",
             $templateReplacements
         );
 
