@@ -190,7 +190,6 @@ class Table extends AbstractHelper
         $out          = '';
         $sortedFields = ($sorter) ? $sorter->getSortedFields() : [];
 
-        //var_dump($sortedFields);
         /* @var $field FieldInterface */
         foreach ($fields as $index => $field) {
             $queryStringId = $field->getQueryStringId();
@@ -212,7 +211,6 @@ class Table extends AbstractHelper
 
             $out .= '</th>';
         }
-//die;
         return $out;
     }
 
