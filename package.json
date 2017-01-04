@@ -1,6 +1,5 @@
 {
   "name": "dewdrop",
-  "version": "1.27.0",
   "description": "Dewdrop makes writing complex WordPress plugins simpler by providing a sensible project layout and developer tools.",
   "directories": {
     "doc": "docs",
