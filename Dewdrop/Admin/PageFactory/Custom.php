@@ -8,11 +8,9 @@
  * @license   https://github.com/DeltaSystems/dewdrop/LICENSE
  */
 
-namespace Dewdrop\Admin\Component\ComponentAbstract;
+namespace Dewdrop\Admin\PageFactory;
 
 use Dewdrop\Admin\Component\ComponentAbstract;
-
-namespace Dewdrop\Admin\PageFactory;
 
 /**
  * A page factory to allow easy overriding of pages from other factories.
