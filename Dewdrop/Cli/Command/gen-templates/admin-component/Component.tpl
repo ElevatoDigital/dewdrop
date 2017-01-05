@@ -1,10 +1,10 @@
 <?php
 
+namespace Admin\{{namespace}};
+
 use Dewdrop\Admin\Component\CrudAbstract;
 use Dewdrop\Fields;
 use Dewdrop\Fields\Listing;
-namespace Admin\{{namespace}};
-
 use Dewdrop\Admin\Component\ComponentAbstract;
 
 class Component extends ComponentAbstract
