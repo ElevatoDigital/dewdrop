@@ -115,9 +115,37 @@ class Table extends AbstractHelper
      */
     public function renderBody(Fields $fields, array $data, TableCellHelper $renderer)
     {
+        return $this->renderSection('tbody', $fields, $data, $renderer);
+    }
+
+    /**
+     * Render a &lt;tfoot&gt; section in the table.  Not included in the default render methods, but
+     * can be called directly when needed.
+     *
+     * @param Fields $fields
+     * @param array $data
+     * @param TableCellHelper $renderer
+     * @return string
+     */
+    public function renderFoot(Fields $fields, array $data, TableCellHelper $renderer)
+    {
+        return $this->renderSection('tfoot', $fields, $data, $renderer);
+    }
+
+    /**
+     * Render a table section wrapped in tags specified in $sectionName.
+     * 
+     * @param string $sectionName
+     * @param Fields $fields
+     * @param array $data
+     * @param TableCellHelper $renderer
+     * @return string
+     */
+    protected function renderSection($sectionName, Fields $fields, array $data, TableCellHelper $renderer)
+    {
         $rowIndex = 0;
 
-        $out = '<tbody>';
+        $out = "<{$sectionName}>";
 
         foreach ($data as $row) {
             $classes = $renderer->getRowClasses($row);
@@ -154,7 +182,7 @@ class Table extends AbstractHelper
             $rowIndex += 1;
         }
 
-        $out .= '</tbody>';
+        $out .= "</{$sectionName}>";
 
         return $out;
     }
