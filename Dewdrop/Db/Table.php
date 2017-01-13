@@ -15,6 +15,7 @@ use Dewdrop\ActivityLog\Handler\TableHandler as ActivityLogTableHandler;
 use Dewdrop\Db\Eav\Definition as EavDefinition;
 use Dewdrop\Db\ManyToMany\Relationship as ManyToManyRelationship;
 use Dewdrop\Db\Select\TableListing;
+use Dewdrop\Env;
 use Dewdrop\Exception;
 use Dewdrop\Pimple;
 
@@ -831,16 +832,11 @@ abstract class Table
         }
 
         // By whom
-        /* @var \Dewdrop\Pimple $pimple */
-        $pimple = Pimple::getInstance();
-        /* @var \Dewdrop\Paths $paths */
-        $paths = $pimple['paths'];
         if ($this->getMetadata('columns', 'created_by_user_id')) {
-            if ($paths->isWp() && 0 < get_current_user_id()) {
-                $data['created_by_user_id'] = get_current_user_id();
-            } elseif (Pimple::hasResource('user') && ($user = Pimple::getResource('user')) && isset($user['user_id'])
-                && 0 < $user['user_id']) {
-                $data['created_by_user_id'] = $user['user_id'];
+            $userId = Env::getInstance()->getCurrentUserId();
+
+            if ($userId) {
+                $data['created_by_user_id'] = $userId;
             }
         }
 
@@ -867,16 +863,11 @@ abstract class Table
         }
 
         // By whom
-        /* @var \Dewdrop\Pimple $pimple */
-        $pimple = Pimple::getInstance();
-        /* @var \Dewdrop\Paths $paths */
-        $paths = $pimple['paths'];
         if ($this->getMetadata('columns', 'updated_by_user_id')) {
-            if ($paths->isWp() && 0 < get_current_user_id()) {
-                $data['updated_by_user_id'] = get_current_user_id();
-            } elseif (Pimple::hasResource('user') && ($user = Pimple::getResource('user')) && isset($user['user_id'])
-                && 0 < $user['user_id']) {
-                $data['updated_by_user_id'] = $user['user_id'];
+            $userId = Env::getInstance()->getCurrentUserId();
+
+            if ($userId) {
+                $data['updated_by_user_id'] = $userId;
             }
         }
 

@@ -96,6 +96,12 @@ class Env implements EnvInterface
         );
     }
 
+    public function getCurrentUserId()
+    {
+        $id = get_current_user_id();
+        return (0 < $id ? $id : null);
+    }
+
     public function getProjectNoun()
     {
         return 'plugin';
