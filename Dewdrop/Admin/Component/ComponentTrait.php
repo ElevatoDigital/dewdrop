@@ -219,6 +219,14 @@ trait ComponentTrait
      */
     public function onPageDispatch($pageName, callable $callback)
     {
+        if (is_array($pageName)) {
+            foreach ($pageName as $name) {
+                $this->onPageDispatch($name, $callback);
+            }
+
+            return $this;
+        }
+
         if (!array_key_exists($pageName, $this->pageDispatchCallbacks)) {
             $this->pageDispatchCallbacks[$pageName] = [];
         }
