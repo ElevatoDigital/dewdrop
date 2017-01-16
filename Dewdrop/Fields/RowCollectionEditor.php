@@ -534,11 +534,11 @@ class RowCollectionEditor implements SaveHandlerInterface
                 'EditControl.Control',
                 function () use ($editor) {
                     if ($editor->isNew()) {
-                        $out = '<button data-is-new="1" class="btn btn-danger btn-delete">';
+                        $out = '<button data-is-new="1" class="btn btn-danger btn-delete-row">';
                     } elseif ($editor->hasDeleteField()) {
-                        $out = '<button data-is-new="0" class="btn btn-danger btn-delete">';
+                        $out = '<button data-is-new="0" class="btn btn-danger btn-delete-row">';
                     } else {
-                        $out = '<button data-is-new="0" class="btn btn-danger btn-delete disabled">';
+                        $out = '<button data-is-new="0" class="btn btn-danger btn-delete-row disabled">';
                     }
 
                     $out .= '<span class="glyphicon glyphicon-trash"></span>';
