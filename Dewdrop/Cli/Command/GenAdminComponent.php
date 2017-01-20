@@ -269,7 +269,31 @@ class GenAdminComponent extends CommandAbstract
      */
     protected function createFolder($path)
     {
-        mkdir($path);
+        if (!is_dir($path)) {
+            mkdir($path);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Given a path, create any directories that don't already exist in that path.
+     *
+     * @param string $path
+     * @return \Dewdrop\Cli\Command\GenAdminComponent
+     */
+    protected function createParentDirectories($path)
+    {
+        $parts = explode('/', $path);
+        $path  = '';
+
+        array_pop($parts);
+
+        foreach($parts as $part) {
+            if (!is_dir($path .= "/$part")) {
+                mkdir($path);
+            }
+        }
 
         return $this;
     }
@@ -285,6 +309,7 @@ class GenAdminComponent extends CommandAbstract
      */
     protected function writeFile($path, $contents)
     {
+        $this->createParentDirectories($path);
         file_put_contents($path, $contents);
 
         return $this;
@@ -296,10 +321,16 @@ class GenAdminComponent extends CommandAbstract
      * @param string $file
      * @param string $template
      * @param array $replacements
+     * @param bool $overwriteExisting Overwrite existing file if it exists
      * @return \Dewdrop\Cli\Command\GenAdminComponent
      */
-    protected function writeFileFromTemplate($file, $template, array $replacements = array())
+    protected function writeFileFromTemplate($file, $template, array $replacements = array(), $overwriteExisting = true)
     {
+        // File already exists and we don't want to overwrite
+        if (!$overwriteExisting && file_exists($file)) {
+            return $this;
+        }
+
         $this->writeFile(
             $file,
             str_replace(

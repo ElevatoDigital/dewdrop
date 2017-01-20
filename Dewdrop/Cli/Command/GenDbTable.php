@@ -17,6 +17,8 @@ use Dewdrop\Inflector;
  */
 class GenDbTable extends CommandAbstract
 {
+    use DatabaseGeneratorTrait;
+
     /**
      * The name of the database table you'd like to create.
      *
@@ -192,31 +194,6 @@ class GenDbTable extends CommandAbstract
         file_put_contents($path, $contents);
 
         return $this;
-    }
-
-    /**
-     * Get the revision number that should be used for the dbdeploy file.
-     *
-     * Returns the number as a zero-padded string, as suggested in the naming
-     * conventions (e.g. "00002").
-     *
-     * @return string
-     */
-    protected function getDbRevision()
-    {
-        $path   = $this->paths->getDb();
-        $files  = glob("{$path}/*.sql");
-        $latest = 0;
-
-        foreach ($files as $file) {
-            $changeNumber = (int) substr(basename($file), 0, strpos($file, '-'));
-
-            if ($changeNumber > $latest) {
-                $latest = $changeNumber;
-            }
-        }
-
-        return sprintf('%05s', $latest + 1);
     }
 
     /**
