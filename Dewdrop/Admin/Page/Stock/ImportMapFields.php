@@ -23,47 +23,47 @@ class ImportMapFields extends StockPageAbstract
     /**
      * @var ImportFile
      */
-    protected $importFile;
+    private $importFile;
 
     /**
      * @var ImportGateway
      */
-    protected $importGateway;
+    private $importGateway;
 
     /**
      * @var array
      */
-    protected $importErrors;
+    private $importErrors;
 
     /**
      * @var string
      */
-    protected $title;
+    private $title;
 
     /**
      * @var string
      */
-    protected $pluralTitle;
+    private $pluralTitle;
 
     /**
      * @var Fields
      */
-    protected $fields;
+    private $fields;
 
     /**
      * @var RowEditor
      */
-    protected $rowEditor;
+    private $rowEditor;
 
     /**
      * @var GroupsFilter
      */
-    protected $fieldGroupsFilter;
+    private $fieldGroupsFilter;
 
     /**
      * @var string
      */
-    protected $primaryRowName;
+    private $primaryRowName;
 
     public function init()
     {
@@ -256,7 +256,7 @@ class ImportMapFields extends StockPageAbstract
         return $this;
     }
 
-    protected function decorateFields(Fields $fields, EditControl $renderer)
+    private function decorateFields(Fields $fields, EditControl $renderer)
     {
         $control = $renderer->getControlRenderer();
 
@@ -280,7 +280,7 @@ class ImportMapFields extends StockPageAbstract
         return $fields;
     }
 
-    protected function getFieldValue($id, $mode, array $importRow)
+    private function getFieldValue($id, $mode, array $importRow)
     {
         switch ($mode) {
             case 'value':
@@ -299,7 +299,7 @@ class ImportMapFields extends StockPageAbstract
         }
     }
 
-    protected function isValid(Fields $fields, array $importRows, array $inputRows)
+    private function isValid(Fields $fields, array $importRows, array $inputRows)
     {
         $rowEditor = $this->getRowEditor();
         $isValid   = true;
