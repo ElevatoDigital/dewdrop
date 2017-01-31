@@ -313,6 +313,11 @@ class ImportMapFields extends StockPageAbstract
 
                 foreach ($fields as $field) {
                     if ('column' === $this->request->getPost($field->getId() . ':mode')) {
+
+                        if ($this->isFieldValid($field)) {
+                            continue;
+                        }
+
                         $column   = $this->request->getPost($field->getId() . ':column');
                         $messages = $rowEditor->getMessages($field);
 
@@ -364,5 +369,14 @@ class ImportMapFields extends StockPageAbstract
         }
 
         return $this;
+    }
+
+    /**
+     * @param FieldInterface $field
+     * @return bool
+     */
+    protected function isFieldValid(FieldInterface $field)
+    {
+        return false;
     }
 }
