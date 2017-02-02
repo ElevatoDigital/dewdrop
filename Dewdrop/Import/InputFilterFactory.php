@@ -26,6 +26,7 @@ class InputFilterFactory
                 'text/csv',
                 'application/vnd.ms-excel',
                 'application/vnd.ms-office',
+                'application/zip',
                 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
             ]
         );
