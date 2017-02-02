@@ -5,11 +5,13 @@ namespace Dewdrop\Admin\Page\Stock;
 use Dewdrop\Admin\Component\ComponentAbstract;
 use Dewdrop\Admin\Component\CrudInterface;
 use Dewdrop\Admin\ResponseHelper\Standard as ResponseHelper;
+use Dewdrop\Db\Field as DbField;
 use Dewdrop\Fields;
 use Dewdrop\Fields\FieldInterface;
 use Dewdrop\Fields\Filter\Groups as GroupsFilter;
 use Dewdrop\Fields\Helper\EditControl;
 use Dewdrop\Fields\RowEditor;
+use Dewdrop\Filter\IsoDate;
 use Dewdrop\Import\DbGateway as ImportGateway;
 use Dewdrop\Import\File as ImportFile;
 
@@ -82,6 +84,7 @@ class ImportMapFields extends StockPageAbstract
             $importRows = $this->importFile->getData();
             $inputRows  = [];
             $fields     = $this->getFields()->getEditableFields();
+            $dateFilter = new IsoDate();
 
             foreach ($importRows as $row) {
                 $data = [];
@@ -90,8 +93,13 @@ class ImportMapFields extends StockPageAbstract
                     $id     = $field->getId();
                     $modeId = $id . ':mode';
                     $mode   = $this->request->getPost($modeId);
+                    $value  = $this->getFieldValue($id, $mode, $row);
 
-                    $data[$id] = $this->getFieldValue($id, $mode, $row);
+                    if ($field instanceof DbField && $field->isType('date')) {
+                        $value = $dateFilter->filter($value);
+                    }
+
+                    $data[$id] = $value;
                 }
 
                 $inputRows[] = $data;
@@ -313,11 +321,6 @@ class ImportMapFields extends StockPageAbstract
 
                 foreach ($fields as $field) {
                     if ('column' === $this->request->getPost($field->getId() . ':mode')) {
-
-                        if ($this->isFieldValid($field)) {
-                            continue;
-                        }
-
                         $column   = $this->request->getPost($field->getId() . ':column');
                         $messages = $rowEditor->getMessages($field);
 
@@ -369,14 +372,5 @@ class ImportMapFields extends StockPageAbstract
         }
 
         return $this;
-    }
-
-    /**
-     * @param FieldInterface $field
-     * @return bool
-     */
-    protected function isFieldValid(FieldInterface $field)
-    {
-        return false;
     }
 }
