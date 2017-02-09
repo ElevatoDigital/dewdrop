@@ -297,7 +297,7 @@ class Wp extends EnvAbstract
 
     /**
      * Registering a component in WordPress means registering a handler
-     * for a hook.  Typically, add_object_page is used, but that implies
+     * for a hook.  Typically, add_menu_page is used, but that implies
      * an entry in the top-level admin menu.  Because we want to support
      * components that don't appear in the menu, we check the display-menu
      * permission here and then use add_submenu_page() with no slug to
@@ -336,15 +336,15 @@ class Wp extends EnvAbstract
     }
 
     /**
-     * A mock wrapper for WP's add_object_page() function.  Allows calls
+     * A mock wrapper for WP's add_menu_page() function.  Allows calls
      * during testing without error.
      *
      * @return void
      */
     protected function addObjectPage()
     {
-        if (function_exists('add_object_page')) {
-            call_user_func_array('add_object_page', func_get_args());
+        if (function_exists('add_menu_page')) {
+            call_user_func_array('add_menu_page', func_get_args());
         }
     }
 
