@@ -17,6 +17,7 @@ use Dewdrop\Zf1\Paths as Zf1Paths;
 use Dewdrop\Zf1\Session\Access as SessionAccess;
 use Pimple;
 use ReflectionClass;
+use Zend_Auth;
 use Zend_Controller_Front;
 use Zend_Session_Namespace;
 
@@ -214,5 +215,24 @@ class Env implements EnvInterface
     public function getProjectNoun()
     {
         return 'app';
+    }
+
+    public function getCurrentUserId()
+    {
+        $auth = Zend_Auth::getInstance();
+
+        if (!$auth->hasIdentity()) {
+            return null;
+        }
+
+        $identity = $auth->getIdentity();
+
+        if (isset($identity->user_id) && $identity->user_id) {
+            return $identity->user_id;
+        } elseif (isset($identity->id) && $identity->id) {
+            return $identity->id;
+        }
+
+        return null;
     }
 }

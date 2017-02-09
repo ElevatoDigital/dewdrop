@@ -2,6 +2,7 @@
 
 namespace Dewdrop\Admin\Component;
 
+use Dewdrop\ActivityLog\Handler\HandlerInterface as ActivityLogHandlerInterface;
 use Dewdrop\Admin\Env\EnvInterface;
 use Dewdrop\Admin\Page\PageAbstract;
 use Dewdrop\Admin\PageFactory\PageFactoryInterface;
@@ -67,6 +68,11 @@ trait ComponentTrait
     private $permissions;
 
     /**
+     * @var ActivityLogHandlerInterface
+     */
+    private $activityLogHandler;
+
+    /**
      * Get the path to this component's class.
      *
      * @return string
@@ -80,6 +86,25 @@ trait ComponentTrait
         }
 
         return $this->path;
+    }
+
+    /**
+     * @param ActivityLogHandlerInterface $activityLogHandler
+     * @return $this
+     */
+    public function setActivityLogHandler(ActivityLogHandlerInterface $activityLogHandler)
+    {
+        $this->activityLogHandler = $activityLogHandler;
+
+        return $this;
+    }
+
+    /**
+     * @return ActivityLogHandlerInterface
+     */
+    public function getActivityLogHandler()
+    {
+        return $this->activityLogHandler;
     }
 
     /**
@@ -188,7 +213,7 @@ trait ComponentTrait
      * is dispatched on this component.  Your callback will receive the new
      * page object as its first argument.
      *
-     * @param mixed $pageName
+     * @param $pageName
      * @param callable $callback
      * @return $this
      */
@@ -198,10 +223,10 @@ trait ComponentTrait
             foreach ($pageName as $name) {
                 $this->onPageDispatch($name, $callback);
             }
-            
+
             return $this;
         }
-        
+
         if (!array_key_exists($pageName, $this->pageDispatchCallbacks)) {
             $this->pageDispatchCallbacks[$pageName] = [];
         }

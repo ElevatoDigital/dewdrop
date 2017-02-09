@@ -10,6 +10,7 @@
 
 namespace Dewdrop\Zf1\Controller\Action;
 
+use Dewdrop\ActivityLog\Handler\NullHandler as ActivityLogNullHandler;
 use Dewdrop\Admin\Component\ComponentInterface;
 use Dewdrop\Admin\Component\ComponentTrait;
 use Dewdrop\Admin\Component\CrudInterface;
@@ -34,6 +35,8 @@ class Admin extends Zend_Controller_Action implements ComponentInterface
         array $invokeArgs = array()
     ) {
         $this->pimple = Pimple::getInstance();
+
+        $this->activityLogHandler = new ActivityLogNullHandler();
 
         if ($this instanceof CrudInterface) {
             $this->addPageFactory(new CrudFactory($this));

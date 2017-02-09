@@ -137,18 +137,15 @@ class Silex extends EnvAbstract
             }
         );
 
-        $this->application->get(
-            '/admin/' . $component->getName(),
+        $this->application->match(
+            '/admin/' . $component->getName() . '/',
             function () use ($component) {
-                $url = '/admin/' . $component->getName() . '/index';
-
-                if (Pimple::hasResource('url-filter')) {
-                    /* @var $filter callable */
-                    $filter = Pimple::getResource('url-filter');
-                    $url    = $filter($url);
+                /* @var $component ComponentInterface */
+                foreach ($this->components as $preDispatchComponent) {
+                    $preDispatchComponent->preDispatch();
                 }
 
-                return $this->application->redirect($url);
+                return $component->dispatchPage('index');
             }
         );
     }

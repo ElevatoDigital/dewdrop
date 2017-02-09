@@ -102,4 +102,11 @@ interface EnvInterface
      * @return void
      */
     public function providePimpleSessionResource(Pimple $pimple);
+
+    /**
+     * Get the ID for the currently logged in user or null if no user is logged in.
+     *
+     * @return integer|null
+     */
+    public function getCurrentUserId();
 }

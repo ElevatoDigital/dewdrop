@@ -47,6 +47,7 @@ class Run
         'GenAdminComponent',
         'GenDbTable',
         'GenEav',
+        'GenUsersAndSecurityLevels',
         'Sniff',
         'Tinker',
         'ActivityLogKeyGen',

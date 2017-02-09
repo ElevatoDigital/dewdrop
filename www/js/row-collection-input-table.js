@@ -1,4 +1,4 @@
-jQuery(function ($) {
+(function () {
     'use strict';
 
     var collections = $('.row-collection-input-table');
@@ -49,7 +49,7 @@ jQuery(function ($) {
     RowCollection.prototype.initRowEventHandlers = function (row) {
         var that = this;
 
-        row.find('.btn-delete').on(
+        row.find('.btn-delete-row').on(
             'click',
             function (e) {
                 var button = $(this);
@@ -68,8 +68,6 @@ jQuery(function ($) {
                             }
 
                             that.refreshVisibility();
-
-                            that.table.trigger('rowDeleted');
                         }
                     }
                 );
@@ -83,8 +81,6 @@ jQuery(function ($) {
             row;
 
         tbody.prepend(html);
-
-        this.table.trigger('rowAdded');
 
         row = tbody.find('tr:first');
 
@@ -105,4 +101,4 @@ jQuery(function ($) {
             collection.init();
         }
     );
-});
+}());

@@ -13,6 +13,7 @@ namespace Dewdrop\Silex;
 use Dewdrop\Env\EnvInterface;
 use Dewdrop\Exception as DewdropException;
 use Dewdrop\Paths;
+use Dewdrop\Pimple as DewdropPimple;
 use Dewdrop\Silex\Session\Access as SessionAccess;
 use Exception as PhpException;
 use Pimple;
@@ -96,6 +97,21 @@ class Env implements EnvInterface
                 return new SessionAccess($pimple['session']);
             }
         );
+    }
+
+    public function getCurrentUserId()
+    {
+        if (!DewdropPimple::hasResource('user')) {
+            return null;
+        }
+
+        $user = DewdropPimple::getResource('user');
+
+        if (isset($user['user_id']) && 0 < $user['user_id']) {
+            return $user['user_id'];
+        } else {
+            return null;
+        }
     }
 
     public function getProjectNoun()
