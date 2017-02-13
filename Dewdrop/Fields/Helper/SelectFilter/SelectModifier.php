@@ -239,6 +239,8 @@ class SelectModifier extends HelperAbstract implements SelectModifierInterface
                 $type = 'Boolean';
             } elseif ($field->isType('date', 'timestamp')) {
                 $type = 'Date';
+            } elseif ($field->isType('time')) {
+                $type = 'Time';
             } elseif ($field->isType('integer', 'float')) {
                 $type = 'Numeric';
             } elseif ($field->isType('clob', 'text')) {

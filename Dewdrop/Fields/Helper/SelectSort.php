@@ -418,7 +418,7 @@ class SelectSort extends HelperAbstract implements SelectModifierInterface
 
         if ($field->isType('reference')) {
             $method = 'sortDbReference';
-        } elseif ($field->isType('date', 'timestamp')) {
+        } elseif ($field->isType('date', 'timestamp', 'time')) {
             $method = 'sortDbDate';
         } elseif ($field->isType('manytomany', 'clob', 'string', 'numeric', 'boolean')) {
             $method = 'sortDbDefault';

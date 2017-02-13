@@ -13,7 +13,6 @@ namespace Dewdrop\Cli\Command;
 use Dewdrop\Cli\Run;
 use Dewdrop\Cli\Renderer\RendererInterface;
 use Dewdrop\Exception;
-use Dewdrop\Paths;
 
 /**
  * The abstract class used by all CLI commands.
@@ -36,6 +35,16 @@ abstract class CommandAbstract
      * @const
      */
     const ARG_OPTIONAL = false;
+
+    /**
+     * @const
+     */
+    const VALUE_REQUIRED = 'value-required';
+
+    /**
+     * @const
+     */
+    const VALUE_NONE = 'value-none';
 
     /**
      * The \Dewdrop\Cli\Run instance that is managing this and other CLI
@@ -264,6 +273,11 @@ abstract class CommandAbstract
                 list($name, $value) = explode('=', $segment);
 
                 unset($args[$index]);
+            } elseif ($this->argTakesNoValue($segment)) {
+                $name  = $segment;
+                $value = true;
+
+                unset($args[$index]);
             } else {
                 // Otherwise, we need to look to the next input segment for the value
                 $name  = $segment;
@@ -443,16 +457,18 @@ abstract class CommandAbstract
      * @param string $description
      * @param boolean $required
      * @param array $aliases
+     * @param string $mode
      *
      * @return \Dewdrop\Cli\Command\CommandAbstract
      */
-    public function addArg($name, $description, $required, $aliases = array())
+    public function addArg($name, $description, $required, $aliases = array(), $mode = self::VALUE_REQUIRED)
     {
         $this->args[] = array(
             'name'        => strtolower($name),
             'required'    => $required,
             'description' => $description,
-            'aliases'     => array_map('strtolower', $aliases)
+            'aliases'     => array_map('strtolower', $aliases),
+            'mode'        => $mode
         );
 
         return $this;
@@ -497,7 +513,7 @@ abstract class CommandAbstract
      *
      * @param string $inputCommand
      *
-     * @return \Dewdrop\Cli\Command\CommandAbstract
+     * @return bool
      */
     public function isSelected($inputCommand)
     {
@@ -531,7 +547,7 @@ abstract class CommandAbstract
      *
      * ./vendor/bin/dewdrop help my-command
      *
-     * @return void
+     * @return $this
      */
     public function help()
     {
@@ -706,5 +722,22 @@ abstract class CommandAbstract
         $this->$setter($value);
 
         return $this;
+    }
+
+    /**
+     * Check to see if the given arg requires a value or not.
+     *
+     * @param string $name
+     * @return bool
+     */
+    private function argTakesNoValue($name)
+    {
+        foreach ($this->args as $arg) {
+            if ($arg['name'] === $name && self::VALUE_NONE === $arg['mode']) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

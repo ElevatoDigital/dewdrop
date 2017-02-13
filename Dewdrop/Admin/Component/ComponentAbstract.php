@@ -246,25 +246,6 @@ abstract class ComponentAbstract implements ComponentInterface, ShellIntegration
     }
 
     /**
-     * @param ActivityLogHandlerInterface $activityLogHandler
-     * @return $this
-     */
-    public function setActivityLogHandler(ActivityLogHandlerInterface $activityLogHandler)
-    {
-        $this->activityLogHandler = $activityLogHandler;
-
-        return $this;
-    }
-
-    /**
-     * @return ActivityLogHandlerInterface
-     */
-    public function getActivityLogHandler()
-    {
-        return $this->activityLogHandler;
-    }
-
-    /**
      * Check to see if this component is active.
      *
      * @return boolean

@@ -31,19 +31,7 @@ class IsoDate extends AbstractFilter
         if (null === $value || '' === $value) {
             $out = null;
         } else {
-            $gmtOffset = 0;
-
-            // Reverse WordPress GMT offset when filtering date input
-            if (function_exists('get_option')) {
-                $timezoneString = get_option('timezone_string');
-                $isoValue       = date('Y-m-d', strtotime($value));
-
-                if ($timezoneString) {
-                    $gmtOffset = timezone_offset_get(new DateTimeZone($timezoneString), date_create($isoValue));
-                }
-            }
-
-            $out = date('Y-m-d', strtotime($value) + ($gmtOffset * -1));
+            $out = date('Y-m-d', strtotime($value));
         }
 
         return $out;

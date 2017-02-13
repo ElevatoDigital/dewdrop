@@ -570,6 +570,20 @@ class RowEditor implements SaveHandlerInterface
             }
         }
 
+        $this->callEditableFieldSaveHandlers();
+
+        return $this;
+    }
+
+    /**
+     * Call the save handlers on any editable fields.  You'll typically only need to call
+     * this if you're doing a custom save callback and are leveraging save handlers (e.g.
+     * via a RowCollectionEditor).
+     *
+     * @return $this
+     */
+    public function callEditableFieldSaveHandlers()
+    {
         /* @var $field FieldInterface */
         foreach ($this->fields->getEditableFields() as $field) {
             $this->saveHandlerHelper->save($field);

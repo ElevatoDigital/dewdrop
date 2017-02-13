@@ -100,6 +100,8 @@ class EditHelperDetector
             return 'inputDate';
         } elseif ($field->isType('timestamp')) {
             return 'inputTimestamp';
+        } elseif ($field->isType('time')) {
+            return 'inputTime';
         }
 
         throw new Exception(

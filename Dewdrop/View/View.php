@@ -164,6 +164,7 @@ class View
         'inputfile'                  => '\Dewdrop\View\Helper\InputFile',
         'inputimage'                 => '\Dewdrop\View\Helper\InputImage',
         'inputtext'                  => '\Dewdrop\View\Helper\InputText',
+        'inputtime'                  => '\Dewdrop\View\Helper\InputTime',
         'inputtimestamp'             => '\Dewdrop\View\Helper\InputTimestamp',
         'optioninputdecorator'       => '\Dewdrop\View\Helper\OptionInputDecorator',
         'pagination'                 => '\Dewdrop\View\Helper\Pagination',
