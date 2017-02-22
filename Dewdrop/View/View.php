@@ -464,6 +464,25 @@ class View
 
         return ob_get_clean();
     }
+    
+    /**
+     * Render the provided template file.
+     *
+     * This method returns the output as a string so that you
+     * have the opportunity to filter or otherwise handle it prior to actually
+     * adding it to the response.
+     *
+     * @param string $template Full path of file
+     * @return string
+     */
+    public function renderFullPathTemplate($template)
+    {
+        ob_start();
+
+        require realpath($template);
+
+        return ob_get_clean();
+    }
 
     /**
      * Escape string included in normal HTML context (i.e. not in an attribute value).
