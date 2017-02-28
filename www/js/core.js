@@ -28,6 +28,8 @@
 
     if ($.fn.tooltip && $.fn.bootstrapTooltip) {
         $.fn.tooltip.Constructor = $.fn.bootstrapTooltip.Constructor;
+    } else {
+        $.fn.tooltip = $.fn.bootstrapTooltip;
     }
 
     window.DEWDROP = DEWDROP;
