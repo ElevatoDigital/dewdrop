@@ -273,7 +273,7 @@ class Wp extends EnvAbstract
                 $url = $slug;
 
                 if ('Index' !== $page['route']) {
-                    $url .= '/' . $page['route'];
+                    $url .= '&route=' . $page['route'];
                 }
 
                 // If the current route matches the page linked then mark it as selected
