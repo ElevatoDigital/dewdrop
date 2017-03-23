@@ -67,6 +67,11 @@ class ContentTest extends PHPUnit_Framework_TestCase
 
         $this->field
             ->expects($this->any())
+            ->method('getHelperFilters')
+            ->will($this->returnValue([]));
+        
+        $this->field
+            ->expects($this->any())
             ->method('getName')
             ->will($this->returnValue($name));
 
