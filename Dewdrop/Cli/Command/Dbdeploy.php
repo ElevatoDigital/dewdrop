@@ -369,10 +369,12 @@ class Dbdeploy extends CommandAbstract
             )
         );
 
+        $fileKeys = array_keys($files);
+
         $this->renderer->text(
             sprintf(
                 'Available Revision: %05s',
-                (0 === $count ? $current : array_pop(array_keys($files)))
+                (0 === $count ? $current : array_pop($fileKeys))
             )
         );
 
