@@ -366,6 +366,9 @@ class Auth
 
         $app['security.firewalls'] = $this->getSecurityFirewallsConfig();
 
+        // Hack to ensure firewall_map, which also defines authentication_provides, is present
+        $app['security.firewall_map'];
+
         $app['security.encoder.digest'] = $app->share(
             function () {
                 return new BCryptPasswordEncoder(6);
