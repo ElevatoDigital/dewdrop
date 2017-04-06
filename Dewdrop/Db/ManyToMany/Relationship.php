@@ -11,6 +11,7 @@
 namespace Dewdrop\Db\ManyToMany;
 
 use Dewdrop\Db\Adapter as DbAdapter;
+use Dewdrop\Db\Driver\Pdo\Pgsql;
 use Dewdrop\Db\Expr;
 use Dewdrop\Db\Row;
 use Dewdrop\Db\Select;
@@ -118,6 +119,12 @@ class Relationship
      * @var bool
      */
     private $allowDuplicateValues = false;
+
+    /**
+     * A callback that is used in place of the default save method.
+     * @var callable
+     */
+    private $saveCallback;
 
     /**
      * Create relationship using the supplied source table and cross-reference
@@ -324,6 +331,7 @@ class Relationship
      * reference the source table.
      *
      * @return string
+     * @throws Exception
      */
     public function getXrefReferenceColumnName()
     {
@@ -445,7 +453,7 @@ class Relationship
         $titleColumn  = $this->findReferenceTitleColumn();
         $driver       = $select->getAdapter()->getDriver();
 
-        if ($driver instanceof \Dewdrop\Db\Driver\Pdo\Pgsql) {
+        if ($driver instanceof Pgsql) {
             $expr = new Expr(
                 "ARRAY_TO_STRING(
                     ARRAY(
@@ -574,6 +582,24 @@ class Relationship
     }
 
     /**
+     * Register a save callback.
+     *
+     * @param  callable $callback
+     * @throws Exception
+     * @return $this
+     */
+    public function setSaveCallback(callable $callback)
+    {
+        if (!is_callable($callback)) {
+            throw new Exception('Invalid callback provided; not callable');
+        }
+
+        $this->saveCallback = $callback;
+
+        return $this;
+    }
+
+    /**
      * Save new values for this relationship.  This is typically called from
      * \Dewdrop\Db\Table when running insert() or update().
      *
@@ -582,6 +608,23 @@ class Relationship
      * @return integer
      */
     public function save($xrefValues, $anchorValue)
+    {
+        if (is_callable($this->saveCallback)) {
+            return call_user_func_array($this->saveCallback, func_get_args());
+        }
+
+        return $this->defaultSave($xrefValues, $anchorValue);
+    }
+
+    /**
+     * Save new values for this relationship.  This is typically called from
+     * \Dewdrop\Db\Table when running insert() or update().
+     *
+     * @param array $xrefValues
+     * @param mixed $anchorValue
+     * @return integer
+     */
+    public function defaultSave($xrefValues, $anchorValue)
     {
         if (!is_array($xrefValues)) {
             $xrefValues = array();
@@ -647,7 +690,7 @@ class Relationship
      * @param mixed $anchorValue
      * @return string
      */
-    private function buildDeleteWhereClause(DbAdapter $db, array $xrefValues, $anchorValue)
+    public function buildDeleteWhereClause(DbAdapter $db, array $xrefValues, $anchorValue)
     {
         $anchorName = $db->quoteIdentifier(
             "{$this->xrefTableName}.{$this->getXrefAnchorColumnName()}"
