@@ -219,7 +219,13 @@ class Index extends StockPageAbstract
         }
 
         $this->view->bootstrapRowActions()->assignCallback($rowActionArgs);
-
+        
+        if ($this->component instanceof BulkActionProcessorInterface) {
+            $this->view->assign([
+                'bulkActions' => $this->component->getBulkActions(),
+            ]);
+        }
+        
         echo $this->view->encodeJsonHtmlSafe(
             $this->view->datatables()->render(
                 $fields,
