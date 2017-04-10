@@ -219,13 +219,23 @@ class Index extends StockPageAbstract
         }
 
         $this->view->bootstrapRowActions()->assignCallback($rowActionArgs);
-        
+
         if ($this->component instanceof BulkActionProcessorInterface) {
             $this->view->assign([
                 'bulkActions' => $this->component->getBulkActions(),
             ]);
         }
-        
+
+        if ($this->component instanceof SortableListingInterface) {
+            $sortField = $this->component->getSortField();
+
+            $this->getView()->tableSortHandle()->assignToField(
+                $sortField,
+                $renderer,
+                $listing->getPrimaryKey()->getName()
+            );
+        }
+
         echo $this->view->encodeJsonHtmlSafe(
             $this->view->datatables()->render(
                 $fields,
