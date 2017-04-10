@@ -77,12 +77,16 @@ class DataTables extends AbstractHelper
     public function getData(Fields $fields, array $data, TableCellHelper $renderer)
     {
         $rowIndex = 0;
-
-        $out = [];
+        $out      = [];
+        $view     = $renderer->getContentRenderer()->getView();
 
         foreach ($data as $dataRow) {
             $columnIndex = 0;
             $row         = [];
+
+            if ($view->bulkActions) {
+                $fields->prepend($view->bulkActionCheckboxField($view->bulkActions, $renderer));
+            }
 
             foreach ($fields as $field) {
                 $row[$field->getQueryStringId()] = $renderer->getContentRenderer()->render($field, $dataRow, $rowIndex, $columnIndex);
