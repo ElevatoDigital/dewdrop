@@ -53,6 +53,7 @@ use Dewdrop\View\Helper\BulkActionCheckboxField;
  * @method Helper\DetectEditHelper detectEditHelper()
  * @method Helper\EditForm editForm()
  * @method \Dewdrop\Fields\Helper\EditControl editControlRenderer()
+ * @method string FileSize()
  * @method \Zend\View\Helper\HeadLink headLink()
  * @method \Zend\View\Helper\HeadMeta headMeta()
  * @method \Zend\View\Helper\HeadScript headScript()
@@ -149,6 +150,7 @@ class View
         'detectedithelper'           => '\Dewdrop\View\Helper\DetectEditHelper',
         'editform'                   => '\Dewdrop\View\Helper\EditForm',
         'editcontrolrenderer'        => '\Dewdrop\View\Helper\EditControlRenderer',
+        'filesize'                   => '\Dewdrop\View\Helper\FileSize',
         'headlink'                   => '\Zend\View\Helper\HeadLink',
         'headmeta'                   => '\Zend\View\Helper\HeadMeta',
         'headscript'                 => '\Zend\View\Helper\HeadScript',
@@ -464,7 +466,7 @@ class View
 
         return ob_get_clean();
     }
-    
+
     /**
      * Render the provided template file.
      *
