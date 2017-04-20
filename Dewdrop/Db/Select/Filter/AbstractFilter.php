@@ -50,22 +50,26 @@ abstract class AbstractFilter implements FilterInterface
         $args      = func_get_args();
         $argsCount = count($args);
 
-        switch ($argsCount) {
-            case 1: // Arbitrary SQL expression
-                if (!$args[0] instanceof Expr) {
-                    throw new Exception(
-                        'You must either pass the table and column names, respectively, or pass an instance of ' .
-                            '\Dewdrop\Db\Expr'
-                    );
-                }
-                $this->expr = $args[0];
-                break;
-            case 2: // Table and column names, respectively
-                $this->tableName  = (string) $args[0];
-                $this->columnName = (string) $args[1];
-                break;
-            default:
-                throw new Exception("Invalid number of arguments: {$argsCount}");
+
+        if (1 === $argsCount) { // Arbitrary SQL expression
+            if (!$args[0] instanceof Expr) {
+                throw new Exception(
+                    'You must either pass the table and column names, respectively, or pass an instance of ' .
+                    '\Dewdrop\Db\Expr'
+                );
+            }
+            $this->expr = $args[0];
+        } elseif (2 === $argsCount) { // Column Name is Arbitrary SQL expression
+            if ($args[1] instanceof Expr) {
+                $this->expr = $args[1];
+            }
+        } elseif (!in_array($argsCount, [1, 2])) {
+            throw new Exception("Invalid number of arguments: {$argsCount}");
+        }
+
+        if (!$this->isExpr()) { // Table and column names, respectively
+            $this->tableName  = (string) $args[0];
+            $this->columnName = (string) $args[1];
         }
     }
 

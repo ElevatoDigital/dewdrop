@@ -1,4 +1,4 @@
-(function () {
+(function ($) {
     'use strict';
 
     var collections = $('.row-collection-input-table');
@@ -101,4 +101,4 @@
             collection.init();
         }
     );
-}());
+}(jQuery));

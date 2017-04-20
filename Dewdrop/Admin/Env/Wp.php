@@ -269,15 +269,13 @@ class Wp extends EnvAbstract
         if ($component instanceof ShellIntegrationInterface && count($component->getSubmenuPages())) {
             global $submenu_file;
 
+            $request = $component->getRequest();
             foreach ($component->getSubmenuPages() as $page) {
-                $url = $slug;
 
-                if ('Index' !== $page['route']) {
-                    $url .= '/' . $page['route'];
-                }
+                $url = $slug . '&route=' . $page['route'];
 
                 // If the current route matches the page linked then mark it as selected
-                if ($url === $component->getRequest()->getQuery('page')) {
+                if ($request->getQuery('route') === $page['route']) {
                     $submenu_file = $url;
                 }
 

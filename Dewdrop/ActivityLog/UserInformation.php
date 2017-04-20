@@ -83,7 +83,9 @@ class UserInformation
     {
         $id = $this->getIdFromSignedCookie();
 
-        if (false === $id) {
+        $sapiName = php_sapi_name();
+
+        if (false === $id && 'cli' !== $sapiName) {
             $ipAddress      = $this->request->getClientIp();
             $geocoderResult = null;
 
@@ -97,7 +99,7 @@ class UserInformation
             $id = $this->dbGateway->insertUserInformation(
                 $ipAddress,
                 $_SERVER['HTTP_USER_AGENT'],
-                php_sapi_name(),
+                $sapiName,
                 $geocoderResult
             );
 
