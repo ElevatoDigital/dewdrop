@@ -95,26 +95,6 @@ abstract class ComponentAbstract implements ComponentInterface, ShellIntegration
     protected $pimple;
 
     /**
-     * The admin environment.  Used to do anything environment (i.e. WP or Silex)
-     * specific, like perform redirects.
-     *
-     * @var EnvInterface
-     */
-    protected $env;
-
-    /**
-     * The path to the component class.
-     *
-     * @var string
-     */
-    protected $path;
-
-    /**
-     * @var ActivityLogHandlerInterface
-     */
-    private $activityLogHandler;
-
-    /**
      * Whether this component is active (currently in charge of dispatching a
      * page/response).
      *
