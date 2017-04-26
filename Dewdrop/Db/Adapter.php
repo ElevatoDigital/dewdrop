@@ -458,6 +458,20 @@ class Adapter
     }
 
     /**
+     * Set the name of the table into which data were last INSERTed. Useful when an INSERT occurs outside the context
+     * of the insert() method.
+     *
+     * @param string $lastInsertTableName
+     * @return $this
+     */
+    public function setLastInsertTableName($lastInsertTableName)
+    {
+        $this->lastInsertTableName = (string) $lastInsertTableName;
+
+        return $this;
+    }
+
+    /**
      * Updates table rows with specified data based on a WHERE clause.
      *
      * @param  mixed        $table The table to update.
