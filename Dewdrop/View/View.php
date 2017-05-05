@@ -217,6 +217,18 @@ class View
     }
 
     /**
+     * Get all the internal view data.  Can sometimes be useful if you want to pass
+     * all the data from a view to a partial rather than having to manually re-assign
+     * all the different view data and keep those two sets of data in sync in your code.
+     *
+     * @return array
+     */
+    public function getData()
+    {
+        return $this->internalViewData;
+    }
+
+    /**
      * Assign variables to this view's data.
      *
      * If the $name parameter is an array rather than a string, assign() will
