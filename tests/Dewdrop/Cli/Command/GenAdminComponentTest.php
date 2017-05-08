@@ -1,6 +1,5 @@
 <?php
 
-use Dewdrop\Cli\Run;
 use Dewdrop\Cli\Renderer\Mock as MockRenderer;
 
 class Dewdrop_Cli_Command_GenAdminComponentTest extends PHPUnit_Framework_TestCase
@@ -52,12 +51,12 @@ class Dewdrop_Cli_Command_GenAdminComponentTest extends PHPUnit_Framework_TestCa
         $gen
             ->expects($this->once())
             ->method('setFolder')
-            ->with('Folder');
+            ->with('some-component');
 
         $gen
             ->expects($this->once())
             ->method('setNamespace')
-            ->with('Namespace');
+            ->with('SomeComponent');
 
         $gen
             ->parseArgs(
@@ -65,9 +64,9 @@ class Dewdrop_Cli_Command_GenAdminComponentTest extends PHPUnit_Framework_TestCa
                     '-t',
                     'Title',
                     '-f',
-                    'Folder',
+                    'some-component',
                     '-n',
-                    'Namespace'
+                    'SomeComponent'
                 )
             );
     }
@@ -88,20 +87,20 @@ class Dewdrop_Cli_Command_GenAdminComponentTest extends PHPUnit_Framework_TestCa
         $gen
             ->expects($this->once())
             ->method('setFolder')
-            ->with('Folder');
+            ->with('some-component');
 
         $gen
             ->expects($this->once())
             ->method('setNamespace')
-            ->with('Namespace');
+            ->with('SomeComponent');
 
         $gen
             ->parseArgs(
                 array(
                     '-f',
-                    'Folder',
+                    'some-component',
                     '-n',
-                    'Namespace',
+                    'SomeComponent',
                     'Title'
                 )
             );
@@ -173,7 +172,7 @@ class Dewdrop_Cli_Command_GenAdminComponentTest extends PHPUnit_Framework_TestCa
         $gen
             ->expects($this->once())
             ->method('componentAlreadyExists')
-            ->with($gen->getComponentPath() . '/Folder')
+            ->with($gen->getComponentPath() . '/some-component')
             ->will($this->returnValue(true));
 
         $gen
@@ -182,9 +181,9 @@ class Dewdrop_Cli_Command_GenAdminComponentTest extends PHPUnit_Framework_TestCa
                     '-t',
                     'Title',
                     '-f',
-                    'Folder',
+                    'some-component',
                     '-n',
-                    'Namespace'
+                    'SomeComponent'
                 )
             );
 
@@ -237,7 +236,7 @@ class Dewdrop_Cli_Command_GenAdminComponentTest extends PHPUnit_Framework_TestCa
                     '-t',
                     'Title',
                     '-f',
-                    'Folder'
+                    'some-component'
                 )
             );
 
