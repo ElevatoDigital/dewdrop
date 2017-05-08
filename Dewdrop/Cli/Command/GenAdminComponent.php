@@ -179,13 +179,13 @@ class GenAdminComponent extends CommandAbstract
 
         $this->writeFileFromTemplate(
             "{$viewScriptDir}/edit.phtml",
-            "{$viewScriptTemplatesDir}/edit.tpl",
+            "{$viewScriptTemplatesDir}/Edit.tpl",
             $templateReplacements
         );
 
         $this->writeFileFromTemplate(
             "{$viewScriptDir}/index.phtml",
-            "{$viewScriptTemplatesDir}/index.tpl",
+            "{$viewScriptTemplatesDir}/Index.tpl",
             $templateReplacements
         );
     }
