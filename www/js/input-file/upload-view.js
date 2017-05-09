@@ -165,7 +165,7 @@ define(
                             if (!response || 'success' !== response.result) {
                                 this.renderErrorMessages(response.messages);
                             } else {
-                                this.$valueInput.val(response.value);
+                                this.$valueInput.val(response.value).trigger('change');
 
                                 this.renderFileValue(response.url, response.thumbnail);
                             }
