@@ -74,6 +74,11 @@ abstract class HandlerAbstract implements HandlerInterface
         return $this;
     }
 
+    public function getActivityLog()
+    {
+        return $this->activityLog;
+    }
+
     public function write($summary, $message)
     {
         $this->activityLog->write($summary, $message);

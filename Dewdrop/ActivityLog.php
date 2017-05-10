@@ -41,6 +41,11 @@ class ActivityLog
     private $shortcodeParser;
 
     /**
+     * @var int
+     */
+    private $lastInsertId;
+
+    /**
      * ActivityLog constructor.
      * @param DbGateway $dbGateway
      * @param HandlerResolver $handlerResolver
@@ -121,7 +126,7 @@ class ActivityLog
             ];
         }
 
-        $this->dbGateway->insertEntry($summary, $message, $entities, $this->getUserInformationId());
+        $this->lastInsertId = $this->dbGateway->insertEntry($summary, $message, $entities, $this->getUserInformationId());
 
         return $this;
     }
@@ -136,5 +141,10 @@ class ActivityLog
     public function getUserInformationId()
     {
         return $this->userInformation->getId();
+    }
+
+    public function lastInsertId()
+    {
+        return $this->lastInsertId;
     }
 }
