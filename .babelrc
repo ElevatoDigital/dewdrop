@@ -1,0 +1,5 @@
+{
+    "presets": [
+        ["es2015", {"modules": false}] /* Don't transform ES6 modules, webpack will do that */
+    ]
+}
