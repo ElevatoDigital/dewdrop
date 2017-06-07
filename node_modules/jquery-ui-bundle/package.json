@@ -1,0 +1,33 @@
+{
+  "name": "jquery-ui-bundle",
+  "version": "1.12.1",
+  "homepage": "http://jqueryui.com",
+  "description": "A curated set of user interface interactions, effects, widgets, and themes built on top of the jQuery JavaScript Library.",
+  "main": "jquery-ui.js",
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/imsky/jquery-ui-bundle.git"
+  },
+  "keywords": [
+    "jquery",
+    "jquery",
+    "ui"
+  ],
+  "author": {
+    "name": "jQuery Foundation and other contributors",
+    "url": "https://github.com/jquery/jquery-ui/blob/1.12.1/AUTHORS.txt"
+  },
+  "maintainers": [
+    {
+      "name": "Ivan Malopinsky",
+      "email": "ivan@imsky.co",
+      "url": "http://imsky.co"
+    }
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/imsky/jquery-ui-bundle/issues"
+  },
+  "homepage": "https://github.com/imsky/jquery-ui-bundle#readme"
+}

@@ -1,0 +1,12 @@
+/build/
+/dist/
+/node_modules/
+/_site/
+
+jquery.timepicker-*
+jquery.timepicker.min.*
+
+*~
+*.sample*
+*.DS_Store
+*.sublime-*

@@ -1,0 +1,32 @@
+{
+  "name": "dewdrop",
+  "repository": {
+    "url": "git+https://github.com/DeltaSystems/dewdrop.git",
+    "type": "git"
+  },
+  "scripts": {
+    "watch": "webpack --env=dev --watch",
+    "build": "webpack --env=dev",
+    "build:dev": "webpack --env=dev",
+    "build:prod": "webpack --env=prod"
+  },
+  "dependencies": {
+    "babel-loader": "^7.0.0",
+    "backbone": "^1.3.3",
+    "bootstrap": "^3.3.7",
+    "codemirror": "^5.26.0",
+    "copy-webpack-plugin": "^4.0.1",
+    "jquery": "^2.2.0",
+    "jquery-timepicker": "^1.3.3",
+    "jquery-ui-bundle": "^1.12.1",
+    "keymaster": "^1.6.2",
+    "moment": "^2.18.1",
+    "raw-loader": "^0.5.1",
+    "summernote-webpack": "^0.8.1",
+    "underscore": "^1.8.3",
+    "velocity-animate": "^1.5.0",
+    "velocity-ui-pack": "^1.2.2",
+    "webpack": "^2.6.1",
+    "webpack-config-utils": "^2.3.0"
+  }
+}
