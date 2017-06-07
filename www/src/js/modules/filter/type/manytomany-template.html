@@ -1,0 +1,34 @@
+<%
+var operators = {
+    "contains":     "contains",
+    "not-contains": "does not contain",
+    "is-empty":     "is empty",
+    "is-not-empty": "is not empty"
+};
+%>
+
+<select name="ftr-comp.<%- inputIndex %>" class="filter-op form-control input-sm">
+    <% _.each(operators, function (option, key) { %>
+
+    <% if (values.comp === key) { %>
+    <option value="<%- key %>" selected="selected"><%- option %></option>
+    <% } else { %>
+    <option value="<%- key %>"><%- option %></option>
+    <% } %>
+
+    <% }); %>
+</select>
+
+<select name="ftr-value.<%- inputIndex %>" class="form-control filter-value filter-input input-sm">
+    <option value=""></option>
+
+    <% _.each(options, function (option) { %>
+
+    <% if (parseInt(values.value, 10) === option.value) { %>
+    <option value="<%- option.value %>" selected="selected"><%- option.title %></option>
+    <% } else { %>
+    <option value="<%- option.value %>"><%- option.title %></option>
+    <% } %>
+
+    <% }); %>
+</select>

@@ -1,0 +1,26 @@
+<div class="row">
+    <div class="col-sm-4">
+        <select class="form-control input-sm filter-field" name="ftr-id.<%- index %>">
+            <option value="" disabled="disabled" selected="selected">Select a field to filter by...</option>
+            <% _.each(fields, function (field) { %>
+
+            <% if (selected === field.id) { %>
+            <option selected="selected" value="<%- field.id.replace('+', ' ') %>"><%- field.label %></option>
+            <% } else { %>
+            <option value="<%- field.id %>"><%- field.label %></option>
+            <% } %>
+
+            <% }); %>
+        </select>
+    </div>
+    <div class="col-sm-8">
+        <div class="form-inline">
+            <span class="glyphicon glyphicon-arrow-right visible-xs"></span>
+            <span class="form-inline filter-control-wrapper"></span>
+            <div class="pull-right btn-group">
+                <button type="button" class="js-add btn btn-add btn-default btn-sm"><span class="glyphicon glyphicon-plus"></span></button>
+                <button type="button" class="js-remove btn btn-remove btn-default btn-sm"><span class="glyphicon glyphicon-minus"></span></button>
+            </div>
+        </div>
+    </div>
+</div>

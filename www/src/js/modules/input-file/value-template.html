@@ -1,0 +1,33 @@
+<div class="input-file-status-ui">
+    <% if (thumbnail) { %>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <a target="_blank" href="<%- url %>">
+                <div class="thumbnail">
+                    <img src="<%- thumbnail %>" />
+                </div>
+
+                <span class="glyphicon glyphicon-file"></span>
+                <%- url.split('/').pop() %>
+            </a>
+        </div>
+    </div>
+    <% } else { %>
+    <a target="_blank" href="<%- url %>">
+        <span class="glyphicon glyphicon-file"></span>
+        <%- url.split('/').pop() %>
+    </a>
+    <% } %>
+
+
+    <div class="btn-group btn-group-justified" role="group">
+        <div class="btn-group" role="group">
+            <button type="button" class="btn btn-default btn-xs btn-remove"><span class="glyphicon glyphicon-remove"></span> Remove</button>
+        </div>
+        <!--
+        <div class="btn-group" role="group">
+            <button type="button" class="btn btn-default btn-xs btn-copy"><span class="glyphicon glyphicon-copy"></span> Copy</button>
+        </div>
+        -->
+    </div>
+</div>
