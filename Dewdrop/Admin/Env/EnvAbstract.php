@@ -51,18 +51,9 @@ abstract class EnvAbstract implements EnvInterface
      */
     protected $coreClientSideDependencies = [
         'js' => [
-            'modernizr'    => '/dewdrop/www/js/modernizr.custom.63049.js',
-            'jquery'       => '/jquery/dist/jquery.min.js',
-            'bootstrap'    => '/bootstrap/dist/js/bootstrap.min.js',
-            'keymaster'    => '/keymaster/keymaster.js',
-            'moment'       => '/moment/min/moment-with-locales.min.js',
-            'velocity'     => '/velocity/jquery.velocity.min.js',
-            'velocity-ui'  => '/velocity/velocity.ui.js',
-            'underscore'   => '/underscore/underscore.js',
-            'backbone'     => '/backbone/backbone.js',
-            'requirejs'    => '/requirejs/require.js',
-            'dewdrop-core' => '/dewdrop/www/js/core.js',
-            'dewdrop-form' => '/dewdrop/www/js/form.js',
+            'modernizr' => '/dewdrop/www/dist/js/modernizr.custom.63049.js',
+            'vendor'    => '/dewdrop/www/dist/js/vendor.js',
+            'dewdrop'   => '/dewdrop/www/dist/js/core.js',
         ],
         'css' => [
             'bootstrap'     => '/bootstrap/dist/css/bootstrap.min.css',

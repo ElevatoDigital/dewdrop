@@ -26,9 +26,6 @@ class InputDate extends BootstrapInputText
      */
     public function directArray(array $options)
     {
-        $this->view->headScript()
-            ->appendFile($this->view->bowerUrl('/dewdrop/www/js/date-picker.js'));
-
         $this->view->headLink()
             ->appendStylesheet($this->view->bowerUrl('/dewdrop/www/css/datetime-picker.css'));
 

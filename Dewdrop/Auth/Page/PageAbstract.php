@@ -66,7 +66,8 @@ abstract class PageAbstract
         $this->view
             ->setScriptPath(__DIR__ . '/view-scripts')
             ->assign('title', $this->auth->getTitle())
-            ->assign('headerHtml', $this->auth->getHeaderHtml());
+            ->assign('headerHtml', $this->auth->getHeaderHtml())
+            ->headScript()->appendFile($this->view->bowerUrl('/dewdrop/www/js/core.js'));
 
         $this->init();
     }

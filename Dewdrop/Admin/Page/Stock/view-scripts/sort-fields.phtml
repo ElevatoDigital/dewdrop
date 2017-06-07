@@ -13,6 +13,3 @@
 <script type="text/javascript">
     var initialFieldGroupsConfig = <?php echo $this->encodeJsonHtmlSafe($this->fieldGroups);?>
 </script>
-
-<?php
-$this->headScript()->appendFile($this->bowerUrl('/dewdrop/www/js/sort-fields/main.js'));

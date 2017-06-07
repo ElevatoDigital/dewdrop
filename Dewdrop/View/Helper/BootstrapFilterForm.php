@@ -108,7 +108,6 @@ class BootstrapFilterForm extends AbstractHelper
      */
     public function inline(Fields $fields, SelectFilter $selectFilter, $title, $method = 'GET', $buttons = false)
     {
-        $this->view->headScript()->appendFile($this->view->bowerUrl('/dewdrop/www/js/filter/main.js'));
         $this->view->headLink()->appendStylesheet($this->view->bowerUrl('/dewdrop/www/css/filter.css'));
 
         return $this->partial(

@@ -35,10 +35,6 @@ class RowCollectionInputTable extends AbstractHelper
      */
     public function direct(RowCollectionEditor $rowCollectionEditor)
     {
-        $this->view->headScript()->appendFile(
-            $this->view->bowerUrl('/dewdrop/www/js/row-collection-input-table.js')
-        );
-
         $this->view->headLink()->appendStylesheet(
             $this->view->bowerUrl('/dewdrop/www/css/row-collection-input-table.css')
         );

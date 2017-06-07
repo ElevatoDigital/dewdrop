@@ -44,7 +44,6 @@ class OptionInputDecorator extends AbstractHelper
         $controlHtml
     ) {
         $this->view->headLink()->appendStylesheet($this->view->bowerUrl('/dewdrop/www/css/option-input-decorator.css'));
-        $this->view->headScript()->appendFile($this->view->bowerUrl('/dewdrop/www/js/option-input-decorator.js'));
 
         return $this->partial(
             'option-input-decorator.phtml',

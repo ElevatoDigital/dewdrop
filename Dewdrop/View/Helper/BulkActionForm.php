@@ -28,7 +28,6 @@ class BulkActionForm extends AbstractHelper
     public function open()
     {
         $this->view->headLink()->appendStylesheet($this->view->bowerUrl('/dewdrop/www/css/bulk-action-form.css'));
-        $this->view->headScript()->appendFile($this->view->bowerUrl('/dewdrop/www/js/bulk-action-form.js'));
 
         return '<form class="bulk-action-form" action="" method="POST">';
     }

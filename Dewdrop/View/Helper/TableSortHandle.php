@@ -31,9 +31,6 @@ class TableSortHandle extends AbstractHelper
      */
     public function assignToField(FieldInterface $field, TableCell $cellRenderer, $primaryKeyName)
     {
-        $this->view->headScript()
-            ->appendFile($this->view->bowerUrl('/dewdrop/www/js/listing-sortable.js'));
-
         $this->view->headLink()
             ->appendStylesheet($this->view->bowerUrl('/dewdrop/www/css/listing-sortable.css'));
 

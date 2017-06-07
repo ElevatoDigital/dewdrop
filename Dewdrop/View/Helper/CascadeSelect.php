@@ -8,8 +8,6 @@ class CascadeSelect extends AbstractHelper
 {
     public function direct(Field $field, Field $cascadeFrom)
     {
-        $this->view->headScript()->appendFile($this->view->bowerUrl('/dewdrop/www/js/cascade-select.js'));
-
         return $this->view->select(
             [
                 'name'       => $field->getControlName(),

@@ -11,7 +11,6 @@ class InputFile extends AbstractHelper
 
     public function directArray(array $options)
     {
-        $this->view->headScript()->appendFile($this->view->bowerUrl('/dewdrop/www/js/input-file/main.js'));
         $this->view->headLink()->appendStylesheet($this->view->bowerUrl('/dewdrop/www/css/input-file.css'));
 
         $options = $this->prepareOptionsArray($options);
