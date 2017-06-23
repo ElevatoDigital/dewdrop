@@ -32,7 +32,7 @@
         $envClass = 'env-' . APPLICATION_ENV;
     }
     ?>
-    <body class="<?php echo $envClass;?>">
+    <body class="auth <?php echo $envClass;?>">
     <div class="container-fluid">
         <div class="row">
             <div class="col-sm-3 col-md-4"></div>
@@ -43,12 +43,6 @@
         </div>
 
         <?php
-        $this->headScript()
-            ->appendFile($this->bowerUrl('/jquery/dist/jquery.min.js'))
-            ->appendFile($this->bowerUrl('/bootstrap/dist/js/bootstrap.min.js'))
-            ->appendFile($this->bowerUrl('/velocity/jquery.velocity.min.js'))
-            ->appendFile($this->bowerUrl('/velocity/velocity.ui.js'));
-
         echo $this->headScript();
         echo $this->view->headScript();
         ?>

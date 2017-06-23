@@ -45,9 +45,3 @@ if ($this->error) {
     </div>
     <div class="panel-footer"><a href="/auth/forgot-password">Lost username or password?</a></div>
 </div>
-
-<?php
-if ($this->error) {
-    $this->headScript()->appendFile($this->bowerUrl('/dewdrop/www/js/auth-error.js'));
-}
-?>
