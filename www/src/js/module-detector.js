@@ -1,8 +1,5 @@
 import $ from 'jquery';
 
-//@todo add detector for each applicable dewdrop file
-
-
 class Loader {
     summernote(override) {
         if (override || $('.summernote').length) {
