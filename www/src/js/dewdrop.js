@@ -63,34 +63,6 @@ class Dewdrop {
 
         return bowerUrl + (0 === url.indexOf('/') ? '' : '/') + url;
     }
-
-    /* Abandoning routing based loading in preference of jQuery detection for now.
-    route() {
-        let router = Backbone.Router.extend({
-            'routes': {
-                //'admin/:component/index': 'index', // put ones that dont match default here
-                'admin/:component/:page*splat': 'default'
-            },
-            'index': (component) => {
-                console.log('index')
-                //System.import('./admin/index.js')//.then((module) => { module.default() })
-            },
-            'default': (component, page) => {
-                try {
-                    System.import(`./admin/${page}.js`);
-                } catch(e) {
-                    console.warn(`No dewdrop module for page: ${page}`, e);
-                }
-            }
-        });
-
-        this.router = new router();
-
-        Backbone.history.start({pushState: true, root: '/'});
-
-        return this;
-    }
-    */
 }
 
 export default Dewdrop;

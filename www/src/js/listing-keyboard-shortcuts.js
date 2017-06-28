@@ -1,15 +1,15 @@
 import $ from 'jquery';
 import key from 'keymaster';
 
-class KeyboardShortcuts {
-    constructor(scope = 'dewdrop-keyboard-shortcuts') {
-        key.setScope('listing');
-        key('j', 'listing', this.nextRow);
-        key('k', 'listing', this.previousRow);
-        key('e', 'listing', this.edit);
-        key('v', 'listing', this.view);
-        key('c', 'listing', this.add);
-        key('/', 'listing', this.filter);
+class ListingKeyboardShortcuts {
+    constructor(scope = 'dewdrop-listing-keyboard-shortcuts') {
+        key.setScope(scope);
+        key('j', scope, this.nextRow);
+        key('k', scope, this.previousRow);
+        key('e', scope, this.edit);
+        key('v', scope, this.view);
+        key('c', scope, this.add);
+        key('/', scope, this.filter);
     }
 
     nextRow() {
@@ -82,4 +82,4 @@ class KeyboardShortcuts {
     }
 }
 
-export default KeyboardShortcuts;
+export default ListingKeyboardShortcuts;
