@@ -57,6 +57,7 @@ require(
                             var options = {
                                 changeMonth: true,
                                 changeYear:  true,
+                                yearRange:   '-100:+100',
                                 defaultDate: moment($input.val()).toDate(),
                                 onSelect: function (e) {
                                     var selected = $popover.datepicker('getDate');
