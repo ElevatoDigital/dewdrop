@@ -1,9 +1,4 @@
-import $ from 'jquery';
-import ui from 'jquery-ui-bundle';
 import moment from 'moment';
-
-
-// @todo get Modernizr
 
 class DatePicker {
     constructor() {

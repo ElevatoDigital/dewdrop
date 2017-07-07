@@ -1,4 +1,3 @@
-import $ from 'jquery';
 import Velocity from 'velocity-animate';
 import VelocityUI from 'velocity-ui-pack';
 

@@ -52,6 +52,8 @@ abstract class EnvAbstract implements EnvInterface
     protected $coreClientSideDependencies = [
         'js' => [
             'modernizr' => '/dewdrop/www/dist/js/modernizr.custom.63049.js',
+            'jquery'    => '/jquery/dist/jquery.min.js',
+            'bootstrap' => '/bootstrap/dist/js/bootstrap.min.js',
             'vendor'    => '/dewdrop/www/dist/js/vendor.js',
             'dewdrop'   => '/dewdrop/www/dist/js/core.js',
         ],
@@ -109,16 +111,44 @@ abstract class EnvAbstract implements EnvInterface
      */
     public function addClientSideDependencyAfterKey($type, $name, $path, $key)
     {
+        return $this->injectClientSideDependency($type, $name, $path, $key, true);
+    }
+
+    /**
+     * Add a client-side dependency you'd like to use throughout the admin environment.
+     *
+     * @param string $type Either "css" or "js".
+     * @param string $name An identifier for the dependency.
+     * @param string $path The path (in your bower_components folder) to the dependency.
+     * @param string $key The key of the value you want to put a dependency before.
+     * @return $this
+     */
+    public function addClientSideDependencyBeforeKey($type, $name, $path, $key)
+    {
+        return $this->injectClientSideDependency($type, $name, $path, $key, false);
+    }
+
+    /**
+     * Add a client-side dependency you'd like to use throughout the admin environment.
+     *
+     * @param string $type Either "css" or "js".
+     * @param string $name An identifier for the dependency.
+     * @param string $path The path (in your bower_components folder) to the dependency.
+     * @param string $key The key of the value you want to put a dependency before or after.
+     * @param bool $isAfter
+     * @return $this
+     */
+    private function injectClientSideDependency($type, $name, $path, $key, $isAfter = true) {
         $this->validateClientSideDependencyType($type);
 
         $dependenciesOfType = $this->coreClientSideDependencies[$type];
 
-        $offset = array_search($key, array_keys($dependenciesOfType)) + 1;
+        $offset = array_search($key, array_keys($dependenciesOfType)) + (int) $isAfter;
         $lastIndex = count($dependenciesOfType) - 1;
 
         $this->coreClientSideDependencies[$type] = array_slice($dependenciesOfType, 0, $offset, true)
-                                                    + [$name => $path]
-                                                    + array_slice($dependenciesOfType, $offset, $lastIndex, true);
+            + [$name => $path]
+            + array_slice($dependenciesOfType, $offset, $lastIndex, true);
 
         return $this;
     }

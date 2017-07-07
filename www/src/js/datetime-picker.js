@@ -1,5 +1,3 @@
-import $ from 'jquery';
-import ui from 'jquery-ui-bundle';
 import tp from 'jquery-timepicker/jquery.timepicker';
 import moment from 'moment';
 

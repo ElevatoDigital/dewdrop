@@ -1,4 +1,3 @@
-import $ from 'jquery';
 
 class Loader {
     summernote(override) {

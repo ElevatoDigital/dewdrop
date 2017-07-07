@@ -1,4 +1,3 @@
-import $ from 'jquery';
 import sn from 'summernote-webpack';
 
 class SummerNote {

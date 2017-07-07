@@ -1,10 +1,13 @@
-import $ from 'jquery';
 import FieldsCollection from './filter/fields-collection';
 import FiltersCollection from './filter/filters-collection';
 import FiltersView from './filter/filters-view';
 
 class Filter {
     constructor(selector = '.filter-form') {
+        if (!selector.length) {
+            selector = '.filter-form'
+        }
+
         $(selector).each(
             function (index, form) {
                 var prefix = $(form).data('prefix'),

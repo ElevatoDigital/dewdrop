@@ -2,6 +2,10 @@ import UploadView from './input-file/upload-view';
 
 class InputFile {
     constructor(selector = '.btn-input-file') {
+        if (!selector.length) {
+            selector = '.btn-input-file'
+        }
+
         // Render initial input state
         $(selector).each(
             function (index, button) {

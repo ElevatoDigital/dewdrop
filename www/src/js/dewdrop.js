@@ -1,6 +1,4 @@
-import $ from 'jquery';
 import _ from 'underscore';
-import bootstrap from 'bootstrap';
 import moment from 'moment';
 //import Backbone from 'backbone';
 import Detector from './module-detector';
@@ -28,12 +26,10 @@ class Dewdrop {
     init() {
         moment.locale(navigator.language);
 
-        $.fn.bootstrapTooltip = $.fn.tooltip.noConflict();
-
-        if ($.fn.tooltip && $.fn.bootstrapTooltip) {
-            $.fn.tooltip.Constructor = $.fn.bootstrapTooltip.Constructor;
-        } else {
-            $.fn.tooltip = $.fn.bootstrapTooltip;
+        /*** Handle jQuery plugin naming conflict between jQuery UI and Bootstrap ***/
+        if ($.widget && $.widget.bridge) {
+            $.widget.bridge('uibutton', $.ui.button);
+            $.widget.bridge('uitooltip', $.ui.tooltip);
         }
 
         // Disable submit inputs upon applicable form submissions

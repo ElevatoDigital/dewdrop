@@ -1,5 +1,3 @@
-import $ from 'jquery';
-import ui from 'jquery-ui-bundle';
 
 class ListingSortable {
     constructor() {

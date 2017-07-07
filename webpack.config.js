@@ -1,7 +1,8 @@
-const webpack = require('webpack')
-const path    = require('path')
+const webpack                   = require('webpack')
+const path                      = require('path')
 const {getIfUtils, removeEmpty} = require('webpack-config-utils')
-const CopyWebpackPlugin = require('copy-webpack-plugin')
+const CopyWebpackPlugin         = require('copy-webpack-plugin')
+const ConcatPlugin              = require('webpack-concat-plugin')
 
 module.exports = env => {
     const {ifProd, ifNotProd} = getIfUtils(env)
@@ -16,7 +17,9 @@ module.exports = env => {
             //publicPath: This is set at runtime in dewdrop.js https://github.com/webpack/docs/wiki/configuration#outputpublicpath
         },
         externals: {
-            'Modernizr': 'Modernizr'
+            'Modernizr': 'Modernizr',
+            'jquery': 'jQuery',
+            '$': 'jQuery'
         },
         context: __dirname,
         resolve: {
@@ -44,10 +47,6 @@ module.exports = env => {
                 comments: false,
                 sourceMap: true
             })),
-            new webpack.ProvidePlugin({
-                $: 'jquery',
-                jQuery: 'jquery'
-            }),
             new webpack.DefinePlugin({ // required for summernote
                 "require.specified": "require.resolve"
             }),
@@ -64,7 +63,22 @@ module.exports = env => {
                 minChunks: function(module){
                     return module.context && module.context.indexOf('node_modules') !== -1;
                 }
-            }))/*,// This would be if we want more long term caching
+            })),
+            /*
+             * Create a file that combines all legacy vendor code that was originally globally required.
+             */
+            new ConcatPlugin({
+                uglify: ifProd(true, false),
+                fileName: 'vendor-legacy.js',
+                filesToConcat: [
+                    './node_modules/keymaster/keymaster.js',
+                    './node_modules/moment/min/moment-with-locales.min.js',
+                    './node_modules/velocity-animate/velocity.min.js',
+                    './node_modules/velocity-animate/velocity.ui.min.js',
+                    './node_modules/underscore/underscore.js',
+                    './node_modules/backbone/backbone-min.js'
+                ]
+            })/*,// This would be if we want more long term caching
             ifProd(new webpack.optimize.CommonsChunkPlugin({
                 name: 'manifest',
                 minChunks: Infinity

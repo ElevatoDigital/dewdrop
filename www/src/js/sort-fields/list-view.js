@@ -1,4 +1,3 @@
-import ui from 'jquery-ui-bundle';
 import listHtml from './list-template.html';
 import fieldHtml from './list-field-template.html';
 

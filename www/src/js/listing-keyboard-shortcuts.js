@@ -1,8 +1,11 @@
-import $ from 'jquery';
 import key from 'keymaster';
 
 class ListingKeyboardShortcuts {
     constructor(scope = 'dewdrop-listing-keyboard-shortcuts') {
+        if (!scope.length) {
+            scope = 'dewdrop-listing-keyboard-shortcuts'
+        }
+
         key.setScope(scope);
         key('j', scope, this.nextRow);
         key('k', scope, this.previousRow);

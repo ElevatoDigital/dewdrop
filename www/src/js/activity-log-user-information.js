@@ -1,6 +1,3 @@
-// @todo test this
-
-import $ from 'jquery';
 
 class ActivityLogUserInformation {
     constructor() {

@@ -1,4 +1,3 @@
-import ui from 'jquery-ui-bundle';
 import List from './list-view';
 
 var GroupsView = Backbone.View.extend({
