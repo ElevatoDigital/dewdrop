@@ -1,5 +1,6 @@
 {
   "name": "dewdrop",
+  "main": "www/src/js/dewdrop.js",
   "repository": {
     "url": "git+https://github.com/DeltaSystems/dewdrop.git",
     "type": "git"
