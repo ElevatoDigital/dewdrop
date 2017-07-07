@@ -13,7 +13,7 @@ module.exports = env => {
         },
         output: {
             path: path.join(__dirname, '/www/dist/js'),
-            filename: '[name].js',//ifProd('[name].[chunkhash].js', '[name].js'),// This would be if we want more long term caching
+            filename: '[name].js',
             //publicPath: This is set at runtime in dewdrop.js https://github.com/webpack/docs/wiki/configuration#outputpublicpath
         },
         externals: {
@@ -78,12 +78,7 @@ module.exports = env => {
                     './node_modules/underscore/underscore.js',
                     './node_modules/backbone/backbone-min.js'
                 ]
-            })/*,// This would be if we want more long term caching
-            ifProd(new webpack.optimize.CommonsChunkPlugin({
-                name: 'manifest',
-                minChunks: Infinity
-            }))*/
-
+            })
         ]),
         module: {
             rules: [
