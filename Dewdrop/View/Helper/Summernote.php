@@ -29,8 +29,6 @@ class Summernote extends BootstrapTextarea
             ->appendStylesheet($this->view->bowerUrl('/font-awesome/css/font-awesome.min.css'))
             ->appendStylesheet($this->view->bowerUrl('/summernote/dist/summernote.css'));
 
-        $this->view->headScript()->appendFile($this->view->bowerUrl('/dewdrop/www/js/summernote.js'));
-
         if (!isset($options['classes']) || !is_array($options['classes'])) {
             $options['classes'] = [];
         }
