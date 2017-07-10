@@ -70,7 +70,9 @@ class DatetimePicker {
             $('.date-input').each(
                 function (index, input) {
                     var $input = $(input),
-                        content;
+                        content,
+                        yearRange,
+                        inputName = $input.attr('name');
 
                     content  = '<div class="date-input-popover" data-input="' + $input.data('input') + '">';
                     content += '<a href="#" class="btn btn-link btn-close">';
@@ -86,6 +88,12 @@ class DatetimePicker {
                         content:   content,
                         html:      true
                     });
+
+                    if (inputName && inputName.indexOf('birthdate') > -1) {
+                        yearRange = '-100:+0';
+                    } else {
+                        yearRange = '-100:+100';
+                    }
 
                     $input.on(
                         'focus',
@@ -106,6 +114,7 @@ class DatetimePicker {
                             var options = {
                                 changeMonth: true,
                                 changeYear:  true,
+                                yearRange:   yearRange,
                                 defaultDate: moment($input.val(), 'MM/DD/YYYY').toDate(),
                                 onSelect: function (e) {
                                     var selected = $popover.datepicker('getDate');
