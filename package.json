@@ -1,6 +1,8 @@
 {
   "name": "dewdrop",
   "main": "www/src/js/dewdrop.js",
+  "jsnext:main": "www/src/js/dewdrop.js",
+  "module": "www/src/js/dewdrop.js",
   "version": "1.3.0",
   "repository": {
     "url": "git+https://github.com/DeltaSystems/dewdrop.git",
