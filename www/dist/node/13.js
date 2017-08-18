@@ -2,10 +2,15 @@ exports.ids = [13];
 exports.modules = {
 
 /***/ 123:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var CascadeSelect = function CascadeSelect() {
@@ -55,7 +60,8 @@ var CascadeSelect = function CascadeSelect() {
     });
 };
 
-/* harmony default export */ __webpack_exports__["default"] = (CascadeSelect);
+exports.default = CascadeSelect;
+module.exports = exports['default'];
 
 /***/ })
 

@@ -2,18 +2,26 @@ exports.ids = [5];
 exports.modules = {
 
 /***/ 132:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_velocity_animate__ = __webpack_require__(136);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_velocity_animate___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_velocity_animate__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_velocity_ui_pack__ = __webpack_require__(137);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_velocity_ui_pack___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_velocity_ui_pack__);
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _velocityAnimate = __webpack_require__(136);
+
+var _velocityAnimate2 = _interopRequireDefault(_velocityAnimate);
+
+var _velocityUiPack = __webpack_require__(137);
+
+var _velocityUiPack2 = _interopRequireDefault(_velocityUiPack);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-
-
 
 var OptionInputDecorator = function OptionInputDecorator() {
     _classCallCheck(this, OptionInputDecorator);
@@ -24,9 +32,9 @@ var OptionInputDecorator = function OptionInputDecorator() {
         e.preventDefault();
 
         if ('block' === well.css('display')) {
-            __WEBPACK_IMPORTED_MODULE_0_velocity_animate___default()(well, 'slideUp');
+            (0, _velocityAnimate2.default)(well, 'slideUp');
         } else {
-            __WEBPACK_IMPORTED_MODULE_0_velocity_animate___default()(well, 'slideDown');
+            (0, _velocityAnimate2.default)(well, 'slideDown');
             well.find('input:first').focus();
         }
     });
@@ -66,7 +74,7 @@ var OptionInputDecorator = function OptionInputDecorator() {
                 } else if ('success' === response.result) {
                     reRenderControl(decorator, response.id);
                 } else if ('invalid' === response.result) {
-                    __WEBPACK_IMPORTED_MODULE_0_velocity_animate___default()(decorator, 'callout.shake');
+                    (0, _velocityAnimate2.default)(decorator, 'callout.shake');
                     renderValidationMessages(decorator, response.messages);
                 }
             },
@@ -138,13 +146,14 @@ var OptionInputDecorator = function OptionInputDecorator() {
             success: function success(response) {
                 decorator.find('.option-input-original-control:first').html($(response).find('.option-input-original-control:first').html());
 
-                __WEBPACK_IMPORTED_MODULE_0_velocity_animate___default()(decorator.find('.well:first'), 'slideUp');
+                (0, _velocityAnimate2.default)(decorator.find('.well:first'), 'slideUp');
             }
         });
     };
 };
 
-/* harmony default export */ __webpack_exports__["default"] = (OptionInputDecorator);
+exports.default = OptionInputDecorator;
+module.exports = exports['default'];
 
 /***/ }),
 

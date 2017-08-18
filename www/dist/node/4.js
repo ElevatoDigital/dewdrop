@@ -2,20 +2,28 @@ exports.ids = [4];
 exports.modules = {
 
 /***/ 133:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_velocity_animate__ = __webpack_require__(136);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_velocity_animate___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_velocity_animate__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_velocity_ui_pack__ = __webpack_require__(137);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_velocity_ui_pack___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_velocity_ui_pack__);
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+var _velocityAnimate = __webpack_require__(136);
+
+var _velocityAnimate2 = _interopRequireDefault(_velocityAnimate);
+
+var _velocityUiPack = __webpack_require__(137);
+
+var _velocityUiPack2 = _interopRequireDefault(_velocityUiPack);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-
-
 
 var RowCollection = function () {
     function RowCollection(collection) {
@@ -64,7 +72,7 @@ var RowCollection = function () {
 
                 e.preventDefault();
 
-                __WEBPACK_IMPORTED_MODULE_0_velocity_animate___default()(row, 'transition.expandOut', {
+                (0, _velocityAnimate2.default)(row, 'transition.expandOut', {
                     complete: function complete() {
                         if (!button.data('is-new')) {
                             row.next().find('.row-collection-queued-to-delete').val(1);
@@ -93,7 +101,7 @@ var RowCollection = function () {
             this.table.show();
             this.alert.hide();
 
-            __WEBPACK_IMPORTED_MODULE_0_velocity_animate___default()(row, 'transition.slideUpIn');
+            (0, _velocityAnimate2.default)(row, 'transition.slideUpIn');
 
             row.find(':input:first').focus();
 
@@ -115,7 +123,8 @@ var RowCollectionInputTable = function RowCollectionInputTable() {
     });
 };
 
-/* harmony default export */ __webpack_exports__["default"] = (RowCollectionInputTable);
+exports.default = RowCollectionInputTable;
+module.exports = exports['default'];
 
 /***/ }),
 

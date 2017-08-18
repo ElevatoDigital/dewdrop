@@ -20,19 +20,7 @@ module.exports = env => {
         stats: {
             colors: true
         },
-        devtool: ifProd('source-map', 'eval'),
-        module: {
-            rules: [
-                {
-                    include: path.resolve(__dirname, 'www/src/js'),
-                    loader: 'babel-loader'
-                },
-                {
-                    test: [/\.txt$/, /\.html$/],
-                    use: 'raw-loader'
-                }
-            ]
-        }
+        devtool: ifProd('source-map', 'eval')
     }
 
     let webConfig  = Object.assign({}, config)
@@ -93,6 +81,18 @@ module.exports = env => {
             ]
         })
     ])
+    webConfig.module = {
+        rules: [
+            {
+                include: path.resolve(__dirname, 'www/src/js'),
+                loader: 'babel-loader'
+            },
+            {
+                test: [/\.txt$/, /\.html$/],
+                use: 'raw-loader'
+            }
+        ]
+    }
 
     nodeConfig.entry = {
         dewdrop: './www/src/js/dewdrop'
@@ -109,6 +109,27 @@ module.exports = env => {
             "require.specified": "require.resolve"
         })
     ])
+    nodeConfig.module =  {
+        rules: [
+            {
+                include: path.resolve(__dirname, 'www/src/js'),
+                loader: 'babel-loader',
+                options: {
+                    presets: [
+                        'stage-0',
+                        'es2015'
+                    ],
+                    plugins: [
+                        'add-module-exports'
+                    ]
+                }
+            },
+            {
+                test: [/\.txt$/, /\.html$/],
+                use: 'raw-loader'
+            }
+        ]
+    }
 
     return [webConfig, nodeConfig]
 }

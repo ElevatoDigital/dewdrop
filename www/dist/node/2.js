@@ -2,14 +2,22 @@ exports.ids = [2];
 exports.modules = {
 
 /***/ 129:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__input_file_upload_view__ = __webpack_require__(166);
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _uploadView = __webpack_require__(166);
+
+var _uploadView2 = _interopRequireDefault(_uploadView);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-
 
 var InputFile = function InputFile() {
     var selector = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '.btn-input-file';
@@ -23,7 +31,7 @@ var InputFile = function InputFile() {
     // Render initial input state
     $(selector).each(function (index, button) {
         var input,
-            view = new __WEBPACK_IMPORTED_MODULE_0__input_file_upload_view__["a" /* default */]();
+            view = new _uploadView2.default();
 
         button = $(button);
         input = $(button.data('value-input'));
@@ -40,7 +48,7 @@ var InputFile = function InputFile() {
 
     // Handle attempt to upload a file
     $(document).on('click', selector, function (e) {
-        var view = new __WEBPACK_IMPORTED_MODULE_0__input_file_upload_view__["a" /* default */](),
+        var view = new _uploadView2.default(),
             button = $(this);
 
         e.preventDefault();
@@ -51,59 +59,83 @@ var InputFile = function InputFile() {
     });
 };
 
-/* harmony default export */ __webpack_exports__["default"] = (InputFile);
+exports.default = InputFile;
+module.exports = exports['default'];
 
 /***/ }),
 
 /***/ 148:
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
 
 module.exports = "<div class=\"input-file-status-ui\">\n    <div class=\"alert alert-danger\" role=\"alert\">\n        <% _.each(messages, function (message) { %>\n        <div><%- message %></div>\n        <% }); %>\n    </div>\n</div>\n";
 
 /***/ }),
 
 /***/ 149:
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
 
 module.exports = "<div class=\"input-file-status-ui\">\n    <div class=\"progress\">\n        <div class=\"progress-bar progress-bar-striped active\" role=\"progressbar\" aria-valuenow=\"45\" aria-valuemin=\"0\" aria-valuemax=\"100\" style=\"width: 100%\">\n            <span class=\"sr-only\">Loading...</span>\n        </div>\n    </div>\n    <div class=\"progress-text text-muted\">Loading.  Please wait...</div>\n</div>\n";
 
 /***/ }),
 
 /***/ 150:
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
 
 module.exports = "<form class=\"input-file-upload-form\" enctype=\"multipart/form-data\" action=\"\" method=\"POST\">\n    <input class=\"input-file-uploader\" type=\"file\" name=\"<%- fileInputName %>\" />\n</form>\n";
 
 /***/ }),
 
 /***/ 151:
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
 
 module.exports = "<div class=\"input-file-status-ui\">\n    <% if (thumbnail) { %>\n    <div class=\"panel panel-default\">\n        <div class=\"panel-body\">\n            <a target=\"_blank\" href=\"<%- url %>\">\n                <div class=\"thumbnail\">\n                    <img src=\"<%- thumbnail %>\" />\n                </div>\n\n                <span class=\"glyphicon glyphicon-file\"></span>\n                <%- url.split('/').pop() %>\n            </a>\n        </div>\n    </div>\n    <% } else { %>\n    <a target=\"_blank\" href=\"<%- url %>\">\n        <span class=\"glyphicon glyphicon-file\"></span>\n        <%- url.split('/').pop() %>\n    </a>\n    <% } %>\n\n\n    <div class=\"btn-group btn-group-justified\" role=\"group\">\n        <div class=\"btn-group\" role=\"group\">\n            <button type=\"button\" class=\"btn btn-default btn-xs btn-remove\"><span class=\"glyphicon glyphicon-remove\"></span> Remove</button>\n        </div>\n        <!--\n        <div class=\"btn-group\" role=\"group\">\n            <button type=\"button\" class=\"btn btn-default btn-xs btn-copy\"><span class=\"glyphicon glyphicon-copy\"></span> Copy</button>\n        </div>\n        -->\n    </div>\n</div>\n";
 
 /***/ }),
 
 /***/ 166:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__upload_template_html__ = __webpack_require__(150);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__upload_template_html___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__upload_template_html__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__value_template_html__ = __webpack_require__(151);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__value_template_html___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__value_template_html__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__progress_template_html__ = __webpack_require__(149);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__progress_template_html___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2__progress_template_html__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__error_messages_template_html__ = __webpack_require__(148);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__error_messages_template_html___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3__error_messages_template_html__);
 
 
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
 
+var _uploadTemplate = __webpack_require__(150);
 
+var _uploadTemplate2 = _interopRequireDefault(_uploadTemplate);
 
-var uploadTemplate = _.template(__WEBPACK_IMPORTED_MODULE_0__upload_template_html___default.a),
-    valueTemplate = _.template(__WEBPACK_IMPORTED_MODULE_1__value_template_html___default.a),
-    progressTemplate = _.template(__WEBPACK_IMPORTED_MODULE_2__progress_template_html___default.a),
-    errorMessagesTemplate = _.template(__WEBPACK_IMPORTED_MODULE_3__error_messages_template_html___default.a);
+var _valueTemplate = __webpack_require__(151);
+
+var _valueTemplate2 = _interopRequireDefault(_valueTemplate);
+
+var _progressTemplate = __webpack_require__(149);
+
+var _progressTemplate2 = _interopRequireDefault(_progressTemplate);
+
+var _errorMessagesTemplate = __webpack_require__(148);
+
+var _errorMessagesTemplate2 = _interopRequireDefault(_errorMessagesTemplate);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var uploadTemplate = _.template(_uploadTemplate2.default),
+    valueTemplate = _.template(_valueTemplate2.default),
+    progressTemplate = _.template(_progressTemplate2.default),
+    errorMessagesTemplate = _.template(_errorMessagesTemplate2.default);
 
 var UploadView = Backbone.View.extend({
     events: {
@@ -231,7 +263,8 @@ var UploadView = Backbone.View.extend({
     }
 });
 
-/* harmony default export */ __webpack_exports__["a"] = (UploadView);
+exports.default = UploadView;
+module.exports = exports['default'];
 
 /***/ })
 

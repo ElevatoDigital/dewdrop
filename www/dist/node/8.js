@@ -2,17 +2,24 @@ exports.ids = [8];
 exports.modules = {
 
 /***/ 130:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_keymaster__ = __webpack_require__(172);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_keymaster___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_keymaster__);
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+var _keymaster = __webpack_require__(172);
+
+var _keymaster2 = _interopRequireDefault(_keymaster);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-
 
 var ListingKeyboardShortcuts = function () {
     function ListingKeyboardShortcuts() {
@@ -24,13 +31,13 @@ var ListingKeyboardShortcuts = function () {
             scope = 'dewdrop-listing-keyboard-shortcuts';
         }
 
-        __WEBPACK_IMPORTED_MODULE_0_keymaster___default.a.setScope(scope);
-        __WEBPACK_IMPORTED_MODULE_0_keymaster___default()('j', scope, this.nextRow);
-        __WEBPACK_IMPORTED_MODULE_0_keymaster___default()('k', scope, this.previousRow);
-        __WEBPACK_IMPORTED_MODULE_0_keymaster___default()('e', scope, this.edit);
-        __WEBPACK_IMPORTED_MODULE_0_keymaster___default()('v', scope, this.view);
-        __WEBPACK_IMPORTED_MODULE_0_keymaster___default()('c', scope, this.add);
-        __WEBPACK_IMPORTED_MODULE_0_keymaster___default()('/', scope, this.filter);
+        _keymaster2.default.setScope(scope);
+        (0, _keymaster2.default)('j', scope, this.nextRow);
+        (0, _keymaster2.default)('k', scope, this.previousRow);
+        (0, _keymaster2.default)('e', scope, this.edit);
+        (0, _keymaster2.default)('v', scope, this.view);
+        (0, _keymaster2.default)('c', scope, this.add);
+        (0, _keymaster2.default)('/', scope, this.filter);
     }
 
     _createClass(ListingKeyboardShortcuts, [{
@@ -112,7 +119,8 @@ var ListingKeyboardShortcuts = function () {
     return ListingKeyboardShortcuts;
 }();
 
-/* harmony default export */ __webpack_exports__["default"] = (ListingKeyboardShortcuts);
+exports.default = ListingKeyboardShortcuts;
+module.exports = exports['default'];
 
 /***/ }),
 

@@ -2,10 +2,15 @@ exports.ids = [14];
 exports.modules = {
 
 /***/ 121:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var ActivityLogUserInformation = function ActivityLogUserInformation() {
@@ -18,7 +23,8 @@ var ActivityLogUserInformation = function ActivityLogUserInformation() {
     });
 };
 
-/* harmony default export */ __webpack_exports__["default"] = (ActivityLogUserInformation);
+exports.default = ActivityLogUserInformation;
+module.exports = exports['default'];
 
 /***/ })
 

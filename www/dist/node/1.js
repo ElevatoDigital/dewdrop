@@ -2,25 +2,37 @@ exports.ids = [1];
 exports.modules = {
 
 /***/ 134:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__sort_fields_groups_collection__ = __webpack_require__(168);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__sort_fields_groups_view__ = __webpack_require__(169);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__sort_fields_add_group_popover_view__ = __webpack_require__(167);
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _groupsCollection = __webpack_require__(168);
+
+var _groupsCollection2 = _interopRequireDefault(_groupsCollection);
+
+var _groupsView = __webpack_require__(169);
+
+var _groupsView2 = _interopRequireDefault(_groupsView);
+
+var _addGroupPopoverView = __webpack_require__(167);
+
+var _addGroupPopoverView2 = _interopRequireDefault(_addGroupPopoverView);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-
-
-
 
 var SortFields = function SortFields() {
     _classCallCheck(this, SortFields);
 
-    var collection = new __WEBPACK_IMPORTED_MODULE_0__sort_fields_groups_collection__["a" /* default */](),
-        popover = new __WEBPACK_IMPORTED_MODULE_2__sort_fields_add_group_popover_view__["a" /* default */]({ collection: collection }),
-        groups = new __WEBPACK_IMPORTED_MODULE_1__sort_fields_groups_view__["a" /* default */]({ collection: collection });
+    var collection = new _groupsCollection2.default(),
+        popover = new _addGroupPopoverView2.default({ collection: collection }),
+        groups = new _groupsView2.default({ collection: collection });
 
     collection.initializeWithGlobalVariable();
 
@@ -29,38 +41,56 @@ var SortFields = function SortFields() {
     });
 };
 
-/* harmony default export */ __webpack_exports__["default"] = (SortFields);
+exports.default = SortFields;
+module.exports = exports['default'];
 
 /***/ }),
 
 /***/ 152:
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
 
 module.exports = "<div class=\"form-inline\">\n    <input placeholder=\"Enter group title...\" type=\"text\" class=\"form-control\" />\n    <button class=\"btn btn-success btn-add-group\"><span class=\"glyphicon glyphicon-ok\"></span></button>\n</div>\n";
 
 /***/ }),
 
 /***/ 153:
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
 
 module.exports = "<li data-field-id=\"<%- id %>\" class=\"list-group-item\">\n    <span class=\"field-label\"><%- label %></span>\n    <span class=\"text-muted glyphicon glyphicon-align-justify pull-right\"></span>\n</li>\n";
 
 /***/ }),
 
 /***/ 154:
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
 
 module.exports = "<li class=\"list-group-item list-group-item-title\">\n    <span class=\"badge\">\n        <%- fields.length %>\n        <%- (1 === fields.length ? 'Field' : 'Fields') %>\n    </span>\n    <h4>\n        <%- title %>\n    </h4>\n    <% if (caption) { %>\n    <div class=\"help-block\"><%- caption %></div>\n    <% } %>\n    <% if (allowEditing) { %>\n    <div class=\"title-input form-inline\">\n        <input type=\"text\" class=\"title-input form-control\" value=\"<%- title %>\" />\n        <button type=\"button\" class=\"btn btn-save-title btn-success btn-sm\"><span class=\"glyphicon glyphicon-ok\"></span></button>\n        <button type=\"button\" class=\"btn btn-cancel btn-link btn-sm\">Cancel</button>\n    </div>\n    <div class=\"title-buttons\">\n        <a href=\"#\" class=\"btn-remove pull-right btn btn-sm btn-default\">\n            <span class=\"glyphicon glyphicon-remove\"></span>\n            Delete Group\n        </a>\n        <a href=\"#\" class=\"btn-edit pull-right btn btn-sm btn-success\">\n            <span class=\"glyphicon glyphicon-pencil\"></span>\n            Edit Title\n        </a>\n    </div>\n    <% } %>\n</li>\n";
 
 /***/ }),
 
 /***/ 167:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__add_group_popover_template_html__ = __webpack_require__(152);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__add_group_popover_template_html___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__add_group_popover_template_html__);
 
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _addGroupPopoverTemplate = __webpack_require__(152);
+
+var _addGroupPopoverTemplate2 = _interopRequireDefault(_addGroupPopoverTemplate);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var AddGroupPopoverView = Backbone.View.extend({
     el: '#add-group-wrapper',
@@ -78,7 +108,7 @@ var AddGroupPopoverView = Backbone.View.extend({
         this.$el.find('#add-group').popover({
             html: true,
             placement: 'top',
-            content: __WEBPACK_IMPORTED_MODULE_0__add_group_popover_template_html___default.a
+            content: _addGroupPopoverTemplate2.default
         });
     },
 
@@ -115,14 +145,20 @@ var AddGroupPopoverView = Backbone.View.extend({
     }
 });
 
-/* harmony default export */ __webpack_exports__["a"] = (AddGroupPopoverView);
+exports.default = AddGroupPopoverView;
+module.exports = exports['default'];
 
 /***/ }),
 
 /***/ 168:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
 var Model = Backbone.Model.extend({
     defaults: {
         allowEditing: true,
@@ -164,16 +200,26 @@ var GroupsCollection = Backbone.Collection.extend({
     }
 });
 
-/* harmony default export */ __webpack_exports__["a"] = (GroupsCollection);
+exports.default = GroupsCollection;
+module.exports = exports['default'];
 
 /***/ }),
 
 /***/ 169:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__list_view__ = __webpack_require__(170);
 
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _listView = __webpack_require__(170);
+
+var _listView2 = _interopRequireDefault(_listView);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var GroupsView = Backbone.View.extend({
     el: '#groups-wrapper',
@@ -192,7 +238,7 @@ var GroupsView = Backbone.View.extend({
         this.$el.empty();
 
         this.collection.each(function (group, index) {
-            var view = new __WEBPACK_IMPORTED_MODULE_0__list_view__["a" /* default */]({
+            var view = new _listView2.default({
                 model: group,
                 hideTitle: hideTitle,
                 ungroupedModel: this.collection.first()
@@ -216,23 +262,33 @@ var GroupsView = Backbone.View.extend({
     }
 });
 
-/* harmony default export */ __webpack_exports__["a"] = (GroupsView);
+exports.default = GroupsView;
+module.exports = exports['default'];
 
 /***/ }),
 
 /***/ 170:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__list_template_html__ = __webpack_require__(154);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__list_template_html___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__list_template_html__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__list_field_template_html__ = __webpack_require__(153);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__list_field_template_html___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__list_field_template_html__);
 
 
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
 
-var listTemplate = _.template(__WEBPACK_IMPORTED_MODULE_0__list_template_html___default.a),
-    fieldTemplate = _.template(__WEBPACK_IMPORTED_MODULE_1__list_field_template_html___default.a);
+var _listTemplate = __webpack_require__(154);
+
+var _listTemplate2 = _interopRequireDefault(_listTemplate);
+
+var _listFieldTemplate = __webpack_require__(153);
+
+var _listFieldTemplate2 = _interopRequireDefault(_listFieldTemplate);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var listTemplate = _.template(_listTemplate2.default),
+    fieldTemplate = _.template(_listFieldTemplate2.default);
 
 var ListView = Backbone.View.extend({
     template: listTemplate,
@@ -350,7 +406,8 @@ var ListView = Backbone.View.extend({
     }
 });
 
-/* harmony default export */ __webpack_exports__["a"] = (ListView);
+exports.default = ListView;
+module.exports = exports['default'];
 
 /***/ })
 

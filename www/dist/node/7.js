@@ -2,18 +2,26 @@ exports.ids = [7];
 exports.modules = {
 
 /***/ 122:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_velocity_animate__ = __webpack_require__(136);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_velocity_animate___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_velocity_animate__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_velocity_ui_pack__ = __webpack_require__(137);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_velocity_ui_pack___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_velocity_ui_pack__);
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _velocityAnimate = __webpack_require__(136);
+
+var _velocityAnimate2 = _interopRequireDefault(_velocityAnimate);
+
+var _velocityUiPack = __webpack_require__(137);
+
+var _velocityUiPack2 = _interopRequireDefault(_velocityUiPack);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-
-
 
 var BulkActionForm = function BulkActionForm() {
     _classCallCheck(this, BulkActionForm);
@@ -34,22 +42,22 @@ var BulkActionForm = function BulkActionForm() {
         var selected = $('.bulk-action-form .bulk-checkbox:checked');
 
         if (selected.length && !panel.hasClass('in')) {
-            __WEBPACK_IMPORTED_MODULE_0_velocity_animate___default()(panel, 'transition.slideUpIn', animationOptions);
+            (0, _velocityAnimate2.default)(panel, 'transition.slideUpIn', animationOptions);
         } else if (!selected.length && panel.hasClass('in')) {
-            __WEBPACK_IMPORTED_MODULE_0_velocity_animate___default()(panel, 'transition.slideDownOut', animationOptions);
+            (0, _velocityAnimate2.default)(panel, 'transition.slideDownOut', animationOptions);
         }
 
         if (selected.length === checkboxes.length) {
             checkAll.prop('checked', true);
 
             if (pagesAlert) {
-                __WEBPACK_IMPORTED_MODULE_0_velocity_animate___default()(pagesAlert, 'fadeIn', { duration: 100 });
+                (0, _velocityAnimate2.default)(pagesAlert, 'fadeIn', { duration: 100 });
             }
         } else {
             checkAll.prop('checked', false);
 
             if (pagesAlert) {
-                __WEBPACK_IMPORTED_MODULE_0_velocity_animate___default()(pagesAlert, 'fadeOut', { duration: 100 });
+                (0, _velocityAnimate2.default)(pagesAlert, 'fadeOut', { duration: 100 });
             }
         }
     };
@@ -69,7 +77,8 @@ var BulkActionForm = function BulkActionForm() {
     refresh();
 };
 
-/* harmony default export */ __webpack_exports__["default"] = (BulkActionForm);
+exports.default = BulkActionForm;
+module.exports = exports['default'];
 
 /***/ }),
 

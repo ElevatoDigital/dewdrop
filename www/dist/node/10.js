@@ -2,10 +2,15 @@ exports.ids = [10];
 exports.modules = {
 
 /***/ 131:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var ListingSortable = function ListingSortable() {
@@ -58,7 +63,8 @@ var ListingSortable = function ListingSortable() {
     });
 };
 
-/* harmony default export */ __webpack_exports__["default"] = (ListingSortable);
+exports.default = ListingSortable;
+module.exports = exports['default'];
 
 /***/ })
 

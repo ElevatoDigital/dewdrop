@@ -17211,9 +17211,15 @@ return zhTw;
 
 /***/ }),
 /* 117 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -17416,27 +17422,39 @@ var Detector = function () {
     return Detector;
 }();
 
-/* harmony default export */ __webpack_exports__["a"] = (Detector);
+exports.default = Detector;
+module.exports = exports['default'];
 
 /***/ }),
 /* 118 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_underscore__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_underscore___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_underscore__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_moment__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_moment___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_moment__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__module_detector__ = __webpack_require__(117);
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-
-
 //import Backbone from 'backbone';
 
+
+var _underscore = __webpack_require__(1);
+
+var _underscore2 = _interopRequireDefault(_underscore);
+
+var _moment = __webpack_require__(0);
+
+var _moment2 = _interopRequireDefault(_moment);
+
+var _moduleDetector = __webpack_require__(117);
+
+var _moduleDetector2 = _interopRequireDefault(_moduleDetector);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Dewdrop = function () {
     function Dewdrop() {
@@ -17446,7 +17464,7 @@ var Dewdrop = function () {
 
         // Dynamically set the webpack public path since it varies
         var key = 'dewdrop/www/dist/js/',
-            url = __WEBPACK_IMPORTED_MODULE_0_underscore___default.a.chain(document.getElementsByTagName('script')).pluck('src').filter(function (a) {
+            url = _underscore2.default.chain(document.getElementsByTagName('script')).pluck('src').filter(function (a) {
             return a.indexOf(key) >= 0;
         }).first().value();
 
@@ -17458,7 +17476,7 @@ var Dewdrop = function () {
     _createClass(Dewdrop, [{
         key: 'init',
         value: function init() {
-            __WEBPACK_IMPORTED_MODULE_1_moment___default.a.locale(navigator.language);
+            _moment2.default.locale(navigator.language);
 
             /*** Handle jQuery plugin naming conflict between jQuery UI and Bootstrap ***/
             if ($.widget && $.widget.bridge) {
@@ -17478,12 +17496,12 @@ var Dewdrop = function () {
     }, {
         key: 'detectAndLoadModules',
         value: function detectAndLoadModules() {
-            new __WEBPACK_IMPORTED_MODULE_2__module_detector__["a" /* default */]().loadModules();
+            new _moduleDetector2.default().loadModules();
         }
     }, {
         key: 'loadModule',
         value: function loadModule(module) {
-            new __WEBPACK_IMPORTED_MODULE_2__module_detector__["a" /* default */]().load(module);
+            new _moduleDetector2.default().load(module);
         }
     }, {
         key: 'bowerUrl',
@@ -17498,7 +17516,8 @@ var Dewdrop = function () {
     return Dewdrop;
 }();
 
-/* harmony default export */ __webpack_exports__["default"] = (Dewdrop);
+exports.default = Dewdrop;
+module.exports = exports['default'];
 
 /***/ }),
 /* 119 */

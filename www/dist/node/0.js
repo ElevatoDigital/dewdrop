@@ -2,18 +2,30 @@ exports.ids = [0];
 exports.modules = {
 
 /***/ 127:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__filter_fields_collection__ = __webpack_require__(155);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__filter_filters_collection__ = __webpack_require__(157);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__filter_filters_view__ = __webpack_require__(158);
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _fieldsCollection = __webpack_require__(155);
+
+var _fieldsCollection2 = _interopRequireDefault(_fieldsCollection);
+
+var _filtersCollection = __webpack_require__(157);
+
+var _filtersCollection2 = _interopRequireDefault(_filtersCollection);
+
+var _filtersView = __webpack_require__(158);
+
+var _filtersView2 = _interopRequireDefault(_filtersView);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-
-
-
 
 var Filter = function Filter() {
     var selector = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '.filter-form';
@@ -26,20 +38,20 @@ var Filter = function Filter() {
 
     $(selector).each(function (index, form) {
         var prefix = $(form).data('prefix'),
-            fields = new __WEBPACK_IMPORTED_MODULE_0__filter_fields_collection__["a" /* default */](),
+            fields = new _fieldsCollection2.default(),
             collection,
             view;
 
         fields.loadConfigFromGlobalVariable(prefix);
 
-        collection = new __WEBPACK_IMPORTED_MODULE_1__filter_filters_collection__["a" /* default */]();
+        collection = new _filtersCollection2.default();
         collection.loadValuesFromGlobalVariable(prefix);
 
         if (!collection.length) {
             collection.add({});
         }
 
-        view = new __WEBPACK_IMPORTED_MODULE_2__filter_filters_view__["a" /* default */]({
+        view = new _filtersView2.default({
             fields: fields,
             collection: collection
         });
@@ -48,19 +60,28 @@ var Filter = function Filter() {
     });
 };
 
-/* harmony default export */ __webpack_exports__["default"] = (Filter);
+exports.default = Filter;
+module.exports = exports['default'];
 
 /***/ }),
 
 /***/ 138:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_backbone__ = __webpack_require__(139);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_backbone___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_backbone__);
 
 
-var BaseView = __WEBPACK_IMPORTED_MODULE_0_backbone___default.a.View.extend({
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _backbone = __webpack_require__(139);
+
+var _backbone2 = _interopRequireDefault(_backbone);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var BaseView = _backbone2.default.View.extend({
     tagName: 'span',
 
     className: 'form-inline',
@@ -118,7 +139,8 @@ var BaseView = __WEBPACK_IMPORTED_MODULE_0_backbone___default.a.View.extend({
     }
 });
 
-/* harmony default export */ __webpack_exports__["a"] = (BaseView);
+exports.default = BaseView;
+module.exports = exports['default'];
 
 /***/ }),
 
@@ -2051,66 +2073,96 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;//     Backbone.
 /***/ }),
 
 /***/ 141:
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
 
 module.exports = "<div class=\"row\">\n    <div class=\"col-sm-4\">\n        <select class=\"form-control input-sm filter-field\" name=\"ftr-id.<%- index %>\">\n            <option value=\"\" disabled=\"disabled\" selected=\"selected\">Select a field to filter by...</option>\n            <% _.each(fields, function (field) { %>\n\n            <% if (selected === field.id) { %>\n            <option selected=\"selected\" value=\"<%- field.id.replace('+', ' ') %>\"><%- field.label %></option>\n            <% } else { %>\n            <option value=\"<%- field.id %>\"><%- field.label %></option>\n            <% } %>\n\n            <% }); %>\n        </select>\n    </div>\n    <div class=\"col-sm-8\">\n        <div class=\"form-inline\">\n            <span class=\"glyphicon glyphicon-arrow-right visible-xs\"></span>\n            <span class=\"form-inline filter-control-wrapper\"></span>\n            <div class=\"pull-right btn-group\">\n                <button type=\"button\" class=\"js-add btn btn-add btn-default btn-sm\"><span class=\"glyphicon glyphicon-plus\"></span></button>\n                <button type=\"button\" class=\"js-remove btn btn-remove btn-default btn-sm\"><span class=\"glyphicon glyphicon-minus\"></span></button>\n            </div>\n        </div>\n    </div>\n</div>\n";
 
 /***/ }),
 
 /***/ 142:
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
 
 module.exports = "<span class=\"text-muted\"> is </span>\n\n&nbsp;\n\n<select name=\"ftr-value.<%- inputIndex %>\" class=\"form-control input-sm\">\n    <% if ('undefined' === typeof values.value || null === values.value || '' === values.value) { %>\n    <option value=\"\" selected=\"selected\">Yes or No</option>\n    <option value=\"0\">No</option>\n    <option value=\"1\">Yes</option>\n    <% } else if (1 === parseInt(values.value, 10)) { %>\n    <option value=\"\">Yes or No</option>\n    <option value=\"0\">No</option>\n    <option value=\"1\" selected=\"selected\">Yes</option>\n    <% } else { %>\n    <option value=\"\">Yes or No</option>\n    <option value=\"0\" selected=\"selected\">No</option>\n    <option value=\"1\">Yes</option>\n    <% } %>\n</select>\n";
 
 /***/ }),
 
 /***/ 143:
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
 
 module.exports = "<%\nvar options = {\n    'on-or-between': 'is on or between',\n    'between':       'is between',\n    'on-or-before':  'is on or before',\n    'before':        'is before',\n    'on-or-after':   'is on or after',\n    'after':         'is after',\n    'is':            'is'\n};\n%>\n\n<select name=\"ftr-comp.<%- inputIndex %>\" class=\"form-control input-sm\">\n    <% _.each(options, function (option, key) { %>\n\n    <% if ('today' === key) { %>\n    <option value=\"\" disabled=\"disabled\">&mdash;</option>\n    <% } %>\n\n    <% if (values.comp === key) { %>\n    <option value=\"<%- key %>\" selected=\"selected\"><%- option %></options>\n    <% } else { %>\n    <option value=\"<%- key %>\"><%- option %></options>\n    <% } %>\n\n    <% }); %>\n</select>\n\n<span class=\"filter-date-inputs\">\n    <input name=\"ftr-start.<%- inputIndex %>\" type=\"date\" class=\"filter-start form-control input-sm\" value=\"<%- values.start %>\" />\n\n    <span class=\"filter-date-end-wrapper\">\n        <span class=\"text-muted\">&nbsp; and &nbsp;</span>\n        <input name=\"ftr-end.<%- inputIndex %>\" type=\"date\" class=\"filter-end form-control input-sm\" value=\"<%- values.end %>\" />\n    </span>\n</span>\n";
 
 /***/ }),
 
 /***/ 144:
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
 
 module.exports = "<%\nvar operators = {\n    \"contains\":     \"contains\",\n    \"not-contains\": \"does not contain\",\n    \"is-empty\":     \"is empty\",\n    \"is-not-empty\": \"is not empty\"\n};\n%>\n\n<select name=\"ftr-comp.<%- inputIndex %>\" class=\"filter-op form-control input-sm\">\n    <% _.each(operators, function (option, key) { %>\n\n    <% if (values.comp === key) { %>\n    <option value=\"<%- key %>\" selected=\"selected\"><%- option %></option>\n    <% } else { %>\n    <option value=\"<%- key %>\"><%- option %></option>\n    <% } %>\n\n    <% }); %>\n</select>\n\n<select name=\"ftr-value.<%- inputIndex %>\" class=\"form-control filter-value filter-input input-sm\">\n    <option value=\"\"></option>\n\n    <% _.each(options, function (option) { %>\n\n    <% if (parseInt(values.value, 10) === option.value) { %>\n    <option value=\"<%- option.value %>\" selected=\"selected\"><%- option.title %></option>\n    <% } else { %>\n    <option value=\"<%- option.value %>\"><%- option.title %></option>\n    <% } %>\n\n    <% }); %>\n</select>\n";
 
 /***/ }),
 
 /***/ 145:
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
 
 module.exports = "<%\nvar options = {\n    'is-less-than': 'is less than',\n    'is':           'is',\n    'is-more-than': 'is more than',\n    'is-between':   'is between'\n};\n%>\n\n<select name=\"ftr-comp.<%- inputIndex %>\" class=\"form-control input-sm\">\n    <% _.each(options, function (option, key) { %>\n\n    <% if (values.comp === key) { %>\n    <option value=\"<%- key %>\" selected=\"selected\"><%- option %></option>\n    <% } else { %>\n    <option value=\"<%- key %>\"><%- option %></option>\n    <% } %>\n\n    <% }); %>\n</select>\n\n<span class=\"filter-numeric-inputs\">\n    <input class=\"filter-operand1 form-control input-sm\" name=\"ftr-operand1.<%- inputIndex %>\" step=\"any\" type=\"number\"\n        value=\"<%- values.operand1 %>\" />\n\n    <span class=\"filter-numeric-operand2-wrapper\">\n        <span class=\"text-muted\">&nbsp; and &nbsp;</span>\n        <input class=\"filter-operand2 form-control input-sm\" name=\"ftr-operand2.<%- inputIndex %>\" step=\"any\"\n            type=\"number\" value=\"<%- values.operand2 %>\" />\n    </span>\n</span>\n\n";
 
 /***/ }),
 
 /***/ 146:
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
 
 module.exports = "<%\nvar operators = {\n    \"is\":        \"is\",\n    \"is-not\":    \"is not\",\n    \"empty\":     \"is empty\",\n    \"not-empty\": \"is not empty\"\n};\n%>\n\n<select name=\"ftr-comp.<%- inputIndex %>\" class=\"form-control filter-op input-sm\">\n    <% _.each(operators, function (option, key) { %>\n\n    <% if (values.comp === key) { %>\n    <option value=\"<%- key %>\" selected=\"selected\"><%- option %></option>\n    <% } else { %>\n    <option value=\"<%- key %>\"><%- option %></option>\n    <% } %>\n\n    <% }); %>\n</select>\n\n<select name=\"ftr-value.<%- inputIndex %>\" class=\"form-control filter-value filter-input input-sm\">\n    <option value=\"\"></option>\n\n    <% _.each(options, function (option, key) { %>\n\n    <% if (parseInt(values.value, 10) === option.value) { %>\n    <option value=\"<%- option.value %>\" selected=\"selected\"><%- option.title %></option>\n    <% } else { %>\n    <option value=\"<%- option.value %>\"><%- option.title %></option>\n    <% } %>\n\n    <% }); %>\n</select>\n";
 
 /***/ }),
 
 /***/ 147:
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
 
 module.exports = "<%\nvar options = {\n    'contains':         'contains',\n    'does-not-contain': 'does not contain',\n    'starts-with':      'starts with',\n    'ends-with':        'ends with'\n};\n%>\n\n<select name=\"ftr-comp.<%- inputIndex %>\" class=\"form-control input-sm\">\n    <% _.each(options, function (option, key) { %>\n\n    <% if (values.comp === key) { %>\n    <option value=\"<%- key %>\" selected=\"selected\"><%- option %></options>\n    <% } else { %>\n    <option value=\"<%- key %>\"><%- option %></options>\n    <% } %>\n\n    <% }); %>\n</select>\n\n<input name=\"ftr-value.<%- inputIndex %>\" type=\"text\" class=\"filter-value form-control input-sm\" value=\"<%- values.value %>\" />\n";
 
 /***/ }),
 
 /***/ 155:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_backbone__ = __webpack_require__(139);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_backbone___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_backbone__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_underscore__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_underscore___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_underscore__);
 
 
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
 
-var Model = __WEBPACK_IMPORTED_MODULE_0_backbone___default.a.Model.extend({
+var _backbone = __webpack_require__(139);
+
+var _backbone2 = _interopRequireDefault(_backbone);
+
+var _underscore = __webpack_require__(1);
+
+var _underscore2 = _interopRequireDefault(_underscore);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var Model = _backbone2.default.Model.extend({
     defaults: {
         id: '',
         label: '',
@@ -2120,7 +2172,7 @@ var Model = __WEBPACK_IMPORTED_MODULE_0_backbone___default.a.Model.extend({
     }
 });
 
-var FieldsCollection = __WEBPACK_IMPORTED_MODULE_0_backbone___default.a.Collection.extend({
+var FieldsCollection = _backbone2.default.Collection.extend({
     model: Model,
 
     loadConfigFromGlobalVariable: function loadConfigFromGlobalVariable(prefix) {
@@ -2134,36 +2186,49 @@ var FieldsCollection = __WEBPACK_IMPORTED_MODULE_0_backbone___default.a.Collecti
             throw 'Could not find initial config for filter form';
         }
 
-        __WEBPACK_IMPORTED_MODULE_1_underscore___default.a.each(window[name], function (field) {
+        _underscore2.default.each(window[name], function (field) {
             this.add(field);
         }, this);
     }
 });
 
-/* harmony default export */ __webpack_exports__["a"] = (FieldsCollection);
+exports.default = FieldsCollection;
+module.exports = exports['default'];
 
 /***/ }),
 
 /***/ 156:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_backbone__ = __webpack_require__(139);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_backbone___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_backbone__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_underscore__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_underscore___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_underscore__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__type_factory__ = __webpack_require__(161);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__filter_template_html__ = __webpack_require__(141);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__filter_template_html___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3__filter_template_html__);
 
 
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
 
+var _backbone = __webpack_require__(139);
 
+var _backbone2 = _interopRequireDefault(_backbone);
+
+var _underscore = __webpack_require__(1);
+
+var _underscore2 = _interopRequireDefault(_underscore);
+
+var _factory = __webpack_require__(161);
+
+var _factory2 = _interopRequireDefault(_factory);
+
+var _filterTemplate = __webpack_require__(141);
+
+var _filterTemplate2 = _interopRequireDefault(_filterTemplate);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var customHtml = $('#filter-template').text(),
-    template = __WEBPACK_IMPORTED_MODULE_1_underscore___default.a.template(customHtml ? customHtml : __WEBPACK_IMPORTED_MODULE_3__filter_template_html___default.a);
+    template = _underscore2.default.template(customHtml ? customHtml : _filterTemplate2.default);
 
-var FilterView = __WEBPACK_IMPORTED_MODULE_0_backbone___default.a.View.extend({
+var FilterView = _backbone2.default.View.extend({
     events: {
         'change .filter-field': 'selectField',
         'click .js-add': 'addFilter',
@@ -2193,7 +2258,7 @@ var FilterView = __WEBPACK_IMPORTED_MODULE_0_backbone___default.a.View.extend({
             var selectedField = this.fields.findWhere({ id: this.selected }),
                 values = this.model.get('values');
 
-            __WEBPACK_IMPORTED_MODULE_1_underscore___default.a.each(selectedField.get('defaults'), function (value, key) {
+            _underscore2.default.each(selectedField.get('defaults'), function (value, key) {
                 if ('undefined' === typeof values[key]) {
                     values[key] = value;
                 }
@@ -2201,7 +2266,7 @@ var FilterView = __WEBPACK_IMPORTED_MODULE_0_backbone___default.a.View.extend({
 
             this.model.set('values', values);
 
-            this.$el.find('.filter-control-wrapper').html(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_2__type_factory__["a" /* default */])(selectedField.get('type'), selectedField.get('options'), this.model, this.index).render().el);
+            this.$el.find('.filter-control-wrapper').html((0, _factory2.default)(selectedField.get('type'), selectedField.get('options'), this.model, this.index).render().el);
         }
 
         if (1 === this.collection.length) {
@@ -2228,22 +2293,32 @@ var FilterView = __WEBPACK_IMPORTED_MODULE_0_backbone___default.a.View.extend({
     }
 });
 
-/* harmony default export */ __webpack_exports__["a"] = (FilterView);
+exports.default = FilterView;
+module.exports = exports['default'];
 
 /***/ }),
 
 /***/ 157:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_backbone__ = __webpack_require__(139);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_backbone___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_backbone__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_underscore__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_underscore___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_underscore__);
 
 
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
 
-var Model = __WEBPACK_IMPORTED_MODULE_0_backbone___default.a.Model.extend({
+var _backbone = __webpack_require__(139);
+
+var _backbone2 = _interopRequireDefault(_backbone);
+
+var _underscore = __webpack_require__(1);
+
+var _underscore2 = _interopRequireDefault(_underscore);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var Model = _backbone2.default.Model.extend({
     defaults: {
         field: '',
         isNew: true,
@@ -2251,7 +2326,7 @@ var Model = __WEBPACK_IMPORTED_MODULE_0_backbone___default.a.Model.extend({
     }
 });
 
-var FiltersCollection = __WEBPACK_IMPORTED_MODULE_0_backbone___default.a.Collection.extend({
+var FiltersCollection = _backbone2.default.Collection.extend({
     model: Model,
 
     loadValuesFromGlobalVariable: function loadValuesFromGlobalVariable(prefix) {
@@ -2265,7 +2340,7 @@ var FiltersCollection = __WEBPACK_IMPORTED_MODULE_0_backbone___default.a.Collect
             throw 'Could not find initial values for filter form';
         }
 
-        __WEBPACK_IMPORTED_MODULE_1_underscore___default.a.each(window[name], function (values, index) {
+        _underscore2.default.each(window[name], function (values, index) {
             var modelData = {
                 field: values.id,
                 isNew: false,
@@ -2277,21 +2352,32 @@ var FiltersCollection = __WEBPACK_IMPORTED_MODULE_0_backbone___default.a.Collect
     }
 });
 
-/* harmony default export */ __webpack_exports__["a"] = (FiltersCollection);
+exports.default = FiltersCollection;
+module.exports = exports['default'];
 
 /***/ }),
 
 /***/ 158:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__filter_view__ = __webpack_require__(156);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_backbone__ = __webpack_require__(139);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_backbone___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_backbone__);
 
 
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
 
-var FiltersView = __WEBPACK_IMPORTED_MODULE_1_backbone___default.a.View.extend({
+var _filterView = __webpack_require__(156);
+
+var _filterView2 = _interopRequireDefault(_filterView);
+
+var _backbone = __webpack_require__(139);
+
+var _backbone2 = _interopRequireDefault(_backbone);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var FiltersView = _backbone2.default.View.extend({
     fields: null,
 
     initialize: function initialize(attributes, options) {
@@ -2304,7 +2390,7 @@ var FiltersView = __WEBPACK_IMPORTED_MODULE_1_backbone___default.a.View.extend({
         this.$el.empty();
 
         this.collection.each(function (filter, index) {
-            var view = new __WEBPACK_IMPORTED_MODULE_0__filter_view__["a" /* default */]({
+            var view = new _filterView2.default({
                 collection: this.collection,
                 fields: this.fields,
                 model: filter,
@@ -2318,26 +2404,38 @@ var FiltersView = __WEBPACK_IMPORTED_MODULE_1_backbone___default.a.View.extend({
     }
 });
 
-/* harmony default export */ __webpack_exports__["a"] = (FiltersView);
+exports.default = FiltersView;
+module.exports = exports['default'];
 
 /***/ }),
 
 /***/ 159:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__base_view__ = __webpack_require__(138);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__boolean_template_html__ = __webpack_require__(142);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__boolean_template_html___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__boolean_template_html__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_underscore__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_underscore___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_underscore__);
 
 
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
 
+var _baseView = __webpack_require__(138);
 
-var template = __WEBPACK_IMPORTED_MODULE_2_underscore___default.a.template(__WEBPACK_IMPORTED_MODULE_1__boolean_template_html___default.a);
+var _baseView2 = _interopRequireDefault(_baseView);
 
-var BooleanView = __WEBPACK_IMPORTED_MODULE_0__base_view__["a" /* default */].extend({
+var _booleanTemplate = __webpack_require__(142);
+
+var _booleanTemplate2 = _interopRequireDefault(_booleanTemplate);
+
+var _underscore = __webpack_require__(1);
+
+var _underscore2 = _interopRequireDefault(_underscore);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var template = _underscore2.default.template(_booleanTemplate2.default);
+
+var BooleanView = _baseView2.default.extend({
     template: template,
 
     updateValues: function updateValues() {
@@ -2347,26 +2445,38 @@ var BooleanView = __WEBPACK_IMPORTED_MODULE_0__base_view__["a" /* default */].ex
     }
 });
 
-/* harmony default export */ __webpack_exports__["a"] = (BooleanView);
+exports.default = BooleanView;
+module.exports = exports['default'];
 
 /***/ }),
 
 /***/ 160:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__base_view__ = __webpack_require__(138);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__date_template_html__ = __webpack_require__(143);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__date_template_html___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__date_template_html__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_underscore__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_underscore___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_underscore__);
 
 
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
 
+var _baseView = __webpack_require__(138);
 
-var template = __WEBPACK_IMPORTED_MODULE_2_underscore___default.a.template(__WEBPACK_IMPORTED_MODULE_1__date_template_html___default.a);
+var _baseView2 = _interopRequireDefault(_baseView);
 
-var DateView = __WEBPACK_IMPORTED_MODULE_0__base_view__["a" /* default */].extend({
+var _dateTemplate = __webpack_require__(143);
+
+var _dateTemplate2 = _interopRequireDefault(_dateTemplate);
+
+var _underscore = __webpack_require__(1);
+
+var _underscore2 = _interopRequireDefault(_underscore);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var template = _underscore2.default.template(_dateTemplate2.default);
+
+var DateView = _baseView2.default.extend({
     template: template,
 
     singleInputOperators: ['on-or-before', 'before', 'on-or-after', 'after', 'is'],
@@ -2411,34 +2521,54 @@ var DateView = __WEBPACK_IMPORTED_MODULE_0__base_view__["a" /* default */].exten
     }
 });
 
-/* harmony default export */ __webpack_exports__["a"] = (DateView);
+exports.default = DateView;
+module.exports = exports['default'];
 
 /***/ }),
 
 /***/ 161:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__boolean_view__ = __webpack_require__(159);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__date_view__ = __webpack_require__(160);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__numeric_view__ = __webpack_require__(163);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__text_view__ = __webpack_require__(165);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__reference_view__ = __webpack_require__(164);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__manytomany_view__ = __webpack_require__(162);
 
 
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
 
+var _booleanView = __webpack_require__(159);
 
+var _booleanView2 = _interopRequireDefault(_booleanView);
 
+var _dateView = __webpack_require__(160);
 
+var _dateView2 = _interopRequireDefault(_dateView);
+
+var _numericView = __webpack_require__(163);
+
+var _numericView2 = _interopRequireDefault(_numericView);
+
+var _textView = __webpack_require__(165);
+
+var _textView2 = _interopRequireDefault(_textView);
+
+var _referenceView = __webpack_require__(164);
+
+var _referenceView2 = _interopRequireDefault(_referenceView);
+
+var _manytomanyView = __webpack_require__(162);
+
+var _manytomanyView2 = _interopRequireDefault(_manytomanyView);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var typeMap = {
-    boolean: __WEBPACK_IMPORTED_MODULE_0__boolean_view__["a" /* default */],
-    date: __WEBPACK_IMPORTED_MODULE_1__date_view__["a" /* default */],
-    numeric: __WEBPACK_IMPORTED_MODULE_2__numeric_view__["a" /* default */],
-    text: __WEBPACK_IMPORTED_MODULE_3__text_view__["a" /* default */],
-    reference: __WEBPACK_IMPORTED_MODULE_4__reference_view__["a" /* default */],
-    manytomany: __WEBPACK_IMPORTED_MODULE_5__manytomany_view__["a" /* default */]
+    boolean: _booleanView2.default,
+    date: _dateView2.default,
+    numeric: _numericView2.default,
+    text: _textView2.default,
+    reference: _referenceView2.default,
+    manytomany: _manytomanyView2.default
 };
 
 var Factory = function Factory(type, options, model, index) {
@@ -2452,26 +2582,38 @@ var Factory = function Factory(type, options, model, index) {
     return new typeMap[type](options);
 };
 
-/* harmony default export */ __webpack_exports__["a"] = (Factory);
+exports.default = Factory;
+module.exports = exports['default'];
 
 /***/ }),
 
 /***/ 162:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__base_view__ = __webpack_require__(138);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__manytomany_template_html__ = __webpack_require__(144);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__manytomany_template_html___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__manytomany_template_html__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_underscore__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_underscore___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_underscore__);
 
 
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
 
+var _baseView = __webpack_require__(138);
 
-var template = __WEBPACK_IMPORTED_MODULE_2_underscore___default.a.template(__WEBPACK_IMPORTED_MODULE_1__manytomany_template_html___default.a);
+var _baseView2 = _interopRequireDefault(_baseView);
 
-var ManyToManyView = __WEBPACK_IMPORTED_MODULE_0__base_view__["a" /* default */].extend({
+var _manytomanyTemplate = __webpack_require__(144);
+
+var _manytomanyTemplate2 = _interopRequireDefault(_manytomanyTemplate);
+
+var _underscore = __webpack_require__(1);
+
+var _underscore2 = _interopRequireDefault(_underscore);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var template = _underscore2.default.template(_manytomanyTemplate2.default);
+
+var ManyToManyView = _baseView2.default.extend({
     template: template,
 
     inputOperators: ['contains', 'not-contains'],
@@ -2507,26 +2649,38 @@ var ManyToManyView = __WEBPACK_IMPORTED_MODULE_0__base_view__["a" /* default */]
     }
 });
 
-/* harmony default export */ __webpack_exports__["a"] = (ManyToManyView);
+exports.default = ManyToManyView;
+module.exports = exports['default'];
 
 /***/ }),
 
 /***/ 163:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__base_view__ = __webpack_require__(138);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__numeric_template_html__ = __webpack_require__(145);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__numeric_template_html___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__numeric_template_html__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_underscore__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_underscore___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_underscore__);
 
 
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
 
+var _baseView = __webpack_require__(138);
 
-var template = __WEBPACK_IMPORTED_MODULE_2_underscore___default.a.template(__WEBPACK_IMPORTED_MODULE_1__numeric_template_html___default.a);
+var _baseView2 = _interopRequireDefault(_baseView);
 
-var NumericView = __WEBPACK_IMPORTED_MODULE_0__base_view__["a" /* default */].extend({
+var _numericTemplate = __webpack_require__(145);
+
+var _numericTemplate2 = _interopRequireDefault(_numericTemplate);
+
+var _underscore = __webpack_require__(1);
+
+var _underscore2 = _interopRequireDefault(_underscore);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var template = _underscore2.default.template(_numericTemplate2.default);
+
+var NumericView = _baseView2.default.extend({
     template: template,
 
     singleInputOperators: ['is-less-than', 'is', 'is-more-than'],
@@ -2567,26 +2721,38 @@ var NumericView = __WEBPACK_IMPORTED_MODULE_0__base_view__["a" /* default */].ex
     }
 });
 
-/* harmony default export */ __webpack_exports__["a"] = (NumericView);
+exports.default = NumericView;
+module.exports = exports['default'];
 
 /***/ }),
 
 /***/ 164:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__base_view__ = __webpack_require__(138);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__reference_template_html__ = __webpack_require__(146);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__reference_template_html___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__reference_template_html__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_underscore__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_underscore___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_underscore__);
 
 
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
 
+var _baseView = __webpack_require__(138);
 
-var template = __WEBPACK_IMPORTED_MODULE_2_underscore___default.a.template(__WEBPACK_IMPORTED_MODULE_1__reference_template_html___default.a);
+var _baseView2 = _interopRequireDefault(_baseView);
 
-var ReferenceView = __WEBPACK_IMPORTED_MODULE_0__base_view__["a" /* default */].extend({
+var _referenceTemplate = __webpack_require__(146);
+
+var _referenceTemplate2 = _interopRequireDefault(_referenceTemplate);
+
+var _underscore = __webpack_require__(1);
+
+var _underscore2 = _interopRequireDefault(_underscore);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var template = _underscore2.default.template(_referenceTemplate2.default);
+
+var ReferenceView = _baseView2.default.extend({
     template: template,
 
     inputOperators: ['is', 'is-not'],
@@ -2622,26 +2788,38 @@ var ReferenceView = __WEBPACK_IMPORTED_MODULE_0__base_view__["a" /* default */].
     }
 });
 
-/* harmony default export */ __webpack_exports__["a"] = (ReferenceView);
+exports.default = ReferenceView;
+module.exports = exports['default'];
 
 /***/ }),
 
 /***/ 165:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__base_view__ = __webpack_require__(138);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__text_template_html__ = __webpack_require__(147);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__text_template_html___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__text_template_html__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_underscore__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_underscore___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_underscore__);
 
 
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
 
+var _baseView = __webpack_require__(138);
 
-var template = __WEBPACK_IMPORTED_MODULE_2_underscore___default.a.template(__WEBPACK_IMPORTED_MODULE_1__text_template_html___default.a);
+var _baseView2 = _interopRequireDefault(_baseView);
 
-var TextView = __WEBPACK_IMPORTED_MODULE_0__base_view__["a" /* default */].extend({
+var _textTemplate = __webpack_require__(147);
+
+var _textTemplate2 = _interopRequireDefault(_textTemplate);
+
+var _underscore = __webpack_require__(1);
+
+var _underscore2 = _interopRequireDefault(_underscore);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var template = _underscore2.default.template(_textTemplate2.default);
+
+var TextView = _baseView2.default.extend({
     template: template,
 
     updateValues: function updateValues() {
@@ -2652,7 +2830,8 @@ var TextView = __WEBPACK_IMPORTED_MODULE_0__base_view__["a" /* default */].exten
     }
 });
 
-/* harmony default export */ __webpack_exports__["a"] = (TextView);
+exports.default = TextView;
+module.exports = exports['default'];
 
 /***/ })
 

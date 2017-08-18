@@ -2,18 +2,26 @@ exports.ids = [6];
 exports.modules = {
 
 /***/ 128:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_velocity_animate__ = __webpack_require__(136);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_velocity_animate___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_velocity_animate__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_velocity_ui_pack__ = __webpack_require__(137);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_velocity_ui_pack___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_velocity_ui_pack__);
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _velocityAnimate = __webpack_require__(136);
+
+var _velocityAnimate2 = _interopRequireDefault(_velocityAnimate);
+
+var _velocityUiPack = __webpack_require__(137);
+
+var _velocityUiPack2 = _interopRequireDefault(_velocityUiPack);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-
-
 
 var ImportEditControl = function ImportEditControl() {
     _classCallCheck(this, ImportEditControl);
@@ -28,7 +36,7 @@ var ImportEditControl = function ImportEditControl() {
         button.addClass('active');
 
         control.find('.import-mode-input').val('column');
-        __WEBPACK_IMPORTED_MODULE_0_velocity_animate___default()(control.find('.import-column'), 'slideDown');
+        (0, _velocityAnimate2.default)(control.find('.import-column'), 'slideDown');
         //control.find('.import-column').velocity('slideDown');
         control.find('.import-edit').hide();
     });
@@ -43,7 +51,7 @@ var ImportEditControl = function ImportEditControl() {
         button.addClass('active');
 
         control.find('.import-mode-input').val('value');
-        __WEBPACK_IMPORTED_MODULE_0_velocity_animate___default()(control.find('.import-edit'), 'slideDown');
+        (0, _velocityAnimate2.default)(control.find('.import-edit'), 'slideDown');
         //control.find('.import-edit').velocity('slideDown');
         control.find('.import-column').hide();
     });
@@ -80,7 +88,8 @@ var ImportEditControl = function ImportEditControl() {
     });
 };
 
-/* harmony default export */ __webpack_exports__["default"] = (ImportEditControl);
+exports.default = ImportEditControl;
+module.exports = exports['default'];
 
 /***/ }),
 
