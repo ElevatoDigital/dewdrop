@@ -85,7 +85,12 @@ module.exports = env => {
         rules: [
             {
                 include: path.resolve(__dirname, 'www/src/js'),
-                loader: 'babel-loader'
+                loader: 'babel-loader',
+                options: {
+                    plugins: [
+                        'syntax-dynamic-import'
+                    ]
+                }
             },
             {
                 test: [/\.txt$/, /\.html$/],
@@ -121,7 +126,8 @@ module.exports = env => {
                     ],
                     plugins: [
                         'add-module-exports',
-                        'transform-es2015-modules-umd'
+                        'transform-es2015-modules-umd',
+                        'dynamic-import-node'
                     ]
                 }
             },
