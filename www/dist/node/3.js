@@ -4,31 +4,53 @@ exports.modules = {
 /***/ 135:
 /***/ (function(module, exports, __webpack_require__) {
 
-"use strict";
+var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;(function (global, factory) {
+    if (true) {
+        !(__WEBPACK_AMD_DEFINE_ARRAY__ = [module, exports, __webpack_require__(173)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory),
+				__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?
+				(__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__),
+				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+    } else if (typeof exports !== "undefined") {
+        factory(module, exports, require('summernote-webpack'));
+    } else {
+        var mod = {
+            exports: {}
+        };
+        factory(mod, mod.exports, global.summernoteWebpack);
+        global.summernote = mod.exports;
+    }
+})(this, function (module, exports, _summernoteWebpack) {
+    'use strict';
 
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _summernoteWebpack = __webpack_require__(173);
-
-var _summernoteWebpack2 = _interopRequireDefault(_summernoteWebpack);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var SummerNote = function SummerNote() {
-    _classCallCheck(this, SummerNote);
-
-    $('.summernote').summernote({
-        height: 400
+    Object.defineProperty(exports, "__esModule", {
+        value: true
     });
-};
 
-exports.default = SummerNote;
-module.exports = exports['default'];
+    var _summernoteWebpack2 = _interopRequireDefault(_summernoteWebpack);
+
+    function _interopRequireDefault(obj) {
+        return obj && obj.__esModule ? obj : {
+            default: obj
+        };
+    }
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    var SummerNote = function SummerNote() {
+        _classCallCheck(this, SummerNote);
+
+        $('.summernote').summernote({
+            height: 400
+        });
+    };
+
+    exports.default = SummerNote;
+    module.exports = exports['default'];
+});
 
 /***/ }),
 

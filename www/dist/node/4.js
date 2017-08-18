@@ -4,127 +4,163 @@ exports.modules = {
 /***/ 133:
 /***/ (function(module, exports, __webpack_require__) {
 
-"use strict";
+var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;(function (global, factory) {
+    if (true) {
+        !(__WEBPACK_AMD_DEFINE_ARRAY__ = [module, exports, __webpack_require__(136), __webpack_require__(137)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory),
+				__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?
+				(__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__),
+				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+    } else if (typeof exports !== "undefined") {
+        factory(module, exports, require('velocity-animate'), require('velocity-ui-pack'));
+    } else {
+        var mod = {
+            exports: {}
+        };
+        factory(mod, mod.exports, global.velocityAnimate, global.velocityUiPack);
+        global.rowCollectionInputTable = mod.exports;
+    }
+})(this, function (module, exports, _velocityAnimate, _velocityUiPack) {
+    'use strict';
 
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
 
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
+    var _velocityAnimate2 = _interopRequireDefault(_velocityAnimate);
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+    var _velocityUiPack2 = _interopRequireDefault(_velocityUiPack);
 
-var _velocityAnimate = __webpack_require__(136);
-
-var _velocityAnimate2 = _interopRequireDefault(_velocityAnimate);
-
-var _velocityUiPack = __webpack_require__(137);
-
-var _velocityUiPack2 = _interopRequireDefault(_velocityUiPack);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var RowCollection = function () {
-    function RowCollection(collection) {
-        _classCallCheck(this, RowCollection);
-
-        this.button = collection.find('.btn-add-row');
-        this.template = collection.find('.row-template').data('row-collection-template');
-        this.count = parseInt(collection.data('editor-count'), 10);
-        this.alert = collection.find('.alert-no-records');
-        this.table = collection.find('table');
+    function _interopRequireDefault(obj) {
+        return obj && obj.__esModule ? obj : {
+            default: obj
+        };
     }
 
-    _createClass(RowCollection, [{
-        key: 'init',
-        value: function init() {
-            this.refreshVisibility();
-
-            this.button.on('click', $.proxy(function (e) {
-                e.preventDefault();
-                this.addRow(this.table, this.template, this.count);
-                this.count += 1;
-            }, this));
-
-            this.table.find('tr').each($.proxy(function (index, tr) {
-                this.initRowEventHandlers($(tr));
-            }, this));
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
         }
-    }, {
-        key: 'refreshVisibility',
-        value: function refreshVisibility() {
-            if (!this.table.find('tbody tr:visible').length) {
-                this.alert.show();
-                this.table.hide();
-            } else {
-                this.alert.hide();
-                this.table.show();
+    }
+
+    var _createClass = function () {
+        function defineProperties(target, props) {
+            for (var i = 0; i < props.length; i++) {
+                var descriptor = props[i];
+                descriptor.enumerable = descriptor.enumerable || false;
+                descriptor.configurable = true;
+                if ("value" in descriptor) descriptor.writable = true;
+                Object.defineProperty(target, descriptor.key, descriptor);
             }
         }
-    }, {
-        key: 'initRowEventHandlers',
-        value: function initRowEventHandlers(row) {
-            var that = this;
 
-            row.find('.btn-delete-row').on('click', function (e) {
-                var button = $(this);
+        return function (Constructor, protoProps, staticProps) {
+            if (protoProps) defineProperties(Constructor.prototype, protoProps);
+            if (staticProps) defineProperties(Constructor, staticProps);
+            return Constructor;
+        };
+    }();
 
-                e.preventDefault();
+    var RowCollection = function () {
+        function RowCollection(collection) {
+            _classCallCheck(this, RowCollection);
 
-                (0, _velocityAnimate2.default)(row, 'transition.expandOut', {
-                    complete: function complete() {
-                        if (!button.data('is-new')) {
-                            row.next().find('.row-collection-queued-to-delete').val(1);
-                        } else {
-                            row.next().remove();
-                            row.remove();
+            this.button = collection.find('.btn-add-row');
+            this.template = collection.find('.row-template').data('row-collection-template');
+            this.count = parseInt(collection.data('editor-count'), 10);
+            this.alert = collection.find('.alert-no-records');
+            this.table = collection.find('table');
+        }
+
+        _createClass(RowCollection, [{
+            key: 'init',
+            value: function init() {
+                this.refreshVisibility();
+
+                this.button.on('click', $.proxy(function (e) {
+                    e.preventDefault();
+                    this.addRow(this.table, this.template, this.count);
+                    this.count += 1;
+                }, this));
+
+                this.table.find('tr').each($.proxy(function (index, tr) {
+                    this.initRowEventHandlers($(tr));
+                }, this));
+            }
+        }, {
+            key: 'refreshVisibility',
+            value: function refreshVisibility() {
+                if (!this.table.find('tbody tr:visible').length) {
+                    this.alert.show();
+                    this.table.hide();
+                } else {
+                    this.alert.hide();
+                    this.table.show();
+                }
+            }
+        }, {
+            key: 'initRowEventHandlers',
+            value: function initRowEventHandlers(row) {
+                var that = this;
+
+                row.find('.btn-delete-row').on('click', function (e) {
+                    var button = $(this);
+
+                    e.preventDefault();
+
+                    (0, _velocityAnimate2.default)(row, 'transition.expandOut', {
+                        complete: function complete() {
+                            if (!button.data('is-new')) {
+                                row.next().find('.row-collection-queued-to-delete').val(1);
+                            } else {
+                                row.next().remove();
+                                row.remove();
+                            }
+
+                            that.refreshVisibility();
                         }
-
-                        that.refreshVisibility();
-                    }
+                    });
                 });
-            });
-        }
-    }, {
-        key: 'addRow',
-        value: function addRow() {
-            var html = this.template.replace(/__INDEX__/g, this.count),
-                tbody = this.table.find('tbody'),
-                row;
+            }
+        }, {
+            key: 'addRow',
+            value: function addRow() {
+                var html = this.template.replace(/__INDEX__/g, this.count),
+                    tbody = this.table.find('tbody'),
+                    row;
 
-            tbody.prepend(html);
+                tbody.prepend(html);
 
-            row = tbody.find('tr:first');
+                row = tbody.find('tr:first');
 
-            // Forcing visibility here because the row isn't actually shown until Velocity is done
-            this.table.show();
-            this.alert.hide();
+                // Forcing visibility here because the row isn't actually shown until Velocity is done
+                this.table.show();
+                this.alert.hide();
 
-            (0, _velocityAnimate2.default)(row, 'transition.slideUpIn');
+                (0, _velocityAnimate2.default)(row, 'transition.slideUpIn');
 
-            row.find(':input:first').focus();
+                row.find(':input:first').focus();
 
-            this.initRowEventHandlers(row);
-        }
-    }]);
+                this.initRowEventHandlers(row);
+            }
+        }]);
 
-    return RowCollection;
-}();
+        return RowCollection;
+    }();
 
-var RowCollectionInputTable = function RowCollectionInputTable() {
-    _classCallCheck(this, RowCollectionInputTable);
+    var RowCollectionInputTable = function RowCollectionInputTable() {
+        _classCallCheck(this, RowCollectionInputTable);
 
-    var collections = $('.row-collection-input-table');
+        var collections = $('.row-collection-input-table');
 
-    collections.each(function (index, collection) {
-        collection = new RowCollection($(collection));
-        collection.init();
-    });
-};
+        collections.each(function (index, collection) {
+            collection = new RowCollection($(collection));
+            collection.init();
+        });
+    };
 
-exports.default = RowCollectionInputTable;
-module.exports = exports['default'];
+    exports.default = RowCollectionInputTable;
+    module.exports = exports['default'];
+});
 
 /***/ }),
 

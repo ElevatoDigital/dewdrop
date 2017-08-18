@@ -17213,311 +17213,379 @@ return zhTw;
 /* 117 */
 /***/ (function(module, exports, __webpack_require__) {
 
-"use strict";
+var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;(function (global, factory) {
+    if (true) {
+        !(__WEBPACK_AMD_DEFINE_ARRAY__ = [module, exports], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory),
+				__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?
+				(__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__),
+				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+    } else if (typeof exports !== "undefined") {
+        factory(module, exports);
+    } else {
+        var mod = {
+            exports: {}
+        };
+        factory(mod, mod.exports);
+        global.moduleDetector = mod.exports;
+    }
+})(this, function (module, exports) {
+    'use strict';
 
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
 
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var Loader = function () {
-    function Loader() {
-        _classCallCheck(this, Loader);
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
     }
 
-    _createClass(Loader, [{
-        key: 'summernote',
-        value: function summernote(override) {
-            if (override || $('.summernote').length) {
-                __webpack_require__.e/* import() */(3).then(__webpack_require__.bind(null, 135)).then(function (mod) {
-                    new mod.default(override);
-                });
+    var _createClass = function () {
+        function defineProperties(target, props) {
+            for (var i = 0; i < props.length; i++) {
+                var descriptor = props[i];
+                descriptor.enumerable = descriptor.enumerable || false;
+                descriptor.configurable = true;
+                if ("value" in descriptor) descriptor.writable = true;
+                Object.defineProperty(target, descriptor.key, descriptor);
             }
         }
-    }, {
-        key: 'deleteButton',
-        value: function deleteButton(override) {
-            if (override || $('.btn-delete').length) {
-                __webpack_require__.e/* import() */(11).then(__webpack_require__.bind(null, 126)).then(function (mod) {
-                    new mod.default(override);
-                });
-            }
-        }
-    }, {
-        key: 'activityLogUserInformation',
-        value: function activityLogUserInformation(override) {
-            if (override || $('.activity-log-user-information').length) {
-                __webpack_require__.e/* import() */(14).then(__webpack_require__.bind(null, 121)).then(function (mod) {
-                    new mod.default(override);
-                });
-            }
-        }
-    }, {
-        key: 'importEditControl',
-        value: function importEditControl(override) {
-            if (override || $('.import-edit-control').length) {
-                __webpack_require__.e/* import() */(6).then(__webpack_require__.bind(null, 128)).then(function (mod) {
-                    new mod.default(override);
-                });
-            }
-        }
-    }, {
-        key: 'cascadeSelect',
-        value: function cascadeSelect(override) {
-            if (override || $('[data-cascade-from]').length) {
-                __webpack_require__.e/* import() */(13).then(__webpack_require__.bind(null, 123)).then(function (mod) {
-                    new mod.default(override);
-                });
-            }
-        }
-    }, {
-        key: 'datePicker',
-        value: function datePicker(override) {
-            if (override || $('.input-date').length) {
-                __webpack_require__.e/* import() */(12).then(__webpack_require__.bind(null, 124)).then(function (mod) {
-                    new mod.default(override);
-                });
-            }
-        }
-    }, {
-        key: 'datetimePicker',
-        value: function datetimePicker(override) {
-            if (override || $('.input-timestamp').length) {
-                __webpack_require__.e/* import() */(9).then(__webpack_require__.bind(null, 125)).then(function (mod) {
-                    new mod.default(override);
-                });
-            }
-        }
-    }, {
-        key: 'listingSortable',
-        value: function listingSortable(override) {
-            if (override || $('[data-dewdrop~="listing-sortable"]').length) {
-                __webpack_require__.e/* import() */(10).then(__webpack_require__.bind(null, 131)).then(function (mod) {
-                    new mod.default(override);
-                });
-            }
-        }
-    }, {
-        key: 'optionInputDecorator',
-        value: function optionInputDecorator(override) {
-            if (override || $('.option-input-decorator').length) {
-                __webpack_require__.e/* import() */(5).then(__webpack_require__.bind(null, 132)).then(function (mod) {
-                    new mod.default(override);
-                });
-            }
-        }
-    }, {
-        key: 'rowCollectionInputTable',
-        value: function rowCollectionInputTable(override) {
-            if (override || $('.row-collection-input-table').length) {
-                __webpack_require__.e/* import() */(4).then(__webpack_require__.bind(null, 133)).then(function (mod) {
-                    new mod.default(override);
-                });
-            }
-        }
-    }, {
-        key: 'filter',
-        value: function filter(override) {
-            if (override || $('.filter-form').length) {
-                __webpack_require__.e/* import() */(0).then(__webpack_require__.bind(null, 127)).then(function (mod) {
-                    new mod.default(override);
-                });
-            }
-        }
-    }, {
-        key: 'sortFields',
-        value: function sortFields(override) {
-            if (override || $('#sort-form').length) {
-                __webpack_require__.e/* import() */(1).then(__webpack_require__.bind(null, 134)).then(function (mod) {
-                    new mod.default(override);
-                });
-            }
-        }
-    }, {
-        key: 'inputFile',
-        value: function inputFile(override) {
-            if (override || $('.btn-input-file').length) {
-                __webpack_require__.e/* import() */(2).then(__webpack_require__.bind(null, 129)).then(function (mod) {
-                    new mod.default(override);
-                });
-            }
-        }
-    }, {
-        key: 'listingKeyboardShortcuts',
-        value: function listingKeyboardShortcuts(override) {
-            if (override || $('a[data-target="#keyboard-shortcuts-modal"]').length) {
-                __webpack_require__.e/* import() */(8).then(__webpack_require__.bind(null, 130)).then(function (mod) {
-                    new mod.default(override);
-                });
-            }
-        }
-    }, {
-        key: 'bulkActionForm',
-        value: function bulkActionForm(override) {
-            if (override || $('.bulk-action-form').length) {
-                __webpack_require__.e/* import() */(7).then(__webpack_require__.bind(null, 122)).then(function (mod) {
-                    new mod.default(override);
-                });
-            }
-        }
-    }]);
 
-    return Loader;
-}();
+        return function (Constructor, protoProps, staticProps) {
+            if (protoProps) defineProperties(Constructor.prototype, protoProps);
+            if (staticProps) defineProperties(Constructor, staticProps);
+            return Constructor;
+        };
+    }();
 
-var Detector = function () {
-    function Detector() {
-        _classCallCheck(this, Detector);
+    var Loader = function () {
+        function Loader() {
+            _classCallCheck(this, Loader);
+        }
 
-        this.loader = new Loader();
-    }
-
-    _createClass(Detector, [{
-        key: 'loadModules',
-        value: function loadModules() {
-            // Execute each method of Loader
-            var _iteratorNormalCompletion = true;
-            var _didIteratorError = false;
-            var _iteratorError = undefined;
-
-            try {
-                for (var _iterator = Object.getOwnPropertyNames(Object.getPrototypeOf(this.loader))[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                    var name = _step.value;
-
-                    var method = this.loader[name];
-
-                    if (!(method instanceof Function) || method === Loader) {
-                        continue;
-                    }
-                    method();
+        _createClass(Loader, [{
+            key: 'summernote',
+            value: function summernote(override) {
+                if (override || $('.summernote').length) {
+                    __webpack_require__.e/* import() */(3).then(__webpack_require__.bind(null, 135)).then(function (mod) {
+                        new mod.default(override);
+                    });
                 }
-            } catch (err) {
-                _didIteratorError = true;
-                _iteratorError = err;
-            } finally {
+            }
+        }, {
+            key: 'deleteButton',
+            value: function deleteButton(override) {
+                if (override || $('.btn-delete').length) {
+                    __webpack_require__.e/* import() */(11).then(__webpack_require__.bind(null, 126)).then(function (mod) {
+                        new mod.default(override);
+                    });
+                }
+            }
+        }, {
+            key: 'activityLogUserInformation',
+            value: function activityLogUserInformation(override) {
+                if (override || $('.activity-log-user-information').length) {
+                    __webpack_require__.e/* import() */(14).then(__webpack_require__.bind(null, 121)).then(function (mod) {
+                        new mod.default(override);
+                    });
+                }
+            }
+        }, {
+            key: 'importEditControl',
+            value: function importEditControl(override) {
+                if (override || $('.import-edit-control').length) {
+                    __webpack_require__.e/* import() */(6).then(__webpack_require__.bind(null, 128)).then(function (mod) {
+                        new mod.default(override);
+                    });
+                }
+            }
+        }, {
+            key: 'cascadeSelect',
+            value: function cascadeSelect(override) {
+                if (override || $('[data-cascade-from]').length) {
+                    __webpack_require__.e/* import() */(13).then(__webpack_require__.bind(null, 123)).then(function (mod) {
+                        new mod.default(override);
+                    });
+                }
+            }
+        }, {
+            key: 'datePicker',
+            value: function datePicker(override) {
+                if (override || $('.input-date').length) {
+                    __webpack_require__.e/* import() */(12).then(__webpack_require__.bind(null, 124)).then(function (mod) {
+                        new mod.default(override);
+                    });
+                }
+            }
+        }, {
+            key: 'datetimePicker',
+            value: function datetimePicker(override) {
+                if (override || $('.input-timestamp').length) {
+                    __webpack_require__.e/* import() */(9).then(__webpack_require__.bind(null, 125)).then(function (mod) {
+                        new mod.default(override);
+                    });
+                }
+            }
+        }, {
+            key: 'listingSortable',
+            value: function listingSortable(override) {
+                if (override || $('[data-dewdrop~="listing-sortable"]').length) {
+                    __webpack_require__.e/* import() */(10).then(__webpack_require__.bind(null, 131)).then(function (mod) {
+                        new mod.default(override);
+                    });
+                }
+            }
+        }, {
+            key: 'optionInputDecorator',
+            value: function optionInputDecorator(override) {
+                if (override || $('.option-input-decorator').length) {
+                    __webpack_require__.e/* import() */(5).then(__webpack_require__.bind(null, 132)).then(function (mod) {
+                        new mod.default(override);
+                    });
+                }
+            }
+        }, {
+            key: 'rowCollectionInputTable',
+            value: function rowCollectionInputTable(override) {
+                if (override || $('.row-collection-input-table').length) {
+                    __webpack_require__.e/* import() */(4).then(__webpack_require__.bind(null, 133)).then(function (mod) {
+                        new mod.default(override);
+                    });
+                }
+            }
+        }, {
+            key: 'filter',
+            value: function filter(override) {
+                if (override || $('.filter-form').length) {
+                    __webpack_require__.e/* import() */(0).then(__webpack_require__.bind(null, 127)).then(function (mod) {
+                        new mod.default(override);
+                    });
+                }
+            }
+        }, {
+            key: 'sortFields',
+            value: function sortFields(override) {
+                if (override || $('#sort-form').length) {
+                    __webpack_require__.e/* import() */(1).then(__webpack_require__.bind(null, 134)).then(function (mod) {
+                        new mod.default(override);
+                    });
+                }
+            }
+        }, {
+            key: 'inputFile',
+            value: function inputFile(override) {
+                if (override || $('.btn-input-file').length) {
+                    __webpack_require__.e/* import() */(2).then(__webpack_require__.bind(null, 129)).then(function (mod) {
+                        new mod.default(override);
+                    });
+                }
+            }
+        }, {
+            key: 'listingKeyboardShortcuts',
+            value: function listingKeyboardShortcuts(override) {
+                if (override || $('a[data-target="#keyboard-shortcuts-modal"]').length) {
+                    __webpack_require__.e/* import() */(8).then(__webpack_require__.bind(null, 130)).then(function (mod) {
+                        new mod.default(override);
+                    });
+                }
+            }
+        }, {
+            key: 'bulkActionForm',
+            value: function bulkActionForm(override) {
+                if (override || $('.bulk-action-form').length) {
+                    __webpack_require__.e/* import() */(7).then(__webpack_require__.bind(null, 122)).then(function (mod) {
+                        new mod.default(override);
+                    });
+                }
+            }
+        }]);
+
+        return Loader;
+    }();
+
+    var Detector = function () {
+        function Detector() {
+            _classCallCheck(this, Detector);
+
+            this.loader = new Loader();
+        }
+
+        _createClass(Detector, [{
+            key: 'loadModules',
+            value: function loadModules() {
+                var _iteratorNormalCompletion = true;
+                var _didIteratorError = false;
+                var _iteratorError = undefined;
+
                 try {
-                    if (!_iteratorNormalCompletion && _iterator.return) {
-                        _iterator.return();
+                    // Execute each method of Loader
+                    for (var _iterator = Object.getOwnPropertyNames(Object.getPrototypeOf(this.loader))[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                        var name = _step.value;
+
+                        var method = this.loader[name];
+
+                        if (!(method instanceof Function) || method === Loader) {
+                            continue;
+                        }
+                        method();
                     }
+                } catch (err) {
+                    _didIteratorError = true;
+                    _iteratorError = err;
                 } finally {
-                    if (_didIteratorError) {
-                        throw _iteratorError;
+                    try {
+                        if (!_iteratorNormalCompletion && _iterator.return) {
+                            _iterator.return();
+                        }
+                    } finally {
+                        if (_didIteratorError) {
+                            throw _iteratorError;
+                        }
                     }
                 }
             }
-        }
-    }, {
-        key: 'load',
-        value: function load(module) {
-            var override = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+        }, {
+            key: 'load',
+            value: function load(module) {
+                var override = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
 
-            this.loader[module](override);
-        }
-    }]);
+                this.loader[module](override);
+            }
+        }]);
 
-    return Detector;
-}();
+        return Detector;
+    }();
 
-exports.default = Detector;
-module.exports = exports['default'];
+    exports.default = Detector;
+    module.exports = exports['default'];
+});
 
 /***/ }),
 /* 118 */
 /***/ (function(module, exports, __webpack_require__) {
 
-"use strict";
+var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;(function (global, factory) {
+    if (true) {
+        !(__WEBPACK_AMD_DEFINE_ARRAY__ = [module, exports, __webpack_require__(1), __webpack_require__(0), __webpack_require__(117)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory),
+				__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?
+				(__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__),
+				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+    } else if (typeof exports !== "undefined") {
+        factory(module, exports, require('underscore'), require('moment'), require('./module-detector'));
+    } else {
+        var mod = {
+            exports: {}
+        };
+        factory(mod, mod.exports, global.underscore, global.moment, global.moduleDetector);
+        global.dewdrop = mod.exports;
+    }
+})(this, function (module, exports, _underscore, _moment, _moduleDetector) {
+    'use strict';
 
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
 
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
+    var _underscore2 = _interopRequireDefault(_underscore);
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-//import Backbone from 'backbone';
+    var _moment2 = _interopRequireDefault(_moment);
 
+    var _moduleDetector2 = _interopRequireDefault(_moduleDetector);
 
-var _underscore = __webpack_require__(1);
-
-var _underscore2 = _interopRequireDefault(_underscore);
-
-var _moment = __webpack_require__(0);
-
-var _moment2 = _interopRequireDefault(_moment);
-
-var _moduleDetector = __webpack_require__(117);
-
-var _moduleDetector2 = _interopRequireDefault(_moduleDetector);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var Dewdrop = function () {
-    function Dewdrop() {
-        _classCallCheck(this, Dewdrop);
-
-        window.DEWDROP = this;
-
-        // Dynamically set the webpack public path since it varies
-        var key = 'dewdrop/www/dist/js/',
-            url = _underscore2.default.chain(document.getElementsByTagName('script')).pluck('src').filter(function (a) {
-            return a.indexOf(key) >= 0;
-        }).first().value();
-
-        this.publicPath = url.substring(0, url.indexOf(key) + key.length);
-
-        __webpack_require__.p = this.publicPath;
+    function _interopRequireDefault(obj) {
+        return obj && obj.__esModule ? obj : {
+            default: obj
+        };
     }
 
-    _createClass(Dewdrop, [{
-        key: 'init',
-        value: function init() {
-            _moment2.default.locale(navigator.language);
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
 
-            /*** Handle jQuery plugin naming conflict between jQuery UI and Bootstrap ***/
-            if ($.widget && $.widget.bridge) {
-                $.widget.bridge('uibutton', $.ui.button);
-                $.widget.bridge('uitooltip', $.ui.tooltip);
+    var _createClass = function () {
+        function defineProperties(target, props) {
+            for (var i = 0; i < props.length; i++) {
+                var descriptor = props[i];
+                descriptor.enumerable = descriptor.enumerable || false;
+                descriptor.configurable = true;
+                if ("value" in descriptor) descriptor.writable = true;
+                Object.defineProperty(target, descriptor.key, descriptor);
             }
-
-            // Disable submit inputs upon applicable form submissions
-            $('.dewdrop-submit.disable-on-submit').closest('form').on('submit', function () {
-                $(this).find('.dewdrop-submit.disable-on-submit').prop('disabled', true);
-            });
-
-            this.detectAndLoadModules();
-
-            return this;
         }
-    }, {
-        key: 'detectAndLoadModules',
-        value: function detectAndLoadModules() {
-            new _moduleDetector2.default().loadModules();
-        }
-    }, {
-        key: 'loadModule',
-        value: function loadModule(module) {
-            new _moduleDetector2.default().load(module);
-        }
-    }, {
-        key: 'bowerUrl',
-        value: function bowerUrl(url) {
-            var dewdropSrc = this.publicPath,
-                bowerUrl = dewdropSrc.substring(0, dewdropSrc.indexOf('bower_components')) + 'bower_components';
 
-            return bowerUrl + (0 === url.indexOf('/') ? '' : '/') + url;
+        return function (Constructor, protoProps, staticProps) {
+            if (protoProps) defineProperties(Constructor.prototype, protoProps);
+            if (staticProps) defineProperties(Constructor, staticProps);
+            return Constructor;
+        };
+    }();
+
+    var Dewdrop = function () {
+        function Dewdrop() {
+            _classCallCheck(this, Dewdrop);
+
+            window.DEWDROP = this;
+
+            // Dynamically set the webpack public path since it varies
+            var key = 'dewdrop/www/dist/js/',
+                url = _underscore2.default.chain(document.getElementsByTagName('script')).pluck('src').filter(function (a) {
+                return a.indexOf(key) >= 0;
+            }).first().value();
+
+            this.publicPath = url.substring(0, url.indexOf(key) + key.length);
+
+            __webpack_require__.p = this.publicPath;
         }
-    }]);
 
-    return Dewdrop;
-}();
+        _createClass(Dewdrop, [{
+            key: 'init',
+            value: function init() {
+                _moment2.default.locale(navigator.language);
 
-exports.default = Dewdrop;
-module.exports = exports['default'];
+                /*** Handle jQuery plugin naming conflict between jQuery UI and Bootstrap ***/
+                if ($.widget && $.widget.bridge) {
+                    $.widget.bridge('uibutton', $.ui.button);
+                    $.widget.bridge('uitooltip', $.ui.tooltip);
+                }
+
+                // Disable submit inputs upon applicable form submissions
+                $('.dewdrop-submit.disable-on-submit').closest('form').on('submit', function () {
+                    $(this).find('.dewdrop-submit.disable-on-submit').prop('disabled', true);
+                });
+
+                this.detectAndLoadModules();
+
+                return this;
+            }
+        }, {
+            key: 'detectAndLoadModules',
+            value: function detectAndLoadModules() {
+                new _moduleDetector2.default().loadModules();
+            }
+        }, {
+            key: 'loadModule',
+            value: function loadModule(module) {
+                new _moduleDetector2.default().load(module);
+            }
+        }, {
+            key: 'bowerUrl',
+            value: function bowerUrl(url) {
+                var dewdropSrc = this.publicPath,
+                    bowerUrl = dewdropSrc.substring(0, dewdropSrc.indexOf('bower_components')) + 'bower_components';
+
+                return bowerUrl + (0 === url.indexOf('/') ? '' : '/') + url;
+            }
+        }]);
+
+        return Dewdrop;
+    }();
+
+    exports.default = Dewdrop;
+    module.exports = exports['default'];
+});
 
 /***/ }),
 /* 119 */

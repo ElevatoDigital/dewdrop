@@ -4,123 +4,161 @@ exports.modules = {
 /***/ 130:
 /***/ (function(module, exports, __webpack_require__) {
 
-"use strict";
+var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;(function (global, factory) {
+    if (true) {
+        !(__WEBPACK_AMD_DEFINE_ARRAY__ = [module, exports, __webpack_require__(172)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory),
+				__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?
+				(__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__),
+				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+    } else if (typeof exports !== "undefined") {
+        factory(module, exports, require('keymaster'));
+    } else {
+        var mod = {
+            exports: {}
+        };
+        factory(mod, mod.exports, global.keymaster);
+        global.listingKeyboardShortcuts = mod.exports;
+    }
+})(this, function (module, exports, _keymaster) {
+    'use strict';
 
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
 
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
+    var _keymaster2 = _interopRequireDefault(_keymaster);
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _keymaster = __webpack_require__(172);
-
-var _keymaster2 = _interopRequireDefault(_keymaster);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var ListingKeyboardShortcuts = function () {
-    function ListingKeyboardShortcuts() {
-        var scope = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'dewdrop-listing-keyboard-shortcuts';
-
-        _classCallCheck(this, ListingKeyboardShortcuts);
-
-        if (!scope.length) {
-            scope = 'dewdrop-listing-keyboard-shortcuts';
-        }
-
-        _keymaster2.default.setScope(scope);
-        (0, _keymaster2.default)('j', scope, this.nextRow);
-        (0, _keymaster2.default)('k', scope, this.previousRow);
-        (0, _keymaster2.default)('e', scope, this.edit);
-        (0, _keymaster2.default)('v', scope, this.view);
-        (0, _keymaster2.default)('c', scope, this.add);
-        (0, _keymaster2.default)('/', scope, this.filter);
+    function _interopRequireDefault(obj) {
+        return obj && obj.__esModule ? obj : {
+            default: obj
+        };
     }
 
-    _createClass(ListingKeyboardShortcuts, [{
-        key: 'nextRow',
-        value: function nextRow() {
-            var selected = $('.bootstrap-table tbody tr.keyboard-selected'),
-                next;
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
 
-            if (!selected.length) {
-                $('.bootstrap-table tbody tr:first').addClass('keyboard-selected');
-            } else {
-                selected.removeClass('keyboard-selected');
+    var _createClass = function () {
+        function defineProperties(target, props) {
+            for (var i = 0; i < props.length; i++) {
+                var descriptor = props[i];
+                descriptor.enumerable = descriptor.enumerable || false;
+                descriptor.configurable = true;
+                if ("value" in descriptor) descriptor.writable = true;
+                Object.defineProperty(target, descriptor.key, descriptor);
+            }
+        }
 
-                next = selected.next();
+        return function (Constructor, protoProps, staticProps) {
+            if (protoProps) defineProperties(Constructor.prototype, protoProps);
+            if (staticProps) defineProperties(Constructor, staticProps);
+            return Constructor;
+        };
+    }();
 
-                if (next) {
-                    next.addClass('keyboard-selected');
+    var ListingKeyboardShortcuts = function () {
+        function ListingKeyboardShortcuts() {
+            var scope = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'dewdrop-listing-keyboard-shortcuts';
+
+            _classCallCheck(this, ListingKeyboardShortcuts);
+
+            if (!scope.length) {
+                scope = 'dewdrop-listing-keyboard-shortcuts';
+            }
+
+            _keymaster2.default.setScope(scope);
+            (0, _keymaster2.default)('j', scope, this.nextRow);
+            (0, _keymaster2.default)('k', scope, this.previousRow);
+            (0, _keymaster2.default)('e', scope, this.edit);
+            (0, _keymaster2.default)('v', scope, this.view);
+            (0, _keymaster2.default)('c', scope, this.add);
+            (0, _keymaster2.default)('/', scope, this.filter);
+        }
+
+        _createClass(ListingKeyboardShortcuts, [{
+            key: 'nextRow',
+            value: function nextRow() {
+                var selected = $('.bootstrap-table tbody tr.keyboard-selected'),
+                    next;
+
+                if (!selected.length) {
+                    $('.bootstrap-table tbody tr:first').addClass('keyboard-selected');
+                } else {
+                    selected.removeClass('keyboard-selected');
+
+                    next = selected.next();
+
+                    if (next) {
+                        next.addClass('keyboard-selected');
+                    }
                 }
             }
-        }
-    }, {
-        key: 'previousRow',
-        value: function previousRow() {
-            var selected = $('.bootstrap-table tbody tr.keyboard-selected'),
-                previous;
+        }, {
+            key: 'previousRow',
+            value: function previousRow() {
+                var selected = $('.bootstrap-table tbody tr.keyboard-selected'),
+                    previous;
 
-            if (!selected || !selected.length) {
-                $('.bootstrap-table tbody tr:last').addClass('keyboard-selected');
-            } else {
-                selected.removeClass('keyboard-selected');
+                if (!selected || !selected.length) {
+                    $('.bootstrap-table tbody tr:last').addClass('keyboard-selected');
+                } else {
+                    selected.removeClass('keyboard-selected');
 
-                previous = selected.prev();
+                    previous = selected.prev();
 
-                if (previous) {
-                    previous.addClass('keyboard-selected');
+                    if (previous) {
+                        previous.addClass('keyboard-selected');
+                    }
                 }
             }
-        }
-    }, {
-        key: 'edit',
-        value: function edit() {
-            var editLink = $('.bootstrap-table tbody tr.keyboard-selected a[data-keyboard-role="edit"]:first');
+        }, {
+            key: 'edit',
+            value: function edit() {
+                var editLink = $('.bootstrap-table tbody tr.keyboard-selected a[data-keyboard-role="edit"]:first');
 
-            if (editLink && editLink.attr('href')) {
-                window.location.href = editLink.attr('href');
+                if (editLink && editLink.attr('href')) {
+                    window.location.href = editLink.attr('href');
+                }
             }
-        }
-    }, {
-        key: 'view',
-        value: function view() {
-            var viewLink = $('.bootstrap-table tbody tr.keyboard-selected a[data-keyboard-role="view"]:first');
+        }, {
+            key: 'view',
+            value: function view() {
+                var viewLink = $('.bootstrap-table tbody tr.keyboard-selected a[data-keyboard-role="view"]:first');
 
-            if (viewLink && viewLink.attr('href')) {
-                viewLink.click();
+                if (viewLink && viewLink.attr('href')) {
+                    viewLink.click();
+                }
             }
-        }
-    }, {
-        key: 'add',
-        value: function add() {
-            var addLink = $('a[data-keyboard-role="create"]:first');
+        }, {
+            key: 'add',
+            value: function add() {
+                var addLink = $('a[data-keyboard-role="create"]:first');
 
-            if (addLink && addLink.attr('href')) {
-                window.location.href = addLink.attr('href');
+                if (addLink && addLink.attr('href')) {
+                    window.location.href = addLink.attr('href');
+                }
             }
-        }
-    }, {
-        key: 'filter',
-        value: function filter() {
-            var filterButton = $('button[data-keyboard-role="filter"]:first');
+        }, {
+            key: 'filter',
+            value: function filter() {
+                var filterButton = $('button[data-keyboard-role="filter"]:first');
 
-            if (filterButton) {
-                filterButton.click();
+                if (filterButton) {
+                    filterButton.click();
 
-                $('.filter-form .filter-field').focus();
+                    $('.filter-form .filter-field').focus();
+                }
             }
-        }
-    }]);
+        }]);
 
-    return ListingKeyboardShortcuts;
-}();
+        return ListingKeyboardShortcuts;
+    }();
 
-exports.default = ListingKeyboardShortcuts;
-module.exports = exports['default'];
+    exports.default = ListingKeyboardShortcuts;
+    module.exports = exports['default'];
+});
 
 /***/ }),
 

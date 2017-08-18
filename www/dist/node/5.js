@@ -4,156 +4,176 @@ exports.modules = {
 /***/ 132:
 /***/ (function(module, exports, __webpack_require__) {
 
-"use strict";
+var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;(function (global, factory) {
+    if (true) {
+        !(__WEBPACK_AMD_DEFINE_ARRAY__ = [module, exports, __webpack_require__(136), __webpack_require__(137)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory),
+				__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?
+				(__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__),
+				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+    } else if (typeof exports !== "undefined") {
+        factory(module, exports, require('velocity-animate'), require('velocity-ui-pack'));
+    } else {
+        var mod = {
+            exports: {}
+        };
+        factory(mod, mod.exports, global.velocityAnimate, global.velocityUiPack);
+        global.optionInputDecorator = mod.exports;
+    }
+})(this, function (module, exports, _velocityAnimate, _velocityUiPack) {
+    'use strict';
 
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
 
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
+    var _velocityAnimate2 = _interopRequireDefault(_velocityAnimate);
 
-var _velocityAnimate = __webpack_require__(136);
+    var _velocityUiPack2 = _interopRequireDefault(_velocityUiPack);
 
-var _velocityAnimate2 = _interopRequireDefault(_velocityAnimate);
+    function _interopRequireDefault(obj) {
+        return obj && obj.__esModule ? obj : {
+            default: obj
+        };
+    }
 
-var _velocityUiPack = __webpack_require__(137);
-
-var _velocityUiPack2 = _interopRequireDefault(_velocityUiPack);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var OptionInputDecorator = function OptionInputDecorator() {
-    _classCallCheck(this, OptionInputDecorator);
-
-    $(document).on('click', '.option-input-decorator .btn-add-option', function (e) {
-        var well = findWrappingDecorator(this).find('.well:first');
-
-        e.preventDefault();
-
-        if ('block' === well.css('display')) {
-            (0, _velocityAnimate2.default)(well, 'slideUp');
-        } else {
-            (0, _velocityAnimate2.default)(well, 'slideDown');
-            well.find('input:first').focus();
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
         }
-    });
+    }
 
-    $(document).on('click', '.option-input-decorator .btn-submit-option', function (e) {
-        e.preventDefault();
-        submitDecorator(findWrappingDecorator(this));
-    });
+    var OptionInputDecorator = function OptionInputDecorator() {
+        _classCallCheck(this, OptionInputDecorator);
 
-    /* Remove all inputs that were part of an option-input-decorator prior to actual submit */
-    $(document).on('submit', 'form', function () {
-        $('.option-input-decorator .well').remove();
-    });
+        $(document).on('click', '.option-input-decorator .btn-add-option', function (e) {
+            var well = findWrappingDecorator(this).find('.well:first');
 
-    $(document).on('keydown', function (e) {
-        // Ignore "enter" key on option-input-decorator inputs so we don't submit the overall form
-        if (13 === e.which && $(e.target).is('.option-input-decorator :input')) {
             e.preventDefault();
-        }
-    });
 
-    var findWrappingDecorator = function findWrappingDecorator(node) {
-        return $(node).closest('.option-input-decorator');
-    };
+            if ('block' === well.css('display')) {
+                (0, _velocityAnimate2.default)(well, 'slideUp');
+            } else {
+                (0, _velocityAnimate2.default)(well, 'slideDown');
+                well.find('input:first').focus();
+            }
+        });
 
-    var submitDecorator = function submitDecorator(decorator) {
-        var data = decorator.find(':input').serialize();
+        $(document).on('click', '.option-input-decorator .btn-submit-option', function (e) {
+            e.preventDefault();
+            submitDecorator(findWrappingDecorator(this));
+        });
 
-        $.ajax(decorator.data('save-action'), {
-            type: 'POST',
-            data: data,
-            success: function success(response) {
-                decorator.find('.form-group').removeClass('has-feedback').removeClass('has-error').removeClass('alert').removeClass('alert-danger').find('.error-message').remove();
+        /* Remove all inputs that were part of an option-input-decorator prior to actual submit */
+        $(document).on('submit', 'form', function () {
+            $('.option-input-decorator .well').remove();
+        });
 
-                if (!response.result || 'error' === response.result) {
+        $(document).on('keydown', function (e) {
+            // Ignore "enter" key on option-input-decorator inputs so we don't submit the overall form
+            if (13 === e.which && $(e.target).is('.option-input-decorator :input')) {
+                e.preventDefault();
+            }
+        });
+
+        var findWrappingDecorator = function findWrappingDecorator(node) {
+            return $(node).closest('.option-input-decorator');
+        };
+
+        var submitDecorator = function submitDecorator(decorator) {
+            var data = decorator.find(':input').serialize();
+
+            $.ajax(decorator.data('save-action'), {
+                type: 'POST',
+                data: data,
+                success: function success(response) {
+                    decorator.find('.form-group').removeClass('has-feedback').removeClass('has-error').removeClass('alert').removeClass('alert-danger').find('.error-message').remove();
+
+                    if (!response.result || 'error' === response.result) {
+                        alert('Error while saving new option.  Please try again.');
+                    } else if ('success' === response.result) {
+                        reRenderControl(decorator, response.id);
+                    } else if ('invalid' === response.result) {
+                        (0, _velocityAnimate2.default)(decorator, 'callout.shake');
+                        renderValidationMessages(decorator, response.messages);
+                    }
+                },
+                error: function error() {
                     alert('Error while saving new option.  Please try again.');
-                } else if ('success' === response.result) {
-                    reRenderControl(decorator, response.id);
-                } else if ('invalid' === response.result) {
-                    (0, _velocityAnimate2.default)(decorator, 'callout.shake');
-                    renderValidationMessages(decorator, response.messages);
                 }
-            },
-            error: function error() {
-                alert('Error while saving new option.  Please try again.');
-            }
-        });
-    };
+            });
+        };
 
-    var renderValidationMessages = function renderValidationMessages(decorator, messages) {
-        var controlName, controlMessages, formGroup;
+        var renderValidationMessages = function renderValidationMessages(decorator, messages) {
+            var controlName, controlMessages, formGroup;
 
-        for (controlName in messages) {
-            if (messages.hasOwnProperty(controlName)) {
-                controlMessages = messages[controlName];
-                formGroup = decorator.find('#' + controlName).closest('.form-group');
+            for (controlName in messages) {
+                if (messages.hasOwnProperty(controlName)) {
+                    controlMessages = messages[controlName];
+                    formGroup = decorator.find('#' + controlName).closest('.form-group');
 
-                if (fieldHasMessages(controlMessages)) {
-                    formGroup.addClass('has-feedback').addClass('has-error').addClass('alert').addClass('alert-danger').append(renderMessagesForField(messages[controlName]));
+                    if (fieldHasMessages(controlMessages)) {
+                        formGroup.addClass('has-feedback').addClass('has-error').addClass('alert').addClass('alert-danger').append(renderMessagesForField(messages[controlName]));
+                    }
                 }
             }
-        }
-    };
+        };
 
-    var fieldHasMessages = function fieldHasMessages(messages) {
-        var hasMessages = false,
-            validatorKey;
+        var fieldHasMessages = function fieldHasMessages(messages) {
+            var hasMessages = false,
+                validatorKey;
 
-        for (validatorKey in messages) {
-            if (messages.hasOwnProperty(validatorKey)) {
-                hasMessages = true;
-                break;
+            for (validatorKey in messages) {
+                if (messages.hasOwnProperty(validatorKey)) {
+                    hasMessages = true;
+                    break;
+                }
             }
-        }
 
-        return hasMessages;
-    };
+            return hasMessages;
+        };
 
-    var renderMessagesForField = function renderMessagesForField(messages) {
-        var validatorKey,
-            wrapper = $('<div></div>'),
-            div;
+        var renderMessagesForField = function renderMessagesForField(messages) {
+            var validatorKey,
+                wrapper = $('<div></div>'),
+                div;
 
-        for (validatorKey in messages) {
-            if (messages.hasOwnProperty(validatorKey)) {
-                div = $('<div class="help-block error-message"></div>');
-                div.text(messages[validatorKey]);
-                wrapper.append(div);
+            for (validatorKey in messages) {
+                if (messages.hasOwnProperty(validatorKey)) {
+                    div = $('<div class="help-block error-message"></div>');
+                    div.text(messages[validatorKey]);
+                    wrapper.append(div);
+                }
             }
-        }
 
-        return wrapper;
-    };
+            return wrapper;
+        };
 
-    var reRenderControl = function reRenderControl(decorator, newOptionValue) {
-        var url = decorator.data('render-url');
+        var reRenderControl = function reRenderControl(decorator, newOptionValue) {
+            var url = decorator.data('render-url');
 
-        if (-1 !== url.indexOf('?')) {
-            url += '&';
-        } else {
-            url += '?';
-        }
-
-        url += 'value=' + newOptionValue + '&field=' + decorator.data('field-id');
-
-        $.ajax({
-            url: url,
-            type: 'GET',
-            success: function success(response) {
-                decorator.find('.option-input-original-control:first').html($(response).find('.option-input-original-control:first').html());
-
-                (0, _velocityAnimate2.default)(decorator.find('.well:first'), 'slideUp');
+            if (-1 !== url.indexOf('?')) {
+                url += '&';
+            } else {
+                url += '?';
             }
-        });
-    };
-};
 
-exports.default = OptionInputDecorator;
-module.exports = exports['default'];
+            url += 'value=' + newOptionValue + '&field=' + decorator.data('field-id');
+
+            $.ajax({
+                url: url,
+                type: 'GET',
+                success: function success(response) {
+                    decorator.find('.option-input-original-control:first').html($(response).find('.option-input-original-control:first').html());
+
+                    (0, _velocityAnimate2.default)(decorator.find('.well:first'), 'slideUp');
+                }
+            });
+        };
+    };
+
+    exports.default = OptionInputDecorator;
+    module.exports = exports['default'];
+});
 
 /***/ }),
 

@@ -4,92 +4,112 @@ exports.modules = {
 /***/ 128:
 /***/ (function(module, exports, __webpack_require__) {
 
-"use strict";
+var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;(function (global, factory) {
+    if (true) {
+        !(__WEBPACK_AMD_DEFINE_ARRAY__ = [module, exports, __webpack_require__(136), __webpack_require__(137)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory),
+				__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?
+				(__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__),
+				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+    } else if (typeof exports !== "undefined") {
+        factory(module, exports, require('velocity-animate'), require('velocity-ui-pack'));
+    } else {
+        var mod = {
+            exports: {}
+        };
+        factory(mod, mod.exports, global.velocityAnimate, global.velocityUiPack);
+        global.importEditControl = mod.exports;
+    }
+})(this, function (module, exports, _velocityAnimate, _velocityUiPack) {
+    'use strict';
 
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _velocityAnimate = __webpack_require__(136);
-
-var _velocityAnimate2 = _interopRequireDefault(_velocityAnimate);
-
-var _velocityUiPack = __webpack_require__(137);
-
-var _velocityUiPack2 = _interopRequireDefault(_velocityUiPack);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var ImportEditControl = function ImportEditControl() {
-    _classCallCheck(this, ImportEditControl);
-
-    $(document).on('click', '.import-edit-control .btn-column', function (e) {
-        var button = $(this),
-            control = button.closest('.import-edit-control');
-
-        e.preventDefault();
-
-        control.find('.btn-group-import .btn').removeClass('active');
-        button.addClass('active');
-
-        control.find('.import-mode-input').val('column');
-        (0, _velocityAnimate2.default)(control.find('.import-column'), 'slideDown');
-        //control.find('.import-column').velocity('slideDown');
-        control.find('.import-edit').hide();
+    Object.defineProperty(exports, "__esModule", {
+        value: true
     });
 
-    $(document).on('click', '.import-edit-control .btn-edit', function (e) {
-        var button = $(this),
-            control = button.closest('.import-edit-control');
+    var _velocityAnimate2 = _interopRequireDefault(_velocityAnimate);
 
-        e.preventDefault();
+    var _velocityUiPack2 = _interopRequireDefault(_velocityUiPack);
 
-        control.find('.btn-group-import .btn').removeClass('active');
-        button.addClass('active');
+    function _interopRequireDefault(obj) {
+        return obj && obj.__esModule ? obj : {
+            default: obj
+        };
+    }
 
-        control.find('.import-mode-input').val('value');
-        (0, _velocityAnimate2.default)(control.find('.import-edit'), 'slideDown');
-        //control.find('.import-edit').velocity('slideDown');
-        control.find('.import-column').hide();
-    });
-
-    $(document).on('click', '.import-edit-control .btn-blank', function (e) {
-        var button = $(this),
-            control = button.closest('.import-edit-control');
-
-        e.preventDefault();
-
-        control.find('.btn-group-import .btn').removeClass('active');
-        button.addClass('active');
-
-        control.find('.import-mode-input').val('blank');
-        control.find('.import-edit').hide();
-        control.find('.import-column').hide();
-    });
-
-    $('.import-edit-control').each(function (index, control) {
-        var modeInput;
-
-        control = $(control);
-        modeInput = control.find('.import-mode-input');
-
-        if ('column' === modeInput.val()) {
-            control.find('.import-column').show();
-            control.find('.btn-group-import .btn-column').addClass('active');
-        } else if ('value' === modeInput.val()) {
-            control.find('.import-edit').show();
-            control.find('.btn-group-import .btn-edit').addClass('active');
-        } else {
-            control.find('.btn-group-import .btn-blank').addClass('active');
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
         }
-    });
-};
+    }
 
-exports.default = ImportEditControl;
-module.exports = exports['default'];
+    var ImportEditControl = function ImportEditControl() {
+        _classCallCheck(this, ImportEditControl);
+
+        $(document).on('click', '.import-edit-control .btn-column', function (e) {
+            var button = $(this),
+                control = button.closest('.import-edit-control');
+
+            e.preventDefault();
+
+            control.find('.btn-group-import .btn').removeClass('active');
+            button.addClass('active');
+
+            control.find('.import-mode-input').val('column');
+            (0, _velocityAnimate2.default)(control.find('.import-column'), 'slideDown');
+            //control.find('.import-column').velocity('slideDown');
+            control.find('.import-edit').hide();
+        });
+
+        $(document).on('click', '.import-edit-control .btn-edit', function (e) {
+            var button = $(this),
+                control = button.closest('.import-edit-control');
+
+            e.preventDefault();
+
+            control.find('.btn-group-import .btn').removeClass('active');
+            button.addClass('active');
+
+            control.find('.import-mode-input').val('value');
+            (0, _velocityAnimate2.default)(control.find('.import-edit'), 'slideDown');
+            //control.find('.import-edit').velocity('slideDown');
+            control.find('.import-column').hide();
+        });
+
+        $(document).on('click', '.import-edit-control .btn-blank', function (e) {
+            var button = $(this),
+                control = button.closest('.import-edit-control');
+
+            e.preventDefault();
+
+            control.find('.btn-group-import .btn').removeClass('active');
+            button.addClass('active');
+
+            control.find('.import-mode-input').val('blank');
+            control.find('.import-edit').hide();
+            control.find('.import-column').hide();
+        });
+
+        $('.import-edit-control').each(function (index, control) {
+            var modeInput;
+
+            control = $(control);
+            modeInput = control.find('.import-mode-input');
+
+            if ('column' === modeInput.val()) {
+                control.find('.import-column').show();
+                control.find('.btn-group-import .btn-column').addClass('active');
+            } else if ('value' === modeInput.val()) {
+                control.find('.import-edit').show();
+                control.find('.btn-group-import .btn-edit').addClass('active');
+            } else {
+                control.find('.btn-group-import .btn-blank').addClass('active');
+            }
+        });
+    };
+
+    exports.default = ImportEditControl;
+    module.exports = exports['default'];
+});
 
 /***/ }),
 

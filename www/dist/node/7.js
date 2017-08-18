@@ -4,81 +4,101 @@ exports.modules = {
 /***/ 122:
 /***/ (function(module, exports, __webpack_require__) {
 
-"use strict";
+var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;(function (global, factory) {
+    if (true) {
+        !(__WEBPACK_AMD_DEFINE_ARRAY__ = [module, exports, __webpack_require__(136), __webpack_require__(137)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory),
+				__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?
+				(__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__),
+				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+    } else if (typeof exports !== "undefined") {
+        factory(module, exports, require('velocity-animate'), require('velocity-ui-pack'));
+    } else {
+        var mod = {
+            exports: {}
+        };
+        factory(mod, mod.exports, global.velocityAnimate, global.velocityUiPack);
+        global.bulkActionForm = mod.exports;
+    }
+})(this, function (module, exports, _velocityAnimate, _velocityUiPack) {
+    'use strict';
 
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _velocityAnimate = __webpack_require__(136);
-
-var _velocityAnimate2 = _interopRequireDefault(_velocityAnimate);
-
-var _velocityUiPack = __webpack_require__(137);
-
-var _velocityUiPack2 = _interopRequireDefault(_velocityUiPack);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var BulkActionForm = function BulkActionForm() {
-    _classCallCheck(this, BulkActionForm);
-
-    var panel = $('.bulk-action-panel'),
-        checkboxes = $('.bulk-action-form .bulk-checkbox'),
-        checkAll = $('.bulk-action-check-all input'),
-        pagesAlert = $('.bulk-action-form .bulk-action-check-all-alert');
-
-    var animationOptions = {
-        duration: 100,
-        complete: function complete() {
-            panel.toggleClass('in');
-        }
-    };
-
-    var refresh = function refresh() {
-        var selected = $('.bulk-action-form .bulk-checkbox:checked');
-
-        if (selected.length && !panel.hasClass('in')) {
-            (0, _velocityAnimate2.default)(panel, 'transition.slideUpIn', animationOptions);
-        } else if (!selected.length && panel.hasClass('in')) {
-            (0, _velocityAnimate2.default)(panel, 'transition.slideDownOut', animationOptions);
-        }
-
-        if (selected.length === checkboxes.length) {
-            checkAll.prop('checked', true);
-
-            if (pagesAlert) {
-                (0, _velocityAnimate2.default)(pagesAlert, 'fadeIn', { duration: 100 });
-            }
-        } else {
-            checkAll.prop('checked', false);
-
-            if (pagesAlert) {
-                (0, _velocityAnimate2.default)(pagesAlert, 'fadeOut', { duration: 100 });
-            }
-        }
-    };
-
-    checkAll.on('change', function (e) {
-        if ($(this).prop('checked')) {
-            checkboxes.prop('checked', true);
-        } else {
-            checkboxes.prop('checked', false);
-        }
-
-        refresh();
+    Object.defineProperty(exports, "__esModule", {
+        value: true
     });
 
-    $(checkboxes).on('change', refresh);
+    var _velocityAnimate2 = _interopRequireDefault(_velocityAnimate);
 
-    refresh();
-};
+    var _velocityUiPack2 = _interopRequireDefault(_velocityUiPack);
 
-exports.default = BulkActionForm;
-module.exports = exports['default'];
+    function _interopRequireDefault(obj) {
+        return obj && obj.__esModule ? obj : {
+            default: obj
+        };
+    }
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    var BulkActionForm = function BulkActionForm() {
+        _classCallCheck(this, BulkActionForm);
+
+        var panel = $('.bulk-action-panel'),
+            checkboxes = $('.bulk-action-form .bulk-checkbox'),
+            checkAll = $('.bulk-action-check-all input'),
+            pagesAlert = $('.bulk-action-form .bulk-action-check-all-alert');
+
+        var animationOptions = {
+            duration: 100,
+            complete: function complete() {
+                panel.toggleClass('in');
+            }
+        };
+
+        var refresh = function refresh() {
+            var selected = $('.bulk-action-form .bulk-checkbox:checked');
+
+            if (selected.length && !panel.hasClass('in')) {
+                (0, _velocityAnimate2.default)(panel, 'transition.slideUpIn', animationOptions);
+            } else if (!selected.length && panel.hasClass('in')) {
+                (0, _velocityAnimate2.default)(panel, 'transition.slideDownOut', animationOptions);
+            }
+
+            if (selected.length === checkboxes.length) {
+                checkAll.prop('checked', true);
+
+                if (pagesAlert) {
+                    (0, _velocityAnimate2.default)(pagesAlert, 'fadeIn', { duration: 100 });
+                }
+            } else {
+                checkAll.prop('checked', false);
+
+                if (pagesAlert) {
+                    (0, _velocityAnimate2.default)(pagesAlert, 'fadeOut', { duration: 100 });
+                }
+            }
+        };
+
+        checkAll.on('change', function (e) {
+            if ($(this).prop('checked')) {
+                checkboxes.prop('checked', true);
+            } else {
+                checkboxes.prop('checked', false);
+            }
+
+            refresh();
+        });
+
+        $(checkboxes).on('change', refresh);
+
+        refresh();
+    };
+
+    exports.default = BulkActionForm;
+    module.exports = exports['default'];
+});
 
 /***/ }),
 
