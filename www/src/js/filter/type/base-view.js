@@ -1,4 +1,5 @@
 import Backbone from 'backbone';
+import _ from 'underscore';
 
 var BaseView = Backbone.View.extend({
     tagName: 'span',

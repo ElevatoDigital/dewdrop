@@ -1,4 +1,5 @@
 import popoverHtml from './add-group-popover-template.html';
+import _ from 'underscore';
 
 var AddGroupPopoverView = Backbone.View.extend({
     el: '#add-group-wrapper',

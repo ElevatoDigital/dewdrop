@@ -1,5 +1,6 @@
 import listHtml from './list-template.html';
 import fieldHtml from './list-field-template.html';
+import _ from 'underscore';
 
 var listTemplate  = _.template(listHtml),
     fieldTemplate = _.template(fieldHtml);

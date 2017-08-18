@@ -1,3 +1,5 @@
+import _ from 'underscore';
+
 var Model = Backbone.Model.extend({
     defaults: {
         allowEditing: true,

@@ -2,6 +2,7 @@ import templateHtml from './upload-template.html';
 import valueTemplateHtml from './value-template.html';
 import progressTemplateHtml from './progress-template.html';
 import errorMessagesTemplateHtml from './error-messages-template.html';
+import _ from 'underscore';
 
 var uploadTemplate        = _.template(templateHtml),
     valueTemplate         = _.template(valueTemplateHtml),

@@ -6107,20 +6107,20 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;//     Underscor
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;(function (global, factory) {
     if (true) {
-        !(__WEBPACK_AMD_DEFINE_ARRAY__ = [module, exports, __webpack_require__(3)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory),
+        !(__WEBPACK_AMD_DEFINE_ARRAY__ = [module, exports, __webpack_require__(3), __webpack_require__(1)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory),
 				__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?
 				(__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__),
 				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
     } else if (typeof exports !== "undefined") {
-        factory(module, exports, require('backbone'));
+        factory(module, exports, require('backbone'), require('underscore'));
     } else {
         var mod = {
             exports: {}
         };
-        factory(mod, mod.exports, global.backbone);
+        factory(mod, mod.exports, global.backbone, global.underscore);
         global.baseView = mod.exports;
     }
-})(this, function (module, exports, _backbone) {
+})(this, function (module, exports, _backbone, _underscore) {
     'use strict';
 
     Object.defineProperty(exports, "__esModule", {
@@ -6128,6 +6128,8 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
     });
 
     var _backbone2 = _interopRequireDefault(_backbone);
+
+    var _underscore2 = _interopRequireDefault(_underscore);
 
     function _interopRequireDefault(obj) {
         return obj && obj.__esModule ? obj : {
@@ -6189,7 +6191,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
         },
 
         focusOnNextTick: function focusOnNextTick() {
-            setTimeout(_.bind(this.focusInput, this), 1);
+            setTimeout(_underscore2.default.bind(this.focusInput, this), 1);
         }
     });
 
@@ -36714,20 +36716,20 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;(function (global, factory) {
     if (true) {
-        !(__WEBPACK_AMD_DEFINE_ARRAY__ = [module, exports, __webpack_require__(133), __webpack_require__(134), __webpack_require__(132), __webpack_require__(131)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory),
+        !(__WEBPACK_AMD_DEFINE_ARRAY__ = [module, exports, __webpack_require__(133), __webpack_require__(134), __webpack_require__(132), __webpack_require__(131), __webpack_require__(1)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory),
 				__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?
 				(__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__),
 				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
     } else if (typeof exports !== "undefined") {
-        factory(module, exports, require('./upload-template.html'), require('./value-template.html'), require('./progress-template.html'), require('./error-messages-template.html'));
+        factory(module, exports, require('./upload-template.html'), require('./value-template.html'), require('./progress-template.html'), require('./error-messages-template.html'), require('underscore'));
     } else {
         var mod = {
             exports: {}
         };
-        factory(mod, mod.exports, global.uploadTemplate, global.valueTemplate, global.progressTemplate, global.errorMessagesTemplate);
+        factory(mod, mod.exports, global.uploadTemplate, global.valueTemplate, global.progressTemplate, global.errorMessagesTemplate, global.underscore);
         global.uploadView = mod.exports;
     }
-})(this, function (module, exports, _uploadTemplate, _valueTemplate, _progressTemplate, _errorMessagesTemplate) {
+})(this, function (module, exports, _uploadTemplate, _valueTemplate, _progressTemplate, _errorMessagesTemplate, _underscore) {
     'use strict';
 
     Object.defineProperty(exports, "__esModule", {
@@ -36742,16 +36744,18 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 
     var _errorMessagesTemplate2 = _interopRequireDefault(_errorMessagesTemplate);
 
+    var _underscore2 = _interopRequireDefault(_underscore);
+
     function _interopRequireDefault(obj) {
         return obj && obj.__esModule ? obj : {
             default: obj
         };
     }
 
-    var uploadTemplate = _.template(_uploadTemplate2.default),
-        valueTemplate = _.template(_valueTemplate2.default),
-        progressTemplate = _.template(_progressTemplate2.default),
-        errorMessagesTemplate = _.template(_errorMessagesTemplate2.default);
+    var uploadTemplate = _underscore2.default.template(_uploadTemplate2.default),
+        valueTemplate = _underscore2.default.template(_valueTemplate2.default),
+        progressTemplate = _underscore2.default.template(_progressTemplate2.default),
+        errorMessagesTemplate = _underscore2.default.template(_errorMessagesTemplate2.default);
 
     var UploadView = Backbone.View.extend({
         events: {
@@ -36815,13 +36819,13 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
                 thumbnail: thumbnail
             }));
 
-            this.$wrapper.on('click', '.btn-remove', _.bind(function (e) {
+            this.$wrapper.on('click', '.btn-remove', _underscore2.default.bind(function (e) {
                 e.preventDefault();
                 this.$valueInput.val('');
                 this.clearStatusUi();
             }, this));
 
-            this.$wrapper.on('click', '.btn-copy', _.bind(function (e) {
+            this.$wrapper.on('click', '.btn-copy', _underscore2.default.bind(function (e) {
                 e.preventDefault();
                 this.$valueInput.val('');
             }, this));
@@ -36849,7 +36853,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
             var files = e.target.files,
                 data = new FormData();
 
-            _.each(files, function (file) {
+            _underscore2.default.each(files, function (file) {
                 data.append(this.$el.find('input').attr('name'), file);
             }, this);
 
@@ -36863,7 +36867,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
                 dataType: 'json',
                 processData: false,
                 contentType: false,
-                success: _.bind(function (response) {
+                success: _underscore2.default.bind(function (response) {
                     if (!response || 'success' !== response.result) {
                         this.renderErrorMessages(response.messages);
                     } else {
@@ -36872,7 +36876,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
                         this.renderFileValue(response.url, response.thumbnail);
                     }
                 }, this),
-                error: _.bind(function () {
+                error: _underscore2.default.bind(function () {
                     this.renderErrorMessages(['There was an error uploading the selected file.  Please try again.']);
                 }, this)
             });
@@ -37534,20 +37538,20 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;(function (global, factory) {
     if (true) {
-        !(__WEBPACK_AMD_DEFINE_ARRAY__ = [module, exports, __webpack_require__(135)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory),
+        !(__WEBPACK_AMD_DEFINE_ARRAY__ = [module, exports, __webpack_require__(135), __webpack_require__(1)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory),
 				__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?
 				(__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__),
 				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
     } else if (typeof exports !== "undefined") {
-        factory(module, exports, require('./add-group-popover-template.html'));
+        factory(module, exports, require('./add-group-popover-template.html'), require('underscore'));
     } else {
         var mod = {
             exports: {}
         };
-        factory(mod, mod.exports, global.addGroupPopoverTemplate);
+        factory(mod, mod.exports, global.addGroupPopoverTemplate, global.underscore);
         global.addGroupPopoverView = mod.exports;
     }
-})(this, function (module, exports, _addGroupPopoverTemplate) {
+})(this, function (module, exports, _addGroupPopoverTemplate, _underscore) {
     'use strict';
 
     Object.defineProperty(exports, "__esModule", {
@@ -37555,6 +37559,8 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
     });
 
     var _addGroupPopoverTemplate2 = _interopRequireDefault(_addGroupPopoverTemplate);
+
+    var _underscore2 = _interopRequireDefault(_underscore);
 
     function _interopRequireDefault(obj) {
         return obj && obj.__esModule ? obj : {
@@ -37593,7 +37599,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
         },
 
         focusInput: function focusInput(e) {
-            setTimeout(_.bind(function () {
+            setTimeout(_underscore2.default.bind(function () {
                 this.$el.find('.popover-content input').focus();
             }, this), 1);
         },
@@ -37625,25 +37631,34 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;(function (global, factory) {
     if (true) {
-        !(__WEBPACK_AMD_DEFINE_ARRAY__ = [module, exports], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory),
+        !(__WEBPACK_AMD_DEFINE_ARRAY__ = [module, exports, __webpack_require__(1)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory),
 				__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?
 				(__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__),
 				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
     } else if (typeof exports !== "undefined") {
-        factory(module, exports);
+        factory(module, exports, require('underscore'));
     } else {
         var mod = {
             exports: {}
         };
-        factory(mod, mod.exports);
+        factory(mod, mod.exports, global.underscore);
         global.groupsCollection = mod.exports;
     }
-})(this, function (module, exports) {
+})(this, function (module, exports, _underscore) {
     'use strict';
 
     Object.defineProperty(exports, "__esModule", {
         value: true
     });
+
+    var _underscore2 = _interopRequireDefault(_underscore);
+
+    function _interopRequireDefault(obj) {
+        return obj && obj.__esModule ? obj : {
+            default: obj
+        };
+    }
+
     var Model = Backbone.Model.extend({
         defaults: {
             allowEditing: true,
@@ -37662,7 +37677,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 
         toJSON: function toJSON() {
             return this.map(function (model) {
-                return _.pick(model.toJSON(this), ['title', 'fields']);
+                return _underscore2.default.pick(model.toJSON(this), ['title', 'fields']);
             });
         },
 
@@ -37671,7 +37686,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
                 throw 'Could not find initialFieldGroupsConfig variable in global scope';
             }
 
-            _.each(window.initialFieldGroupsConfig, function (group, index) {
+            _underscore2.default.each(window.initialFieldGroupsConfig, function (group, index) {
                 group.allowEditing = true;
                 group.animate = false;
                 group.sortIndex = index;
@@ -37695,20 +37710,20 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;(function (global, factory) {
     if (true) {
-        !(__WEBPACK_AMD_DEFINE_ARRAY__ = [module, exports, __webpack_require__(168)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory),
+        !(__WEBPACK_AMD_DEFINE_ARRAY__ = [module, exports, __webpack_require__(168), __webpack_require__(1)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory),
 				__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?
 				(__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__),
 				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
     } else if (typeof exports !== "undefined") {
-        factory(module, exports, require('./list-view'));
+        factory(module, exports, require('./list-view'), require('underscore'));
     } else {
         var mod = {
             exports: {}
         };
-        factory(mod, mod.exports, global.listView);
+        factory(mod, mod.exports, global.listView, global.underscore);
         global.groupsView = mod.exports;
     }
-})(this, function (module, exports, _listView) {
+})(this, function (module, exports, _listView, _underscore) {
     'use strict';
 
     Object.defineProperty(exports, "__esModule", {
@@ -37716,6 +37731,8 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
     });
 
     var _listView2 = _interopRequireDefault(_listView);
+
+    var _underscore2 = _interopRequireDefault(_underscore);
 
     function _interopRequireDefault(obj) {
         return obj && obj.__esModule ? obj : {
@@ -37757,7 +37774,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
         },
 
         updateSortIndexes: function updateSortIndexes() {
-            this.$el.find('.list-group').each(_.bind(function (index, list) {
+            this.$el.find('.list-group').each(_underscore2.default.bind(function (index, list) {
                 this.collection.get($(list).data('model-id')).set('sortIndex', index);
                 this.collection.sort();
             }, this));
@@ -37774,20 +37791,20 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;(function (global, factory) {
     if (true) {
-        !(__WEBPACK_AMD_DEFINE_ARRAY__ = [module, exports, __webpack_require__(137), __webpack_require__(136)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory),
+        !(__WEBPACK_AMD_DEFINE_ARRAY__ = [module, exports, __webpack_require__(137), __webpack_require__(136), __webpack_require__(1)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory),
 				__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?
 				(__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__),
 				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
     } else if (typeof exports !== "undefined") {
-        factory(module, exports, require('./list-template.html'), require('./list-field-template.html'));
+        factory(module, exports, require('./list-template.html'), require('./list-field-template.html'), require('underscore'));
     } else {
         var mod = {
             exports: {}
         };
-        factory(mod, mod.exports, global.listTemplate, global.listFieldTemplate);
+        factory(mod, mod.exports, global.listTemplate, global.listFieldTemplate, global.underscore);
         global.listView = mod.exports;
     }
-})(this, function (module, exports, _listTemplate, _listFieldTemplate) {
+})(this, function (module, exports, _listTemplate, _listFieldTemplate, _underscore) {
     'use strict';
 
     Object.defineProperty(exports, "__esModule", {
@@ -37798,14 +37815,16 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 
     var _listFieldTemplate2 = _interopRequireDefault(_listFieldTemplate);
 
+    var _underscore2 = _interopRequireDefault(_underscore);
+
     function _interopRequireDefault(obj) {
         return obj && obj.__esModule ? obj : {
             default: obj
         };
     }
 
-    var listTemplate = _.template(_listTemplate2.default),
-        fieldTemplate = _.template(_listFieldTemplate2.default);
+    var listTemplate = _underscore2.default.template(_listTemplate2.default),
+        fieldTemplate = _underscore2.default.template(_listFieldTemplate2.default);
 
     var ListView = Backbone.View.extend({
         template: listTemplate,
@@ -37857,7 +37876,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
                 connectWith: '.list-group'
             }).disableSelection();
 
-            _.each(this.model.get('fields'), function (field, index) {
+            _underscore2.default.each(this.model.get('fields'), function (field, index) {
                 this.$el.append(fieldTemplate(field));
             }, this);
 
