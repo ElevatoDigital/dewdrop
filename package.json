@@ -1,7 +1,7 @@
 {
   "name": "dewdrop",
   "main": "www/dist/node/dewdrop.js",
-  "version": "1.3.5",
+  "version": "1.3.6",
   "repository": {
     "url": "git+https://github.com/DeltaSystems/dewdrop.git",
     "type": "git"

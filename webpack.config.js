@@ -43,7 +43,7 @@ module.exports = env => {
     }
     webConfig.output = {
         path: path.join(__dirname, '/www/dist/js'),
-        filename: '[name].js',
+        filename: '[name].js'
         //publicPath: This is set at runtime in dewdrop.js https://github.com/webpack/docs/wiki/configuration#outputpublicpath
     }
     webConfig.plugins = removeEmpty([
@@ -101,6 +101,7 @@ module.exports = env => {
     nodeConfig.output = {
         path: path.join(__dirname, '/www/dist/node'),
         filename: '[name].js',
+        libraryTarget: 'umd'
         //publicPath: This is set at runtime in dewdrop.js https://github.com/webpack/docs/wiki/configuration#outputpublicpath
     }
     nodeConfig.plugins = removeEmpty([
