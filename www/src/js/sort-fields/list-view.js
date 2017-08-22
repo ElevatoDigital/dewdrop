@@ -1,11 +1,12 @@
 import listHtml from './list-template.html';
 import fieldHtml from './list-field-template.html';
 import _ from 'underscore';
+import Backbone from 'backbone';
 
 var listTemplate  = _.template(listHtml),
     fieldTemplate = _.template(fieldHtml);
 
-var ListView =Backbone.View.extend({
+var ListView = Backbone.View.extend({
     template: listTemplate,
 
     tagName: 'ul',

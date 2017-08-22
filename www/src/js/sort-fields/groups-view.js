@@ -1,5 +1,6 @@
 import List from './list-view';
 import _ from 'underscore';
+import Backbone from 'backbone';
 
 var GroupsView = Backbone.View.extend({
     el: '#groups-wrapper',

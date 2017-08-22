@@ -1,4 +1,5 @@
 import _ from 'underscore';
+import Backbone from 'backbone';
 
 var Model = Backbone.Model.extend({
     defaults: {

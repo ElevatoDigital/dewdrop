@@ -1,6 +1,5 @@
 import _ from 'underscore';
 import moment from 'moment';
-//import Backbone from 'backbone';
 import Detector from './module-detector';
 
 class Dewdrop {
