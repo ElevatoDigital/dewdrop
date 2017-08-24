@@ -51,10 +51,18 @@ class UsersTableGateway extends Table implements UserProviderInterface
         if (!$username) {
             throw new UsernameNotFoundException('Please provide a username.');
         } else {
+            $deletedClause = '';
+
+            if ($this->getMetadata()['columns']['deleted']) {
+                $deletedClause = 'AND NOT deleted';
+            } elseif ($this->getMetadata()['columns']['is_deleted']) {
+                $deletedClause = 'AND NOT is_deleted';
+            }
+
             $rowData = $this->getAdapter()->fetchRow(
-                'SELECT u.*
+                "SELECT u.*
                 FROM users u
-                WHERE LOWER(u.username) = ?',
+                WHERE LOWER(u.username) = ? {$deletedClause}",
                 [trim(strtolower($username))]
             );
 
