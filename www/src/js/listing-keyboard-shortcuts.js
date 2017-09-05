@@ -1,4 +1,3 @@
-import key from 'keymaster';
 
 class ListingKeyboardShortcuts {
     constructor(scope = 'dewdrop-listing-keyboard-shortcuts') {

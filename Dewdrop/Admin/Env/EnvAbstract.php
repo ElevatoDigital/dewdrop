@@ -54,6 +54,7 @@ abstract class EnvAbstract implements EnvInterface
             'modernizr' => '/dewdrop/www/dist/js/modernizr.custom.63049.js',
             'jquery'    => '/jquery/dist/jquery.min.js',
             'bootstrap' => '/bootstrap/dist/js/bootstrap.min.js',
+            'keymaster' => '/keymaster/keymaster.js',
             'vendor'    => '/dewdrop/www/dist/js/vendor.js',
             'dewdrop'   => '/dewdrop/www/dist/js/core.js',
         ],

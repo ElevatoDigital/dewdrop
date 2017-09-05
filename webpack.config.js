@@ -10,6 +10,7 @@ module.exports = env => {
     const config = {
         externals: {
             'Modernizr': 'Modernizr',
+            'key': 'key',
             'jquery': 'jQuery',
             '$': 'jQuery'
         },
