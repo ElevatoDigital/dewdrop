@@ -157,7 +157,7 @@ abstract class HelperAbstract implements HelperInterface
 
             if (!is_callable($callback)) {
                 throw new HelperCallableNotAvailableForField(
-                    "Field {$id} does not have a callable assigned and one could not be detected."
+                    "Field {$id} does not have a callable for {$this->name} assigned and one could not be detected."
                 );
             }
 

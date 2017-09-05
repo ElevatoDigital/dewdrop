@@ -93,7 +93,7 @@ class Entity
 
     public function assembleShortCode()
     {
-        return sprintf('[%s id=%d]', $this->handler->getName(), $this->primaryKeyValue);
+        return sprintf('[%s id=%s]', $this->handler->getName(), $this->primaryKeyValue);
     }
 
     public function __toString()

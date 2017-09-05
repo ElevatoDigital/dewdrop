@@ -37,7 +37,7 @@ class BootstrapBreadcrumbs extends AbstractHelper
                 $crumb['active'] = false;
             }
 
-            if (!$crumb['active'] && !isset($crumb['active'])) {
+            if (!$crumb['active'] && !isset($crumb['href'])) {
                 throw new Exception('Inactive crumbs must have an href.');
             }
 

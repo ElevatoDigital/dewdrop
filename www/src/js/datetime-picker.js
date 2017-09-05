@@ -101,6 +101,7 @@ class DatetimePicker {
                             var $popover;
 
                             $input.popover('show');
+
                             $popover = $('[data-input="' + $input.data('input') + '"] .date-wrapper');
 
                             $('[data-input="' + $input.data('input') + '"] a').on(
