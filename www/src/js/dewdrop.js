@@ -23,6 +23,13 @@ class Dewdrop {
     }
 
     init() {
+        if (undefined === $ && jQuery) {
+            window.$ = jQuery;
+        }
+        if (undefined === $) {
+            console.error('jQuery must be installed to use dewdrop.');
+        }
+
         moment.locale(navigator.language);
 
         /*** Handle jQuery plugin naming conflict between jQuery UI and Bootstrap ***/
