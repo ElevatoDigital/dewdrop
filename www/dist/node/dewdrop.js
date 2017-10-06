@@ -35557,6 +35557,13 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
         _createClass(Dewdrop, [{
             key: 'init',
             value: function init() {
+                if (undefined === $ && jQuery) {
+                    window.$ = jQuery;
+                }
+                if (undefined === $) {
+                    console.error('jQuery must be installed to use dewdrop.');
+                }
+
                 _moment2.default.locale(navigator.language);
 
                 /*** Handle jQuery plugin naming conflict between jQuery UI and Bootstrap ***/
