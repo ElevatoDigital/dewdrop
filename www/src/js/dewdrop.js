@@ -27,8 +27,14 @@ class Dewdrop {
 
         /*** Handle jQuery plugin naming conflict between jQuery UI and Bootstrap ***/
         if ($.widget && $.widget.bridge) {
-            $.widget.bridge('uibutton', $.ui.button);
-            $.widget.bridge('uitooltip', $.ui.tooltip);
+            if ($.ui) {
+                if ($.ui.button) {
+                    $.widget.bridge('uibutton', $.ui.button);
+                }
+                if ($.ui.tooltip) {
+                    $.widget.bridge('uitooltip', $.ui.tooltip);
+                }
+            }
         }
 
         // Disable submit inputs upon applicable form submissions
