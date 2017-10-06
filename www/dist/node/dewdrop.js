@@ -35372,6 +35372,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
                     var $popover;
 
                     $input.popover('show');
+
                     $popover = $('[data-input="' + $input.data('input') + '"] .date-wrapper');
 
                     $('[data-input="' + $input.data('input') + '"] a').on('click', function (e) {
