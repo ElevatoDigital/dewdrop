@@ -18,7 +18,7 @@
         "phpoffice/phpexcel": "1.8.*",
         "pimple/pimple": "1.*",
         "psy/psysh": "0.6.*",
-        "swiftmailer/swiftmailer": "@stable",
+        "swiftmailer/swiftmailer": "^5.4.8",
         "symfony/security": "~2.3",
         "thunderer/shortcode": "^0.5",
         "zendframework/zend-console": "~2.4.0",
