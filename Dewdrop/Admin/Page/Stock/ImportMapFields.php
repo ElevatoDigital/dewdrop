@@ -5,6 +5,7 @@ namespace Dewdrop\Admin\Page\Stock;
 use Dewdrop\Admin\Component\ComponentAbstract;
 use Dewdrop\Admin\Component\CrudInterface;
 use Dewdrop\Admin\ResponseHelper\Standard as ResponseHelper;
+use Dewdrop\Db\Adapter;
 use Dewdrop\Db\Field as DbField;
 use Dewdrop\Fields;
 use Dewdrop\Fields\FieldInterface;
@@ -14,6 +15,7 @@ use Dewdrop\Fields\RowEditor;
 use Dewdrop\Filter\IsoDate;
 use Dewdrop\Import\DbGateway as ImportGateway;
 use Dewdrop\Import\File as ImportFile;
+use Dewdrop\Pimple;
 
 class ImportMapFields extends StockPageAbstract
 {
@@ -347,6 +349,11 @@ class ImportMapFields extends StockPageAbstract
     {
         $rowEditor = $this->getRowEditor();
 
+        /* @var $db Adapter */
+        $db = Pimple::getResource('db');
+
+        $db->beginTransaction();
+
         foreach ($inputRows as $inputData) {
             $this->initializeRowEditor($rowEditor);
 
@@ -370,6 +377,8 @@ class ImportMapFields extends StockPageAbstract
                 ]
             );
         }
+
+        $db->commit();
 
         return $this;
     }
