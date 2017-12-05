@@ -223,13 +223,40 @@ class Manager implements ServiceProviderInterface
         return $adapter;
     }
 
+    /**
+     * @return int|string Detected id column name.
+     * @throws Exception
+     * @throws \Dewdrop\Exception
+     */
     private function detectIdColumn()
     {
-        // @todo Auto-detect using manage DB metadata
+        $metadata = $this->getManageDbAdapter()->getTableMetadata($this->instanceTableName);
+
+        foreach ($metadata['columns'] as $column => $meta) {
+            if ($meta['PRIMARY']) {
+                return $column;
+            }
+        }
+
+        throw new Exception('Unable to detect id column.');
     }
 
+    /**
+     * @return int|string Detected subdomain column name.
+     * @throws Exception
+     * @throws \Dewdrop\Exception
+     */
     private function detectSubdomainColumn()
     {
-        // @todo Auto-detect using manage DB metadata
+        $metadata   = $this->getManageDbAdapter()->getTableMetadata($this->instanceTableName);
+        $candidates = ['domain', 'subdomain'];
+
+        foreach ($metadata['columns'] as $column => $meta) {
+            if (in_array($column, $candidates)) {
+                return $column;
+            }
+        }
+
+        throw new Exception('Unable to detect id column.');
     }
 }
