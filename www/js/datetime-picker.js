@@ -11,7 +11,11 @@ require(
         'use strict';
 
         // Used to append popovers.  Avoids WP and Bootstrap CSS conflicts.
-        var styleWrapper = $('<div class="bootstrap-wrapper"></div>');
+        var styleWrapper         = $('<div class="bootstrap-wrapper"></div>'),
+            dateInputFormat      = 'MM/DD/YYYY',
+            dateInputValueFormat = 'YYYY-MM-DD',
+            timeInputFormat      = 'h:mma',
+            timeInputValueFormat = 'HH:mm';
 
         $(document.body).append(styleWrapper);
 
@@ -65,8 +69,29 @@ require(
         );
 
         if (Modernizr.touch && Modernizr.inputtypes.date) {
-            $('.date-input').attr('type', 'date');
-            $('.time-input').attr('type', 'time');
+
+            $('.date-input').each(function () {
+
+                var $dateInput = $(this),
+                    dateInput  = $dateInput.val();
+
+                if (dateInput) {
+                    $dateInput.val(moment(dateInput, dateInputFormat).format(dateInputValueFormat));
+                }
+                $dateInput.attr('type', 'date');
+            });
+
+            $('.time-input').each(function () {
+
+                var $timeInput = $(this),
+                    timeInput  = $timeInput.val();
+
+                if (timeInput) {
+                    $timeInput.val(moment(timeInput, timeInputFormat).format(timeInputValueFormat));
+                }
+                $timeInput.attr('type', 'time');
+            });
+
         } else {
             $('.time-input').timepicker({
                 change: function () {
@@ -123,12 +148,12 @@ require(
                                 changeMonth: true,
                                 changeYear:  true,
                                 yearRange:   yearRange,
-                                defaultDate: moment($input.val(), 'MM/DD/YYYY').toDate(),
+                                defaultDate: moment($input.val(), dateInputFormat).toDate(),
                                 onSelect: function (e) {
                                     var selected = $popover.datepicker('getDate');
 
                                     if (selected) {
-                                        $input.val(moment(selected).format('MM/DD/YYYY'));
+                                        $input.val(moment(selected).format(dateInputFormat));
                                     } else {
                                         $input.val('');
                                     }
