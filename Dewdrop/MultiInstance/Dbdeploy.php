@@ -96,9 +96,7 @@ class Dbdeploy
     private function getCliExec()
     {
         $config = $this->config;
-
-        var_dump($config);
-
+        
         return new CliExec($config['type'], $config['username'], $config['password'], $config['host'], $config['name']);
     }
 
