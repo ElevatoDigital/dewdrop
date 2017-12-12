@@ -1,13 +1,42 @@
 <?php
 
+/**
+ * Dewdrop
+ *
+ * @link      https://github.com/DeltaSystems/dewdrop
+ * @copyright Delta Systems (http://deltasys.com)
+ * @license   https://github.com/DeltaSystems/dewdrop/LICENSE
+ */
+
 namespace Dewdrop\MultiInstance;
 
 use Dewdrop\Db\Adapter as DbAdapter;
 use Dewdrop\Db\Driver\Pdo\Pgsql as Pgsql;
+use Dewdrop\Pimple;
 use PDO;
 use Silex\Application;
 use Silex\ServiceProviderInterface;
 
+/**
+ * Class Manager
+ * This class can be used for many database related functions, primarily detecting the default database,
+ * as well as instance creation and management.
+ * Example use cases:
+ *
+ * Defining db in your Bootstrap.php
+ * $this->application['db'] = $this->application->share(
+ *     function() {
+ *         $manager = new Manager($configForManageDb, 'offices', 'office_%d');
+ *
+ *         return $manager->getCurrent();
+ *     }
+ * );
+ *
+ * Creating a new up-to-date app instance
+ * $manager->createInstance(4, 'some_subdomain');
+ *
+ * @package Dewdrop\MultiInstance
+ */
 class Manager implements ServiceProviderInterface
 {
     /**
@@ -15,20 +44,49 @@ class Manager implements ServiceProviderInterface
      */
     private $currentInstance;
 
+    /**
+     * @var DbAdapter
+     */
     private $manageDbAdapter;
 
+    /**
+     * @var array
+     */
+    private $manageDbConfig;
+
+    /**
+     * @var string
+     */
     private $instanceTableName;
 
+    /**
+     * @var string
+     */
     private $instanceUsername;
 
+    /**
+     * @var string
+     */
     private $instancePassword;
 
+    /**
+     * @var string
+     */
     private $instanceHost;
 
+    /**
+     * @var string
+     */
     private $databaseNameTemplate;
 
+    /**
+     * @var string
+     */
     private $idColumn;
 
+    /**
+     * @var string
+     */
     private $subdomainColumn;
 
     /**
@@ -36,6 +94,17 @@ class Manager implements ServiceProviderInterface
      */
     private $silex;
 
+    /**
+     * Manager constructor.
+     *
+     * @param array $dbConfig Array of username, password, host, name, type
+     * @param string $instanceTableName Name of table that keeps application instance records. eg. offices
+     * @param string $databaseNameTemplate Sprintf format containing exactly 1 specifier for the id column. eg. gt_office_%d
+     * @param null $idColumn Manually specify primary key column of the instance table.
+     * @param null $subdomainColumn Manually specify subdomain column of the instance table.
+     * @throws Exception
+     * @throws \Dewdrop\Exception
+     */
     public function __construct(
         array $dbConfig,
         $instanceTableName,
@@ -43,6 +112,8 @@ class Manager implements ServiceProviderInterface
         $idColumn = null,
         $subdomainColumn = null
     ) {
+        $this->silex           = Pimple::getResource('admin');
+        $this->manageDbConfig  = $dbConfig;
         $this->manageDbAdapter = $this->createAdapterFromConfig($dbConfig);
 
         $this->instanceTableName = $instanceTableName;
@@ -72,11 +143,26 @@ class Manager implements ServiceProviderInterface
     {
     }
 
+    /**
+     * @return DbAdapter
+     */
     public function getManageDbAdapter()
     {
         return $this->manageDbAdapter;
     }
 
+    /**
+     * @return array
+     */
+    public function getManageDbConfig()
+    {
+        return $this->manageDbConfig;
+    }
+
+    /**
+     * @param $instanceUsername
+     * @return $this
+     */
     public function setInstanceUsername($instanceUsername)
     {
         $this->instanceUsername = $instanceUsername;
@@ -84,6 +170,10 @@ class Manager implements ServiceProviderInterface
         return $this;
     }
 
+    /**
+     * @param $instancePassword
+     * @return $this
+     */
     public function setInstancePassword($instancePassword)
     {
         $this->instancePassword = $instancePassword;
@@ -91,6 +181,10 @@ class Manager implements ServiceProviderInterface
         return $this;
     }
 
+    /**
+     * @param $instanceHost
+     * @return $this
+     */
     public function setInstanceHost($instanceHost)
     {
         $this->instanceHost = $instanceHost;
@@ -98,16 +192,25 @@ class Manager implements ServiceProviderInterface
         return $this;
     }
 
+    /**
+     * @return string
+     */
     public function getIdColumn()
     {
         return $this->idColumn;
     }
 
+    /**
+     * @return string
+     */
     public function getSubdomainColumn()
     {
         return $this->subdomainColumn;
     }
 
+    /**
+     * @return array
+     */
     public function getAll()
     {
         $instances = [];
@@ -120,7 +223,11 @@ class Manager implements ServiceProviderInterface
         return $instances;
     }
 
-    public function getById($id)
+    /**
+     * @param $id
+     * @return array
+     */
+    public function fetchInstanceMetadataById($id)
     {
         $query = sprintf(
             'SELECT * FROM %s WHERE %s = ?',
@@ -128,10 +235,14 @@ class Manager implements ServiceProviderInterface
             $this->manageDbAdapter->quoteIdentifier($this->idColumn)
         );
 
-        return new Instance($this, $this->manageDbAdapter->fetchRow($query, [$id]));
+        return $this->manageDbAdapter->fetchRow($query, [$id]);
     }
 
-    public function getBySubdomain($subdomain)
+    /**
+     * @param string $subdomain
+     * @return array
+     */
+    public function fetchInstanceMetadataBySubdomain($subdomain)
     {
         $query = sprintf(
             'SELECT * FROM %s WHERE LOWER(%s) = ?',
@@ -139,9 +250,40 @@ class Manager implements ServiceProviderInterface
             $this->manageDbAdapter->quoteIdentifier($this->subdomainColumn)
         );
 
-        return new Instance($this, $this->manageDbAdapter->fetchRow($query, [$subdomain]));
+        return $this->manageDbAdapter->fetchRow($query, [$subdomain]);
     }
 
+    /**
+     * @param $id
+     * @return Instance
+     * @throws Exception
+     */
+    public function getById($id): Instance
+    {
+        $row = $this->fetchInstanceMetadataById($id);
+
+        if (empty($row)) {
+            throw new Exception("An instance with id {$id} does not exist.");
+        }
+
+        return new Instance($this, $row);
+    }
+
+    /**
+     * @param string $subdomain
+     * @return Instance
+     */
+    public function getBySubdomain($subdomain): Instance
+    {
+        $row = $this->fetchInstanceMetadataBySubdomain($subdomain);
+
+        return new Instance($this, $row);
+    }
+
+    /**
+     * @param Instance $instance
+     * @return $this
+     */
     public function setCurrent(Instance $instance)
     {
         $this->currentInstance = $instance;
@@ -152,6 +294,10 @@ class Manager implements ServiceProviderInterface
         return $this;
     }
 
+    /**
+     * @return Instance
+     * @throws Exception
+     */
     public function getCurrent()
     {
         if (!$this->currentInstance) {
@@ -173,11 +319,30 @@ class Manager implements ServiceProviderInterface
         return $this->currentInstance;
     }
 
+    /**
+     * @param Instance $instance
+     * @return string
+     * @throws Exception
+     */
     public function getDatabaseNameForInstance(Instance $instance)
     {
-        return sprintf($this->databaseNameTemplate, $instance->getId());
+        return $this->getDatabaseNameForId($instance->getId());
     }
 
+    /**
+     * @param $id
+     * @return string
+     */
+    public function getDatabaseNameForId($id)
+    {
+        return sprintf($this->databaseNameTemplate, $id);
+    }
+
+    /**
+     * @param Instance $instance
+     * @return DbAdapter
+     * @throws Exception
+     */
     public function createAdapterForInstance(Instance $instance)
     {
         $pdo = new PDO(
@@ -197,6 +362,11 @@ class Manager implements ServiceProviderInterface
         return $adapter;
     }
 
+    /**
+     * @param Instance $instance
+     * @return $this
+     * @throws Exception
+     */
     public function modifySilexDbConfigForInstance(Instance $instance)
     {
         $config = $this->silex['config'];
@@ -206,6 +376,10 @@ class Manager implements ServiceProviderInterface
         return $this;
     }
 
+    /**
+     * @param array $config
+     * @return DbAdapter
+     */
     private function createAdapterFromConfig(array $config)
     {
         // @todo Validate config
@@ -224,7 +398,7 @@ class Manager implements ServiceProviderInterface
     }
 
     /**
-     * @return int|string Detected id column name.
+     * @return string Detected id column name.
      * @throws Exception
      * @throws \Dewdrop\Exception
      */
@@ -242,7 +416,7 @@ class Manager implements ServiceProviderInterface
     }
 
     /**
-     * @return int|string Detected subdomain column name.
+     * @return string Detected subdomain column name.
      * @throws Exception
      * @throws \Dewdrop\Exception
      */
@@ -258,5 +432,74 @@ class Manager implements ServiceProviderInterface
         }
 
         throw new Exception('Unable to detect id column.');
+    }
+
+    /**
+     * @param $databaseName
+     * @return mixed
+     */
+    private function databaseExists($databaseName)
+    {
+        $exists = $this->getManageDbAdapter()->fetchRow(
+            "SELECT EXISTS(SELECT 1 FROM pg_database WHERE datname = ?)",
+            [$databaseName]
+        );
+
+        return $exists['exists'];
+    }
+
+    /**
+     * Create an instance, the schema should have all db migrations.
+     *
+     * @param $id
+     * @param string $subdomain
+     * @param bool $copyUsers
+     * @return Instance
+     * @throws Exception
+     */
+    public function createInstance($id, $subdomain, $copyUsers = true)
+    {
+        $databaseName = $this->getDatabaseNameForId($id);
+
+        if ($this->databaseExists($databaseName)) {
+            throw new Exception("Database {$databaseName} already exists.");
+        }
+
+        $this->getManageDbAdapter()->query("CREATE DATABASE $databaseName");
+
+        $instance = $this->getById($id);
+
+        $instance->dbdeploy()->update();
+
+        if ($copyUsers) {
+            $users = $this->getManageDbAdapter()->fetchAll('SELECT * FROM users WHERE deleted = false');
+
+            $this->copyUsersToInstance($users, $instance);
+        }
+
+        return $instance;
+    }
+
+    /**
+     * Copy users from the Manage application to an instance.
+     *
+     * @param $users
+     * @param Instance $instance
+     */
+    public function copyUsersToInstance($users, Instance $instance)
+    {
+        foreach ($users as $user) {
+            $instance->getDbAdapter()->insert(
+                'users',
+                [
+                    'security_level_id' => 1,
+                    'username'          => $user['username'],
+                    'first_name'        => $user['first_name'],
+                    'last_name'         => $user['last_name'],
+                    'password_hash'     => $user['password_hash'],
+                    'email_address'     => $user['email_address']
+                ]
+            );
+        }
     }
 }
