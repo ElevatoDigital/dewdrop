@@ -1,0 +1,2 @@
+webpackJsonp([15],{122:function(t,o,n){"use strict";function _classCallCheck(t,o){if(!(t instanceof o))throw new TypeError("Cannot call a class as a function")}Object.defineProperty(o,"__esModule",{value:!0});var e=function ActivityLogUserInformation(){_classCallCheck(this,ActivityLogUserInformation),$(".activity-log-user-information").popover({html:!0,container:"body",placement:"bottom"})};o.default=e}});
+//# sourceMappingURL=15.js.map

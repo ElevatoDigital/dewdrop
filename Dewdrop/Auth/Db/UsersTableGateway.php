@@ -53,9 +53,9 @@ class UsersTableGateway extends Table implements UserProviderInterface
         } else {
             $deletedClause = '';
 
-            if ($this->getMetadata()['columns']['deleted']) {
+            if (isset($this->getMetadata()['columns']['deleted'])) {
                 $deletedClause = 'AND NOT deleted';
-            } elseif ($this->getMetadata()['columns']['is_deleted']) {
+            } elseif (isset($this->getMetadata()['columns']['is_deleted'])) {
                 $deletedClause = 'AND NOT is_deleted';
             }
 

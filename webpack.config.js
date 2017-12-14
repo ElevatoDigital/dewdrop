@@ -12,7 +12,9 @@ module.exports = env => {
             'Modernizr': 'Modernizr',
             'key': 'key',
             'jquery': 'jQuery',
-            '$': 'jQuery'
+            '$': 'jQuery',
+            'window.jQuery': 'jquery',
+            'window.$': 'jquery'
         },
         context: __dirname,
         resolve: {

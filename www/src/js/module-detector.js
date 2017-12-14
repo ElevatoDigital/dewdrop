@@ -75,6 +75,11 @@ class Loader {
             import('./bulk-action-form').then((mod) => { new mod.default(override); });
         }
     }
+    datatables(override) {
+        if (override || $('#datatables-options').length) {
+            import('./datatables').then((mod) => { new mod.default(override); });
+        }
+    }
 }
 
 class Detector {

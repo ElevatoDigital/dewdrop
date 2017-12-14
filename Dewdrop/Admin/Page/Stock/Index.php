@@ -15,9 +15,9 @@ use Dewdrop\Admin\Component\ComponentAbstract;
 use Dewdrop\Admin\Component\CrudInterface;
 use Dewdrop\Admin\Component\SortableListingInterface;
 use Dewdrop\Admin\ResponseHelper\Standard as ResponseHelper;
-use Dewdrop\Bootstrap;
 use Dewdrop\Pimple;
 use Dewdrop\Session;
+use Dewdrop\View\Helper\DataTables;
 
 /**
  * Render the primary listing for a component.  This page is more complex
@@ -139,10 +139,25 @@ class Index extends StockPageAbstract
         }
     }
 
-    /**
-     * Pass a whole log of stuff into the view.
-     */
     public function render()
+    {
+        $format         = $this->request->getQuery('format', 'default');
+        $allowedFormats = ['default', 'datatables'];
+
+        if (!in_array($format, $allowedFormats)) {
+            $format = 'default';
+        }
+
+        $renderMethod = 'render'.ucfirst($format);
+
+        return $this->$renderMethod();
+    }
+
+    /**
+     * Render the entire page by default.
+     * @return string
+     */
+    public function renderDefault()
     {
         $fields  = $this->component->getFields();
         $listing = $this->component->getListing();
@@ -161,7 +176,7 @@ class Index extends StockPageAbstract
             'isSortable'             => ($this->component instanceof SortableListingInterface),
             'page'                   => $this,
             'createUrl'              => $this->getCreateUrl(),
-            'deletedRecordsModifier' => $listing->getSelectModifierByName('SelectDeletedRecords')
+            'deletedRecordsModifier' => $listing->getSelectModifierByName('SelectDeletedRecords'),
         ]);
 
         if ($this->component instanceof BulkActionProcessorInterface) {
@@ -172,5 +187,64 @@ class Index extends StockPageAbstract
         }
 
         return $this->renderView();
+    }
+
+    /**
+     * Render a JSON response that will be consumed by DataTables.
+     */
+    public function renderDatatables()
+    {
+        $listing        = $this->component->getListing();
+        $groupingFilter = $this->component->getFieldGroupsFilter();
+        $filter         = $this->component->getVisibilityFilter();
+        $fields         = $this->component->getFields()->getVisibleFields([$groupingFilter, $filter]);
+        $listingData    = $listing->fetchData($groupingFilter->apply($fields));
+        $totalRowCount  = $listing->getTotalRowCount();
+        $renderer       = $this->view->tableCellRenderer();
+        $pkey           = $listing->getPrimaryKey()->getName();
+        $permissions    = $this->component->getPermissions();
+        $rowActionArgs  = [
+            'renderer'  => $renderer,
+            'field'     => $fields->getIterator()->current(),
+            'title'     => $this->component->getPrimaryModel()->getSingularTitle(),
+            'urlFields' => $pkey
+        ];
+
+        if ($permissions->can('edit')) {
+            $rowActionArgs['edit'] = $this->view->adminUrl('edit', [$pkey => '%s']);
+        }
+
+        if ($permissions->can('view')) {
+            $rowActionArgs['view'] = $this->view->adminUrl('view', [$pkey => '%s']);
+        }
+
+        $this->view->bootstrapRowActions()->assignCallback($rowActionArgs);
+
+        if ($this->component instanceof BulkActionProcessorInterface) {
+            $this->view->assign([
+                'bulkActions' => $this->component->getBulkActions(),
+            ]);
+        }
+
+        if ($this->component instanceof SortableListingInterface) {
+            $sortField = $this->component->getSortField();
+
+            $this->getView()->tableSortHandle()->assignToField(
+                $sortField,
+                $renderer,
+                $listing->getPrimaryKey()->getName()
+            );
+        }
+
+        echo $this->view->encodeJsonHtmlSafe(
+            $this->view->datatables()->render(
+                $fields,
+                $listingData,
+                $renderer,
+                $totalRowCount
+            )
+        );
+
+        exit(0);
     }
 }

@@ -1,0 +1,14 @@
+/* DataTable specific styling */
+.bootstrap-table.dataTable th {
+    color: #428bca;
+}
+.bootstrap-table.dataTable th::after {
+    color: #444;
+}
+.dataTable-loading-overlay {
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    background-color: grey;
+    opacity: 0.3;
+}

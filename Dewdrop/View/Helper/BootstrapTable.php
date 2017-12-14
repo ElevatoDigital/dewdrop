@@ -10,7 +10,10 @@
 
 namespace Dewdrop\View\Helper;
 
+use Dewdrop\Admin\Component\CrudAbstract;
+use Dewdrop\Fields;
 use Dewdrop\Fields\Helper\SelectSort;
+use Dewdrop\Fields\Listing;
 
 /**
  * Render a table using classes and markup consistent with Boostrap's
@@ -41,7 +44,7 @@ class BootstrapTable extends Table
         }
 
         return <<<HTML
-            <div class="table-responsive"{$tableWrapperIdAttr}><table class="bootstrap-table table table-hover">
+            <div class="table-responsive" {$tableWrapperIdAttr}><table class="bootstrap-table table table-hover">
 HTML;
     }
 
@@ -78,33 +81,35 @@ HTML;
     }
 
     /**
-     * Render a sorting link for a particular column.  If the collumn is
+     * Render a sorting link for a particular column.  If the column is
      * currently selected, which we can detect using a SelectSort helper, we use the
      * carets provided in Bootstrap to indicate in which direction it is sorted.
      *
      * @param string $content
-     * @param string $fieldId
+     * @param string $queryStringId
      * @param string $direction
      * @param SelectSort $sorter
      * @return string
      */
-    protected function renderSortLink($content, $fieldId, $direction, SelectSort $sorter = null)
+    protected function renderSortLink($content, $queryStringId, $direction, SelectSort $sorter = null)
     {
-        $caret = '';
+        $caret        = '';
+        $sortedFields = ($sorter) ? $sorter->getSortedFields() : [];
 
-        if ($fieldId === $sorter->getSortedField()->getQueryStringId()) {
-            $activeDirection = $this->getActiveSortDirection($fieldId, $sorter);
+        if (isset($sortedFields[$queryStringId])) {
+            $activeDirection = $sortedFields[$queryStringId];
 
-            if ('asc' === $activeDirection) {
+            if ('ASC' === $activeDirection) {
                 $caret = ' <span class="caret caret-up"></span>';
             } else {
                 $caret = '<span class="caret"></span>';
             }
         }
 
+        /** @noinspection HtmlUnknownTarget */
         return sprintf(
             '<a href="%s">%s%s</a>',
-            $this->view->escapeHtmlAttr($this->assembleSortUrl($fieldId, $direction)),
+            $this->view->escapeHtmlAttr($this->assembleSortUrl($queryStringId, $direction)),
             $this->view->escapeHtml($content),
             $caret
         );

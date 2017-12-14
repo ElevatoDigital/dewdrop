@@ -65,7 +65,7 @@ class BootstrapFilterForm extends AbstractHelper
 
     /**
      * Render a filter form using the supplied Fields, SelectFilter and title.
-     * By default, this form will use GET so that it geneates a query string
+     * By default, this form will use GET so that it generates a query string
      * that can be used to share search results, but you can use POST if needed
      * for your case.
      *
