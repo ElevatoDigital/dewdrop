@@ -3,15 +3,26 @@ import moment from 'moment';
 class DatePicker {
     constructor() {
         // Used to append popovers.  Avoids WP and Bootstrap CSS conflicts.
-        var styleWrapper = $('<div class="bootstrap-wrapper"></div>');
+        var styleWrapper         = $('<div class="bootstrap-wrapper"></div>'),
+            inputFormat          = 'MM/DD/YYYY',
+            dateInputValueFormat = 'YYYY-MM-DD';
 
         $(document.body).append(styleWrapper);
 
-        if (Modernizr.touch && Modernizr.inputtypes.date) {
-            $('.input-date').attr('type', 'date');
-        } else {
-            $('.input-date').each(
-                function (index, input) {
+        $('.input-date').each(
+            function (index, input) {
+                if (Modernizr.touch && Modernizr.inputtypes.date) {
+
+                    var $inputDate = $(this),
+                        inputDate  = $inputDate.val();
+
+                    if (inputDate) {
+                        $inputDate.val(moment(inputDate, inputFormat).format(dateInputValueFormat));
+                    }
+
+                    $inputDate.attr('type', 'date');
+
+                } else {
                     var $input = $(input),
                         content,
                         yearRange,
@@ -59,12 +70,12 @@ class DatePicker {
                                 changeMonth: true,
                                 changeYear:  true,
                                 yearRange:   yearRange,
-                                defaultDate: moment($input.val()).toDate(),
+                                defaultDate: moment($input.val(), inputFormat).toDate(),
                                 onSelect: function (e) {
                                     var selected = $popover.datepicker('getDate');
 
                                     if (selected) {
-                                        $input.val(moment(selected).format('MM/DD/YYYY'));
+                                        $input.val(moment(selected, inputFormat).format(inputFormat));
                                     } else {
                                         $input.val('');
                                     }
@@ -87,8 +98,8 @@ class DatePicker {
                         }
                     );
                 }
-            );
-        }
+            }
+        );
     }
 }
 

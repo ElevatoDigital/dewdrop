@@ -49968,7 +49968,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 })(this, function (module) {
   "use strict";
 
-  module.exports = "<%\nvar options = {\n    'contains':         'contains',\n    'does-not-contain': 'does not contain',\n    'starts-with':      'starts with',\n    'ends-with':        'ends with'\n};\n%>\n\n<select name=\"ftr-comp.<%- inputIndex %>\" class=\"form-control input-sm\">\n    <% _.each(options, function (option, key) { %>\n\n    <% if (values.comp === key) { %>\n    <option value=\"<%- key %>\" selected=\"selected\"><%- option %></options>\n    <% } else { %>\n    <option value=\"<%- key %>\"><%- option %></options>\n    <% } %>\n\n    <% }); %>\n</select>\n\n<input name=\"ftr-value.<%- inputIndex %>\" type=\"text\" class=\"filter-value form-control input-sm\" value=\"<%- values.value %>\" />\n";
+  module.exports = "<%\nvar options = {\n    'contains':         'contains',\n    'does-not-contain': 'does not contain',\n    'starts-with':      'starts with',\n    'ends-with':        'ends with',\n    'empty':            'is empty',\n    'not-empty':        'is not empty',\n};\n%>\n\n<select name=\"ftr-comp.<%- inputIndex %>\" class=\"form-control input-sm\">\n    <% _.each(options, function (option, key) { %>\n\n    <% if (values.comp === key) { %>\n    <option value=\"<%- key %>\" selected=\"selected\"><%- option %></options>\n    <% } else { %>\n    <option value=\"<%- key %>\"><%- option %></options>\n    <% } %>\n\n    <% }); %>\n</select>\n\n<input name=\"ftr-value.<%- inputIndex %>\" type=\"text\" class=\"filter-value form-control input-sm\" value=\"<%- values.value %>\" />\n";
 });
 
 /***/ }),
@@ -50611,14 +50611,24 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
         _classCallCheck(this, DatePicker);
 
         // Used to append popovers.  Avoids WP and Bootstrap CSS conflicts.
-        var styleWrapper = $('<div class="bootstrap-wrapper"></div>');
+        var styleWrapper = $('<div class="bootstrap-wrapper"></div>'),
+            inputFormat = 'MM/DD/YYYY',
+            dateInputValueFormat = 'YYYY-MM-DD';
 
         $(document.body).append(styleWrapper);
 
-        if (Modernizr.touch && Modernizr.inputtypes.date) {
-            $('.input-date').attr('type', 'date');
-        } else {
-            $('.input-date').each(function (index, input) {
+        $('.input-date').each(function (index, input) {
+            if (Modernizr.touch && Modernizr.inputtypes.date) {
+
+                var $inputDate = $(this),
+                    inputDate = $inputDate.val();
+
+                if (inputDate) {
+                    $inputDate.val((0, _moment2.default)(inputDate, inputFormat).format(dateInputValueFormat));
+                }
+
+                $inputDate.attr('type', 'date');
+            } else {
                 var $input = $(input),
                     content,
                     yearRange,
@@ -50661,12 +50671,12 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
                         changeMonth: true,
                         changeYear: true,
                         yearRange: yearRange,
-                        defaultDate: (0, _moment2.default)($input.val()).toDate(),
+                        defaultDate: (0, _moment2.default)($input.val(), inputFormat).toDate(),
                         onSelect: function onSelect(e) {
                             var selected = $popover.datepicker('getDate');
 
                             if (selected) {
-                                $input.val((0, _moment2.default)(selected).format('MM/DD/YYYY'));
+                                $input.val((0, _moment2.default)(selected, inputFormat).format(inputFormat));
                             } else {
                                 $input.val('');
                             }
@@ -50684,8 +50694,8 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
                         $input.popover('hide');
                     }
                 });
-            });
-        }
+            }
+        });
     };
 
     exports.default = DatePicker;
@@ -50738,7 +50748,11 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
         _classCallCheck(this, DatetimePicker);
 
         // Used to append popovers.  Avoids WP and Bootstrap CSS conflicts.
-        var styleWrapper = $('<div class="bootstrap-wrapper"></div>');
+        var styleWrapper = $('<div class="bootstrap-wrapper"></div>'),
+            dateInputFormat = 'MM/DD/YYYY',
+            dateInputValueFormat = 'YYYY-MM-DD',
+            timeInputFormat = 'h:mma',
+            timeInputValueFormat = 'HH:mm';
 
         $(document.body).append(styleWrapper);
 
@@ -50784,8 +50798,28 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
         });
 
         if (Modernizr.touch && Modernizr.inputtypes.date) {
-            $('.date-input').attr('type', 'date');
-            $('.time-input').attr('type', 'time');
+
+            $('.date-input').each(function () {
+
+                var $dateInput = $(this),
+                    dateInput = $dateInput.val();
+
+                if (dateInput) {
+                    $dateInput.val((0, _moment2.default)(dateInput, dateInputFormat).format(dateInputValueFormat));
+                }
+                $dateInput.attr('type', 'date');
+            });
+
+            $('.time-input').each(function () {
+
+                var $timeInput = $(this),
+                    timeInput = $timeInput.val();
+
+                if (timeInput) {
+                    $timeInput.val((0, _moment2.default)(timeInput, timeInputFormat).format(timeInputValueFormat));
+                }
+                $timeInput.attr('type', 'time');
+            });
         } else {
             $('.time-input').timepicker({
                 change: function change() {
@@ -50836,12 +50870,12 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
                         changeMonth: true,
                         changeYear: true,
                         yearRange: yearRange,
-                        defaultDate: (0, _moment2.default)($input.val(), 'MM/DD/YYYY').toDate(),
+                        defaultDate: (0, _moment2.default)($input.val(), dateInputFormat).toDate(),
                         onSelect: function onSelect(e) {
                             var selected = $popover.datepicker('getDate');
 
                             if (selected) {
-                                $input.val((0, _moment2.default)(selected).format('MM/DD/YYYY'));
+                                $input.val((0, _moment2.default)(selected).format(dateInputFormat));
                             } else {
                                 $input.val('');
                             }
@@ -51969,11 +52003,36 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
     var TextView = _baseView2.default.extend({
         template: template,
 
+        inputOperators: ['contains', 'not-contains', 'starts-with', 'ends-with'],
+
+        noInputOperators: ['empty', 'not-empty'],
+
+        events: {
+            'change select': 'handleOperatorSelection'
+        },
+
+        postRender: function postRender() {
+            this.handleOperatorSelection();
+        },
+
         updateValues: function updateValues() {
             this.model.set('values', {
                 comp: this.$el.find('select').val(),
                 value: this.$el.find('input.filter-value').val()
             });
+        },
+
+        handleOperatorSelection: function handleOperatorSelection() {
+            var selected = this.$el.find('select').val();
+
+            this.focusInput();
+            this.updateValues();
+
+            if (-1 !== this.inputOperators.indexOf(selected)) {
+                this.$el.find('input.filter-value').show();
+            } else if (-1 !== this.noInputOperators.indexOf(selected)) {
+                this.$el.find('input.filter-value').hide();
+            }
         }
     });
 

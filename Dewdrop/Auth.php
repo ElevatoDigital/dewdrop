@@ -218,7 +218,7 @@ class Auth
         $bodyHtml = $mailView->render('forgot-password-email-html.phtml');
         $bodyText = $mailView->render('forgot-password-email-text.phtml');
 
-        $message = Swift_Message::newInstance();
+        $message = new Swift_Message();
         $message
             ->setSubject('Reset Password')
             ->setFrom("noreply@{$_SERVER['SERVER_NAME']}")

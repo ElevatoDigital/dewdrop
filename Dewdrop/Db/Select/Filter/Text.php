@@ -16,6 +16,10 @@ class Text extends AbstractFilter
 
     const OP_ENDS_WITH = 'ends-with';
 
+    const OP_EMPTY = 'empty';
+
+    const OP_NOT_EMPTY = 'not-empty';
+
     public function apply(Select $select, $conditionSetName, array $queryVars)
     {
         if (!isset($queryVars['comp'])) {
@@ -31,6 +35,10 @@ class Text extends AbstractFilter
 
         if (!$this->isValidOperator($operator)) {
             throw new InvalidOperator("{$operator} is not a valid operator for text filters.");
+        }
+
+        if (in_array($operator, [self::OP_EMPTY, self::OP_NOT_EMPTY], true)) {
+            return $this->filterEmptyOrNotEmpty($operator, $select, $conditionSetName);
         }
 
         // Don't attempt to filter if no value is available
@@ -98,13 +106,23 @@ class Text extends AbstractFilter
         );
     }
 
+    private function filterEmptyOrNotEmpty($operator, Select $select, $conditionSetName)
+    {
+        $quotedAlias = $select->quoteWithAlias($this->tableName, $this->columnName);
+        $operator    = (self::OP_EMPTY === $operator ? 'IS NULL' : 'IS NOT NULL');
+
+        return $select->whereConditionSet($conditionSetName, "{$quotedAlias} {$operator}");
+    }
+
     private function isValidOperator($operator)
     {
         static $validOperators = array(
             self::OP_CONTAINS,
             self::OP_NOT_CONTAINS,
             self::OP_STARTS_WITH,
-            self::OP_ENDS_WITH
+            self::OP_ENDS_WITH,
+            self::OP_EMPTY,
+            self::OP_NOT_EMPTY,
         );
 
         return in_array($operator, $validOperators);
