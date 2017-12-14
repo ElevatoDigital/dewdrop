@@ -23,12 +23,25 @@ class Dewdrop {
     }
 
     init() {
+        if (undefined === $ && jQuery) {
+            window.$ = jQuery;
+        }
+        if (undefined === $) {
+            console.error('jQuery must be installed to use dewdrop.');
+        }
+
         moment.locale(navigator.language);
 
         /*** Handle jQuery plugin naming conflict between jQuery UI and Bootstrap ***/
         if ($.widget && $.widget.bridge) {
-            $.widget.bridge('uibutton', $.ui.button);
-            $.widget.bridge('uitooltip', $.ui.tooltip);
+            if ($.ui) {
+                if ($.ui.button) {
+                    $.widget.bridge('uibutton', $.ui.button);
+                }
+                if ($.ui.tooltip) {
+                    $.widget.bridge('uitooltip', $.ui.tooltip);
+                }
+            }
         }
 
         // Disable submit inputs upon applicable form submissions
