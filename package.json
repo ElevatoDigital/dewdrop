@@ -1,7 +1,7 @@
 {
   "name": "dewdrop",
   "main": "www/dist/node/dewdrop.js",
-  "version": "1.3.9",
+  "version": "2.0.0",
   "description": "Dewdrop makes writing complex WordPress plugins simpler by providing a sensible project layout and developer tools.",
   "license": "SEE LICENSE IN LICENSE",
   "bugs": {
