@@ -18,6 +18,8 @@ class Link
 
     private $cssClasses = [];
 
+    private $linkText;
+
     public static function createInstance()
     {
         return new Link();
@@ -62,6 +64,13 @@ class Link
         return $this;
     }
 
+    public function setLinkText($text)
+    {
+        $this->linkText = $text;
+
+        return $this;
+    }
+
     public function __invoke(FieldInterface $field)
     {
         $field->addHelperFilter(
@@ -76,7 +85,7 @@ class Link
                 } else {
                     $node = new Node('a');
                     $node
-                        ->setHtml($content)
+                        ->setHtml($this->linkText ? $rowData[$this->linkText] : $content)
                         ->setAttribute('href', sprintf($this->urlTemplate, $rowData[$this->id]))
                         ->setAttribute('class', implode(' ', $this->cssClasses));
 
