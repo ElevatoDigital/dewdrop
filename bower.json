@@ -27,6 +27,8 @@
     "requirejs-text": "2.*",
     "summernote": ">=0.6.5",
     "timepicker": "1.4.*",
-    "velocity": "0.1.*"
+    "velocity": "0.1.*",
+    "datatables.net": "^1.10.16",
+    "datatables.net-bs": "^2.1.1"
   }
 }
