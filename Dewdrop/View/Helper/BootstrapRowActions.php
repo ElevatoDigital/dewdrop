@@ -60,6 +60,26 @@ class BootstrapRowActions extends AbstractHelper
 
         extract($options);
 
+        /* @var $field \Dewdrop\Fields\FieldInterface */
+        /* @var $renderer \Dewdrop\Fields\Helper\TableCell */
+
+        $originalCallback = $renderer->getTdClassNamesRenderer()->getFieldAssignment($field);
+
+        $renderer->getTdClassNamesRenderer()->assign(
+            $field->getId(),
+            function ($helper, array $rowData, $rowIndex, $columnIndex) use ($originalCallback) {
+                $fieldClasses = call_user_func($originalCallback, $rowData, $rowIndex, $columnIndex);
+
+                if (!is_array($fieldClasses)) {
+                    $fieldClasses = [$fieldClasses];
+                }
+
+                $classes = array_merge($fieldClasses, $this->getTableCellClasses());
+
+                return $classes;
+            }
+        );
+
         $originalCallback = $renderer->getContentRenderer()->getFieldAssignment($field);
 
         $renderer->getContentRenderer()->assign(
@@ -168,5 +188,15 @@ class BootstrapRowActions extends AbstractHelper
                 'modalTitle' => $modalTitle
             )
         );
+    }
+
+    /**
+     * Get CSS class added to wrapping &lt;td&gt; to allow for styling of columns containing the row action buttons.
+     *
+     * @return array
+     */
+    public function getTableCellClasses()
+    {
+        return ['row-actions-table-cell'];
     }
 }
