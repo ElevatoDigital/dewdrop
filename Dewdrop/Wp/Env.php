@@ -82,7 +82,16 @@ class Env implements EnvInterface
         $pimple['session'] = $pimple->share(
             function () {
                 if (class_exists('WP_Session')) {
-                    return WP_Session::get_instance();
+                    /**
+                     * WP Session Manager updated to version 3.0 on 2018-01-16.  The new major version
+                     * breaks any code that used WP_Session.  Whereas before WP_Session::get_instance()
+                     * returned an instance of WP_Session, it now returns $_SESSION.  Basically, their
+                     * implementation now just implements a session save handler rather than providing
+                     * an API for writing to session storage itself.  So now we just return $_SESSION
+                     * here.  We could still call WP_Session::get_instance() but that triggers deprecation
+                     * warnings.
+                     */
+                    return $_SESSION;
                 } else {
                     return new ArrayObject();
                 }

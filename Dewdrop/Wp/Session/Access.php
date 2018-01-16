@@ -29,17 +29,13 @@ class Access implements SessionAccessInterface
      */
     public function __construct($session)
     {
-        if (!$session instanceof ArrayObject && !$session instanceof WP_Session) {
-            throw new Exception('WP session storage requires either WP_Session or an ArrayObject placeholder.');
-        }
-
         $this->session = $session;
     }
 
     public function get($name)
     {
         $out = $this->session[$name];
-        
+
         if ($out instanceof Recursive_ArrayAccess) {
             $out = $out->toArray();
         }
