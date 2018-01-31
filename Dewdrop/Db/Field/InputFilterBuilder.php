@@ -69,6 +69,10 @@ class InputFilterBuilder
             }
         }
 
+        foreach ($field->getTable()->getUniqueConstraintsAffectingColumn($field->getName()) as $uniqueConstraint) {
+            $input->getValidatorChain()->attach($uniqueConstraint->createValidatorForField($field));
+        }
+
         return $input;
     }
 

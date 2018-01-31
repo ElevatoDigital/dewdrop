@@ -15,7 +15,6 @@ use Dewdrop\ActivityLog\Handler\TableHandler as ActivityLogTableHandler;
 use Dewdrop\Db\Eav\Definition as EavDefinition;
 use Dewdrop\Db\ManyToMany\Relationship as ManyToManyRelationship;
 use Dewdrop\Db\Select\TableListing;
-use Dewdrop\Env;
 use Dewdrop\Exception;
 use Dewdrop\Pimple;
 
@@ -139,6 +138,11 @@ abstract class Table
     private $activityLogHandler;
 
     /**
+     * @var UniqueConstraint[]
+     */
+    private $uniqueConstraints = [];
+
+    /**
      * Create new table object with supplied DB adapter
      *
      * @param Adapter $db
@@ -233,6 +237,36 @@ abstract class Table
     public function getEav()
     {
         return $this->eav;
+    }
+
+    public function hasUniqueConstraint($columns, array $options = [])
+    {
+        if (!is_array($columns)) {
+            $columns = [$columns];
+        }
+
+        $constraint = new UniqueConstraint($this, $columns);
+        $constraint->setOptions($options);
+        $this->uniqueConstraints[] = $constraint;
+
+        return $this;
+    }
+
+    /**
+     * @param string $columnName
+     * @return UniqueConstraint[]
+     */
+    public function getUniqueConstraintsAffectingColumn($columnName)
+    {
+        $constraints = [];
+
+        foreach ($this->uniqueConstraints as $uniqueConstraint) {
+            if ($uniqueConstraint->affectsColumn($columnName)) {
+                $constraints[] = $uniqueConstraint;
+            }
+        }
+
+        return $constraints;
     }
 
     /**
@@ -832,11 +866,16 @@ abstract class Table
         }
 
         // By whom
+        /* @var \Dewdrop\Pimple $pimple */
+        $pimple = Pimple::getInstance();
+        /* @var \Dewdrop\Paths $paths */
+        $paths = $pimple['paths'];
         if ($this->getMetadata('columns', 'created_by_user_id')) {
-            $userId = Env::getInstance()->getCurrentUserId();
-
-            if ($userId) {
-                $data['created_by_user_id'] = $userId;
+            if ($paths->isWp() && 0 < get_current_user_id()) {
+                $data['created_by_user_id'] = get_current_user_id();
+            } elseif (Pimple::hasResource('user') && ($user = Pimple::getResource('user')) && isset($user['user_id'])
+                && 0 < $user['user_id']) {
+                $data['created_by_user_id'] = $user['user_id'];
             }
         }
 
@@ -863,11 +902,16 @@ abstract class Table
         }
 
         // By whom
+        /* @var \Dewdrop\Pimple $pimple */
+        $pimple = Pimple::getInstance();
+        /* @var \Dewdrop\Paths $paths */
+        $paths = $pimple['paths'];
         if ($this->getMetadata('columns', 'updated_by_user_id')) {
-            $userId = Env::getInstance()->getCurrentUserId();
-
-            if ($userId) {
-                $data['updated_by_user_id'] = $userId;
+            if ($paths->isWp() && 0 < get_current_user_id()) {
+                $data['updated_by_user_id'] = get_current_user_id();
+            } elseif (Pimple::hasResource('user') && ($user = Pimple::getResource('user')) && isset($user['user_id'])
+                && 0 < $user['user_id']) {
+                $data['updated_by_user_id'] = $user['user_id'];
             }
         }
 
