@@ -174,7 +174,7 @@ class Inflector
      */
     public function conditionalPlural($number, $word)
     {
-        return $number > 1 ? $this->pluralize($word) : $word;
+        return $number === 1 ? $word : $this->pluralize($word);
     }
 
     /**
