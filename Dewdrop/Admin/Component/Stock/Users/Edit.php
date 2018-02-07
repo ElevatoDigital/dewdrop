@@ -60,7 +60,7 @@ class Edit extends StockEdit
                     $responseHelper->setSuccessMessage("Successfully saved changes to {$title}");
                 }
 
-                $row->save();
+                $this->rowEditor->save();
 
                 if (!$this->request->isAjax()) {
                     $responseHelper->redirectToAdminPage('index');
