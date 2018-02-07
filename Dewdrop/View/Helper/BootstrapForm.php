@@ -10,6 +10,7 @@
 
 namespace Dewdrop\View\Helper;
 
+use Dewdrop\Db\Field as DbField;
 use Dewdrop\Fields;
 use Dewdrop\Fields\FieldInterface;
 use Dewdrop\Fields\GroupedFields;
@@ -176,7 +177,12 @@ class BootstrapForm extends AbstractHelper
         $output = '';
 
         foreach ($fields->getEditableFields() as $field) {
-            $output .= '<div class="">';
+            if ($field instanceof DbField && $field->isType('boolean')) {
+                $output .= '<div class="boolean-field">';
+            } else {
+                $output .= '<div class="">';
+            }
+
             $output .= $this->renderFieldContent($field, $inputFilter, $renderer, $fieldPosition);
             $output .= '</div>';
 
