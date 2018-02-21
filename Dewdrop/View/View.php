@@ -35,6 +35,7 @@ use Dewdrop\View\Helper\BulkActionCheckboxField;
  * @method string adminComponentNav()
  * @method string adminNotice()
  * @method string adminUrl()
+ * @method Block|Helper\Block block($name = null)
  * @method string bootstrapColumnsModal()
  * @method string bootstrapDetailsView()
  * @method mixed bootstrapFilterForm()
@@ -53,7 +54,6 @@ use Dewdrop\View\Helper\BulkActionCheckboxField;
  * @method Helper\DetectEditHelper detectEditHelper()
  * @method Helper\EditForm editForm()
  * @method \Dewdrop\Fields\Helper\EditControl editControlRenderer()
- * @method string FileSize()
  * @method \Zend\View\Helper\HeadLink headLink()
  * @method \Zend\View\Helper\HeadMeta headMeta()
  * @method \Zend\View\Helper\HeadScript headScript()
@@ -130,6 +130,7 @@ class View
         'adminnotice'                => '\Dewdrop\View\Helper\AdminNotice',
         'admintitle'                 => '\Dewdrop\View\Helper\AdminTitle',
         'adminurl'                   => '\Dewdrop\View\Helper\AdminUrl',
+        'block'                      => Helper\Block::class,
         'bootstraptable'             => '\Dewdrop\View\Helper\BootstrapTable',
         'bootstrapbreadcrumbs'       => '\Dewdrop\View\Helper\BootstrapBreadcrumbs',
         'bootstrapcolumnsmodal'      => '\Dewdrop\View\Helper\BootstrapColumnsModal',
@@ -150,7 +151,6 @@ class View
         'detectedithelper'           => '\Dewdrop\View\Helper\DetectEditHelper',
         'editform'                   => '\Dewdrop\View\Helper\EditForm',
         'editcontrolrenderer'        => '\Dewdrop\View\Helper\EditControlRenderer',
-        'filesize'                   => '\Dewdrop\View\Helper\FileSize',
         'headlink'                   => '\Zend\View\Helper\HeadLink',
         'headmeta'                   => '\Zend\View\Helper\HeadMeta',
         'headscript'                 => '\Zend\View\Helper\HeadScript',
@@ -162,7 +162,6 @@ class View
         'inputfile'                  => '\Dewdrop\View\Helper\InputFile',
         'inputimage'                 => '\Dewdrop\View\Helper\InputImage',
         'inputtext'                  => '\Dewdrop\View\Helper\InputText',
-        'inputtime'                  => '\Dewdrop\View\Helper\InputTime',
         'inputtimestamp'             => '\Dewdrop\View\Helper\InputTimestamp',
         'optioninputdecorator'       => '\Dewdrop\View\Helper\OptionInputDecorator',
         'pagination'                 => '\Dewdrop\View\Helper\Pagination',
@@ -214,18 +213,6 @@ class View
     public function init()
     {
 
-    }
-
-    /**
-     * Get all the internal view data.  Can sometimes be useful if you want to pass
-     * all the data from a view to a partial rather than having to manually re-assign
-     * all the different view data and keep those two sets of data in sync in your code.
-     *
-     * @return array
-     */
-    public function getData()
-    {
-        return $this->internalViewData;
     }
 
     /**
@@ -402,6 +389,7 @@ class View
 
         $partial->assignInstance('headscript', $this->headScript());
         $partial->assignInstance('headlink', $this->headLink());
+        $partial->assignInstance('block', $this->block());
 
         // Pass along any custom helper class assignments to the newly created partial
         foreach ($this->helperClasses as $name => $className) {
@@ -475,25 +463,6 @@ class View
         ob_start();
 
         require $this->scriptPath . '/' . basename($template);
-
-        return ob_get_clean();
-    }
-
-    /**
-     * Render the provided template file.
-     *
-     * This method returns the output as a string so that you
-     * have the opportunity to filter or otherwise handle it prior to actually
-     * adding it to the response.
-     *
-     * @param string $template Full path of file
-     * @return string
-     */
-    public function renderFullPathTemplate($template)
-    {
-        ob_start();
-
-        require realpath($template);
 
         return ob_get_clean();
     }
