@@ -594,6 +594,7 @@ class Pgsql implements DriverInterface
             case 'char':
             case 'bpchar':
             case 'interval':
+            case 'uuid':
                 $genericType = 'text';
                 if (1 === $length) {
                     $genericType = 'boolean';
