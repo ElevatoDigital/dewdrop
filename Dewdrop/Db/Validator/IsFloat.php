@@ -28,8 +28,6 @@ class IsFloat extends AbstractValidator
      */
     public function __construct($options = array())
     {
-        $this->wrapper = StringUtils::getWrapper();
-
         if ($options instanceof Traversable) {
             $options = ArrayUtils::iteratorToArray($options);
         }
