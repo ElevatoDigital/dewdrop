@@ -11,6 +11,8 @@
 namespace Dewdrop\Db\Field;
 
 use Dewdrop\Db\Field;
+use Dewdrop\Db\Validator\IsFloat;
+use Dewdrop\Db\Validator\IsInt;
 use Dewdrop\Filter\IsoDate as IsoDateFilter;
 use Dewdrop\Filter\IsoTimestamp as IsoTimestampFilter;
 use Dewdrop\Filter\NullableDbBoolean as NullableDbBooleanFilter;
@@ -197,8 +199,12 @@ class InputFilterBuilder
                 ->attach(new Filter\ToNull(Filter\ToNull::TYPE_STRING))
                 ->attach(new Filter\ToInt());
         }
-
-        $input->getValidatorChain()->attach(new \Zend\I18n\Validator\IsInt());
+        
+        if (extension_loaded('intl')) {
+            $input->getValidatorChain()->attach(new \Zend\I18n\Validator\IsInt());
+        } else {
+            $input->getValidatorChain()->attach(new IsInt());
+        }
 
         return $input;
     }
@@ -217,7 +223,11 @@ class InputFilterBuilder
             $input->getFilterChain()->attach(new Filter\Callback(function ($value) {
                 return preg_replace('/[^0-9.-]/', '', $value);
             }));
-            $input->getValidatorChain()->attach(new \Zend\I18n\Validator\IsFloat());
+            if (extension_loaded('intl')) {
+                $input->getValidatorChain()->attach(new \Zend\I18n\Validator\IsFloat());
+            } else {
+                $input->getValidatorChain()->attach(new IsFloat());
+            }
         }
 
         return $input;
