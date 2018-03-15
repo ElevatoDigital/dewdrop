@@ -48,9 +48,10 @@ class InputText extends AbstractHelper
     protected function directField(Field $field, array $options = array())
     {
         $fieldDefaults = array(
-            'name'  => $field->getControlName(),
-            'id'    => $field->getHtmlId(),
-            'value' => $field->getValue()
+            'name'     => $field->getControlName(),
+            'id'       => $field->getHtmlId(),
+            'value'    => $field->getValue(),
+            'required' => $field->isRequired()
         );
 
         return $this->directArray(array_merge($fieldDefaults, $options));
@@ -61,11 +62,12 @@ class InputText extends AbstractHelper
      * input.
      *
      * @param string $name
-     * @param boolean $value
+     * @param mixed $value
      * @param mixed $classes
+     * @param boolean $required
      * @return string
      */
-    protected function directExplicit($name, $value, $classes = null)
+    protected function directExplicit($name, $value, $classes = null, $required = false)
     {
         if (null !== $classes && !is_array($classes)) {
             $classes = array($classes);
@@ -73,9 +75,10 @@ class InputText extends AbstractHelper
 
         return $this->directArray(
             array(
-                'name'    => $name,
-                'value'   => $value,
-                'classes' => $classes
+                'name'     => $name,
+                'value'    => $value,
+                'classes'  => $classes,
+                'required' => $required
             )
         );
     }
@@ -103,6 +106,10 @@ class InputText extends AbstractHelper
             $type = 'text';
         }
 
+        if (!$required) {
+            $required = false;
+        }
+
         return $this->partial(
             'input-text.phtml',
             array(
@@ -112,7 +119,8 @@ class InputText extends AbstractHelper
                 'classes'     => $classes,
                 'type'        => $type,
                 'autofocus'   => $autofocus,
-                'placeholder' => $placeholder
+                'placeholder' => $placeholder,
+                'required'    => $required
             )
         );
     }
