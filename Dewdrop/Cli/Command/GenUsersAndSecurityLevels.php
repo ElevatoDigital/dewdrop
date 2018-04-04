@@ -213,7 +213,7 @@ class GenUsersAndSecurityLevels extends GenAdminComponent
             $path     = $this->paths->getDb().'/'.$this->getDbRevision().'-'.$filename;
             $contents = file_get_contents(__DIR__."/gen-templates/users-and-security-levels/db/{$filename}");
 
-            if ($tempalteReplacements) {
+            if ($templateReplacements) {
                 $this->writeFile(
                     $path,
                     str_replace(
