@@ -105,7 +105,13 @@ class GenUsersAndSecurityLevels extends GenAdminComponent
      */
     public function setAdminPassword($adminPassword)
     {
-        $this->adminPassword = $adminPassword;
+        $hashedPassword = $this->runner
+            ->setArgs(
+                array('--plaintext=' . $adminPassword)
+            )
+            ->executeCommand('AuthHashPassword')
+        ;
+        $this->adminPassword = $hashedPassword;
 
         return $this;
     }
