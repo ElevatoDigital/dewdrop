@@ -13,3 +13,5 @@ CREATE TABLE "users" (
 	CONSTRAINT fk_users_security_level_id FOREIGN KEY (security_level_id)
 		REFERENCES security_levels (security_level_id)
 );
+
+{{createAdminUser}}

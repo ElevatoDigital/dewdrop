@@ -184,21 +184,22 @@ class GenUsersAndSecurityLevels extends GenAdminComponent
 
         // TableName => filename
         $tables = [
-            self::TABLE_NAME_SECURITY_LEVELS => $dbPrefix.'-create-security-levels.sql'
+            self::TABLE_NAME_SECURITY_LEVELS => $dbPrefix.'-create-security-levels.sql',
+            self::TABLE_NAME_USERS => $dbPrefix.'-create-users.sql'
         ];
 
         if ($this->adminUsername && $this->adminPassword && $this->adminEmail) {
-            $tables[self::TABLE_NAME_USERS] = $dbPrefix.'-create-users-with-admin-user.sql';
 
             $templateReplacements = array(
-                '{{adminUsername}}' => $this->adminUsername,
-                '{{adminPassword}}' => $this->adminPassword,
-                '{{adminEmail}}'    => $this->adminEmail
+                '{{createAdminUser}}' => sprintf(
+                    "INSERT INTO users(security_level_id, username, email_address, password_hash) VALUES ('1', '%s', '%s', %s' );",
+                    $this->adminUsername,
+                    $this->adminEmail,
+                    $this->adminPassword
+                )
             );
         } else {
-            $tables[self::TABLE_NAME_USERS] = $dbPrefix.'-create-users.sql';
-
-            $templateReplacements = array();
+            $templateReplacements = array('{{createAdminUser}}' => '');
         }
 
         foreach ($tables as $tableName => $filename) {
