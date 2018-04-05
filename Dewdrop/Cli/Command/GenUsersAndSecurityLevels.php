@@ -105,13 +105,17 @@ class GenUsersAndSecurityLevels extends GenAdminComponent
      */
     public function setAdminPassword($adminPassword)
     {
-        $hashedPassword = $this->runner
-            ->setArgs(
-                array('--plaintext=' . $adminPassword)
-            )
-            ->executeCommand('AuthHashPassword')
-        ;
-        $this->adminPassword = $hashedPassword;
+        $pimple = $this->runner->getPimple();
+
+        if (!$pimple['auth']) {
+            throw new Exception('You must configure the \Dewdrop\Auth service in your bootstrap to generate an admin user.');
+        }
+
+        $pimple['auth']->init();
+
+        $encoder = $pimple['security.encoder.digest'];
+
+        $this->adminPassword = $encoder->encodePassword($adminPassword, '');
 
         return $this;
     }
