@@ -80,7 +80,7 @@ class GenUsersAndSecurityLevels extends GenAdminComponent
 
         $this->addExample(
             'Generate Users & Security Levels; optionally also create admin user',
-            './vendor/bin/dewdrop gen-users-and-security-levels admin password email@email.com'
+            './vendor/bin/dewdrop gen-users-and-security-levels --admin-username=admin --admin-password=password --admin-email=email@email.com'
         );
     }
 
