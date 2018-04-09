@@ -9,5 +9,9 @@ CREATE TABLE "users" (
 	"date_updated" timestamp(6) NOT NULL DEFAULT now(),
 	"last_successful_login_date" timestamp(6) NULL,
 	"first_name" varchar(128),
-	"last_name" varchar(128)
+	"last_name" varchar(128),
+	CONSTRAINT fk_users_security_level_id FOREIGN KEY (security_level_id)
+		REFERENCES security_levels (security_level_id)
 );
+
+{{createAdminUser}}
