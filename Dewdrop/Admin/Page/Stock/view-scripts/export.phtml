@@ -15,5 +15,10 @@ $csvExportHelper = $this->csvExport();
 
 $csvExportHelper->sendHeaders("{$this->component->getTitle()} Export.csv");
 
-$csvExportHelper->renderWithGenerator($fields, $listing, $this->csvCellRenderer());
+$csvExportHelper->renderWithGenerator(
+    $fields,
+    $listing,
+    $this->csvCellRenderer(),
+    $this->component->getFields()
+);
 

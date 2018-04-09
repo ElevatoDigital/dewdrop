@@ -103,9 +103,15 @@ class CsvExport extends AbstractHelper
      * @param Fields $fields
      * @param Listing $listing
      * @param CsvCell $csvCellRenderer
+     * @param Fields|null $filterFields
      * @return void
      */
-    public function renderWithGenerator(Fields $fields, Listing $listing, CsvCell $csvCellRenderer)
+    public function renderWithGenerator(
+        Fields $fields,
+        Listing $listing,
+        CsvCell $csvCellRenderer,
+        Fields $filterFields = null
+    )
     {
         // Output CSV data
         $outputHandle = fopen('php://output', 'w');
@@ -113,12 +119,16 @@ class CsvExport extends AbstractHelper
         // Get the visible component fields
         $fields = $fields->getVisibleFields();
 
+        if (!$filterFields) {
+            $filterFields = $fields;
+        }
+
         // Render header
         fputcsv($outputHandle, $this->renderHeader($fields, $csvCellRenderer));
 
         // Render content
         $rowIndex = 0;
-        foreach ($listing->fetchDataWithGenerator($fields) as $row) {
+        foreach ($listing->fetchDataWithGenerator($filterFields) as $row) {
             $csvRow      = [];
             $columnIndex = 0;
             foreach ($fields as $field) {
