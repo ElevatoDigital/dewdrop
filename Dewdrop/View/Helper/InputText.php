@@ -138,7 +138,7 @@ class InputText extends AbstractHelper
     {
         $this
             ->checkRequired($options, array('name', 'value'))
-            ->ensurePresent($options, array('classes', 'id', 'autofocus', 'placeholder', 'type'))
+            ->ensurePresent($options, array('classes', 'id', 'autofocus', 'placeholder', 'required', 'type'))
             ->ensureArray($options, array('classes'));
 
         return $options;
