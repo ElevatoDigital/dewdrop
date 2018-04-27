@@ -28,7 +28,7 @@ class IsoTimestamp extends AbstractFilter
      */
     public function filter($value)
     {
-        if (null === $value || '' === $value) {
+        if ('' === trim($value)) {
             $out = null;
         } else {
             $gmtOffset = 0;

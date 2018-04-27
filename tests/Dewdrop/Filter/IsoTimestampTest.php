@@ -14,10 +14,25 @@ class IsoTimestampTest extends \PHPUnit_Framework_TestCase
         $this->filter = new IsoTimestamp();
     }
 
-    public function testEmptyValueReturnsNull()
+    /**
+     * @return array
+     */
+    public function emptyValueDataProvider()
     {
-        $this->assertNull($this->filter->filter(null));
-        $this->assertNull($this->filter->filter(''));
+        return [
+            [null],
+            [''],
+            [' '],
+        ];
+    }
+
+    /**
+     * @dataProvider emptyValueDataProvider()
+     * @param mixed $value
+     */
+    public function testEmptyValueReturnsNull($value)
+    {
+        $this->assertNull($this->filter->filter($value));
     }
 
     public function testValueIsPassedToStrtotimeForParsing()
