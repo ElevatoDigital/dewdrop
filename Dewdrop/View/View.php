@@ -163,6 +163,7 @@ class View
         'inputimage'                 => '\Dewdrop\View\Helper\InputImage',
         'inputtext'                  => '\Dewdrop\View\Helper\InputText',
         'inputtimestamp'             => '\Dewdrop\View\Helper\InputTimestamp',
+        'inputtime'                  => '\Dewdrop\View\Helper\InputTime',
         'optioninputdecorator'       => '\Dewdrop\View\Helper\OptionInputDecorator',
         'pagination'                 => '\Dewdrop\View\Helper\Pagination',
         'rowcollectioninputtable'    => '\Dewdrop\View\Helper\RowCollectionInputTable',
