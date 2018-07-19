@@ -48,7 +48,7 @@ class DbGateway extends Table
         $platform = $userAgent->platform();
 
         $data = [
-            'ip_address'                  => $ipAddress,
+            'ip_address'                  => substr($ipAddress, 0, 32),
             'sapi_name'                   => substr($sapiName, 0, 32),
             'user_agent'                  => substr($userAgentString, 0, 255),
             'user_agent_browser'          => substr($browser, 0, 32),
