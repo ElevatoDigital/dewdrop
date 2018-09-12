@@ -3,6 +3,7 @@
 namespace Dewdrop\Fields;
 
 use Dewdrop\Fields;
+use Dewdrop\Fields\Exception;
 use PHPUnit_Framework_TestCase;
 
 class FieldTest extends PHPUnit_Framework_TestCase
@@ -255,6 +256,26 @@ class FieldTest extends PHPUnit_Framework_TestCase
         $this->field->assignHelperCallback('Helper.1', function () {});
         $this->field->assignHelperCallback('Helper.2', function () {});
         $this->assertEquals(2, count($this->field->getAllHelperCallbacks()));
+    }
+
+    public function testCanRemoveHelperCallback()
+    {
+        $this->field->assignHelperCallback('Test-Helper-1', function () {});
+        $this->field->assignHelperCallback('Test-Helper-2', function () {});
+
+        $this->assertTrue($this->field->hasHelperCallback('Test-Helper-1'));
+        $this->assertTrue($this->field->hasHelperCallback('Test-Helper-2'));
+
+        $this->field->removeHelperCallback('Test-Helper-1');
+
+        $this->assertFalse($this->field->hasHelperCallback('Test-Helper-1'));
+        $this->assertTrue($this->field->hasHelperCallback('Test-Helper-2'));
+
+        try {
+            $this->field->removeHelperCallback('Test-Helper-3');
+        } catch (Exception $e) {
+            // NOOP
+        }
     }
 
     /**

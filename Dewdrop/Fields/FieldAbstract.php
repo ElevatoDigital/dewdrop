@@ -12,7 +12,6 @@ namespace Dewdrop\Fields;
 
 use Dewdrop\Fields;
 use Dewdrop\Fields as FieldsSet;
-use Dewdrop\Fields\Exception;
 
 /**
  * This class serves as a base for both custom and DB fields in Dewdrop.
@@ -518,6 +517,21 @@ abstract class FieldAbstract implements FieldInterface
     public function getHelperCallback($helperName)
     {
         return $this->customHelperCallbacks[strtolower($helperName)];
+    }
+
+    /**
+     * Remove the custom callback with the supplied helper name.
+     *
+     * @param string $helperName
+     * @throws \Dewdrop\Fields\Exception
+     */
+    public function removeHelperCallback($helperName)
+    {
+        if (!$this->hasHelperCallback($helperName)) {
+            throw new Exception("Helper callback '{$helperName}' does not exist");
+        }
+
+        unset($this->customHelperCallbacks[strtolower($helperName)]);
     }
 
     /**
