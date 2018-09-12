@@ -266,7 +266,7 @@ class FieldTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($this->field->hasHelperCallback('Test-Helper-1'));
         $this->assertTrue($this->field->hasHelperCallback('Test-Helper-2'));
 
-        $this->field->removeHelperCallback('Test-Helper-1');
+        $this->assertSame($this->field, $this->field->removeHelperCallback('Test-Helper-1'));
 
         $this->assertFalse($this->field->hasHelperCallback('Test-Helper-1'));
         $this->assertTrue($this->field->hasHelperCallback('Test-Helper-2'));

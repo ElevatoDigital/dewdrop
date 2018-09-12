@@ -523,6 +523,7 @@ abstract class FieldAbstract implements FieldInterface
      * Remove the custom callback with the supplied helper name.
      *
      * @param string $helperName
+     * @return FieldAbstract
      * @throws \Dewdrop\Fields\Exception
      */
     public function removeHelperCallback($helperName)
@@ -532,6 +533,8 @@ abstract class FieldAbstract implements FieldInterface
         }
 
         unset($this->customHelperCallbacks[strtolower($helperName)]);
+
+        return $this;
     }
 
     /**
