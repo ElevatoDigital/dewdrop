@@ -31,10 +31,8 @@ echo $this->partial(
         'singularTitle'  => $this->singularTitle
     )
 );
-?>
 
-<?php
-/* @var $fields \Dewdrop\Fields */
+// Start table
 
 $renderer = $this->tableCellRenderer();
 $fields   = $this->fields->getVisibleFields(array($this->groupingFilter, $this->visibilityFilter));
@@ -58,8 +56,6 @@ if ($this->permissions->can('view')) {
 $this->bootstrapRowActions()->assignCallback($rowActionArgs);
 
 $selectFilter  = $this->listing->getSelectModifierByName('SelectFilter');
-$listingData   = $this->listing->fetchData($this->groupingFilter->apply($this->fields));
-$totalRowCount = $this->listing->getTotalRowCount();
 
 if ($this->isSortable) {
     $sortField = $this->component->getSortField();
@@ -86,23 +82,27 @@ if ($this->deletedRecordsModifier && $this->deletedRecordsModifier->isShowingDel
     );
 }
 
-if (0 === $totalRowCount && $selectFilter->hasFilters()) {
+if (0 === $this->totalRowCount && $selectFilter->hasFilters()) {
     printf(
         '<div class="alert alert-warning">No %s found matching your filters.  Please try again.</div>',
         $this->escapeHtml(strtolower($this->pluralTitle))
     );
 } else {
-    echo $this->bootstrapTable(
+    echo $this->listing->renderTable(
+        $this,
         $fields,
-        $listingData,
-        $renderer,
-        $this->listing->getSelectModifierByName('SelectSort')
+        $this->component,
+        $renderer
     );
 }
+
+// End table
 
 if ($this->isSortable) {
     echo $this->tableSortHandle()->close();
 }
+
+$totalRowCount = $this->listing->getTotalRowCount();
 
 /* @var $paginationHelper \Dewdrop\Fields\Helper\SelectPaginate */
 $paginationHelper = $this->listing->getSelectModifierByName('SelectPaginate');
@@ -116,11 +116,12 @@ if ($this->bulkActions) {
     );
 }
 
-echo $this->pagination(
+$paginationTitle = (1 === $totalRowCount ? $this->singularTitle : $this->pluralTitle);
+
+echo $this->listing->renderPagination(
+    $this,
     $totalRowCount,
-    ($paginationHelper->isEnabled() ? $paginationHelper->getPageSize() : $totalRowCount),
-    $paginationHelper->getPage(),
-    (1 === $totalRowCount ? $this->singularTitle : $this->pluralTitle)
+    $paginationTitle
 );
 
 echo $this->bootstrapColumnsModal(
@@ -130,5 +131,5 @@ echo $this->bootstrapColumnsModal(
     $this->visibilityFilter->canBeFilteredByUser()
 );
 
-$this->headScript()->appendFile($this->bowerUrl('/dewdrop/www/js/listing-keyboard-shortcuts.js'));
+echo $this->listing->renderFooter($this, $fields, $paginationTitle);
 ?>

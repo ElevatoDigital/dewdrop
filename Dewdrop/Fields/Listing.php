@@ -10,6 +10,7 @@
 
 namespace Dewdrop\Fields;
 
+use Dewdrop\Admin\Component\CrudAbstract;
 use Dewdrop\Db\Field as DbField;
 use Dewdrop\Db\Select;
 use Dewdrop\Fields;
@@ -21,6 +22,9 @@ use Dewdrop\Fields\Helper\SelectPaginate;
 use Dewdrop\Fields\Helper\SelectSort;
 use Dewdrop\Pimple;
 use Dewdrop\Request;
+use Dewdrop\Fields\Listing\HandlerAbstract;
+use Dewdrop\Fields\Helper\TableCell as TableCellHelper;
+use Dewdrop\View\View;
 
 /**
  * The Listing class wraps a Select object and applies a number of SelectModifier
@@ -80,18 +84,24 @@ class Listing
     private $request;
 
     /**
+     * @var HandlerAbstract
+     */
+    private $listingHandler;
+
+    /**
      * Supply the Select object that will be manipulated by this listing.
      *
      * @param Select $select
      * @param DbField $primaryKey
      * @param Request $request
+     * @param HandlerAbstract $listingHandler
      */
-    public function __construct(Select $select, DbField $primaryKey, Request $request = null)
+    public function __construct(Select $select, DbField $primaryKey, Request $request = null, HandlerAbstract $listingHandler = null)
     {
-        $this->select     = $select;
-        $this->primaryKey = $primaryKey;
-
-        $this->request = ($request ?: Pimple::getResource('dewdrop-request'));
+        $this->select         = $select;
+        $this->primaryKey     = $primaryKey;
+        $this->request        = ($request ?: Pimple::getResource('dewdrop-request'));
+        $this->listingHandler = ($listingHandler ?: Pimple::getResource('listing-handler'));
 
         $this
             ->registerSelectModifier(new SelectFilter($this->request))
@@ -382,5 +392,58 @@ class Listing
         $select->where("{$quotedPrimaryKey} = ?", $id);
 
         return $this->select->getAdapter()->fetchRow($select);
+    }
+
+    /**
+     * Render the table for this listing.
+     *
+     * @param View $view
+     * @param Fields $fields
+     * @param CrudAbstract $component
+     * @param TableCellHelper|null $renderer
+     * @return mixed
+     */
+    public function renderTable(View $view, Fields $fields, CrudAbstract $component, TableCellHelper $renderer = null)
+    {
+        $data = $this->listingHandler->getData($this, $component, $fields);
+
+        return $this->listingHandler->renderTable($view, $fields, $data, $renderer, $this->getSelectSortModifier());
+    }
+
+    /**
+     * @param View $view
+     * @param int $totalRowCount
+     * @param string $title
+     * @return string
+     */
+    public function renderPagination(View $view, $totalRowCount, $title)
+    {
+        $paginationHelper = $this->getSelectPaginateModifier();
+        $pageSize         = ($paginationHelper->isEnabled() ? $paginationHelper->getPageSize() : $totalRowCount);
+
+        return $this->listingHandler->renderPagination(
+            $view,
+            $totalRowCount,
+            $pageSize,
+            $paginationHelper->getPage(),
+            $title
+        );
+    }
+
+    /**
+     * @param View $view
+     * @param Fields $fields
+     * @param $paginationTitle
+     * @return string
+     */
+    public function renderFooter(View $view, Fields $fields, $paginationTitle)
+    {
+        return $this->listingHandler->renderFooter(
+            $view,
+            $fields,
+            $this->getSelectSortModifier(),
+            $this->getSelectPaginateModifier(),
+            $paginationTitle
+        );
     }
 }

@@ -44,6 +44,8 @@ use Dewdrop\View\Helper\BulkActionCheckboxField;
  * @method Helper\BootstrapRowActions bootstrapRowActions()
  * @method string bootstrapSelect()
  * @method mixed bootstrapTable()
+ * @method mixed bootstrapDataTableTable()
+ * @method mixed datatables()
  * @method string bootstrapTextarea()
  * @method string bowerUrl(string $url, string $wwwPath = null, string $docRoot = null)
  * @method Helper\BulkActionForm bulkActionForm()
@@ -132,6 +134,8 @@ class View
         'adminurl'                   => '\Dewdrop\View\Helper\AdminUrl',
         'block'                      => Helper\Block::class,
         'bootstraptable'             => '\Dewdrop\View\Helper\BootstrapTable',
+        'bootstrapdatatabletable'    => '\Dewdrop\View\Helper\BootstrapDataTableTable',
+        'datatables'                 => '\Dewdrop\View\Helper\DataTables',
         'bootstrapbreadcrumbs'       => '\Dewdrop\View\Helper\BootstrapBreadcrumbs',
         'bootstrapcolumnsmodal'      => '\Dewdrop\View\Helper\BootstrapColumnsModal',
         'bootstrapdetailsview'       => '\Dewdrop\View\Helper\BootstrapDetailsView',
@@ -247,6 +251,15 @@ class View
         }
 
         return $this;
+    }
+
+    /**
+     * Retrieve the data assigned to this view.
+     * @return array
+     */
+    public function getInternalViewData()
+    {
+        return $this->internalViewData;
     }
 
     /**

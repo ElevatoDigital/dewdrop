@@ -1,32 +1,34 @@
 {
-    "name": "dewdrop",
-    "version": "1.14.9",
-    "main": [
-        "www/css",
-        "www/js",
-        "www/images",
-        "www/fonts"
-    ],
-    "ignore": [
-        "Dewdrop",
-        "bin",
-        "db",
-        "docs",
-        "tests",
-        "composer.json",
-        "composer.lock"
-    ],
-    "dependencies": {
-        "jquery":         "1.*",
-        "jquery-ui":      "1.*",
-        "backbone":       "1.1.*",
-        "keymaster":      "1.6.*",
-        "moment":         "2.*",
-        "bootstrap":      "3.*",
-        "velocity":       "0.1.*",
-        "requirejs":      "2.*",
-        "requirejs-text": "2.*",
-        "summernote":     ">=0.6.5",
-        "timepicker":     "1.4.*"
-    }
+  "name": "dewdrop",
+  "version": "1.14.9",
+  "main": [
+    "www/css",
+    "www/js",
+    "www/images",
+    "www/fonts"
+  ],
+  "ignore": [
+    "Dewdrop",
+    "bin",
+    "db",
+    "docs",
+    "tests",
+    "composer.json",
+    "composer.lock"
+  ],
+  "dependencies": {
+    "backbone": "1.1.*",
+    "bootstrap": "3.*",
+    "jquery": "1.*",
+    "jquery-ui": "1.*",
+    "keymaster": "1.6.*",
+    "moment": "2.*",
+    "requirejs": "2.*",
+    "requirejs-text": "2.*",
+    "summernote": ">=0.6.5",
+    "timepicker": "1.4.*",
+    "velocity": "0.1.*",
+    "datatables.net": "^2.1.1",
+    "datatables.net-bs": "^2.1.1"
+  }
 }

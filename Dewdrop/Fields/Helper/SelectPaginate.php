@@ -14,11 +14,13 @@ use Dewdrop\Db\Select;
 use Dewdrop\Exception;
 use Dewdrop\Fields\FieldInterface;
 use Dewdrop\Fields;
+use Dewdrop\Pimple;
 use Dewdrop\Request;
+use Dewdrop\Fields\Listing\HandlerAbstract;
 
 /**
  * This helper paginates a Select object so that a single page of a listing
- * can be retrieved at a time.  Yuo can adjust the number of records to
+ * can be retrieved at a time. You can adjust the number of records to
  * return per page.
  */
 class SelectPaginate extends HelperAbstract implements SelectModifierInterface
@@ -47,11 +49,16 @@ class SelectPaginate extends HelperAbstract implements SelectModifierInterface
     private $page;
 
     /**
+     * Default page size.
+     */
+    const DEFAULT_PAGE_SIZE = 50;
+
+    /**
      * The number of records to show per page.
      *
      * @var int
      */
-    private $pageSize = 50;
+    private $pageSize;
 
     /**
      * A Request object we can use to look up the current page.
@@ -59,6 +66,11 @@ class SelectPaginate extends HelperAbstract implements SelectModifierInterface
      * @var \Dewdrop\Request
      */
     private $request;
+
+    /**
+     * @var HandlerAbstract
+     */
+    private $listingHandler;
 
     /**
      * A param prefix that can be used if you have multiple paginated listings
@@ -73,10 +85,12 @@ class SelectPaginate extends HelperAbstract implements SelectModifierInterface
      * is selected.
      *
      * @param Request $request
+     * @param HandlerAbstract $listingHandler
      */
-    public function __construct(Request $request)
+    public function __construct(Request $request, HandlerAbstract $listingHandler = null)
     {
-        $this->request = $request;
+        $this->request        = $request;
+        $this->listingHandler = ($listingHandler ?: Pimple::getResource('listing-handler'));
     }
 
     /**
@@ -156,6 +170,8 @@ class SelectPaginate extends HelperAbstract implements SelectModifierInterface
      */
     public function getPage()
     {
+        $this->page = $this->listingHandler->getPageFromRequest($this->getPrefix(), $this->getPageSize());
+
         return $this->page;
     }
 
@@ -179,6 +195,11 @@ class SelectPaginate extends HelperAbstract implements SelectModifierInterface
      */
     public function getPageSize()
     {
+        if (!$this->pageSize) {
+            // @todo DataTables provides this as 'length'
+            $this->pageSize = $this->request->getQuery('page-size', $this::DEFAULT_PAGE_SIZE);
+        }
+
         return $this->pageSize;
     }
 
@@ -203,8 +224,6 @@ class SelectPaginate extends HelperAbstract implements SelectModifierInterface
 
         $driver = $select->getAdapter()->getDriver();
 
-        $this->page = (int) $this->request->getQuery($this->prefix . 'listing-page', 1);
-
         $driver->prepareSelectForTotalRowCalculation($select);
 
         if (!$this->enabled) {
@@ -213,7 +232,7 @@ class SelectPaginate extends HelperAbstract implements SelectModifierInterface
 
         return $select->limit(
             $this->getPageSize(),
-            $this->getPageSize() * ($this->page - 1)
+            $this->getPageSize() * ($this->getPage() - 1)
         );
     }
 }
