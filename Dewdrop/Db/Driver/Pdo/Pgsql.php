@@ -605,6 +605,9 @@ class Pgsql implements DriverInterface
             case 'json':
                 $genericType = 'clob';
                 break;
+            case 'jsonb':
+                $genericType = 'clob';
+                break;
             case 'date':
                 $genericType = 'date';
                 break;
