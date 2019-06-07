@@ -217,6 +217,18 @@ class View
     }
 
     /**
+     * Get all the internal view data.  Can sometimes be useful if you want to pass
+     * all the data from a view to a partial rather than having to manually re-assign
+     * all the different view data and keep those two sets of data in sync in your code.
+     *
+     * @return array
+     */
+    public function getData()
+    {
+        return $this->internalViewData;
+    }
+
+    /**
      * Assign variables to this view's data.
      *
      * If the $name parameter is an array rather than a string, assign() will
@@ -464,6 +476,25 @@ class View
         ob_start();
 
         require $this->scriptPath . '/' . basename($template);
+
+        return ob_get_clean();
+    }
+
+    /**
+     * Render the provided template file.
+     *
+     * This method returns the output as a string so that you
+     * have the opportunity to filter or otherwise handle it prior to actually
+     * adding it to the response.
+     *
+     * @param string $template Full path of file
+     * @return string
+     */
+    public function renderFullPathTemplate($template)
+    {
+        ob_start();
+
+        require realpath($template);
 
         return ob_get_clean();
     }
