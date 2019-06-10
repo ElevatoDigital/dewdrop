@@ -50,7 +50,7 @@ class PaginationTest extends BaseTestCase
         $result = $this->queryDom('ul/li[7]/a', $out);
         $this->assertEquals('19', $result->current()->textContent);
 
-        $result = $this->queryDom('ul/li[8]/a', $out);
+        $result = $this->queryDom('ul/li[8][class="disabled"]/span', $out);
         $this->assertEquals('20', $result->current()->textContent);
 
         $result = $this->queryDom('ul/li[9]/a', $out);
@@ -76,8 +76,13 @@ class PaginationTest extends BaseTestCase
         $out = $this->view->pagination(1000, 10, 98);
 
         $index = 5;
-        for ($i=90; $i <= 100; $i++, $index++) {
-            $result = $this->queryDom("ul/li[{$index}]/a", $out);
+        for ($i = 90; $i <= 100; $i++, $index++) {
+            if ($i !== 98) {
+                $selector = "ul/li[{$index}]/a";
+            } else {
+                $selector = "ul/li[{$index}][class=\"disabled\"]/span";
+            }
+            $result   = $this->queryDom($selector, $out);
             $this->assertEquals($i, $result->current()->textContent);
         }
     }

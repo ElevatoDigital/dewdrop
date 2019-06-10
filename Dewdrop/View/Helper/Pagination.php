@@ -38,8 +38,10 @@ class Pagination extends AbstractHelper
             $out .= "<div class=\"page-current-of-all\">Page {$page} of {$pageCount}</div>" .
                 '<ul class="pagination">';
 
-            $out .= '<li' . ($page > 1 ? '' : ' class="disabled"') . '><a href="' . $this->url($page - 1) .
-                '">&laquo; Previous</a></li>';
+            $out .= '<li' . ($page > 1 ? '' : ' class="disabled"') . '>' .
+                ($page > 1 ? '<a href="' . $this->url($page - 1) . '">&laquo; Previous</a>' :
+                    '<span>&laquo; Previous</span>') .
+                '</li>';
 
             $j = 0;
             for ($i = 1; $i <= $pageCount; $i++) {
@@ -65,18 +67,21 @@ class Pagination extends AbstractHelper
 
                     if ($j + 1 !== $i) {
                         // ellipses
-                        $out .= '<li class="disabled"><a href="#">...</a></li>';
+                        $out .= '<li class="disabled"><span>...</span></li>';
                     }
 
-                    $out .= '<li' . ($i === $page ? ' class="disabled"' : '' ) . '><a href="' . $this->url($i) .
-                        "\">{$i}</a></li>";
+                    $out .= '<li' . ($i === $page ? ' class="disabled"' : '' ) . '>' .
+                        ($i === $page ? "<span>{$i}</span>" : '<a href="' . $this->url($i) . "\">{$i}</a>") .
+                        '</li>';
 
                     $j = $i;
                 }
             }
 
-            $out .= '<li' . ($page < $pageCount ? '' : ' class="disabled"') . '><a href="' . $this->url($page + 1) .
-                '">Next &raquo;</a></li>';
+            $out .= '<li' . ($page < $pageCount ? '' : ' class="disabled"') . '>' .
+                ($page < $pageCount ? '<a href="' . $this->url($page + 1) . '">Next &raquo;</a>' :
+                    '<span>Next &raquo;</span>') .
+                '</li>';
 
             $out .= '</ul>';
         }

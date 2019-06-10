@@ -203,7 +203,7 @@ class SelectPaginate extends HelperAbstract implements SelectModifierInterface
 
         $driver = $select->getAdapter()->getDriver();
 
-        $this->page = (int) $this->request->getQuery($this->prefix . 'listing-page', 1);
+        $this->page = max(1, (int) $this->request->getQuery($this->prefix . 'listing-page', 1));
 
         $driver->prepareSelectForTotalRowCalculation($select);
 
