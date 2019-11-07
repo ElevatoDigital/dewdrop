@@ -151,6 +151,7 @@ class View
         'detectedithelper'           => '\Dewdrop\View\Helper\DetectEditHelper',
         'editform'                   => '\Dewdrop\View\Helper\EditForm',
         'editcontrolrenderer'        => '\Dewdrop\View\Helper\EditControlRenderer',
+        'filesize'                   => '\Dewdrop\View\Helper\FileSize',
         'headlink'                   => '\Zend\View\Helper\HeadLink',
         'headmeta'                   => '\Zend\View\Helper\HeadMeta',
         'headscript'                 => '\Zend\View\Helper\HeadScript',
