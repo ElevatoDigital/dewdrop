@@ -24,47 +24,47 @@ class EntryReader implements IteratorAggregate, Countable
     /**
      * @var DbGateway
      */
-    private $dbGateway;
+    protected $dbGateway;
 
     /**
      * @var HandlerResolver
      */
-    private $handlerResolver;
+    protected $handlerResolver;
 
     /**
      * @var array
      */
-    private $handlers = [];
+    protected $handlers = [];
 
     /**
      * @var array
      */
-    private $entities = [];
+    protected $entities = [];
 
     /**
      * @var int
      */
-    private $limit = null;
+    protected $limit = null;
 
     /**
      * @var int
      */
-    private $offset = null;
+    protected $offset = null;
 
     /**
      * @var string
      */
-    private $order = 'desc';
+    protected $order = 'desc';
 
     /**
      * @var array
      */
-    private $entries = null;
+    protected $entries = null;
 
     /**
      * @var int
      */
-    private $totalCount = 0;
+    protected $totalCount = 0;
 
     public function __construct(DbGateway $dbGateway, HandlerResolver $handlerResolver)
     {
@@ -176,7 +176,7 @@ class EntryReader implements IteratorAggregate, Countable
         return $this->totalCount;
     }
 
-    private function fetchEntries()
+    protected function fetchEntries()
     {
         if (!is_array($this->entries)) {
             $select = $this->select();

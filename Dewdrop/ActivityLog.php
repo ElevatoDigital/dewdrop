@@ -12,7 +12,6 @@ namespace Dewdrop;
 
 use Dewdrop\ActivityLog\DbGateway;
 use Dewdrop\ActivityLog\Entry\EntryReader;
-use Dewdrop\ActivityLog\Exception\InvalidShortcode as InvalidShortcodeException;
 use Dewdrop\ActivityLog\Handler\HandlerInterface;
 use Dewdrop\ActivityLog\HandlerResolver;
 use Dewdrop\ActivityLog\UserInformation;
@@ -23,27 +22,27 @@ class ActivityLog
     /**
      * @var DbGateway
      */
-    private $dbGateway;
+    protected $dbGateway;
 
     /**
      * @var HandlerResolver
      */
-    private $handlerResolver;
+    protected $handlerResolver;
 
     /**
      * @var UserInformation
      */
-    private $userInformation;
+    protected $userInformation;
 
     /**
      * @var ShortcodeParser
      */
-    private $shortcodeParser;
+    protected $shortcodeParser;
 
     /**
      * @var int
      */
-    private $lastInsertId;
+    protected $lastInsertId;
 
     /**
      * ActivityLog constructor.
