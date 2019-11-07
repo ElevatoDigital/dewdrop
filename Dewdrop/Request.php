@@ -106,7 +106,7 @@ class Request
      */
     public function getUrl()
     {
-        $url = preg_replace('/\?.+$/', '', $_SERVER['REQUEST_URI']);
+        $url = preg_replace('/\?.*$/', '', $_SERVER['REQUEST_URI']);
 
         if (0 < count($this->query)) {
             $url .= '?';
