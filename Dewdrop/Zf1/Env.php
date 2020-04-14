@@ -61,6 +61,12 @@ class Env implements EnvInterface
             $bootstrap = Front::getInstance()->getParam('bootstrap');
             $zfConfig  = $bootstrap->getOptions();
 
+            if(isset($zfConfig['debug'])){
+                $debug = (bool)$zfConfig['debug'];
+            }else{
+                $debug = false;
+            }
+
             $this->dewdropOptions = new DewdropOptions($zfConfig);
 
             $config = [
