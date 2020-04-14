@@ -27,7 +27,7 @@ class Env implements EnvInterface
 
     public function isInUse()
     {
-        return class_exists('\Silex\Application');
+        return class_exists('\Silex\Application', false);
     }
 
     public function getConfigData($file = null)

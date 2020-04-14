@@ -44,7 +44,7 @@ class Env implements EnvInterface
      */
     public function isInUse()
     {
-        return Front::hasInstance() || ('cli' === php_sapi_name() && class_exists('Zend_Controller_Front'));
+        return Front::hasInstance() || ('cli' === php_sapi_name() && class_exists('Zend_Controller_Front', false));
     }
 
     /**
