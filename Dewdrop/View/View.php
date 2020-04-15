@@ -21,6 +21,7 @@ use Dewdrop\Fields\Helper\TableCell;
 use Dewdrop\Fields\Listing\BulkActions;
 use Dewdrop\View\Helper;
 use Dewdrop\View\Helper\BulkActionCheckboxField;
+use Zend\View\Renderer\PhpRenderer;
 
 /**
  * A simple view implementation that allows for simple assignment of data,
@@ -359,6 +360,13 @@ class View
     public function __call($method, $args)
     {
         $helper = $this->helper($method);
+
+        // patch for ZF2 Zend/View support
+        if(method_exists($helper,'setView')){
+            // note: should probably be a singleton..?
+            $renderer = new PhpRenderer();
+            $helper->setView($renderer);
+        }
 
         if (method_exists($helper, 'direct')) {
             return call_user_func_array(array($helper, 'direct'), $args);
