@@ -63,7 +63,6 @@ class Env implements EnvInterface
 
     public function initializeCli()
     {
-
     }
 
     public function initializePimple(Pimple $pimple)

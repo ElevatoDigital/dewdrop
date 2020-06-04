@@ -163,7 +163,7 @@ class ManyToManyMessage
     {
         if (1 === count($shortcodes)) {
             return current($shortcodes);
-        } else if (2 === count($shortcodes)) {
+        } elseif (2 === count($shortcodes)) {
             return implode(' and ', $shortcodes);
         } else {
             $lastItem = array_pop($shortcodes);

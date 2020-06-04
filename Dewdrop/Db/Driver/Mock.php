@@ -245,7 +245,6 @@ class Mock implements DriverInterface
      */
     public function beginTransaction()
     {
-
     }
 
     /**
@@ -253,7 +252,6 @@ class Mock implements DriverInterface
      */
     public function commit()
     {
-
     }
 
     /**
@@ -263,7 +261,6 @@ class Mock implements DriverInterface
      */
     public function rollback()
     {
-
     }
 
     /**
@@ -300,7 +297,6 @@ class Mock implements DriverInterface
      */
     public function prepareSelectForTotalRowCalculation(Select $select)
     {
-
     }
 
     /**
@@ -338,7 +334,6 @@ class Mock implements DriverInterface
      */
     public function truncateTimeStampToDate($timestamp)
     {
-
     }
 
     /**

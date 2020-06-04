@@ -141,7 +141,6 @@ abstract class ComponentAbstract implements ComponentInterface, ShellIntegration
      */
     public function preDispatch()
     {
-
     }
 
     /**
@@ -352,7 +351,6 @@ abstract class ComponentAbstract implements ComponentInterface, ShellIntegration
     {
         if (!$this->name) {
             $this->name = $this->env->inflectComponentName(basename($this->getPath()));
-
         }
 
         return $this->name;

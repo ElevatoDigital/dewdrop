@@ -215,7 +215,6 @@ class View
      */
     public function init()
     {
-
     }
 
     /**

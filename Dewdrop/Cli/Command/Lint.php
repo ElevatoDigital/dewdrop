@@ -51,6 +51,5 @@ class Lint extends CommandAbstract
      */
     public function execute()
     {
-
     }
 }

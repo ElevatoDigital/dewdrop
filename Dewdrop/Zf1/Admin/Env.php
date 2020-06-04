@@ -68,5 +68,4 @@ class Env extends EnvAbstract
         $redirector = $this->actionController->getHelper('Redirector');
         $redirector->gotoUrlAndExit($url);
     }
-
 }

@@ -68,5 +68,4 @@ class Access implements SessionAccessInterface
             $this->session->regenerate_id();
         }
     }
-
 }

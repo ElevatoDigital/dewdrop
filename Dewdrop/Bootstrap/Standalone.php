@@ -33,7 +33,6 @@ class Standalone implements PimpleProviderInterface
 
     public function init()
     {
-
     }
 
     /**

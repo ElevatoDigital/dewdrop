@@ -72,7 +72,7 @@ interface FieldInterface
 
     /**
      * Get the name used to represent this field in result sets.
-     * 
+     *
      * @return string
      */
     public function getName();

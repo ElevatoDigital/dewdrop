@@ -614,7 +614,7 @@ class Wpdb implements DriverInterface
      */
     public function quoteInternal($input)
     {
-        return "'" . $this->wpdb->escape($input) . "'";
+        return "'" . esc_sql($input) . "'";
     }
 
     /**

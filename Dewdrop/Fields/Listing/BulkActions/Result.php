@@ -54,7 +54,6 @@ class Result
 
         $this->result  = $result;
         $this->message = $message;
-
     }
 
     /**

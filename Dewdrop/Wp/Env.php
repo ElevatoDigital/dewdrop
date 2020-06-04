@@ -74,7 +74,6 @@ class Env implements EnvInterface
 
     public function initializePimple(Pimple $pimple)
     {
-
     }
 
     public function providePimpleSessionResource(Pimple $pimple)

@@ -243,7 +243,6 @@ class RowEditor implements SaveHandlerInterface
                     $modelName,
                     $link->link($this->getModel($modelName))
                 );
-
             }
         }
 

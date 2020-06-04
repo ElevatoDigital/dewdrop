@@ -162,4 +162,3 @@ class Files implements PageFactoryInterface
         return $pages;
     }
 }
-

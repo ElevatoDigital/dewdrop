@@ -250,7 +250,7 @@ class Table extends AbstractHelper
     {
         if (!$sorter) {
             return ('asc' === $this->view->getRequest()->getQuery('dir') ? 'asc' : 'desc');
-        } else if ($sorter->isSorted() && $sorter->getSortedField()->getQueryStringId() === $fieldId) {
+        } elseif ($sorter->isSorted() && $sorter->getSortedField()->getQueryStringId() === $fieldId) {
             return strtolower($sorter->getSortedDirection());
         }
 

@@ -297,7 +297,7 @@ interface DriverInterface
 
     /**
      * Generate an SQL statement to analyze a table.
-     * 
+     *
      * @param string $tableName
      * @return string
      */

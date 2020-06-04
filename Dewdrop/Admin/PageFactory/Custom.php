@@ -8,7 +8,6 @@
  * @license   https://github.com/DeltaSystems/dewdrop/LICENSE
  */
 
-namespace Dewdrop\Admin\Component\ComponentAbstract;
 namespace Dewdrop\Admin\PageFactory;
 
 use Dewdrop\Admin\Component\ComponentAbstract;

@@ -41,7 +41,6 @@ class Pimple
      */
     private function __clone()
     {
-
     }
 
     /**
