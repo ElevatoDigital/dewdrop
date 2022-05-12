@@ -450,6 +450,7 @@ class Wpdb implements DriverInterface
     {
         switch ($nativeType) {
             case 'tinyint':
+            case 'tinyint unsigned':
                 $type = 'integer';
 
                 if (4 >= $length) {
@@ -457,10 +458,15 @@ class Wpdb implements DriverInterface
                 }
                 break;
             case 'smallint':
+            case 'smallint unsigned':
             case 'mediumint':
+            case 'mediumint unsigned':
             case 'int':
+            case 'int unsigned':
             case 'bigint':
+            case 'bigint unsigned':
             case 'integer':
+            case 'integer unsigned':
                 $type = 'integer';
                 break;
             case 'tinytext':
