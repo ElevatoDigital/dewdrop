@@ -16,7 +16,7 @@
         "jdorn/sql-formatter": "1.2.*",
         "monolog/monolog": "^1.4.1",
         "phpoffice/phpexcel": "1.8.*",
-        "pimple/pimple": "1.*",
+        "pimple/pimple": "*",
         "psy/psysh": "0.6.*",
         "swiftmailer/swiftmailer": "@stable",
         "symfony/security": "^4",
