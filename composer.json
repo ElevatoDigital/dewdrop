@@ -19,7 +19,7 @@
         "pimple/pimple": "1.*",
         "psy/psysh": "0.6.*",
         "swiftmailer/swiftmailer": "@stable",
-        "symfony/security": "~2.3",
+        "symfony/security": "^4",
         "thunderer/shortcode": "^0.5",
         "zendframework/zend-console": "~2.4.0",
         "zendframework/zend-dom": "~2.4.0",
